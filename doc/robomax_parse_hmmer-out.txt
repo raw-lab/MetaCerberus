@@ -1,0 +1,11 @@
+hmmsearch --domtblout XXX.faa.FOAM.out FOAM-hmm_rel1a.hmm XXX.faa
+sort XXX.faa.FOAM.out > XXX.faa.FOAM.out.sort
+python bmn-HMMerBestHit.py XXX.faa.FOAM.out.sort > XXX.faa.FOAM.out.sort.BH
+awk '{print $4}' XXX.faa.FOAM.out.sort.BH > XXX.faa.FOAM.out.sort.BH.tmp1
+python bmn-CountEachElement.py XXX.faa.FOAM.out.sort.BH.tmp1 > XXX.faa.FOAM.out.sort.BH.tmp2
+python bmn-KOoneCount.py XXX.faa.FOAM.out.sort.BH.tmp2 | sed s/KO://g | sort -k 1 > XXX.faa.FOAM.out.sort.BH.KO
+
+https://github.com/alunem/bioman
+bmn-KOoneCount.py
+bmn-CountEachElement.py
+bmn-HMMerBestHit.py
