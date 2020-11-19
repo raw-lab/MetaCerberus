@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="RoboMax",
     version="0.8",
-    author="Alexander Brown, Richard White",
-    author_email="raw937@gmail.com",
+    author="Richard White III",
+    author_email="rwhit101@uncc.edu",
     description="python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
     long_description=long_description,
     url="https://github.com/raw937/robomax",
