@@ -74,6 +74,21 @@ def install_dependencies():
     hmmer_cmd = "conda install -c bioconda hmmer"
     subprocess.call(hmmer_cmd, shell=True)
 
+    numpy_cmd = "conda install numpy"
+    subprocess.call(numpy_cmd, shell=True)
+
+    plotly_cmd = "conda install plotly"
+    subprocess.call(plotly_cmd, shell=True)
+
+    pandas_cmd = "conda install pandas"
+    subprocess.call(pandas_cmd, shell=True)
+
+    dash_cmd = "conda install dash"
+    subprocess.call(dash_cmd, shell=True)
+
+    openpyxl_cmd = "conda install openpyxl"
+    subprocess.call(openpyxl_cmd, shell=True)
+
 if __name__ == "__install_dependencies__":
     install_dependencies()
 
@@ -82,11 +97,11 @@ install_dependencies()
 
 def wrapper_download():
 
-    git_URL = 'https://github.com/raw937/robomax.git'
+    git_URL = 'https://github.com/raw-lab/robomax.git'
     os.mkdir(path3, access_rights)
     os.chdir(path3)
     git.Repo.clone_from(git_URL, path3, branch='master')
-    shutil.move(os.path.join(path_to_wrapper, 'Robomax_Wrapper_v8.py'), path)
+    shutil.move(os.path.join(path_to_wrapper, 'Robomax_Wrapper_v9.py'), path)
     shutil.rmtree(path3)
 
 if __name__ == "__wrapper_download__":
