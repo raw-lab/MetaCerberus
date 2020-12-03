@@ -89,6 +89,9 @@ def install_dependencies():
     openpyxl_cmd = "conda install openpyxl"
     subprocess.call(openpyxl_cmd, shell=True)
 
+    webbrowser_cmd = "conda install webbrowser"
+    subprocess.call(webbrowser_cmd, shell=True)
+
 if __name__ == "__install_dependencies__":
     install_dependencies()
 
