@@ -252,7 +252,7 @@ def visual(path,file_name):
     KO4=KO[KO['Layer']==4].sort_values(by=['Count'],ascending=False).head(10)
     FT=pd.concat([FT1,FT2,FT3,FT4])
     KO=pd.concat([KO1,KO2,KO3,KO4])
-    f_path=os.path.join(path + os.sep, f_name+'_output.xlsx')
+    f_path=os.path.join(path + os.sep,f_name+'_output.xlsx')
     csv_path=os.path.join(path + os.sep, f_name+'_output')
     table.to_excel (f_path, index = False, header=True)
     table.to_csv (csv_path, index = False, header=True)
@@ -351,16 +351,19 @@ def roll_up(KO_ID_dict, rollup_file):
         outfile.write(outline + "\n")
     return rollup_file
 
-def faa_processing(faa_path):
+def faa_processing(faa_path,path,f_name):
+    output_path=path+os.sep+f_name+"_output"
+    os.makedirs(output_path)
+    output_path=os.path.join(output_path + os.sep, f_name)
     script_dir = os.path.dirname(os.path.realpath(__file__))
     hmm_file = os.path.join(script_dir, "osf_Files/FOAM-hmm_rel1a.hmm.gz")
-    hmm_cmd = "hmmsearch --domtblout %s.FOAM.out %s %s" %(faa_path, hmm_file, faa_path)
+    hmm_cmd = "hmmsearch --domtblout %s.FOAM.out %s %s" %(output_path, hmm_file, faa_path)
     subprocess.call(hmm_cmd, shell=True)
 
     BH_dict = {}
     BS_dict = {}
     minscore = 25
-    reader = open(faa_path + ".FOAM.out", "r").readlines()
+    reader = open(output_path + ".FOAM.out", "r").readlines()
     for line in reader:
         if line[0] == "#": continue
         line = line.split()
@@ -386,31 +389,34 @@ def faa_processing(faa_path):
                 KO_ID_dict[KO_ID] += 1
             except KeyError:
                 KO_ID_dict[KO_ID] = 1
-
-    rollup_file = "%s.FOAM.out.sort.BH.KO.rollup" %(faa_path)
+    
+    rollup_file = "%s.FOAM.out.sort.BH.KO.rollup" %(output_path)
     return roll_up(KO_ID_dict, rollup_file)
 
 def main(path, file):
     f_name, f_ext = os.path.splitext(file)
-
+    f_name=f_name.split('.')[0]
     fq_list = [".fq", ".fastq"]
     fna_list = [".fa",".fna", ".fasta", ".ffn"]
+    output_path=path+os.sep+f_name+"_output"
     if f_ext in fq_list:
         fq_path = os.path.join(path + os.sep, file)
         fna_path = fq_processing(fq_path, path, f_name)
         faa_path = fna_processing(fna_path, path, f_name)
-        rollup_file=faa_processing(faa_path)
-        visual(path,rollup_file)
+        rollup_file=faa_processing(faa_path,path,f_name)
+        visual(output_path,rollup_file)
     elif f_ext in fna_list:
         fna_path = os.path.join(path + os.sep, file)
         faa_path = fna_processing(fna_path, path, f_name)
-        rollup_file=faa_processing(faa_path)
-        visual(path,rollup_file)
+        rollup_file=faa_processing(faa_path,path,f_name)
+        visual(output_path,rollup_file)
     elif f_ext == ".faa":
         faa_path = os.path.join(path + os.sep, file)
-        rollup_file=faa_processing(faa_path)
-        visual(path,rollup_file)
+        rollup_file=faa_processing(faa_path,path,f_name)
+        visual(output_path,rollup_file)
     elif f_ext == ".rollup":
+        # os.makedirs(path+os.sep+file)
+        # print(path)
         visual(path,os.path.join(path + os.sep, file))
         # visual(file)
     else:

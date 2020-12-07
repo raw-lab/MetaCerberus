@@ -89,9 +89,6 @@ def install_dependencies():
     openpyxl_cmd = "conda install openpyxl"
     subprocess.call(openpyxl_cmd, shell=True)
 
-    webbrowser_cmd = "conda install webbrowser"
-    subprocess.call(webbrowser_cmd, shell=True)
-
 if __name__ == "__install_dependencies__":
     install_dependencies()
 
@@ -104,7 +101,7 @@ def wrapper_download():
     os.mkdir(path3, access_rights)
     os.chdir(path3)
     git.Repo.clone_from(git_URL, path3, branch='master')
-    shutil.move(os.path.join(path_to_wrapper, 'Robomax_Wrapper_v9.py'), path)
+    shutil.move(os.path.join(path_to_wrapper, 'Robomax_Wrapper_v8.py'), path)
     shutil.rmtree(path3)
 
 if __name__ == "__wrapper_download__":
