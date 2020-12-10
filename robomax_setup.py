@@ -4,7 +4,7 @@ import subprocess
 import sys
 import os
 import getpass
-import git
+
 import shutil
 import tempfile
 from os.path import isfile, join
@@ -88,16 +88,19 @@ def install_dependencies():
 
     openpyxl_cmd = "conda install openpyxl"
     subprocess.call(openpyxl_cmd, shell=True)
+    
+    git_cmd = "pip install GitPython"
+    subprocess.call(git_cmd, shell=True)
 
 if __name__ == "__install_dependencies__":
     install_dependencies()
 
 install_dependencies()
 #############################get current wrapper from github###################################
-
+import git
 def wrapper_download():
 
-    git_URL = 'https://github.com/raw-lab/robomax.git'
+    git_URL = 'https://github.com/aoukthrilok/robomax.git'
     os.mkdir(path3, access_rights)
     os.chdir(path3)
     git.Repo.clone_from(git_URL, path3, branch='master')
