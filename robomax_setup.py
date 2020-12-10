@@ -100,7 +100,7 @@ install_dependencies()
 import git
 def wrapper_download():
 
-    git_URL = 'https://github.com/aoukthrilok/robomax.git'
+    git_URL = 'https://github.com/raw-lab/robomax.git'
     os.mkdir(path3, access_rights)
     os.chdir(path3)
     git.Repo.clone_from(git_URL, path3, branch='master')
