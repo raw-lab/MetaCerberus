@@ -57,8 +57,8 @@ visualisation outputs based on output file
 - We are Using Dash and Plotly for visualise the data
 - Once the program is executed the visuals will be displayed on screen.
 - If you want to open those visuals again,Give `rollup file path` (which created in output folder) followed by '-i' while running the Wrapper File.
-```bash
-python Robomax_Wrapper_v9.py -i <rollup file path>
+```
+python robomax.py -i <rollup file path>
 ```
 
 
@@ -68,7 +68,8 @@ Citing RoboMax
 
 CONTACT
 -------
-The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw937).<br />
+The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw-lab).<br />
 If you have any questions or feedback, please feel free to get in touch by email. 
-Dr. Richard Allen White III - raw937@gmail.com.  <br />
-Or [open an issue](https://github.com/raw937/robomax/issues).
+Dr. Richard Allen White III - rwhit101@uncc.edu or raw937@gmail.com.  <br />
+Thrilok Kumar Reddy Aouk - taouk@uncc.edu.  <br />
+Or [open an issue](https://github.com/raw-lab/robomax/issues).
