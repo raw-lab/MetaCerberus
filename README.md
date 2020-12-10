@@ -67,7 +67,7 @@ Citing RoboMax
 CONTACT
 -------
 The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw-lab).<br />
-If you have any questions or feedback, please feel free to get in touch by email. .<br />
+If you have any questions or feedback, please feel free to get in touch by email.<br />
 Dr. Richard Allen White III - rwhit101@uncc.edu or raw937@gmail.com.  <br />
 Thrilok Kumar Reddy Aouk - taouk@uncc.edu.  <br />
 Or [open an issue](https://github.com/raw-lab/robomax/issues).
