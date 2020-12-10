@@ -43,9 +43,7 @@ Running code by passing data file
 -----
 - Go to the desktop folder ->Robomax
 - Give `input file path` followed by '-i' while running the Wrapper File.
-```bash
-python Robomax_Wrapper_v9.py -i <input file path>
-```
+```python robomax.py -i <input file path>```
 
 Output Files
 -----
