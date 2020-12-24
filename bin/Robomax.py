@@ -298,13 +298,14 @@ def fq_processing(fq_path, path, f_name):
         fna_path.write(seq + "\n")
     return fna_path
 
-def fna_processing(fna_path, path, f_name):
-    prokka_outdir = path + "/prokka_results/"
+def fna_processing(fna_path, path, f_name,file):
+    name="/prokka_results_"+file
+    prokka_outdir = path + name+"/"
     prokka_cmd = "prokka %s --outdir %s --prefix %s" %(fna_path, prokka_outdir, f_name)
     subprocess.call(prokka_cmd, shell=True)
 
     faa_path = prokka_outdir + f_name + ".faa"
-    return faa_path
+    return faa_path,path+name
 
 def roll_up(KO_ID_dict, rollup_file):
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -402,12 +403,14 @@ def main(path, file):
     if f_ext in fq_list:
         fq_path = os.path.join(path + os.sep, file)
         fna_path = fq_processing(fq_path, path, f_name)
-        faa_path = fna_processing(fna_path, path, f_name)
+        faa_path,path = fna_processing(fna_path, path, f_name,file)
+        output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
         visual(output_path,rollup_file)
     elif f_ext in fna_list:
         fna_path = os.path.join(path + os.sep, file)
-        faa_path = fna_processing(fna_path, path, f_name)
+        faa_path,path = fna_processing(fna_path, path, f_name,file)
+        output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
         visual(output_path,rollup_file)
     elif f_ext == ".faa":
