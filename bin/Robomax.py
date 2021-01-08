@@ -188,8 +188,6 @@ def output_visual(path,f_name,FT,KO,FT_main,KO_main,table):
         [Input(component_id='slct_Name', component_property='value'),Input(component_id='slct_Layer', component_property='value')]
     )
     def update_graph(x,y):
-        print(x,'sdfsdds')
-        print(y)
 
         container = "The year chosen by user was: {} {}".format(x,y)
         if x=='Foam':
@@ -260,8 +258,13 @@ def visual(path,file_name):
 
 
 def get_args():
+    version="1.0"
     parser = argparse.ArgumentParser(description='RoboMax is used for versatile functional ontology assignments for metagenomes via HMM searching with environmental focus of shotgun meta-omics data')
     parser.add_argument('-i', type=str, required=True, help='path to file or directory \n <accepted formats {.faa,.fna,.ffn,.rollup} , for visualisation : {.rollup }>')
+    parser.add_argument('--version','-v', action='version',
+                        version='Robomax: \n version: {} December 24th 2020'.format(version),
+                        help='show the version number and exit')
+    
     args = parser.parse_args()
 
     return parser, args
@@ -283,27 +286,37 @@ def get_file_list(args):
             file_list = [f for f in os.listdir(in_file_path) if isfile(join(in_file_path, f))]
     return path, file_list
 
-def fq_processing(fq_path, path, f_name):
-    fna_name = path + f_name + ".fna"
-    fna_path = open(fna_name, "w")
-    reader = csv.reader(open(fq_path, "r"), delimiter="\t")
-    for line in reader:
-        if line[0][0] != "@": continue
-        label = line[0]
-        try:
-            seq = next(reader)[0]
-        except IndexError:
-            continue
-        fna_path.write(label + "\n")
-        fna_path.write(seq + "\n")
-    return fna_path
+# def fq_processing(fq_path, path, f_name):
+#     fna_name = path + f_name + ".fna"
+#     fna_path = open(fna_name, "w")
+#     reader = csv.reader(open(fq_path, "r"), delimiter="\t")
+#     for line in reader:
+#         if line[0][0] != "@": continue
+#         label = line[0]
+#         try:
+#             seq = next(reader)[0]
+#         except IndexError:
+#             continue
+#         fna_path.write(label + "\n")
+#         fna_path.write(seq + "\n")
+#     return fna_path
+
+def fastq_processing(fq_path, path, f_name,file):
+    trim_path=path+f_name+"_trim.fastq"
+    cmd1="fastp -i "+fq_path+" -o " + trim_path
+    # cmd2="fastqc "+trim_path
+    trim_fna=path+f_name+"_trim.fna"
+    cmd3="sed -n '1~4s/^@/>/p;2~4p' "+trim_path+"  > "+trim_fna
+    subprocess.call(cmd1,shell=True)
+    # subprocess.call(cmd2,shell=True)
+    subprocess.call(cmd3,shell=True)
+    return trim_fna
 
 def fna_processing(fna_path, path, f_name,file):
     name="/prokka_results_"+file
     prokka_outdir = path + name+"/"
-    prokka_cmd = "prokka %s --outdir %s --prefix %s" %(fna_path, prokka_outdir, f_name)
+    prokka_cmd = "prokka %s --outdir %s --prefix %s --centre clean --compliant --metagenome" %(fna_path, prokka_outdir, f_name)
     subprocess.call(prokka_cmd, shell=True)
-
     faa_path = prokka_outdir + f_name + ".faa"
     return faa_path,path+name
 
@@ -397,12 +410,12 @@ def faa_processing(faa_path,path,f_name):
 def main(path, file):
     f_name, f_ext = os.path.splitext(file)
     f_name=f_name.split('.')[0]
-    fq_list = [".fq", ".fastq"]
-    fna_list = [".fa",".fna", ".fasta", ".ffn"]
+    fq_list = [".fq",".fastq"]
+    fna_list = [".fa",".fna" ,".fasta",".ffn"]
     output_path=path+os.sep+f_name+"_output"
     if f_ext in fq_list:
         fq_path = os.path.join(path + os.sep, file)
-        fna_path = fq_processing(fq_path, path, f_name)
+        fna_path = fastq_processing(fq_path, path, f_name,file)
         faa_path,path = fna_processing(fna_path, path, f_name,file)
         output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
@@ -413,7 +426,7 @@ def main(path, file):
         output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
         visual(output_path,rollup_file)
-    elif f_ext == ".faa":
+    elif f_ext in  [".faa"]:
         faa_path = os.path.join(path + os.sep, file)
         rollup_file=faa_processing(faa_path,path,f_name)
         visual(output_path,rollup_file)
@@ -429,5 +442,6 @@ if __name__ == "__main__":
     parser, args = get_args()
     path, file_list = get_file_list(args)
     print(parser,args)
+    # return
     for f in file_list:
         main(path, f)
