@@ -15,12 +15,18 @@ import dash  # (version 1.12.0) pip install dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import argparse
+import argparse 
 from plotly.offline import plot
 import webbrowser
 from threading import Timer
 app = dash.Dash(__name__)
-def preprocess_data(df):
+def preprocess_data(path,file_name):
+    file=file_name.split('/')[-1]
+    f_name, f_ext = os.path.splitext(file)
+
+    reader = csv.reader(open(file_name, "r"), delimiter="\t")
+    df=pd.DataFrame(reader)
+    df.columns=['Id','Count','Foam','KO']
     dict1={}
     dict2={}
     for i in range(len(df['Foam'])):
@@ -57,7 +63,48 @@ def preprocess_data(df):
     table.drop(table[table['Name']==''].index,inplace=True)
     table.drop(table[table['Name']=="'"].index,inplace=True)
     table.drop(table[table['Name']=='NA'].index,inplace=True)
+    table_list.append([table,path,f_name])
     return table
+def new_visual():
+    layout1 = go.Layout(
+        title="My Dash Graph",
+        height=1500,
+#         paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(255,0,0,0)',
+        # grid= dict(columns=2, rows=2)
+        )
+    fig2 =go.Figure(layout=layout1)
+    column=0
+    # rows=int((len(table_list)+1)/2)
+    row=-1
+    for t in table_list:
+        if column==0:
+            row+=1
+        table=t[0]
+        fig23=px.sunburst(table, path=['Type','Layer','Name'], values='Count',
+                color='Count',
+                color_continuous_scale='RdBu',
+                color_continuous_midpoint=np.average(table['Count'], weights=table['Count'])*2,
+                #   width=1800,
+                #   height=900
+                        )
+        fig2.add_trace(go.Sunburst(
+            labels=fig23['data'][0]['labels'].tolist(),
+            parents=fig23['data'][0]['parents'].tolist(),
+            values=fig23['data'][0]['values'].tolist(),
+            ids=fig23['data'][0]['ids'].tolist(),
+            domain=dict(column=column,row=row)
+        
+        ))
+        column=abs(column-1)
+
+    fig2.update_layout(
+        grid= dict(columns=2, rows=row+1),
+        margin = dict(t=0, l=0, r=0, b=0)
+    )
+    plot(fig2, filename=path+'/'+'sunburst_plot'+".html", auto_open=True)
+
+
 def output_visual(path,f_name,FT,KO,FT_main,KO_main,table):
     df1 = table[table["Type"]=='Foam']
     df4=table[table["Type"]=='KO']
@@ -226,14 +273,17 @@ def output_visual(path,f_name,FT,KO,FT_main,KO_main,table):
     Timer(1, open_browser).start()
     app.run_server(port=port)
 
-def visual(path,file_name):
-    file=file_name.split('/')[-1]
-    f_name, f_ext = os.path.splitext(file)
+def visual(table_value):
+    table=table_value[0]
+    path=table_value[1]
+    f_name=table_value[2]
+    # file=file_name.split('/')[-1]
+    # f_name, f_ext = os.path.splitext(file)
 
-    reader = csv.reader(open(file_name, "r"), delimiter="\t")
-    df=pd.DataFrame(reader)
-    df.columns=['Id','Count','Foam','KO']
-    table=preprocess_data(df)
+    # reader = csv.reader(open(file_name, "r"), delimiter="\t")
+    # df=pd.DataFrame(reader)
+    # df.columns=['Id','Count','Foam','KO']
+    # table=preprocess_data(df)
     print(table)
     FT=table[table['Type']=='Foam'].drop(['Type'],axis=1)
     KO=table[table['Type']=='KO'].drop(['Type'],axis=1)
@@ -419,29 +469,37 @@ def main(path, file):
         faa_path,path = fna_processing(fna_path, path, f_name,file)
         output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
-        visual(output_path,rollup_file)
+        preprocess_data(output_path,rollup_file)
     elif f_ext in fna_list:
         fna_path = os.path.join(path + os.sep, file)
         faa_path,path = fna_processing(fna_path, path, f_name,file)
         output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
-        visual(output_path,rollup_file)
+        preprocess_data(output_path,rollup_file)
     elif f_ext in  [".faa"]:
         faa_path = os.path.join(path + os.sep, file)
         rollup_file=faa_processing(faa_path,path,f_name)
-        visual(output_path,rollup_file)
+        preprocess_data(output_path,rollup_file)
     elif f_ext == ".rollup":
         # os.makedirs(path+os.sep+file)
         # print(path)
-        visual(path,os.path.join(path + os.sep, file))
+        preprocess_data(path,os.path.join(path + os.sep, file))
         # visual(file)
+    elif f_ext == '.html':
+        pass
     else:
         print("File extension \" %s \" not recognized. Please name file(s) appropriately." %(f_ext))
 
 if __name__ == "__main__":
     parser, args = get_args()
     path, file_list = get_file_list(args)
-    print(parser,args)
+    # print(parser,args)
     # return
+    # print(file_list)
+    table_list=[]
     for f in file_list:
         main(path, f)
+    if len(table_list)==1:
+        visual(table_list[0])
+    elif len(table_list)<=6:
+        new_visual()
