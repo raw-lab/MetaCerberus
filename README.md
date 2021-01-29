@@ -1,9 +1,9 @@
-# Welcome to RoboMax
+# Welcome to Cerberus
 >python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data
 
 
 
-Installing RoboMax: 
+Installing Cerberus: 
 -------
 - needs a pip installer
 - needs a conda installer
@@ -21,7 +21,7 @@ Clone the Robomax Repository
 -----
 - Run the below code to clone the Robomax Repository.
 ```bash
-git clone https://github.com/raw-lab/robomax.git
+git clone https://github.com/raw-lab/cerberus.git
 ```
 
 
@@ -70,4 +70,4 @@ The informatics point-of-contact for this project is [Dr. Richard Allen White II
 If you have any questions or feedback, please feel free to get in touch by email.<br />
 Dr. Richard Allen White III - rwhit101@uncc.edu or raw937@gmail.com.  <br />
 Thrilok Kumar Reddy Aouk - taouk@uncc.edu.  <br />
-Or [open an issue](https://github.com/raw-lab/robomax/issues).
+Or [open an issue](https://github.com/raw-lab/cerberus/issues).
