@@ -1,7 +1,7 @@
 # Welcome to Cerberus
 >python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data
 
-
+![GitHub Logo](cerberus_logo.jpg)
 
 Installing Cerberus: 
 -------
@@ -17,7 +17,7 @@ Input formats:
 - type 2 nucleotide fasta (.fasta, .fa, .fna, .ffn format), assembled raw reads into contigs
 - type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence 
 
-Clone the Robomax Repository 
+Clone the Cerberus Repository 
 -----
 - Run the below code to clone the Robomax Repository.
 ```bash
@@ -27,21 +27,21 @@ git clone https://github.com/raw-lab/cerberus.git
 
 Run Setup File
 -----
-- Open Robomax repo Folder
-- Run setup “robomax_setup.py”
+- Open Cerberus repo Folder
+- Run setup “Cerberus_setup.py”
 ```bash
-cd robomax
+cd cerberus
 ```
 ```bash
-python robomax_setup.py
+python cerberus_setup.py
 ```
-- It will create directory “Robomax” on desktop
+- It will create directory “cerberus” on desktop
 - It will install all dependencies from the setup file
 - It also download osf files and Latest Version of Primary code file(Wrapper).
 
 Running code by passing data file
 -----
-- Go to the desktop folder ->Robomax
+- Go to the desktop folder ->cerberus
 - Give `input file path` followed by '-i' while running the Wrapper File.
 ```python robomax.py -i <input file path>```
 
@@ -56,13 +56,13 @@ visualisation outputs based on output file
 - Once the program is executed the visuals will be displayed on screen.
 - If you want to open those visuals again,Give `rollup file path` (which created in output folder) followed by '-i' while running the Wrapper File.
 ```
-python robomax.py -i <rollup file path>
+python cerberus.py -i <rollup file path>
 ```
 
 
-Citing RoboMax
+Citing Cerberus
 -------------
- RoboMax: python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. PeerJ Preprints. 
+Cerberus: python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints. 
 
 CONTACT
 -------
