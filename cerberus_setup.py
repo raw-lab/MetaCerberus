@@ -11,15 +11,15 @@ from os.path import isfile, join
 
 ############################Set paths for file interactions###################################
 
-path = "/home/%s/Desktop/robomax"% getpass.getuser()
-path2 = "/home/%s/Desktop/robomax/osf_Files"% getpass.getuser()
-path3 = "/home/%s/Desktop/robomax/gittemp"% getpass.getuser()
-path_to_wrapper = "/home/%s/Desktop/robomax/gittemp/bin/"% getpass.getuser()
+path = "/home/%s/Desktop/cerberus"% getpass.getuser()
+path2 = "/home/%s/Desktop/cerberus/osf_Files"% getpass.getuser()
+path3 = "/home/%s/Desktop/cerberus/gittemp"% getpass.getuser()
+path_to_wrapper = "/home/%s/Desktop/cerberus/gittemp/bin/"% getpass.getuser()
 access_rights = 0o755
 
-############################Creates the robomax folder########################################
+############################Creates the cerberus folder########################################
 
-def robomax_dir():
+def cerberus_dir():
     try:
         os.mkdir(path, access_rights)
     except OSError:
@@ -28,8 +28,8 @@ def robomax_dir():
         print("Successfully created the directory %s" % path),
         osf_Files_dir()
 
-if __name__ == "__robomax_dir__":
-    robomax_dir()
+if __name__ == "__cerberus_dir__":
+    cerberus_dir()
 
 ####Creates osf file directory and initiates OSF file download cmd create_osf_Files()#########
 
@@ -62,7 +62,7 @@ def create_osf_Files():
 if __name__ == "__create_osf_Files__":
     create_osf_Files()
 
-robomax_dir()
+cerberus_dir()
 
 ################################Install prokka and hmmer dependencies#########################
 
@@ -100,11 +100,11 @@ install_dependencies()
 import git
 def wrapper_download():
 
-    git_URL = 'https://github.com/raw-lab/robomax.git'
+    git_URL = 'https://github.com/raw-lab/cerberus.git'
     os.mkdir(path3, access_rights)
     os.chdir(path3)
     git.Repo.clone_from(git_URL, path3, branch='master')
-    shutil.move(os.path.join(path_to_wrapper, 'Robomax.py'), path)
+    shutil.move(os.path.join(path_to_wrapper, 'cerberus.py'), path)
     shutil.rmtree(path3)
 
 if __name__ == "__wrapper_download__":
