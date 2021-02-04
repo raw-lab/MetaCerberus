@@ -21,6 +21,10 @@ Step 2: Running code by passing folder containing multiple genomes
 
 After Executing the above code, It will Run and download visualization plots and respective output folders. 
 
-![SUNBURST](https://github.com/raw-lab/cerberus/blob/main/tutorial/SunBurst.png)  ![OUTPUTFOLDER](https://github.com/raw-lab/cerberus/blob/main/tutorial/output_folder.png)
+![SUNBURST](https://github.com/raw-lab/cerberus/blob/main/tutorial/SunBurst.png)  
 
-![BarPlot](https://github.com/raw-lab/cerberus/blob/main/tutorial/BarPlot.png)  ![PCA](https://github.com/raw-lab/cerberus/blob/main/tutorial/PCA.png)
+![OUTPUTFOLDER](https://github.com/raw-lab/cerberus/blob/main/tutorial/output_folder.png)
+
+![BarPlot](https://github.com/raw-lab/cerberus/blob/main/tutorial/BarPlot.png)  
+
+![PCA](https://github.com/raw-lab/cerberus/blob/main/tutorial/PCA.png)
