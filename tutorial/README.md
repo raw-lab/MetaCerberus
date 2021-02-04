@@ -1,2 +1,2 @@
-## Usage Tutorial Example for RoboMAX
+## Usage Tutorial Example for Cerberus Using 5 genomes
 checking
