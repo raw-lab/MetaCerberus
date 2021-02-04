@@ -15,4 +15,4 @@ Step 2: Running code by passing folder containing multiple genomes
 
 - Give `input folder path` followed by '-i' while running the Cerberus File.
 ```python cerberus.py -i <input folder path>```
-![folderpath](tutorial/folder_path.jpg)
+![folderpath](https://github.com/raw-lab/cerberus/blob/main/tutorial/folder_path.png)
