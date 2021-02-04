@@ -15,4 +15,4 @@ Step 2: Running code by passing folder containing multiple genomes
 
 - Give `input folder path` followed by '-i' while running the Cerberus File.
 ```python cerberus.py -i <input folder path>```
-
+![GitHub Logo](folder_path.jpg)
