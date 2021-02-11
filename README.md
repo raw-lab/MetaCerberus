@@ -41,6 +41,10 @@ python cerberus_setup.py
 
 Running code by passing data file
 -----
+- Activate prokka environment before running the CODE
+```bash
+conda activate prokka_env
+```
 - Go to the desktop folder ->cerberus
 - Give `input file path` followed by '-i' while running the Wrapper File.
 ```python robomax.py -i <input file path>```
