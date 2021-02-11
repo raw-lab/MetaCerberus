@@ -712,14 +712,15 @@ if __name__ == "__main__":
     table_list=[]
     for f in file_list:
         main(path, f)
-    if len(table_list)==1:
+    len_tab=len(table_list)
+    if len_tab==1:
         visual(table_list[0])
-    elif len(table_list)<=3:
+    elif len_tab<=3:
         # new_visual()
         # PCA1()
         new_visual()
-    elif len(table_list)<=6:
+    elif len_tab<=6:
         PCA1()
         new_visual()
-    elif len(table_list)>6:
+    elif len_tab>6:
         PCA1()
