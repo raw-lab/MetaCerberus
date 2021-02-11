@@ -49,6 +49,7 @@ conda activate prokka_env
 
 - Give `input file path` followed by '-i' while running the Wrapper File.
 ```python cerberus.py -i <input file path>```
+>Here,Input path can be either be folder path or file path.
 
 Output Files
 -----
