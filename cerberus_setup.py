@@ -68,26 +68,26 @@ cerberus_dir()
 
 def install_dependencies():
 
-    prokka_cmd = "conda create -n prokka_env -c conda-forge -c bioconda prokka"
+    prokka_cmd = "conda create -n prokka_env -c conda-forge -c bioconda hmmer prokka pandas numpy plotly dash openpyxl matplotlib scikit-learn"
     subprocess.call(prokka_cmd, shell=True)
     
-    hmmer_cmd = "conda install -c bioconda hmmer"
-    subprocess.call(hmmer_cmd, shell=True)
+    # hmmer_cmd = "conda install -c bioconda hmmer"
+    # subprocess.call(hmmer_cmd, shell=True)
 
-    numpy_cmd = "conda install numpy"
-    subprocess.call(numpy_cmd, shell=True)
+    # numpy_cmd = "conda install numpy"
+    # subprocess.call(numpy_cmd, shell=True)
 
-    plotly_cmd = "conda install plotly"
-    subprocess.call(plotly_cmd, shell=True)
+    # plotly_cmd = "conda install plotly"
+    # subprocess.call(plotly_cmd, shell=True)
 
-    pandas_cmd = "conda install pandas"
-    subprocess.call(pandas_cmd, shell=True)
+    # pandas_cmd = "conda install pandas"
+    # subprocess.call(pandas_cmd, shell=True)
 
-    dash_cmd = "conda install dash"
-    subprocess.call(dash_cmd, shell=True)
+    # dash_cmd = "conda install dash"
+    # subprocess.call(dash_cmd, shell=True)
 
-    openpyxl_cmd = "conda install openpyxl"
-    subprocess.call(openpyxl_cmd, shell=True)
+    # openpyxl_cmd = "conda install openpyxl"
+    # subprocess.call(openpyxl_cmd, shell=True)
     
     git_cmd = "pip install GitPython"
     subprocess.call(git_cmd, shell=True)
@@ -95,8 +95,8 @@ def install_dependencies():
     fastqc_cmd = "sudo apt install fastqc"
     subprocess.call(fastqc_cmd, shell=True)
 
-    fastp_cmd = "conda install -c bioconda fastp"
-    subprocess.call(fastp_cmd, shell=True)
+    # fastp_cmd = "conda install -c bioconda fastp"
+    # subprocess.call(fastp_cmd, shell=True)
 
 if __name__ == "__install_dependencies__":
     install_dependencies()
@@ -109,7 +109,7 @@ def wrapper_download():
     git_URL = 'https://github.com/raw-lab/cerberus.git'
     os.mkdir(path3, access_rights)
     os.chdir(path3)
-    git.Repo.clone_from(git_URL, path3, branch='master')
+    git.Repo.clone_from(git_URL, path3, branch='main')
     shutil.move(os.path.join(path_to_wrapper, 'cerberus.py'), path)
     shutil.rmtree(path3)
 
