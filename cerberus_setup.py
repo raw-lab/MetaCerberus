@@ -68,7 +68,7 @@ cerberus_dir()
 
 def install_dependencies():
 
-    prokka_cmd = "conda install -c conda-forge -c bioconda -c defaults prokka"
+    prokka_cmd = "conda create -n prokka_env -c conda-forge -c bioconda prokka"
     subprocess.call(prokka_cmd, shell=True)
     
     hmmer_cmd = "conda install -c bioconda hmmer"
@@ -91,6 +91,12 @@ def install_dependencies():
     
     git_cmd = "pip install GitPython"
     subprocess.call(git_cmd, shell=True)
+
+    fastqc_cmd = "sudo apt install fastqc"
+    subprocess.call(fastqc_cmd, shell=True)
+
+    fastp_cmd = "conda install -c bioconda fastp"
+    subprocess.call(fastp_cmd, shell=True)
 
 if __name__ == "__install_dependencies__":
     install_dependencies()
