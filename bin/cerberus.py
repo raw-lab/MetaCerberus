@@ -163,7 +163,7 @@ def new_visual():
     app.layout = html.Div(
     #     style={'backgroundColor': colors['background']},
         children=[
-        html.H1("Robomax Outputs", style={'text-align': 'center'}),
+        html.H1("Cerberus Outputs", style={'text-align': 'center'}),
         dcc.Graph(id='sunburst', figure=fig2),
 
         html.H3("Select Type and Layer from the below Dropdowns", style={'text-align': 'left'}),
@@ -318,7 +318,7 @@ def output_visual(path,f_name,FT,KO,FT_main,KO_main,table):
     app.layout = html.Div(
     #     style={'backgroundColor': colors['background']},
         children=[
-        html.H1("Robomax Outputs", style={'text-align': 'center'}),
+        html.H1("Cerberus Outputs", style={'text-align': 'center'}),
         dcc.Graph(id='sunburst', figure=fig2),
 
         html.H3("Select Type and Layer from the below Dropdowns", style={'text-align': 'left'}),
@@ -457,10 +457,10 @@ def visual(table_value):
 
 def get_args():
     version="1.0"
-    parser = argparse.ArgumentParser(description='RoboMax is used for versatile functional ontology assignments for metagenomes via HMM searching with environmental focus of shotgun meta-omics data')
+    parser = argparse.ArgumentParser(description='Cerberus is used for versatile functional ontology assignments for metagenomes via HMM searching with environmental focus of shotgun meta-omics data')
     parser.add_argument('-i', type=str, required=True, help='path to file or directory \n <accepted formats {.faa,.fna,.ffn,.rollup} , for visualisation : {.rollup }>')
     parser.add_argument('--version','-v', action='version',
-                        version='Robomax: \n version: {} December 24th 2020'.format(version),
+                        version='Cerberus: \n version: {} December 24th 2020'.format(version),
                         help='show the version number and exit')
     
     args = parser.parse_args()
