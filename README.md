@@ -1,5 +1,5 @@
 # Welcome to Cerberus
->python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data
+Python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data
 
 ![GitHub Logo](cerberus_logo.jpg)
 
@@ -48,7 +48,8 @@ Output Files
 - Output folder will be created on the input folder path.
 - Let the Input be RW2.faa, the output folder created will be RW2_output.
 
-visualisation outputs based on output file
+
+Visualisation of outputs
 -----
 - We are Using Dash and Plotly for visualise the data
 - Once the program is executed the visuals will be displayed on screen.
