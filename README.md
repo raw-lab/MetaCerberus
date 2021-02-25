@@ -52,7 +52,8 @@ visualisation outputs based on output file
 -----
 - We are Using Dash and Plotly for visualise the data
 - Once the program is executed the visuals will be displayed on screen.
-- If you want to open those visuals again,Give `rollup file path` (which created in output folder) followed by '-i' while running the Wrapper File.
+- If you want to open those visuals again,
+- Give `rollup file path` (which created in output folder) followed by '-i' while running the Wrapper File.
 ```
 python cerberus.py -i <rollup file path>
 ```
