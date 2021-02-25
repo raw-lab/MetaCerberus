@@ -33,7 +33,8 @@ python cerberus_setup.py
 
 Running code by passing data file
 -----
-- Go to the desktop folder ->cerberus in new Terminal.
+- Go to the desktop folder 
+- Open Cerberus in new terminal.
 - Activate prokka environment by running the following code.
 ```bash
 conda activate prokka_env
@@ -58,7 +59,6 @@ Visualisation of outputs
 ```
 python cerberus.py -i <rollup file path>
 ```
-
 
 Citing Cerberus
 -------------
