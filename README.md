@@ -41,7 +41,7 @@ conda activate prokka_env
 - Activating prokka_env is must before running cerberus.
 - Give `input file path` followed by '-i' while running the Wrapper File.
 ```python cerberus.py -i <input file path>```
->Here,Input path can either be folder path or file path.
+- Here the input path can either be folder path or file path.
 
 Output Files
 -----
