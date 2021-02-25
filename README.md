@@ -3,12 +3,6 @@
 
 ![GitHub Logo](cerberus_logo.jpg)
 
-Installing Cerberus: 
--------
-- needs a pip installer
-- needs a conda installer
-- needs source installer
-- maybe a gpu down the road
 
 Input formats:
 -----
@@ -17,16 +11,14 @@ Input formats:
 - type 2 nucleotide fasta (.fasta, .fa, .fna, .ffn format), assembled raw reads into contigs
 - type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence 
 
-Clone the Cerberus Repository 
+Installing Cerberus (from source): 
 -----
+Clone github Repo
 - Run the below code to clone the Robomax Repository.
 ```bash
 git clone https://github.com/raw-lab/cerberus.git
 ```
-
-
 Run Setup File
------
 - Open Cerberus repo Folder
 - Run setup “Cerberus_setup.py”
 ```bash
