@@ -19,6 +19,7 @@ import argparse
 from plotly.offline import plot
 import webbrowser
 from threading import Timer
+import time
 
 
 import plotly.graph_objs as go
@@ -52,6 +53,8 @@ def preprocess_data(path,file_name):
 
     reader = csv.reader(open(file_name, "r"), delimiter="\t")
     df=pd.DataFrame(reader)
+    if df.empty:
+        return
     df.columns=['Id','Count','Foam','KO']
     dict1={}
     dict2={}
@@ -636,7 +639,7 @@ def PCA1():
     pca = PCA(n_components=3,svd_solver='randomized')
     X_train= pca.fit_transform(res1)
     labels = {
-    str(i): f"PC {i+1} ({var:.1f}%)"
+    str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
     for i, var in enumerate(pca.explained_variance_ratio_ * 100)
     }
     fig = px.scatter_3d(
@@ -702,7 +705,22 @@ def main(path, file):
         pass
     else:
         print("File extension \" %s \" not recognized. Please name file(s) appropriately." %(f_ext))
-
+def time_graph():
+    time_list.sort()
+    x = [i[0] for i in time_list]
+    y = [i[1] for i in time_list]
+    fig = go.Figure(data=go.Scatter(x=x, y=y))
+    fig.update_layout(
+        title="Memory-Time Graph",
+        xaxis_title="Size of the Genome (in MB's)",
+        yaxis_title="Time taken (in min)",
+        font=dict(
+            family="Courier New, monospace",
+            size=18,
+            color="RebeccaPurple"
+        )
+    )
+    plot(fig, filename=path+'/'+'time_graph'+".html", auto_open=True)
 if __name__ == "__main__":
     parser, args = get_args()
     path, file_list = get_file_list(args)
@@ -710,9 +728,18 @@ if __name__ == "__main__":
     # return
     # print(file_list)
     table_list=[]
+    time_list=[]
     for f in file_list:
+        start_time = time.time()
+        size=os.path.getsize(path+os.sep+f)
+        size=round(size / (1024 * 1024), 2)
         main(path, f)
+        time_taken=time.time() - start_time
+        time_taken=round(time_taken / (60), 2)
+        time_list.append((time_taken,size))
+    # print("--- %s seconds ---" % (time.time() - start_time))
     len_tab=len(table_list)
+    time_graph()
     if len_tab==1:
         visual(table_list[0])
     elif len_tab<=3:
@@ -722,5 +749,7 @@ if __name__ == "__main__":
     elif len_tab<=6:
         PCA1()
         new_visual()
+        
     elif len_tab>6:
         PCA1()
+    
