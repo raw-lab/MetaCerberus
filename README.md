@@ -20,6 +20,7 @@ git clone https://github.com/raw-lab/cerberus.git
 ```
 Run Setup File
 - Open Cerberus repo Folder
+- Run setup “Cerberus_setup.py”
 ```bash
 cd cerberus
 ```
