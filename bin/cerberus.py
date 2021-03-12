@@ -514,7 +514,7 @@ def fastq_processing(fq_path, path, f_name,file):
     return trim_fna
 
 def fna_processing(fna_path, path, f_name,file):
-    name="/prokka_results_"+file
+    name="/prokka_results_"+f_name
     prokka_outdir = path + name+"/"
     prokka_cmd = "prokka %s --outdir %s --prefix %s --centre clean --compliant --metagenome" %(fna_path, prokka_outdir, f_name)
     subprocess.call(prokka_cmd, shell=True)
