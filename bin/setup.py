@@ -6,11 +6,11 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="Cerberus",
     version="0.8",
-    author="Richard White III",
+    author="Richard White III, Thrilok Kumar Reddy Aouk",
     author_email="rwhit101@uncc.edu",
     description="python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
     long_description=long_description,
-    url="https://github.com/raw937/cerberus",
+    url="https://github.com/raw-lab/cerberus",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -27,7 +27,6 @@ setuptools.setup(
           'plotly',
           'psutil',
           'joblib',
-          'hmmer @ http://eddylab.org/software/hmmer/hmmer.tar.gz',
-          'prokka @ https://github.com/tseemann/prokka/tarball/master'
+          'hmmer @ http://eddylab.org/software/hmmer/hmmer.tar.gz'
           ],
 )
