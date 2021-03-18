@@ -3,8 +3,8 @@ import plotly.graph_objects as go
 from plotly.offline import plot
 def time_graph(path,time_list):
     time_list.sort()
-    x = [i[0] for i in time_list]
-    y = [i[1] for i in time_list]
+    x = [i[1] for i in time_list]
+    y = [i[0] for i in time_list]
     fig = go.Figure(data=go.Scatter(x=x, y=y))
     fig.update_layout(
         title="Memory-Time Graph",
