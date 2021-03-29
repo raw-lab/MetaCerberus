@@ -6,7 +6,7 @@ def get_args():
     parser.add_argument('--version','-v', action='version',
                         version='Cerberus: \n version: {} December 24th 2020'.format(version),
                         help='show the version number and exit')
-    
+    parser.add_argument('-virus',type=str,default='mic',help='mic or euk \n mic-->for microbial(includes bacteriophage) \n euk-->eukaryote option (includes other viruses)')
     args = parser.parse_args()
 
     return parser, args

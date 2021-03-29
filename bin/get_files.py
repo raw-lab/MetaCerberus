@@ -17,4 +17,5 @@ def get_file_list(args):
         else:
             path = in_file_path
             file_list = [f for f in os.listdir(in_file_path) if isfile(join(in_file_path, f))]
-    return path, file_list
+    
+    return path, file_list,args.virus

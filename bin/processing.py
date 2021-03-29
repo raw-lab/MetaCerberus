@@ -14,14 +14,17 @@ def fastq_processing(fq_path, path, f_name,file):
     subprocess.call(cmd3,shell=True)
     return trim_fna
 
-def fna_processing(fna_path, path, f_name,file):
+def fna_processing(fna_path, path, f_name,file,virus):
     # name="/prokka_results_"+f_name
     # prokka_outdir = path + name+"/"
     # print(path,234567)
     # prokka_cmd = "prokka %s --outdir %s --prefix %s --centre clean --compliant --metagenome" %(fna_path, prokka_outdir, f_name)
     # subprocess.call(prokka_cmd, shell=True)
     path_to_faa=path+"/"+f_name+'_pro.faa'
-    prodigal_cmd="prodigal -i %s -a %s"%(fna_path, path_to_faa)
+    if virus=='mic':
+        prodigal_cmd="prodigal -i %s -a %s"%(fna_path, path_to_faa)
+    elif virus=='euk':
+        prodigal_cmd="/home/taouk/FragGeneScanPlusPlus/FGSpp -s %s -o %s -w 0 -r /home/taouk/FragGeneScanPlusPlus/train -t 454_5 -p 16"%(fna_path, path_to_faa[:-4])
     subprocess.call(prodigal_cmd, shell=True)
     # faa_path = prokka_outdir + f_name + ".faa"
     # return faa_path,path+name
