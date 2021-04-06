@@ -49,6 +49,7 @@ def main(path, file,table_list,virus):
 if __name__ == "__main__":
     parser, args = get_args()
     path, file_list,virus = get_file_list(args)
+    print(virus,'thrilok')
     # print(parser,args)
     # return
     # print(file_list)

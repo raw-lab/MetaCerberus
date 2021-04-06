@@ -21,11 +21,12 @@ def fna_processing(fna_path, path, f_name,file,virus):
     # prokka_cmd = "prokka %s --outdir %s --prefix %s --centre clean --compliant --metagenome" %(fna_path, prokka_outdir, f_name)
     # subprocess.call(prokka_cmd, shell=True)
     path_to_faa=path+"/"+f_name+'_pro.faa'
-    if virus=='mic':
-        prodigal_cmd="prodigal -i %s -a %s"%(fna_path, path_to_faa)
-    elif virus=='euk':
-        prodigal_cmd="/home/taouk/FragGeneScanPlusPlus/FGSpp -s %s -o %s -w 0 -r /home/taouk/FragGeneScanPlusPlus/train -t 454_5 -p 16"%(fna_path, path_to_faa[:-4])
-    subprocess.call(prodigal_cmd, shell=True)
+    if not virus:
+        cmd="prodigal -i %s -a %s"%(fna_path, path_to_faa)
+    else:
+        print('here')
+        cmd="%s/FGSpp -s %s -o %s -w 0 -r %s/train -t 454_5 -p 16"%(virus,fna_path, path_to_faa[:-4],virus)
+    subprocess.call(cmd, shell=True)
     # faa_path = prokka_outdir + f_name + ".faa"
     # return faa_path,path+name
     return path_to_faa,path
@@ -81,7 +82,7 @@ def faa_processing(faa_path,path,f_name):
     output_path=os.path.join(output_path + os.sep, f_name)
     script_dir = os.path.dirname(os.path.realpath(__file__))
     hmm_file = os.path.join(script_dir, "osf_Files/FOAM-hmm_rel1a.hmm.gz")
-    hmm_cmd = "hmmsearch --domtblout %s.FOAM.out %s %s" %(output_path, hmm_file, faa_path)
+    hmm_cmd = "hmmsearch --cpu 28 --domtblout %s.FOAM.out %s %s" %(output_path, hmm_file, faa_path)
     subprocess.call(hmm_cmd, shell=True)
 
     BH_dict = {}

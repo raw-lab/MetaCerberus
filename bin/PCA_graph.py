@@ -76,4 +76,4 @@ def PCA1(path,table_list):
                     
                     )
     # fig.show()
-    plot(fig, filename=path+'/'+'PCA_plot'+".html", auto_open=True)
+    plot(fig, filename=path+'/'+'PCA_plot'+".html", auto_open=False)

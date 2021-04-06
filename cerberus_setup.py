@@ -68,7 +68,7 @@ cerberus_dir()
 
 def install_dependencies():
 
-    prokka_cmd = "conda create -n prokka_env -c conda-forge -c bioconda hmmer prokka pandas numpy plotly dash openpyxl matplotlib scikit-learn"
+    prokka_cmd = "conda create -n cerberus_env -c conda-forge -c bioconda hmmer pandas numpy plotly dash openpyxl matplotlib scikit-learn"
     subprocess.call(prokka_cmd, shell=True)
     
     # hmmer_cmd = "conda install -c bioconda hmmer"
