@@ -45,6 +45,12 @@ conda activate cerberus_env
 python cerberus.py -i <input file path>
 ```
 - Here the input path can either be folder path or file path.
+- By Default it takes microbial option which includes bacteriophage
+- For eukaryote option: you should give argument `--euk` along with `<FGSpp path>` which is in your local computer
+```bash
+python cerberus.py -i <input file path> --euk <FGSpp path>
+```
+- You can also download FGSpp from github link : `https://github.com/unipept/FragGeneScanPlusPlus`
 
 Output Files
 -----
