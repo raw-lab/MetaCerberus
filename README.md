@@ -42,7 +42,8 @@ conda activate cerberus_env
 - Activating cerberus_env is must before running cerberus.
 - Give `input file path` followed by '-i' while running the Wrapper File.
 ```bash
-python cerberus.py -i <input file path>```
+python cerberus.py -i <input file path>
+```
 - Here the input path can either be folder path or file path.
 
 Output Files
