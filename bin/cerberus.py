@@ -3,12 +3,12 @@ from os.path import isfile, join
 import time
 
 
-from preprocess import preprocess_data
+from preprocess_before_visual import preprocess_data
 from time_g import time_graph
-from new_visual import new_visual
-from visual import visual
+from multi_file_visual import new_visual
+from single_file_visual import visual
 from get_args import get_args
-from processing import faa_processing,fastq_processing,fna_processing
+from sequence_processors import faa_processing,fastq_processing,fna_processing
 from PCA_graph import PCA1
 from get_files import get_file_list
 
