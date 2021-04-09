@@ -110,7 +110,14 @@ def wrapper_download():
     os.mkdir(path3, access_rights)
     os.chdir(path3)
     git.Repo.clone_from(git_URL, path3, branch='main')
-    shutil.move(os.path.join(path_to_wrapper, 'cerberus.py'), path)
+    file_names = os.listdir(path_to_wrapper)
+    for file_name in file_names:
+    	shutil.move(os.path.join(path_to_wrapper,file_name), path)
+    par=os.path.join(path3, 'src/FragGeneScanPlusPlus-master.zip')
+    cmd_unzip="unzip "+par
+    subprocess.call(cmd_unzip, shell=True)
+    os.rename(os.path.join(path3, 'FragGeneScanPlusPlus-master'), 'FGSpp')
+    shutil.move(os.path.join(path3, 'FGSpp'), path)
     shutil.rmtree(path3)
 
 if __name__ == "__wrapper_download__":
