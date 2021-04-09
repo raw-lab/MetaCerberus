@@ -20,12 +20,13 @@ def fna_processing(fna_path, path, f_name,file,virus):
     # print(path,234567)
     # prokka_cmd = "prokka %s --outdir %s --prefix %s --centre clean --compliant --metagenome" %(fna_path, prokka_outdir, f_name)
     # subprocess.call(prokka_cmd, shell=True)
+    script_dir = os.path.dirname(os.path.realpath(__file__))
     path_to_faa=path+"/"+f_name+'_pro.faa'
     if not virus:
         cmd="prodigal -i %s -a %s"%(fna_path, path_to_faa)
     else:
-        print('here')
-        cmd="%s/FGSpp -s %s -o %s -w 0 -r %s/train -t 454_5 -p 16"%(virus,fna_path, path_to_faa[:-4],virus)
+        print('FGSpp')
+        cmd="%s/FGSpp/FGSpp -s %s -o %s -w 0 -r %s/FGSpp/train -t 454_5 -p 16"%(script_dir,fna_path, path_to_faa[:-4],script_dir)
     subprocess.call(cmd, shell=True)
     # faa_path = prokka_outdir + f_name + ".faa"
     # return faa_path,path+name

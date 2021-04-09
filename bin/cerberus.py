@@ -13,7 +13,7 @@ from PCA_graph import PCA1
 from get_files import get_file_list
 
 
-def main(path, file,table_list,virus):
+def main(path, file,table_list,euk):
     f_name, f_ext = os.path.splitext(file)
     f_name=f_name.split('.')[0]
     fq_list = [".fq",".fastq"]
@@ -22,13 +22,13 @@ def main(path, file,table_list,virus):
     if f_ext in fq_list:
         fq_path = os.path.join(path + os.sep, file)
         fna_path = fastq_processing(fq_path, path, f_name,file)
-        faa_path,path = fna_processing(fna_path, path, f_name,file,virus)
+        faa_path,path = fna_processing(fna_path, path, f_name,file,euk)
         output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
         preprocess_data(output_path,rollup_file,table_list)
     elif f_ext in fna_list:
         fna_path = os.path.join(path + os.sep, file)
-        faa_path,path = fna_processing(fna_path, path, f_name,file,virus)
+        faa_path,path = fna_processing(fna_path, path, f_name,file,euk)
         output_path=path+os.sep+f_name+"_output"
         rollup_file=faa_processing(faa_path,path,f_name)
         preprocess_data(output_path,rollup_file,table_list)
@@ -48,8 +48,7 @@ def main(path, file,table_list,virus):
 
 if __name__ == "__main__":
     parser, args = get_args()
-    path, file_list,virus = get_file_list(args)
-    print(virus,'thrilok')
+    path, file_list,euk = get_file_list(args)
     # print(parser,args)
     # return
     # print(file_list)
@@ -59,7 +58,7 @@ if __name__ == "__main__":
         start_time = time.time()
         size=os.path.getsize(path+os.sep+f)
         size=round(size / (1024 * 1024), 2)
-        main(path, f,table_list,virus)
+        main(path, f,table_list,euk)
         time_taken=time.time() - start_time
         time_taken=round(time_taken / (60), 2)
         time_list.append((time_taken,size))

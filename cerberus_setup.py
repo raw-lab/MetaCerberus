@@ -118,6 +118,8 @@ def wrapper_download():
     subprocess.call(cmd_unzip, shell=True)
     os.rename(os.path.join(path3, 'FragGeneScanPlusPlus-master'), 'FGSpp')
     shutil.move(os.path.join(path3, 'FGSpp'), path)
+    make=os.path.join(path, 'FGSpp')
+    subprocess.call(['make', '-C', make])
     shutil.rmtree(path3)
 
 if __name__ == "__wrapper_download__":
