@@ -35,7 +35,7 @@ Running code by passing data file
 -----
 - Go to the desktop folder 
 - Open Cerberus in new terminal.
-- Activate prokka environment by running the following code.
+- Activate Cerberus environment by running the following code.
 ```bash
 conda activate cerberus_env
 ```
