@@ -1,20 +1,13 @@
-import io
-import re
 import subprocess
-import sys
 import os
-import getpass
 
 import shutil
-import tempfile
-from os.path import isfile, join
 
 ############################Set paths for file interactions###################################
 
-path = "/home/%s/Desktop/cerberus"% getpass.getuser()
-path2 = "/home/%s/Desktop/cerberus/osf_Files"% getpass.getuser()
-path3 = "/home/%s/Desktop/cerberus/gittemp"% getpass.getuser()
-path_to_wrapper = "/home/%s/Desktop/cerberus/gittemp/bin/"% getpass.getuser()
+home = os.path.expanduser("~")
+path = home +"/cerberus"
+path2 = path +"/osf_Files"
 access_rights = 0o755
 
 ############################Creates the cerberus folder########################################
@@ -40,7 +33,6 @@ def osf_Files_dir():
         print ("Creation of the directory %s failed" % path2)
     else:
         print("Successfully created the directory %s" % path2),
-        os.chdir(path2)
         create_osf_Files()
 
 if __name__ == "__osf_Files_dir__":
@@ -49,81 +41,45 @@ if __name__ == "__osf_Files_dir__":
 ##Downloads OSF files to osf_File directory
 
 def create_osf_Files():
-    
-    osf_cmd = "wget https://osf.io/72p6g/download -v -O FOAM_readme.txt"
+    osf_cmd = "wget https://osf.io/72p6g/download -v -O "+path2+"/FOAM_readme.txt"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/muan4/download -v -O FOAM-onto_rel1.tsv"
+    osf_cmd = "wget https://osf.io/muan4/download -v -O "+path2+"/FOAM-onto_rel1.tsv"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/2hp7t/download -v -O KO_classification.txt"
+    osf_cmd = "wget https://osf.io/2hp7t/download -v -O "+path2+"/KO_classification.txt"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/bdpv5/download -v -O FOAM-hmm_rel1a.hmm.gz"
+    osf_cmd = "wget https://osf.io/bdpv5/download -v -O "+path2+"/FOAM-hmm_rel1a.hmm.gz"
     subprocess.call(['bash', '-c', osf_cmd])
-        
+
 if __name__ == "__create_osf_Files__":
     create_osf_Files()
 
 cerberus_dir()
 
-################################Install prokka and hmmer dependencies#########################
+######################################Install dependencies#####################################
 
 def install_dependencies():
-
-    prokka_cmd = "conda create -n cerberus_env -c conda-forge -c bioconda hmmer pandas numpy plotly dash openpyxl matplotlib scikit-learn"
-    subprocess.call(prokka_cmd, shell=True)
-    
-    # hmmer_cmd = "conda install -c bioconda hmmer"
-    # subprocess.call(hmmer_cmd, shell=True)
-
-    # numpy_cmd = "conda install numpy"
-    # subprocess.call(numpy_cmd, shell=True)
-
-    # plotly_cmd = "conda install plotly"
-    # subprocess.call(plotly_cmd, shell=True)
-
-    # pandas_cmd = "conda install pandas"
-    # subprocess.call(pandas_cmd, shell=True)
-
-    # dash_cmd = "conda install dash"
-    # subprocess.call(dash_cmd, shell=True)
-
-    # openpyxl_cmd = "conda install openpyxl"
-    # subprocess.call(openpyxl_cmd, shell=True)
-    
-    git_cmd = "pip install GitPython"
-    subprocess.call(git_cmd, shell=True)
-
-    fastqc_cmd = "sudo apt install fastqc"
-    subprocess.call(fastqc_cmd, shell=True)
-
-    # fastp_cmd = "conda install -c bioconda fastp"
-    # subprocess.call(fastp_cmd, shell=True)
+    conda_cmd = "conda create -n cerberus_env -c conda-forge -c bioconda hmmer pandas numpy plotly dash openpyxl matplotlib scikit-learn fastqc"
+    subprocess.call(conda_cmd, shell=True)
 
 if __name__ == "__install_dependencies__":
     install_dependencies()
 
 install_dependencies()
-#############################get current wrapper from github###################################
-import git
-def wrapper_download():
 
-    git_URL = 'https://github.com/raw-lab/cerberus.git'
-    os.mkdir(path3, access_rights)
-    os.chdir(path3)
-    git.Repo.clone_from(git_URL, path3, branch='main')
-    file_names = os.listdir(path_to_wrapper)
-    for file_name in file_names:
-    	shutil.move(os.path.join(path_to_wrapper,file_name), path)
-    par=os.path.join(path3, 'src/FragGeneScanPlusPlus-master.zip')
+#############################get current wrapper from github###################################
+
+def wrapper_download():
+    for file_name in os.listdir('bin/'):
+        shutil.copy(os.path.join('bin/', file_name), path)
+    par='src/FragGeneScanPlusPlus-master.zip'
     cmd_unzip="unzip "+par
     subprocess.call(cmd_unzip, shell=True)
-    os.rename(os.path.join(path3, 'FragGeneScanPlusPlus-master'), 'FGSpp')
-    shutil.move(os.path.join(path3, 'FGSpp'), path)
+    os.rename('FragGeneScanPlusPlus-master', 'FGSpp')
+    shutil.move('FGSpp', path)
     make=os.path.join(path, 'FGSpp')
     subprocess.call(['make', '-C', make])
-    shutil.rmtree(path3)
 
 if __name__ == "__wrapper_download__":
     wrapper_download()
 
 wrapper_download()
-
