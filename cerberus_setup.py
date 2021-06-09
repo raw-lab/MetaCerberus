@@ -60,7 +60,7 @@ cerberus_dir()
 ######################################Install dependencies#####################################
 
 def install_dependencies():
-    conda_cmd = "conda create -n cerberus_env -c conda-forge -c bioconda hmmer pandas numpy plotly dash openpyxl matplotlib scikit-learn fastqc"
+    conda_cmd = "conda create -n cerberus_env -c conda-forge -c bioconda hmmer prodigal pandas numpy plotly dash openpyxl matplotlib scikit-learn fastqc"
     subprocess.call(conda_cmd, shell=True)
 
 if __name__ == "__install_dependencies__":
