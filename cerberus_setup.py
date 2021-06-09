@@ -1,24 +1,26 @@
-import subprocess
-import os
+#!/usr/bin/env python3
 
+import os
+import subprocess
 import shutil
+
 
 ############################Set paths for file interactions###################################
 
 home = os.path.expanduser("~")
-path = home +"/cerberus"
-path2 = path +"/osf_Files"
+path = os.path.join(home, "bin/cerberus")
+pathOSF = os.path.join(path, "osf_Files")
 access_rights = 0o755
 
 ############################Creates the cerberus folder########################################
 
 def cerberus_dir():
     try:
-        os.mkdir(path, access_rights)
+        os.makedirs(path, access_rights, exist_ok=True)
     except OSError:
         print ("Creation of the directory %s failed" % path)
     else:
-        print("Successfully created the directory %s" % path),
+        print("Successfully created the directory %s" % path)
         osf_Files_dir()
 
 if __name__ == "__cerberus_dir__":
@@ -28,11 +30,11 @@ if __name__ == "__cerberus_dir__":
 
 def osf_Files_dir():
     try:
-        os.mkdir(path2, access_rights)
+        os.makedirs(pathOSF, access_rights)
     except OSError:
-        print ("Creation of the directory %s failed" % path2)
+        print ("Creation of the directory %s failed" % pathOSF)
     else:
-        print("Successfully created the directory %s" % path2),
+        print("Successfully created the directory %s" % pathOSF)
         create_osf_Files()
 
 if __name__ == "__osf_Files_dir__":
@@ -41,13 +43,13 @@ if __name__ == "__osf_Files_dir__":
 ##Downloads OSF files to osf_File directory
 
 def create_osf_Files():
-    osf_cmd = "wget https://osf.io/72p6g/download -v -O "+path2+"/FOAM_readme.txt"
+    osf_cmd = "wget https://osf.io/72p6g/download -v -O "+pathOSF+"/FOAM_readme.txt"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/muan4/download -v -O "+path2+"/FOAM-onto_rel1.tsv"
+    osf_cmd = "wget https://osf.io/muan4/download -v -O "+pathOSF+"/FOAM-onto_rel1.tsv"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/2hp7t/download -v -O "+path2+"/KO_classification.txt"
+    osf_cmd = "wget https://osf.io/2hp7t/download -v -O "+pathOSF+"/KO_classification.txt"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/bdpv5/download -v -O "+path2+"/FOAM-hmm_rel1a.hmm.gz"
+    osf_cmd = "wget https://osf.io/bdpv5/download -v -O "+pathOSF+"/FOAM-hmm_rel1a.hmm.gz"
     subprocess.call(['bash', '-c', osf_cmd])
 
 if __name__ == "__create_osf_Files__":
@@ -68,18 +70,21 @@ install_dependencies()
 
 #############################get current wrapper from github###################################
 
-def wrapper_download():
+def install():
     for file_name in os.listdir('bin/'):
         shutil.copy(os.path.join('bin/', file_name), path)
-    par='src/FragGeneScanPlusPlus-master.zip'
-    cmd_unzip="unzip "+par
+    par = 'src/FragGeneScanPlusPlus-master.zip'
+    cmd_unzip = "unzip "+par
     subprocess.call(cmd_unzip, shell=True)
     os.rename('FragGeneScanPlusPlus-master', 'FGSpp')
     shutil.move('FGSpp', path)
-    make=os.path.join(path, 'FGSpp')
+    make = os.path.join(path, 'FGSpp')
     subprocess.call(['make', '-C', make])
+    print("Files copied to '"+ path +"'")
+    print("Add this to your PATH or .bashrc for easier use:")
+    print('export PATH="$HOME/bin/cerberus:$PATH"')
 
 if __name__ == "__wrapper_download__":
-    wrapper_download()
+    install()
 
-wrapper_download()
+install()
