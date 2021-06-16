@@ -43,13 +43,13 @@ if __name__ == "__osf_Files_dir__":
 ##Downloads OSF files to osf_File directory
 
 def create_osf_Files():
-    osf_cmd = "wget https://osf.io/72p6g/download -v -O "+pathOSF+"/FOAM_readme.txt"
+    osf_cmd = "wget -c https://osf.io/72p6g/download -v -O "+pathOSF+"/FOAM_readme.txt"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/muan4/download -v -O "+pathOSF+"/FOAM-onto_rel1.tsv"
+    osf_cmd = "wget -c https://osf.io/muan4/download -v -O "+pathOSF+"/FOAM-onto_rel1.tsv"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/2hp7t/download -v -O "+pathOSF+"/KO_classification.txt"
+    osf_cmd = "wget -c https://osf.io/2hp7t/download -v -O "+pathOSF+"/KO_classification.txt"
     subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/bdpv5/download -v -O "+pathOSF+"/FOAM-hmm_rel1a.hmm.gz"
+    osf_cmd = "wget -c https://osf.io/bdpv5/download -v -O "+pathOSF+"/FOAM-hmm_rel1a.hmm.gz"
     subprocess.call(['bash', '-c', osf_cmd])
 
 if __name__ == "__create_osf_Files__":
@@ -57,7 +57,7 @@ if __name__ == "__create_osf_Files__":
 
 cerberus_dir()
 
-######################################Install dependencies#####################################
+#####################################Install dependencies#####################################
 
 def install_dependencies():
     conda_cmd = "conda create -n cerberus_env -c conda-forge -c bioconda hmmer prodigal pandas numpy plotly dash openpyxl matplotlib scikit-learn fastqc"
@@ -68,18 +68,19 @@ if __name__ == "__install_dependencies__":
 
 install_dependencies()
 
-#############################get current wrapper from github###################################
+#############################Install Cerberus to ~/bin/cerberus################################
 
 def install():
     for file_name in os.listdir('bin/'):
         shutil.copy(os.path.join('bin/', file_name), path)
-    par = 'src/FragGeneScanPlusPlus-master.zip'
-    cmd_unzip = "unzip "+par
+    par = 'src/FragGeneScanPlus-master.zip'
+    cmd_unzip = "unzip " + par
     subprocess.call(cmd_unzip, shell=True)
-    os.rename('FragGeneScanPlusPlus-master', 'FGSpp')
-    shutil.move('FGSpp', path)
-    make = os.path.join(path, 'FGSpp')
+    os.rename('FragGeneScanPlus-master', 'FGS+')
+    shutil.move('FGS+', path)
+    make = os.path.join(path, 'FGS+')
     subprocess.call(['make', '-C', make])
+    print(" ")
     print("Files copied to '"+ path +"'")
     print("Add this to your PATH or .bashrc for easier use:")
     print('export PATH="$HOME/bin/cerberus:$PATH"')

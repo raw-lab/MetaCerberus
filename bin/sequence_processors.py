@@ -1,36 +1,32 @@
 import os
-from os.path import isfile, join
-import sys
 import subprocess
 import csv
-def fastq_processing(fq_path, path, f_name,file):
+
+
+def fastq_processing(fq_path, path, f_name):
     trim_path=path+'/'+f_name+"_trim.fastq"
     cmd1="fastp -i "+fq_path+" -o " + trim_path
     cmd2="fastqc "+trim_path
     trim_fna=path+'/'+f_name+"_trim.fna"
-    cmd3="sed -n '1~4s/^@/>/p;2~4p' "+trim_path+"  > "+trim_fna
+    cmd3 = "sed -n '1~4s/^@/>/p;2~4p' "+trim_path+"  > "+trim_fna
     subprocess.call(cmd1,shell=True)
     subprocess.call(cmd2,shell=True)
     subprocess.call(cmd3,shell=True)
     return trim_fna
 
-def fna_processing(fna_path, path, f_name,file,virus):
-    # name="/prokka_results_"+f_name
-    # prokka_outdir = path + name+"/"
-    # print(path,234567)
-    # prokka_cmd = "prokka %s --outdir %s --prefix %s --centre clean --compliant --metagenome" %(fna_path, prokka_outdir, f_name)
-    # subprocess.call(prokka_cmd, shell=True)
+
+def fna_processing(fna_path, path, f_name, euk):
     script_dir = os.path.dirname(os.path.realpath(__file__))
-    path_to_faa=path+"/"+f_name+'_pro.faa'
-    if not virus:
-        cmd="prodigal -i %s -a %s"%(fna_path, path_to_faa)
+    path_to_faa = path + "/" + f_name + '_pro.faa'
+    nCPU = os.cpu_count()/2
+    if euk:
+        cmd="%s/FGS+/FGS+ -s %s -o %s -w 0 -r %s/FGS+/train -t 454_5 -p %s"%(script_dir, fna_path, path_to_faa[:-4], script_dir, nCPU)
     else:
-        print('FGSpp')
-        cmd="%s/FGSpp/FGSpp -s %s -o %s -w 0 -r %s/FGSpp/train -t 454_5 -p 16"%(script_dir,fna_path, path_to_faa[:-4],script_dir)
-    subprocess.call(cmd, shell=True)
-    # faa_path = prokka_outdir + f_name + ".faa"
-    # return faa_path,path+name
-    return path_to_faa,path
+        cmd="prodigal -i %s -a %s"%(fna_path, path_to_faa)
+    print(cmd)
+    subprocess.run(cmd, shell=True, stdout=open("process_fna.out", 'w'))
+    return path_to_faa
+
 
 def roll_up(KO_ID_dict, rollup_file):
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -77,14 +73,16 @@ def roll_up(KO_ID_dict, rollup_file):
         outfile.write(outline + "\n")
     return rollup_file
 
-def faa_processing(faa_path,path,f_name):
+
+def faa_processing(faa_path, path, f_name):
     output_path=path+os.sep+f_name+"_output"
     os.makedirs(output_path)
     output_path=os.path.join(output_path + os.sep, f_name)
     script_dir = os.path.dirname(os.path.realpath(__file__))
     hmm_file = os.path.join(script_dir, "osf_Files/FOAM-hmm_rel1a.hmm.gz")
-    hmm_cmd = "hmmsearch --cpu 28 --domtblout %s.FOAM.out %s %s" %(output_path, hmm_file, faa_path)
-    subprocess.call(hmm_cmd, shell=True)
+    nCPU = int(os.cpu_count()/2)
+    hmm_cmd = "hmmsearch --cpu %s --domtblout %s.FOAM.out %s %s" %(nCPU, output_path, hmm_file, faa_path)
+    subprocess.run(hmm_cmd, shell=True, stdout=open("process_faa.out", 'w'))
 
     BH_dict = {}
     BS_dict = {}

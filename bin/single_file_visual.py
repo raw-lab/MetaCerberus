@@ -1,23 +1,16 @@
 import os
-from os.path import isfile, join
-import sys
-import subprocess
-import csv
 import pandas as pd
-import plotly
 import numpy as np
 import plotly.express as px  # (version 4.7.0)
 import plotly.graph_objects as go
 import dash_table
-import datetime
 import dash  # (version 1.12.0) pip install dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 from plotly.offline import plot
-import webbrowser
-from threading import Timer
-import matplotlib.pyplot as plt
+
+
 def visual(table_value):
     table=table_value[0]
     path=table_value[1]
@@ -212,10 +205,10 @@ def visual(table_value):
 
     # app = dash.Dash(__name__) 
 
-    port = 8050 
+    #port = 8050 
 
-    def open_browser():
-        webbrowser.open_new("http://localhost:{}".format(port))
+    #def open_browser():
+    #    webbrowser.open_new("http://localhost:{}".format(port))
 
-    Timer(1, open_browser).start()
-    app.run_server(port=port)
+    #Timer(1, open_browser).start()
+    #app.run_server(port=port)

@@ -1,8 +1,4 @@
 import os
-from os.path import isfile, join
-import sys
-import subprocess
-import csv
 import pandas as pd
 import plotly
 import numpy as np
@@ -20,10 +16,7 @@ from threading import Timer
 import matplotlib.pyplot as plt
 
 
-
-
-
-def new_visual(path,table_list):
+def new_visual(path, table_list):
 
     app = dash.Dash(__name__)
     layout1 = go.Layout(
@@ -176,10 +169,10 @@ def new_visual(path,table_list):
 
     # app = dash.Dash(__name__) 
 
-    port = 8050 
+#    port = 8050 
 
-    def open_browser():
-        webbrowser.open_new("http://localhost:{}".format(port))
+#    def open_browser():
+#        webbrowser.open_new("http://localhost:{}".format(port))
 
-    Timer(1, open_browser).start()
-    app.run_server(port=port)
+#    Timer(1, open_browser).start()
+#    app.run_server(port=port)

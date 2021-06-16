@@ -1,12 +1,9 @@
 import os
-from os.path import isfile, join
-import sys
 import csv
 import pandas as pd
-import numpy as np
 
 
-def preprocess_data(path,file_name,table_list):
+def preprocess_data(path, file_name, table_list):
     file=file_name.split('/')[-1]
     f_name, f_ext = os.path.splitext(file)
 
@@ -53,3 +50,4 @@ def preprocess_data(path,file_name,table_list):
     table.drop(table[table['Name']=='NA'].index,inplace=True)
     table_list.append([table,path,f_name])
     return table
+    
