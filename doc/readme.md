@@ -8,6 +8,11 @@ Input formats:
 - type 2 nucleotide fasta (.fasta, .fa, .fna, .ffn format), assembled raw reads into contigs
 - type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence 
 
+Options in config
+-----
+- - euk (for eukaryotes FGS++)
+- - mic (for microbes)
+
 Table of Contents
 -------
 
@@ -44,11 +49,10 @@ Step 1 - Cerberus-master.py (control center of cerberus)
 -------
 
 - calls all the individual scripts etc
-
 - Refactor cerberus to call our functions
 
-get_args.py (put in here)
-def args() ()
+    get_args.py (put in here)
+    def args() ()
 
 ### Add the config file user uses here. 
 
@@ -68,19 +72,18 @@ Step 4 - Decon.py (bbduk from Rhea)
 
 Step 5 - format.py
 -------
-Cconvert fq to fna post trim
+- Convert fq to fna post trim
+- Removes the quality scores post trim
+- Removes N's from scaffold contigs (make an options in config)
 
 ## Example function (fq -> fna)
-def fastq_processing(fq_path, path, f_name):
-trim_path=path+'/'+f_name+"_trim.fastq"
-trim_fna=path+'/'+f_name+"_trim.fna"
-cmd1 = "sed -n '1~4s/^@/>/p;2~4p' "+trim_path+" > "+trim_fna ##I wrote this reg expression sed
-subprocess.call(cmd1,shell=True)
-return trim_fna
+    def fastq_processing(fq_path, path, f_name):
+    trim_path=path+'/'+f_name+"_trim.fastq"
+    trim_fna=path+'/'+f_name+"_trim.fna"
+    cmd1 = "sed -n '1~4s/^@/>/p;2~4p' "+trim_path+" > "+trim_fna ##I wrote this reg expression sed
+    subprocess.call(cmd1,shell=True)
+    return trim_fna
 
-Removes the quality scores post trim
-+
-IAIAIAAIA 
 
 ## REMOVE N’S here (from a scaffold or contig input)
 - LIKELY an easier way then this
