@@ -94,7 +94,7 @@ TAGAGTGTAGTG
 TTTAAA
 
 ### example from Thrilok
-def Ndeletion(input_file,output_file):
+    def Ndeletion(input_file,output_file):
     # input_file='./one.fna'
     # output_file=open('./out.txt','w')
     counter=1
@@ -147,7 +147,8 @@ Step 6 - hmmer.py (uniquely cerberus)
 hmm_cmd = "hmmsearch --cpu %s --domtblout %s.FOAM.out %s %s" %(nCPU, output_path, hmm_file, faa_path)
 
 ### example command I wrote (no worries if you have a better way !)
-def faa_processing(faa_path, path, f_name):
+
+    def faa_processing(faa_path, path, f_name):
     output_path=path+os.sep+f_name+"_output"
     os.makedirs(output_path)
     output_path=os.path.join(output_path + os.sep, f_name)
@@ -213,7 +214,7 @@ python bmn-KOoneCount_p3.py XXX.faa.FOAM.out.sort.BH.tmp2 | sed s/KO://g | sort 
 
 ### The Rollup function post parsing here
 ROLL-up of the .ko and .foam function
-def roll_up(KO_ID_dict, rollup_file):
+    def roll_up(KO_ID_dict, rollup_file):
     script_dir = os.path.dirname(os.path.realpath(__file__))
     FOAM_file = os.path.join(script_dir, "osf_Files/FOAM-onto_rel1.tsv")
     FOAM_dict = {}
