@@ -219,21 +219,21 @@ Parse output from hmmer search
 ### The Rollup function post parsing here
 - ROLL-up of the .ko and .foam function
 
-    def roll_up(KO_ID_dict, rollup_file):
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-    FOAM_file = os.path.join(script_dir, "osf_Files/FOAM-onto_rel1.tsv")
-    FOAM_dict = {}
-    reader = csv.reader(open(FOAM_file, "r"), delimiter="\t")
-    header = next(reader)
-    for line in reader:
+        def roll_up(KO_ID_dict, rollup_file):
+        script_dir = os.path.dirname(os.path.realpath(__file__))
+        FOAM_file = os.path.join(script_dir, "osf_Files/FOAM-onto_rel1.tsv")
+        FOAM_dict = {}
+        reader = csv.reader(open(FOAM_file, "r"), delimiter="\t")
+        header = next(reader)
+        for line in reader:
         KO_ID = line[4]
         FOAM_info = line[0:4]
         FOAM_dict[KO_ID] = FOAM_info
 
-    KEGG_file = os.path.join(script_dir, "osf_Files/KO_classification.txt")
-    KEGG_dict = {}
-    reader = csv.reader(open(KEGG_file, "r"), delimiter="\t")
-    for line in reader:
+        KEGG_file = ospath.join(script_dir, "osf_Files/KO_classification.txt")
+        KEGG_dict = {}
+        reader = csv.reader(open(KEGG_file, "r"), delimiter="\t")
+        for line in reader:
         if line[0] != "":
             tier_1 = line[0]
             continue
@@ -247,11 +247,11 @@ Parse output from hmmer search
         KEGG_info = [tier_1, tier_2, pathway] + line[4:]
         KEGG_dict[KO_ID] = KEGG_info
 
-    KO_ID_list = [key for key in KO_ID_dict]
-    KO_ID_list.sort()
+        KO_ID_list = [key for key in KO_ID_dict]
+        KO_ID_list.sort()
 
-    outfile = open(rollup_file, "w")
-    for KO_ID in KO_ID_list:
+        outfile = open(rollup_file, "w")
+        for KO_ID in KO_ID_list:
         try:
             FOAM_info = FOAM_dict[KO_ID]
         except KeyError:
@@ -262,7 +262,7 @@ Parse output from hmmer search
             KEGG_info = ["NA"]
         outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], FOAM_info, KEGG_info]])
         outfile.write(outline + "\n")
-    return rollup_file
+        return rollup_file
 
 ### UNSURE what preprocess_before_visual.py
 ### Formating the rollup prior to plotting?
