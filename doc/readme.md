@@ -144,7 +144,8 @@ Step 6 - GeneCall.py (RheaGeneCall.py from Rhea)
 Step 6 - hmmer.py (uniquely cerberus)
 -------
 - Searches using hmmer3
-hmm_cmd = "hmmsearch --cpu %s --domtblout %s.FOAM.out %s %s" %(nCPU, output_path, hmm_file, faa_path)
+- Command
+```hmm_cmd = "hmmsearch --cpu %s --domtblout %s.FOAM.out %s %s" %(nCPU, output_path, hmm_file, faa_path)```
 
 ### example command I wrote (no worries if you have a better way !)
 
@@ -196,24 +197,25 @@ Step 7 - Parser.py
 Parse output from hmmer search
 
 ### Sorted for parsing (top value on top)
-sort XXX.faa.FOAM.out > XXX.faa.FOAM.out.sort  
+```sort XXX.faa.FOAM.out > XXX.faa.FOAM.out.sort```  
 
 ### Grab top hit from sorted output
-python bmn-HMMerBestHit_p3.py XXX.faa.FOAM.out.sort > XXX.faa.FOAM.out.sort.BH 
+```python bmn-HMMerBestHit_p3.py XXX.faa.FOAM.out.sort > XXX.faa.FOAM.out.sort.BH``` 
 
-### Grab fouth line
-awk '{print $4}' XXX.faa.FOAM.out.sort.BH > XXX.faa.FOAM.out.sort.BH.tmp1 
+### Grab fouth column
+```awk '{print $4}' XXX.faa.FOAM.out.sort.BH > XXX.faa.FOAM.out.sort.BH.tmp1```
 
 ### counts elements 
-python bmn-CountEachElement_p3.py XXX.faa.FOAM.out.sort.BH.tmp1 > XXX.faa.FOAM.out.sort.BH.tmp2 
+```python bmn-CountEachElement_p3.py XXX.faa.FOAM.out.sort.BH.tmp1 > XXX.faa.FOAM.out.sort.BH.tmp2``` 
 - Maybe preprocess_before_visual.py? 
 
 ### count and adds up KO
-python bmn-KOoneCount_p3.py XXX.faa.FOAM.out.sort.BH.tmp2 | sed s/KO://g | sort -k 1 > XXX.faa.FOAM.out.sort.BH.KO
+```python bmn-KOoneCount_p3.py XXX.faa.FOAM.out.sort.BH.tmp2 | sed s/KO://g | sort -k 1 > XXX.faa.FOAM.out.sort.BH.KO```
 - Maybe preprocess_before_visual.py? 
 
 ### The Rollup function post parsing here
-ROLL-up of the .ko and .foam function
+- ROLL-up of the .ko and .foam function
+
     def roll_up(KO_ID_dict, rollup_file):
     script_dir = os.path.dirname(os.path.realpath(__file__))
     FOAM_file = os.path.join(script_dir, "osf_Files/FOAM-onto_rel1.tsv")
