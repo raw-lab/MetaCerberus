@@ -3,88 +3,97 @@
 import os
 import subprocess
 import shutil
+import argparse
 
 
-############################Set paths for file interactions###################################
-
-home = os.path.expanduser("~")
-path = os.path.join(home, "bin/cerberus")
-pathOSF = os.path.join(path, "osf_Files")
+# Global Variables
 access_rights = 0o755
+pathDB = "cerberusDB"
 
-############################Creates the cerberus folder########################################
 
-def cerberus_dir():
+# Install Program Files
+def install(path):
     try:
         os.makedirs(path, access_rights, exist_ok=True)
-    except OSError:
+    except:
         print ("Creation of the directory %s failed" % path)
-    else:
-        print("Successfully created the directory %s" % path)
-        osf_Files_dir()
+        return False
 
-if __name__ == "__cerberus_dir__":
-    cerberus_dir()
-
-####Creates osf file directory and initiates OSF file download cmd create_osf_Files()#########
-
-def osf_Files_dir():
-    try:
-        os.makedirs(pathOSF, access_rights)
-    except OSError:
-        print ("Creation of the directory %s failed" % pathOSF)
-    else:
-        print("Successfully created the directory %s" % pathOSF)
-        create_osf_Files()
-
-if __name__ == "__osf_Files_dir__":
-    osf_Files_dir()
-
-##Downloads OSF files to osf_File directory
-
-def create_osf_Files():
-    osf_cmd = "wget https://osf.io/72p6g/download -v -O "+pathOSF+"/FOAM_readme.txt"
-    subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/muan4/download -v -O "+pathOSF+"/FOAM-onto_rel1.tsv"
-    subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/2hp7t/download -v -O "+pathOSF+"/KO_classification.txt"
-    subprocess.call(['bash', '-c', osf_cmd])
-    osf_cmd = "wget https://osf.io/bdpv5/download -v -O "+pathOSF+"/FOAM-hmm_rel1a.hmm.gz"
-    subprocess.call(['bash', '-c', osf_cmd])
-
-if __name__ == "__create_osf_Files__":
-    create_osf_Files()
-
-cerberus_dir()
-
-######################################Install dependencies#####################################
-
-def install_dependencies():
-    conda_cmd = "conda create -n cerberus_env -c conda-forge -c bioconda hmmer prodigal pandas numpy plotly dash openpyxl matplotlib scikit-learn fastqc"
-    subprocess.call(conda_cmd, shell=True)
-
-if __name__ == "__install_dependencies__":
-    install_dependencies()
-
-install_dependencies()
-
-#############################get current wrapper from github###################################
-
-def install():
     for file_name in os.listdir('bin/'):
-        shutil.copy(os.path.join('bin/', file_name), path)
-    par = 'src/FragGeneScanPlusPlus-master.zip'
+        file = os.path.join('bin', file_name)
+        if os.path.isfile(file):
+            shutil.copy(file, path)
+    par = 'src/FragGeneScanPlus-master.zip'
     cmd_unzip = "unzip "+par
     subprocess.call(cmd_unzip, shell=True)
-    os.rename('FragGeneScanPlusPlus-master', 'FGSpp')
-    shutil.move('FGSpp', path)
-    make = os.path.join(path, 'FGSpp')
+    os.rename('FragGeneScanPlus-master', 'FGS+')
+    shutil.move('FGS+', path)
+    make = os.path.join(path, 'FGS+')
     subprocess.call(['make', '-C', make])
-    print("Files copied to '"+ path +"'")
+    print("\nProgram files copied to '"+ path +"'")
     print("Add this to your PATH or .bashrc for easier use:")
-    print('export PATH="$HOME/bin/cerberus:$PATH"')
+    print(f'export PATH="{path}:$PATH"')
+    return True
 
-if __name__ == "__wrapper_download__":
-    install()
 
-install()
+# Download FOAM and KO from OSF
+def download_db(path):
+    dbdir = os.path.join(path, pathDB)
+    try:
+        os.makedirs(dbdir, access_rights, exist_ok=True)
+    except:
+        print ("Creation of the directory %s failed" % pathDB)
+        return False
+
+    osf_cmd = "wget https://osf.io/72p6g/download -v -O "+dbdir+"/FOAM_readme.txt -c"
+    subprocess.call(['bash', '-c', osf_cmd])
+    osf_cmd = "wget https://osf.io/muan4/download -v -O "+dbdir+"/FOAM-onto_rel1.tsv -c"
+    subprocess.call(['bash', '-c', osf_cmd])
+    osf_cmd = "wget https://osf.io/2hp7t/download -v -O "+dbdir+"/KO_classification.txt -c"
+    subprocess.call(['bash', '-c', osf_cmd])
+    osf_cmd = "wget https://osf.io/bdpv5/download -v -O "+dbdir+"/FOAM-hmm_rel1a.hmm.gz -c"
+    subprocess.call(['bash', '-c', osf_cmd])
+
+    return
+
+
+######################################Install dependencies#####################################
+def install_dependencies():
+    conda_cmd = "conda create -n cerberus -c conda-forge -c bioconda hmmer prodigal fastqc fastp bbmap pandas numpy plotly openpyxl matplotlib scikit-learn python=3.7 -y"
+    subprocess.call(conda_cmd, shell=True)
+    # TODO: 'conda activate' command not working through script, manually install ray for now.
+    #pip_cmd = "conda activate cerberus ; pip install ray[default]"
+    #subprocess.call(pip_cmd, shell=True)
+    print("WARNING")
+    print("Please manually install 'ray' by issuing the following commands:")
+    print("> conda activate cerberus")
+    print("> pip install ray[default]")
+    return
+
+
+def main():
+    ## Parse the command line
+    parser = argparse.ArgumentParser(add_help=False)
+    required = parser.add_argument_group('required arguments')
+    required.add_argument('-p', "--path", type=str, help='path to install directory. Default is to install in downloaded path', required=True)
+    optional = parser.add_argument_group('optional arguments')
+    optional.add_argument('-i', '--install', action='store_true', help='Only copy the scripts to "path"')
+    optional.add_argument('-d', '--download', action='store_true', help='Only download FOAM and KO database')
+    optional.add_argument('-e', '--environment', action='store_true', help='Only create the cerberus conda environment with dependencies installed')
+    optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
+    args = parser.parse_args()
+
+    if any([args.install, args.download, args.environment]):
+        if args.install:
+            install(args.path)
+        if args.download:
+            download_db(args.path)
+        if args.environment:
+            install_dependencies()
+    else:
+        install(args.path)
+        download_db(args.path)
+        install_dependencies()
+
+if __name__ == "__main__":
+    main()

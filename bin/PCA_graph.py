@@ -11,7 +11,8 @@ import glob
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-def PCA1(path,table_list):
+
+def PCA1(path, table_list):
 #     m='/home/taouk/Desktop/robo/data/prokka_results_N139.ffn/N139_output/N139.FOAM.out.sort.BH.KO_output'
 #     z='/home/taouk/Desktop/robo/data/N139_output/N139.FOAM.out.sort.BH.KO_output'
 #     x='/home/taouk/Desktop/robo/data/input_dir/prokka_results_Agro_10k_R1.fastq/Agro_10k_R1_output/Agro_10k_R1.FOAM.out.sort.BH.KO_output'
@@ -34,14 +35,17 @@ def PCA1(path,table_list):
         filelist.append(a)
             
     print(filelist)
-    df_merged2 = reduce(lambda  left,right: pd.merge(left,right,on=['Name'],
-                                                how='outer'), filelist)
-    result=df_merged2.replace(np.nan, 0)
-    pivoted=result.T
-    res=pivoted.rename(columns=pivoted.iloc[0])
+    df_merged2 = reduce(lambda  left,
+                        right: pd.merge(left,
+                        right,
+                        on=['Name'],
+                        how='outer'), filelist)
+    result = df_merged2.replace(np.nan, 0)
+    pivoted = result.T
+    res = pivoted.rename(columns=pivoted.iloc[0])
     res1=res.drop(res.index[0])
-    pca = PCA(n_components=3,svd_solver='randomized')
-    X_train= pca.fit_transform(res1)
+    pca = PCA(n_components=3, svd_solver='randomized')
+    X_train = pca.fit_transform(res1)
     labels = {
     str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
     for i, var in enumerate(pca.explained_variance_ratio_ * 100)
@@ -58,22 +62,22 @@ def PCA1(path,table_list):
     
     })
     fig.update_layout(scene = dict(
-                        xaxis = dict(
-                            backgroundcolor="rgb(255,255, 255)",
-                            gridcolor="black",
-                            showbackground=True,
-                            zerolinecolor="black",),
-                        yaxis = dict(
-                            backgroundcolor="rgb(255,255, 255)",
-                            gridcolor="black",
-                            showbackground=True,
-                            zerolinecolor="black"),
-                        zaxis = dict(
-                            backgroundcolor="rgb(255,255, 255)",
-                            gridcolor="black",
-                            showbackground=True,
-                            zerolinecolor="black",),),
-                    
-                    )
+            xaxis = dict(
+                backgroundcolor="rgb(255,255, 255)",
+                gridcolor="black",
+                showbackground=True,
+                zerolinecolor="black",),
+            yaxis = dict(
+                backgroundcolor="rgb(255,255, 255)",
+                gridcolor="black",
+                showbackground=True,
+                zerolinecolor="black"),
+            zaxis = dict(
+                backgroundcolor="rgb(255,255, 255)",
+                gridcolor="black",
+                showbackground=True,
+                zerolinecolor="black",),),
+        
+        )
     # fig.show()
     plot(fig, filename=path+'/'+'PCA_plot'+".html", auto_open=False)
