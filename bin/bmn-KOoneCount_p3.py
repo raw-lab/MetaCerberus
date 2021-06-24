@@ -35,7 +35,7 @@ with open(args.rawKOcount, 'r') as KOfile:
             continue
         [KO,n1]=line.split()
         Ksplit=KO.split(',')
-        n2=round(float(n1)/len(Ksplit)) #Alexander Brown added round()
+        n2=round(float(n1)/len(Ksplit)) 
         for K in Ksplit:
             if K in nmap:
                 nmap[K]=nmap[K]+n2
