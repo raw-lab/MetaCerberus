@@ -77,6 +77,7 @@ Example:
     required.add_argument('-m', '--mic', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument("-c", "--config", help = "path to configuration file", type=argparse.FileType('r'))
+    optional.add_argument("-o", "--outpath", help = "path to output directory. Defaults to current directory.", type=str)
     optional.add_argument('--version', '-v', action='version',
                         version='Cerberus: \n version: {} June 24th 2021'.format(__version__),
                         help='show the version number and exit')
@@ -101,7 +102,10 @@ Example:
         config['EUK'] = args.euk
     if args.mic:
         config['MIC'] = args.mic
+    if args.outpath:
+        config['DIR_OUT'] = args.outpath
     print(config)
+
     # search dependency paths
     # TODO: Check versions as well
     print("Checking environment for dependencies:")
@@ -151,7 +155,7 @@ Example:
     if 'DIR_OUT' not in config:
         config['DIR_OUT'] = os.path.abspath("./pipeline")
     else:
-        config['DIR_OUT'] += "./pipeline"
+        os.path.join(config['DIR_OUT'], "pipeline")
     os.makedirs(config['DIR_OUT'], exist_ok=True)
 
     # Step 1 - Load Input Files
@@ -194,83 +198,91 @@ Example:
 
     print(f"\nFastq files: {fastq}")
     print(f"\nFasta files: {fasta}")
-    print(f"\nAmino Acids: {amino}")
+
 
     # Step 2 (check quality of fastq files)
-    print("\nSTEP 2: Checking quality of fastq files")
     jobs = []
-    for key,value in fastq.items():
-        jobs.append(rayWorker.remote(cerberusQC.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
+    if fastq:
+        print("\nSTEP 2: Checking quality of fastq files")
+        for key,value in fastq.items():
+            jobs.append(rayWorker.remote(cerberusQC.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
 
 
     # Step 3 (trim fastq files)
-    print("\nSTEP 3: Trimming fastq files")
     jobTrim = []
-    for key,value in fastq.items():
-        jobTrim.append(rayWorker.remote(cerberusTrim.trimReads, key, [key, value], config, f"{STEP[3]}/{key}"))
+    if fastq:
+        print("\nSTEP 3: Trimming fastq files")
+        for key,value in fastq.items():
+            jobTrim.append(rayWorker.remote(cerberusTrim.trimReads, key, [key, value], config, f"{STEP[3]}/{key}"))
 
+    # Waitfor Trimmed Reads
     trimmedReads = {}
-    print("Waiting for trimming jobs")
     for job in jobTrim:
         key,value = ray.get(job)
         trimmedReads[key] = value
-    print(f"\nTrimmed Files: {trimmedReads}")
+    if trimmedReads:
+        print(f"\nTrimmed Files: {trimmedReads}")
 
-    print("\nChecking quality of trimmed files")
-    for key,value in trimmedReads.items():
-        jobs.append(rayWorker.remote(cerberusQC.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+    if trimmedReads:
+        print("\nChecking quality of trimmed files")
+        for key,value in trimmedReads.items():
+            jobs.append(rayWorker.remote(cerberusQC.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
-    print("\nSTEP 4: Decontaminating trimmed files")
     jobDecon = []
-    for key,value in trimmedReads.items():
-        jobDecon.append(rayWorker.remote(cerberusDecon.deconReads, key, [key, value], config, f"{STEP[4]}/{key}"))
+    if trimmedReads:
+        print("\nSTEP 4: Decontaminating trimmed files")
+        for key,value in trimmedReads.items():
+            jobDecon.append(rayWorker.remote(cerberusDecon.deconReads, key, [key, value], config, f"{STEP[4]}/{key}"))
 
     deconReads = {}
     for job in jobDecon:
         key,value = ray.get(job)
         deconReads[key] = value
-    print(f"Decontaminated reads: {deconReads}")
+    if deconReads:
+        print(f"Decontaminated reads: {deconReads}")
 
 
     # step 5a for cleaning contigs
-    print("\nSTEP 5a: Removing N's from contig files")
     jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
-    for key,value in fasta.items():
-        jobContigs.append(rayWorker.remote(cerberusFormat.removeN, key, value, config, f"{STEP[5]}/{key}"))
+    if fasta:
+        print("\nSTEP 5a: Removing N's from contig files")
+        for key,value in fasta.items():
+            jobContigs.append(rayWorker.remote(cerberusFormat.removeN, key, value, config, f"{STEP[5]}/{key}"))
     
     for job in jobContigs:
         key,value = ray.get(job)
         fasta[key] = value
 
     # step 5b Format (convert fq to fna. Remove quality scores and N's)
-    print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
     jobFormat = []
-    for key,value in deconReads.items():
-        jobFormat.append(rayWorker.remote(cerberusFormat.reformat, key, value, config, f"{STEP[5]}/{key}"))
+    if deconReads:
+        print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
+        for key,value in deconReads.items():
+            jobFormat.append(rayWorker.remote(cerberusFormat.reformat, key, value, config, f"{STEP[5]}/{key}"))
 
     for job in jobFormat:
         key, value = ray.get(job)
         fasta[key] = value
-
-    print(f"Fasta reads: {fasta}")
+    if fasta:
+        print(f"FASTA reads: {fasta}")
 
 
     # step 6 (ORF Finder)
-    print("STEP 6: ORF Finder")
     jobGenecall = []
-    for key,value in fasta.items():
-        if key.startswith("euk_"):
-            jobGenecall.append(rayWorker.remote(cerberusGenecall.findORF_euk, key, value, config, f"{STEP[6]}/{key}"))
-        else:
-            jobGenecall.append(rayWorker.remote(cerberusGenecall.findORF_mic, key, value, config, f"{STEP[6]}/{key}"))
+    if fasta:
+        print("STEP 6: ORF Finder")
+        for key,value in fasta.items():
+            if key.startswith("euk_"):
+                jobGenecall.append(rayWorker.remote(cerberusGenecall.findORF_euk, key, value, config, f"{STEP[6]}/{key}"))
+            else:
+                jobGenecall.append(rayWorker.remote(cerberusGenecall.findORF_mic, key, value, config, f"{STEP[6]}/{key}"))
 
-
+    # Waiting for GeneCall
     for job in jobGenecall:
         key,value = ray.get(job)
         amino[key] = value
-
     print(f"Amino Acids: {amino}")
 
 
@@ -281,7 +293,6 @@ Example:
         jobHMM.append(rayWorker.remote(cerberusHMMER.search, key, value, config, f"{STEP[7]}/{key}"))
 
     hmmFoam = {}
-    hmmRollup = {}
     print("Waiting for HMMER")
     for job in jobHMM:
         key,value = ray.get(job)
@@ -294,12 +305,13 @@ Example:
     print("STEP 8: Parse HMMER results")
     jobParse = []
     for key,value in hmmFoam.items():
-        jobParse.append(rayWorker.remote(cerberusParser.parse, key, value, config, f"{STEP[8]}/{key}"))
         jobParse.append(rayWorker.remote(cerberusParser.parseHmmer, key, value, config, f"{STEP[8]}/{key}"))
 
+    hmmRollup = {}
     print("Waiting for parsed results")
     for job in jobParse:
         key,value = ray.get(job)
+        hmmRollup[key] = value
 
 
     # step 9 (Visual)
@@ -307,6 +319,11 @@ Example:
     for key,value in hmmRollup.items():
         cerberusVisual.createReport(value, config, f"{STEP[9]}/{key}")
 
+
+    # Wait for misc jobs
+    print("Waiting for lingering jobs")
+    for job in jobs:
+        key,value = ray.get(job)
 
     # Finished!
     print("\nFinished Pipeline")

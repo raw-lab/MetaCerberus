@@ -20,11 +20,12 @@ def search(aminoAcid, config, subdir):
     foamOut = os.path.join(path, name)
 
     # HMMER
-    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-        try:
-            command = f'hmmsearch --cpu {config["CPUS"]} --domtblout {foamOut} {foamDB} {aminoAcid}'
-            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-        except:
-            print("Error: failed to run: " + command)
+    try:
+        command = f'hmmsearch --cpu {config["CPUS"]} --domtblout {foamOut} {foamDB} {aminoAcid}'
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=ferr)
+            #TODO: Add option to redirect output to file
+    except:
+        print("Error: failed to run: " + command)
 
     return foamOut
