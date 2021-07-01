@@ -12,6 +12,7 @@ import sys
 import os
 import subprocess
 import argparse
+import shutil
 import re
 import multiprocessing as mp
 import time
@@ -155,7 +156,7 @@ Example:
     if 'DIR_OUT' not in config:
         config['DIR_OUT'] = os.path.abspath("./pipeline")
     else:
-        os.path.join(config['DIR_OUT'], "pipeline")
+        config['DIR_OUT'] = os.path.abspath(os.path.join(config['DIR_OUT'], "pipeline"))
     os.makedirs(config['DIR_OUT'], exist_ok=True)
 
     # Step 1 - Load Input Files
@@ -307,25 +308,25 @@ Example:
     for key,value in hmmFoam.items():
         jobParse.append(rayWorker.remote(cerberusParser.parseHmmer, key, value, config, f"{STEP[8]}/{key}"))
 
-    hmmRollup = {}
+    hmmTable = {}
     print("Waiting for parsed results")
     for job in jobParse:
         key,value = ray.get(job)
-        hmmRollup[key] = value
-        print(cerberusParser.preprocess_data(value), file=open(f"{value}.table", 'w'))
+        hmmTable[key] = cerberusParser.preprocess_data(value)
 
 
     # step 9 (Visual)
-    print("Creating plots COMMING SOON") #TODO: Implement plots once confident on FOAM/KO Results
-    for key,value in hmmRollup.items():
-        cerberusVisual.createReport(value, config, f"{STEP[9]}/{key}")
+    print("Creating plots")
+    for key,value in hmmTable.items():
+        cerberusVisual.createReport(value, config, f"{STEP[9]}")
+        jobs.append(rayWorker.remote(cerberusVisual.create_html, key, value, config, f"{STEP[9]}"))
 
 
     # Wait for misc jobs
     print("Waiting for lingering jobs")
     ready, pending = ray.wait(jobs)
     while(pending):
-        print(ready, pending)
+        print(len(pending))
         ready, pending = ray.wait(pending)
 
     # Finished!
