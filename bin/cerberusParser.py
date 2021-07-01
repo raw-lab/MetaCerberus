@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """cerberusParser.py Parses HMMER output and identifies KOs with FOAM and KEGG DB info
-1) Get top hits
-2) Store best score
-3) Save rollup file
+1) Get best hits
+2) Save rollup file
+3) Convert rollup file to table
 """
 
 import os
 import csv
-from collections import Counter
+import pandas as pd
 
 
 def parseHmmer(hmmer, config, subdir):
@@ -92,3 +92,52 @@ def roll_up(KO_ID_dict, rollup_file, dbPath):
             outfile.write(outline + "\n")
 
     return rollup_file
+
+
+########## processRollup #########
+def preprocess_data(file_name):
+    df = pd.read_csv(file_name, names=['Id','Count','Foam','KO'], delimiter='\t')
+    if df.empty:
+        return
+
+    # Reformat data. This method avoids chained indexing
+    # Splits string into list, strips brackets and quotes
+    def helper(x):
+        x = x.strip('[]').split("', ")
+        return [i.strip("'") for i in x]
+    
+    # Convert 'Count" column to numeric
+    df["Count"] = pd.to_numeric(df["Count"])
+    # call helper method to reformat 'FOAM' and 'KO' columns
+    df['Foam'] = df['Foam'].apply(helper)
+    df['KO'] = df['KO'].apply(helper)
+
+    # Calculate Layer and Count #TODO: Refactor this section for clarity
+    dictFoam = {}
+    dictKO = {}
+    for row in range(len(df)):
+        for j in range(len(df['Foam'][row])):
+            # Store name in dictionary, default is zero count
+            dictFoam[df['Foam'][row][j]] = dictFoam.get(df['Foam'][row][j], ["",0])
+            # Get current name count from dictionary
+            n,m = dictFoam[df['Foam'][row][j]]
+            # j+1 is layer, m is count
+            dictFoam[df['Foam'][row][j]] = [j+1, m+df['Count'][row]]
+        
+        for j in range(len(df['KO'][row])):
+            dictKO[df['KO'][row][j]] = dictKO.get(df['KO'][row][j],["",0])
+            n,m = dictKO[df['KO'][row][j]]
+            dictKO[df['KO'][row][j]] = [j+1,m+df['Count'][row]]
+    
+    # Create Layer and Count Columns
+    a = {'Type':'Foam','Name':list(dictFoam.keys()),'Layer':[x[0] for x in dictFoam.values()],'Count':[x[1] for x in dictFoam.values()]}
+    FT = pd.DataFrame(data=a)
+    a2 = {'Type':'KO','Name':list(dictKO.keys()),'Layer':[x[0] for x in dictKO.values()],'Count':[x[1] for x in dictKO.values()]}
+    KT = pd.DataFrame(data=a2)
+    table = pd.concat([FT,KT])
+
+    # Drop invalid rows. #TODO: Bug here, when deletes, moving to before table concat may fix it.
+    table.drop(table[table['Name']==''].index, inplace=True)
+    table.drop(table[table['Name']=="'"].index, inplace=True)
+    table.drop(table[table['Name']=='NA'].index, inplace=True)
+    return table

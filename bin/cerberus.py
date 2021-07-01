@@ -312,6 +312,7 @@ Example:
     for job in jobParse:
         key,value = ray.get(job)
         hmmRollup[key] = value
+        print(cerberusParser.preprocess_data(value), file=open(f"{value}.table", 'w'))
 
 
     # step 9 (Visual)
@@ -322,8 +323,10 @@ Example:
 
     # Wait for misc jobs
     print("Waiting for lingering jobs")
-    for job in jobs:
-        key,value = ray.get(job)
+    ready, pending = ray.wait(jobs)
+    while(pending):
+        print(ready, pending)
+        ready, pending = ray.wait(pending)
 
     # Finished!
     print("\nFinished Pipeline")
