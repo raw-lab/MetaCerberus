@@ -20,7 +20,7 @@ import socket
 import ray
 
 import cerberusQC, cerberusTrim, cerberusDecon, cerberusFormat
-import cerberusGenecall, cerberusHMMER, cerberusParser, cerberusVisual
+import cerberusGenecall, cerberusHMMER, cerberusParser, cerberusReport
 
 
 ## Global variables
@@ -92,11 +92,14 @@ Example:
     # Initialize RAY for Multithreading
     ray.init()
 
-    config = {}
     if args.config is not None:
         print("\nLoading Configuration")
         config = loadConfig(args.config)
         args.config.close()
+    else:
+        config = {}
+    
+    config["FLAGS"] = []
 
     # Merge config with parsed arguments
     if args.euk:
@@ -177,8 +180,10 @@ Example:
             elif ext in FILES_AMINO:
                 amino[name] = item
         elif os.path.isdir(item):
-            print(f'{item} is a directory, not a file') #TODO: ???implement loading all files in directory???
-            # fastq, fasta = readFiles(item)
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_FASTQ + FILES_FASTA:
+                    args.mic.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid file')
     for item in args.euk:
@@ -192,13 +197,17 @@ Example:
             elif ext in FILES_AMINO:
                 amino[name] = item
         elif os.path.isdir(item):
-            print(f'{item} is a directory, not a file') #TODO: ???implement loading all files in directory???
-            # fastq, fasta = readFiles(item)
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_FASTQ + FILES_FASTA:
+                    args.euk.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid file')
 
-    print(f"\nFastq files: {fastq}")
-    print(f"\nFasta files: {fasta}")
+    print("Loading sequence files from config file or command line.")
+    print(f"\nFastq sequences: {fastq}")
+    print(f"\nFasta sequences: {fasta}")
+    print(f"\nProtein Sequences: {amino}")
 
 
     # Step 2 (check quality of fastq files)
@@ -221,8 +230,6 @@ Example:
     for job in jobTrim:
         key,value = ray.get(job)
         trimmedReads[key] = value
-    if trimmedReads:
-        print(f"\nTrimmed Files: {trimmedReads}")
 
     if trimmedReads:
         print("\nChecking quality of trimmed files")
@@ -241,13 +248,11 @@ Example:
     for job in jobDecon:
         key,value = ray.get(job)
         deconReads[key] = value
-    if deconReads:
-        print(f"Decontaminated reads: {deconReads}")
 
 
     # step 5a for cleaning contigs
     jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
-    if fasta:
+    if fasta and "scaf" in config["FLAGS"]:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
             jobContigs.append(rayWorker.remote(cerberusFormat.removeN, key, value, config, f"{STEP[5]}/{key}"))
@@ -266,8 +271,6 @@ Example:
     for job in jobFormat:
         key, value = ray.get(job)
         fasta[key] = value
-    if fasta:
-        print(f"FASTA reads: {fasta}")
 
 
     # step 6 (ORF Finder)
@@ -284,7 +287,6 @@ Example:
     for job in jobGenecall:
         key,value = ray.get(job)
         amino[key] = value
-    print(f"Amino Acids: {amino}")
 
 
     # step 7 (HMMER)
@@ -293,13 +295,11 @@ Example:
     for key,value in amino.items():
         jobHMM.append(rayWorker.remote(cerberusHMMER.search, key, value, config, f"{STEP[7]}/{key}"))
 
-    hmmFoam = {}
     print("Waiting for HMMER")
+    hmmFoam = {}
     for job in jobHMM:
         key,value = ray.get(job)
         hmmFoam[key] = value
-
-    print(f"HMM Foam: {hmmFoam}")
 
 
     # step 8 (Parser)
@@ -308,25 +308,27 @@ Example:
     for key,value in hmmFoam.items():
         jobParse.append(rayWorker.remote(cerberusParser.parseHmmer, key, value, config, f"{STEP[8]}/{key}"))
 
-    hmmTable = {}
+    hmmTables = {}
     print("Waiting for parsed results")
     for job in jobParse:
         key,value = ray.get(job)
-        hmmTable[key] = cerberusParser.preprocess_data(value)
+        hmmTables[key] = cerberusParser.createTables(value)
 
 
-    # step 9 (Visual)
-    print("Creating plots")
-    for key,value in hmmTable.items():
-        cerberusVisual.createReport(value, config, f"{STEP[9]}")
-        jobs.append(rayWorker.remote(cerberusVisual.create_html, key, value, config, f"{STEP[9]}"))
+    # step 9 (Report)
+    print("Creating Reports")
+    #for key,value in hmmTables.items():
+    #    jobs.append(rayWorker.remote(cerberusVisual.create_html, key, [key,value], config, f"{STEP[9]}"))
+    cerberusReport.createReport(hmmTables, config, f"{STEP[9]}")
+    #if len(hmmTables) > 2:
+    #    cerberusVisual.graphPCA(f"{STEP[9]}", hmmTables.values())
 
 
     # Wait for misc jobs
     print("Waiting for lingering jobs")
     ready, pending = ray.wait(jobs)
     while(pending):
-        print(len(pending))
+        print(f"Waiting for {len(pending)} jobs.")
         ready, pending = ray.wait(pending)
 
     # Finished!
@@ -345,49 +347,6 @@ def loadConfig(configFile):
         config[line[0].strip()] = line[1].strip()
     
     return config
-
-
-## readFiles
-def readFiles(config):
-    rawReads = {}
-    contigs = {}
-    indir = config['DIR_IN']
-    for filename in os.listdir(indir):
-        filepath = f"{indir}/{filename}"
-        print(f"Checking file: {filename}:")
-        if (os.path.abspath(filepath) == os.path.abspath(config['REFSEQ']) or
-                os.path.abspath(filepath) == os.path.abspath(config['REF_LAMBDA'])):
-            print("Skipping Reference Sequence")
-            continue
-        if os.path.abspath(filepath) == os.path.abspath(config['ADAPTER']):
-            print("ADAPTER file, skipping")
-            continue
-        if filename.endswith(tuple(FILES_QUALITY)): # With quality scores
-            ext = list(filter(filename.endswith, FILES_QUALITY))[0]
-            if "_R2.fastq" in filename:
-                print("reverse read")
-                continue
-            if "_R1.fastq" in filename:
-                baseName = filename.replace("_R1"+ext, "")
-                reverseFile = filepath.replace("_R1"+ext, "_R2"+ext)
-                if not os.path.exists(filepath):
-                    # print("The reverse file does not exist, assuming single read.")
-                    rawReads[filename] = filepath
-                    continue
-                else:
-                    print(f"Paired End File")
-                    rawReads[baseName] = (filepath, reverseFile)
-                    continue
-            else:
-                print(f"Single Read File")
-                rawReads[filename] = filepath
-                continue
-        elif filename.endswith(tuple(FILES_CONTIG)):
-            print(f"Assembly File")
-            contigs[filename] = filepath
-        else:
-            print("not a sequence file")
-    return (rawReads, contigs)
 
 
 ## Start main method

@@ -94,9 +94,9 @@ def roll_up(KO_ID_dict, rollup_file, dbPath):
     return rollup_file
 
 
-########## processRollup #########
-def preprocess_data(file_name):
-    df = pd.read_csv(file_name, names=['Id','Count','Foam','KO'], delimiter='\t')
+########## createTables #########
+def createTables(fileRollup):
+    df = pd.read_csv(fileRollup, names=['Id','Count','Foam','KO'], delimiter='\t')
     if df.empty:
         return
 
@@ -112,7 +112,7 @@ def preprocess_data(file_name):
     df['Foam'] = df['Foam'].apply(helper)
     df['KO'] = df['KO'].apply(helper)
 
-    # Calculate Layer and Count #TODO: Refactor this section for clarity
+    # Calculate Level and Count #TODO: Refactor this section for clarity
     dictFoam = {}
     dictKO = {}
     for row in range(len(df)):
@@ -121,7 +121,7 @@ def preprocess_data(file_name):
             dictFoam[df['Foam'][row][j]] = dictFoam.get(df['Foam'][row][j], ["",0])
             # Get current name count from dictionary
             n,m = dictFoam[df['Foam'][row][j]]
-            # j+1 is layer, m is count
+            # j+1 is Level, m is count
             dictFoam[df['Foam'][row][j]] = [j+1, m+df['Count'][row]]
         
         for j in range(len(df['KO'][row])):
@@ -129,15 +129,19 @@ def preprocess_data(file_name):
             n,m = dictKO[df['KO'][row][j]]
             dictKO[df['KO'][row][j]] = [j+1,m+df['Count'][row]]
     
-    # Create Layer and Count Columns
-    a = {'Type':'Foam','Name':list(dictFoam.keys()),'Layer':[x[0] for x in dictFoam.values()],'Count':[x[1] for x in dictFoam.values()]}
-    FT = pd.DataFrame(data=a)
-    a2 = {'Type':'KO','Name':list(dictKO.keys()),'Layer':[x[0] for x in dictKO.values()],'Count':[x[1] for x in dictKO.values()]}
-    KT = pd.DataFrame(data=a2)
-    table = pd.concat([FT,KT])
 
-    # Drop invalid rows. #TODO: Bug here, when deletes, moving to before table concat may fix it.
-    table.drop(table[table['Name']==''].index, inplace=True)
-    table.drop(table[table['Name']=="'"].index, inplace=True)
-    table.drop(table[table['Name']=='NA'].index, inplace=True)
-    return table
+    # Create Level and Count Columns
+    dataFOAM = {'Type':'Foam',
+        'Name':list(dictFoam.keys()),
+        'Level':[x[0] for x in dictFoam.values()],
+        'Count':[x[1] for x in dictFoam.values()]}
+    FT = pd.DataFrame(data=dataFOAM)
+    FT.drop(FT[FT['Name']==''].index, inplace=True)
+    FT.drop(FT[FT['Name']=='NA'].index, inplace=True)
+    
+    dataKO = {'Type':'KO','Name':list(dictKO.keys()),'Level':[x[0] for x in dictKO.values()],'Count':[x[1] for x in dictKO.values()]}
+    KT = pd.DataFrame(data=dataKO)
+    KT.drop(KT[KT['Name']==''].index, inplace=True)
+    KT.drop(KT[KT['Name']=='NA'].index, inplace=True)
+
+    return pd.concat([FT,KT])

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 import os
 import subprocess
 
@@ -12,7 +11,6 @@ def findORF_mic(contig, config, subdir):
     fout = open(f"{path}/stdout.txt", 'w')
     ferr = open(f"{path}/stderr.txt", 'w')
 
-    
     try:
         command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {path}/proteins.faa -f gff"
         subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
@@ -33,7 +31,7 @@ def findORF_euk(contig, config, subdir):
 
     FGStrain = f"{os.path.dirname(config['EXE_FGS+'])}/train"
 
-    command = f"{config['EXE_FGS+']} -s {contig} -o {path}/proteins -w 0 -r {FGStrain} -t 454_5"
+    command = f"{config['EXE_FGS+']} -s {contig} -o {path}/proteins -w 0 -r {FGStrain} -t complete "
     subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
 
     fout.close()
