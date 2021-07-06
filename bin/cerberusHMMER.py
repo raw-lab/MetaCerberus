@@ -19,7 +19,7 @@ def search(aminoAcid, config, subdir):
     name = os.path.splitext(name)[0] + ".FOAM.out"
     foamOut = os.path.join(path, name)
 
-    return foamOut #TODO: debug code for faster tests
+    #return foamOut #TODO: debug code for faster duplicate tests
     # HMMER
     try:
         command = f'hmmsearch --cpu {config["CPUS"]} --domtblout {foamOut} {foamDB} {aminoAcid}'
