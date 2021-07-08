@@ -9,13 +9,8 @@ import subprocess
 import textwrap
 
 
-# trimReads
-def reformat(fastq, config, subdir):
-    return format_fastq(fastq, config, subdir)
-    
-
 ## format_fastq
-def format_fastq(fastq, config, subdir):
+def reformat(fastq, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)    
 
@@ -28,6 +23,20 @@ def format_fastq(fastq, config, subdir):
     return fasta
 
 
+def splitSequence(name, sequence):
+    sequences = sequence.split("N")
+    sequences = [seq for seq in sequences if len(seq)>0]
+    name = name.split()
+    basename = name[0]
+    info = ' '.join(name[1:])
+    seqs = []
+    for i, seq in enumerate(sequences, 1):
+        n = f">{basename}_{i} {info}"
+        seqs.append(n)
+        seqs += textwrap.wrap(seq, 80)
+    return seqs
+
+
 # Remove N's
 def removeN(fasta, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
@@ -38,29 +47,18 @@ def removeN(fasta, config, subdir):
     outFasta = os.path.join(path, outFasta)
 
     with open(fasta) as fileIn, open(outFasta, 'w') as fileOut:
-        counter = 0
+        name = ""
         sequence = ""
         for line in fileIn:
             line = line.strip()
             if line.startswith('>'):
-                if counter == 0:
-                    counter = 1
-                else:
-                    sequences = sequence.split("N")
-                    sequences = [s for s in sequences if len(s)>0]
-                    for seq in sequences:
-                        fileOut.write(f">seq{counter}\n")
-                        fileOut.write('\n'.join(textwrap.wrap(seq, 80)))
-                        fileOut.write('\n')
-                        counter += 1
+                if len(name) > 0:
+                    sequences = splitSequence(name, sequence)
+                    fileOut.write('\n'.join(sequences))
+                name = line[1:]
                 sequence = ""
             else:
                 sequence += line
-        sequences = sequence.split("N")
-        sequences = [s for s in sequences if len(s)>0]
-        for seq in sequences:
-            fileOut.write(f">seq{counter}\n")
-            fileOut.write('\n'.join(textwrap.wrap(seq, 80)))
-            fileOut.write('\n')
-            counter += 1
+        sequences = splitSequence(name, sequence)
+        fileOut.write('\n'.join(sequences))
     return outFasta

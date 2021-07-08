@@ -19,20 +19,20 @@ def createReport(dicTables, config, subdir):
 
     shutil.copy(f"{config['PATH']}/plotly-2.0.0.min.js", path)
 
-    dicSunburst = {}
-    dicFoam = {}
-    dicKO = {}
     # Save XLS and CVS reports
     for f_name,table in dicTables.items():
         save_path = os.path.join(path, f_name)
         table.to_excel(save_path+'.xlsx', index = False, header=True)
         table.to_csv(save_path+'.csv', index = False, header=True)
         figSunburst, FOAM_Charts, KO_Charts = createFigures(table)
-        dicSunburst[f_name] = figSunburst #TODO: Implement multiple tables, for now just plots last result.
-        dicFoam[f_name] = FOAM_Charts
-        dicKO[f_name] = KO_Charts
+        outfile = os.path.join(path, f_name+'_report.html')
+        writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts)
+
+    return None
 
 
+########## Write HTML File ##########
+def writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts):
     # Create HTML Report
     htmlHeader = [
         '<html>',
@@ -41,7 +41,7 @@ def createReport(dicTables, config, subdir):
         '</head>',
         '<body>\n']
     
-    with open(os.path.join(path, 'report.html'), 'w') as htmlOut:
+    with open(outfile, 'w') as htmlOut:
         htmlOut.write("\n".join(htmlHeader))
         htmlOut.write("<h1>Report<h1>\n")
 
@@ -119,14 +119,13 @@ def createReport(dicTables, config, subdir):
         }});""")
         htmlOut.write('</script>\n')
         htmlOut.write('\n</body>\n</html>\n')
-
-    return None
-
+    
 
 ######### Create PCA HTML Graph ##########
 def graphPCA(path, table_list):
     filelist = []
     for file in table_list:
+        print(file)
         a = file.iloc[0]
         y = file.iloc[2]
         a = a[['Name','Count']]
@@ -180,40 +179,45 @@ def graphPCA(path, table_list):
     return
 
 
-########## Create FOAM and KO HTML Report##########
+########## Create Figures ##########
 def createFigures(table):
-
     dfFoam = table[table["Type"]=='Foam']
     dfKO = table[table["Type"]=='KO']
     count = table['Count']
     midpoint = np.average(count, weights=count)*2
 
+    dfKO = dfKO.replace("KO", "KEGG")
+
     # Create Sunburst Figures
-    figSunburst = go.Figure()
+    figSunburst = go.Figure(layout=dict(
+        grid = dict(columns=2, rows=1),
+        margin = dict(t=0, l=0, r=0, b=0)))
+    figSunburst.update_traces(font=dict(size=[40]))
     col=0
     for df in [dfFoam, dfKO]:
         sun = px.sunburst(df, path = ['Type','Level','Name'],
             values = 'Count', color = 'Count',
             color_continuous_scale = 'RdBu',
             color_continuous_midpoint = midpoint)
+        sun.update_traces(textfont=dict(size=[40]))
         figSunburst.add_trace(go.Sunburst(
             labels = sun['data'][0]['labels'],
             parents = sun['data'][0]['parents'],
             values = sun['data'][0]['values'],
             ids = sun['data'][0]['ids'],
-            domain = dict(column=col)))
+            domain = dict(column=col),
+            textfont = dict(size=[40])
+            ))
+        sun.update_traces(textfont=dict(size=[40]))
+        figSunburst.update_traces(textfont=dict(size=[40]))
         col += 1
-    figSunburst.update_layout(
-        grid = dict(columns=2, rows=1),
-        margin = dict(t=0, l=0, r=0, b=0))
+    figSunburst.update_traces(textfont=dict(size=[40]))
 
     # Create FOAM and KO Bar Charts
 
     FT = table[table['Type']=='Foam'].drop(['Type'],axis=1)
     KT = table[table['Type']=='KO'].drop(['Type'],axis=1)
-    print("FOAM")
     FOAM_Charts = createHierarchyFigures(FT)
-    print("KO")
     KO_Charts = createHierarchyFigures(KT)
 
     return figSunburst, FOAM_Charts, KO_Charts
@@ -239,11 +243,18 @@ def createHierarchyFigures(tbl):
             data[level1][0][level2][0][level3] = {}, row[idxCount]
         else:
             level4 = row[idxName]
+            print(level1, level2, level3, level4)
             data[level1][0][level2][0][level3][0][level4] = row[idxCount]
 
+    ### Helper method for conciseness below ###
     def buildFigure(x, y, title):
-        return  go.Figure(layout={'title':title}, data=[go.Bar(x=list(x), y=list(y))])
+        return go.Figure(layout={'title':title,
+                #'xaxis_title':"Name",
+                'yaxis_title':"KO Count"},
+                data=[go.Bar(x=list(x), y=list(y))])
     
+    # Gather levels in hierarchy format
+    # TODO: This is probably better as a recursive function and/or incorporated with previous loop
     charts = {}
     data1 = {}
     for k1,v1 in data.items():

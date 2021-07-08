@@ -81,15 +81,18 @@ def roll_up(KO_ID_dict, rollup_file, dbPath):
                 continue
             KO_ID = line[3]
             KEGG_info = [tier_1, tier_2, pathway] + line[4:]
-            KEGG_dict[KO_ID] = KEGG_info
+            if KO_ID not in KEGG_dict:
+                KEGG_dict[KO_ID] = []
+            KEGG_dict[KO_ID].append(KEGG_info)
 
     # Match FOAM and KEGG info with found KO
     with open(rollup_file, "w") as outfile:
         for KO_ID in sorted(KO_ID_dict.keys()):
             FOAM_info = FOAM_dict[KO_ID] if KO_ID in FOAM_dict else ["NA"]
             KEGG_info = KEGG_dict[KO_ID] if KO_ID in KEGG_dict else ["NA"]
-            outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], FOAM_info, KEGG_info]])
-            outfile.write(outline + "\n")
+            for match in KEGG_info:
+                outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], FOAM_info, match]])
+                outfile.write(outline + "\n")
 
     return rollup_file
 

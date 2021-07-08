@@ -72,34 +72,57 @@ def main():
     required = parser.add_argument_group('''At least one sequence is required
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-& cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
-& cerberus.py --config file.config''')
-    required.add_argument('-e', '--euk', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
-    required.add_argument('-m', '--mic', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
+> cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
+> cerberus.py --config file.config''')
+    required.add_argument('--euk', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
+    required.add_argument('--mic', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
+    required.add_argument('--fgs', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
+    required.add_argument('--prod', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
+    required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
+    required.add_argument('--prot', action='append', default=[], help='Protein Amino Acid sequence')
+    required.add_argument('--config', help = 'path to configuration file', type=argparse.FileType('r'))
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument("-c", "--config", help = "path to configuration file", type=argparse.FileType('r'))
-    optional.add_argument("-o", "--outpath", help = "path to output directory. Defaults to current directory.", type=str)
+    optional.add_argument('--outpath', help = 'path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
     optional.add_argument('--version', '-v', action='version',
                         version='Cerberus: \n version: {} June 24th 2021'.format(__version__),
                         help='show the version number and exit')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
     args = parser.parse_args()
 
-    if not any([args.euk, args.mic, args.config]):
-        parser.print_help()
-        parser.error('At least one of --euk or --mic must be declared either in the command line or through --config file')
+    # Merge redundant flags
+    if args.prod:
+        args.euk += args.prod
+    if args.fgs:
+        args.mic += args.fgs
+    if args.super:
+        args.euk += args.super
+        args.mic += args.super
 
     # Initialize RAY for Multithreading
     ray.init()
 
-    if args.config is not None:
-        print("\nLoading Configuration")
-        config = loadConfig(args.config)
-        args.config.close()
-    else:
-        config = {}
-    
+    config = {}
     config["FLAGS"] = []
+    if args.config:
+        print("\nLoading Configuration File")
+        for line in args.config:
+            line = line.strip()
+            if re.match("#", line) or line == "":
+                continue
+            line = line.split(" ", 1)
+            if line[0] in ['euk', 'prod', 'super']:
+                args.euk += [line[1]]
+            if line[0] in ['mic', 'fgs', 'super']:
+                args.mic += [line[1]]
+            if line[0] == 'prot':
+                args.prot += [line[1]]
+            if line[0] == 'outpath':
+                config['DIR_OUT'] = line[1]
+        args.config.close()
+
+    if not any([args.euk, args.mic]):
+        parser.print_help()
+        parser.error('At least one sequence must be declared either in the command line or through the config file')
 
     # Merge config with parsed arguments
     if args.euk:
@@ -252,7 +275,7 @@ Example:
 
     # step 5a for cleaning contigs
     jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
-    if fasta and "scaf" in config["FLAGS"]:
+    if fasta:# and "scaf" in config["FLAGS"]:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
             jobContigs.append(rayWorker.remote(cerberusFormat.removeN, key, value, config, f"{STEP[5]}/{key}"))
@@ -317,11 +340,9 @@ Example:
 
     # step 9 (Report)
     print("Creating Reports")
-    #for key,value in hmmTables.items():
-    #    jobs.append(rayWorker.remote(cerberusVisual.create_html, key, [key,value], config, f"{STEP[9]}"))
+    if len(hmmTables) > 2:
+        cerberusReport.graphPCA(f"{STEP[9]}", hmmTables.values())
     cerberusReport.createReport(hmmTables, config, f"{STEP[9]}")
-    #if len(hmmTables) > 2:
-    #    cerberusVisual.graphPCA(f"{STEP[9]}", hmmTables.values())
 
 
     # Wait for misc jobs
