@@ -1,82 +1,376 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""cerberus.py: Versatile Functional Ontology Assignments for Metagenomes
 
-import os
+Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data.
+"""
+
+__version__ = "1.0"
+
 import sys
-from subprocess import STDOUT
+import os
+import subprocess
+import configargparse as argparse
+import re
+import multiprocessing as mp
 import time
+import socket
+import ray
 
-from preprocess_before_visual import preprocess_data
-from time_g import time_graph
-from multi_file_visual import new_visual
-from single_file_visual import visual
-from get_args import get_args
-from sequence_processors import faa_processing, fastq_processing, fna_processing
-from PCA_graph import PCA1
-from get_files import get_file_list
+import cerberusQC, cerberusTrim, cerberusDecon, cerberusFormat
+import cerberusGenecall, cerberusHMMER, cerberusParser, cerberusReport
 
 
-def main(path, file, table_list, euk):
-    f_name, f_ext = os.path.splitext(file)
-    f_name = f_name.split('.')[0]
-    fq_list = [".fq",".fastq"]
-    fna_list = [".fa",".fna" ,".fasta",".ffn"]
-    output_path = path + os.sep + f_name+"_output"
+## Global variables
+FILES_FASTQ = ['.fastq', '.fastq.gz']
+FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
+FILES_AMINO = [".faa"]
 
-    if f_ext in fq_list:
-        fq_path = os.path.join(path + os.sep, file)
-        fna_path = fastq_processing(fq_path, path, f_name)
-        faa_path = fna_processing(fna_path, path, f_name, euk)
-        output_path = path+os.sep+f_name+"_output"
-        rollup_file = faa_processing(faa_path, path, f_name)
-        preprocess_data(output_path,rollup_file,table_list)
-    elif f_ext in fna_list:
-        fna_path = os.path.join(path + os.sep, file)
-        faa_path = fna_processing(fna_path, path, f_name, euk)
-        output_path = path+os.sep + f_name + "_output"
-        rollup_file = faa_processing(faa_path, path, f_name)
-        preprocess_data(output_path, rollup_file, table_list)
-    elif f_ext in  [".faa"]:
-        faa_path = os.path.join(path + os.sep, file)
-        rollup_file=faa_processing(faa_path, path, f_name)
-        preprocess_data(output_path,rollup_file,table_list)
-    elif f_ext == ".rollup":
-        # os.makedirs(path+os.sep+file)
-        # print(path)
-        preprocess_data(path,os.path.join(path + os.sep, file),table_list)
-        # visual(file)
-    elif f_ext == '.html':
-        pass
+DEPENDENCIES = {
+        'EXE_FASTQC': 'fastqc',
+        'EXE_FASTP': 'fastp',
+        'EXE_BBDUK': 'bbduk.sh',
+        'EXE_PRODIGAL': 'prodigal'
+        }
+
+STEP = {
+    1:"step_01-loadFiles",
+    2:"step_02-QC",
+    3:"step_03-trim",
+    4:"step_04-decontaminate",    
+    5:"step_05-format",
+    6:"step_06-geneCall",
+    7:"step_07-hmmer",
+    8:"step_08-parse",
+    9:"step_09-visualizeData"
+    }
+
+
+## PRINT to stderr ##
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+## RAY WORKER THREAD ##
+@ray.remote
+def rayWorker(func, key, value, config, path):
+    start = time.time()
+    eprint(f"{socket.gethostname()} | {func.__name__} | {path}")
+    ret = func(value, config, path)
+    with open(f'{config["DIR_OUT"]}/time.txt', 'a+') as outTime:
+        outTime.write(f'{func.__name__}\t{path}\t{time.time()-start:.2f} seconds\n')
+    return key, ret
+
+
+## MAIN
+def main():
+    # TODO: Load default args from config file
+    # https://pypi.org/project/ConfigArgParse/ looks very user friendly
+
+
+    ## Parse the command line
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.set_defaults()
+    required = parser.add_argument_group('required arguments')
+    required = parser.add_argument_group('''At least one sequence is required
+<accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
+Example:
+> cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
+> cerberus.py --config file.config''')
+    required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
+    required.add_argument('--euk', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
+    required.add_argument('--mic', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
+    required.add_argument('--fgs', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
+    required.add_argument('--prod', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
+    required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
+    required.add_argument('--prot', action='append', default=[], help='Protein Amino Acid sequence')
+    optional = parser.add_argument_group('optional arguments')
+    optional.add_argument('--outpath', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
+    optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
+    optional.add_argument('--version', '-v', action='version',
+                        version='Cerberus: \n version: {} June 24th 2021'.format(__version__),
+                        help='show the version number and exit')
+    optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
+    hidden = parser.add_argument_group()
+    hidden.add_argument("--EXE_PRODIGAL", help=argparse.SUPPRESS)
+    args = parser.parse_args()
+
+    print(args)
+
+    # Merge redundant flags
+    if args.prod:
+        args.euk += args.prod
+    if args.fgs:
+        args.mic += args.fgs
+    if args.super:
+        args.euk += args.super
+        args.mic += args.super
+
+    if not any([args.euk, args.mic, args.prot]):
+        parser.print_help()
+        parser.error('At least one sequence must be declared either in the command line or through the config file')
+
+    # Initialize RAY for Multithreading
+    ray.init()
+
+    # Initialize Config
+    config = {}
+    if args.outpath:
+        config['DIR_OUT'] = args.outpath
+
+    # search dependency paths
+    # TODO: Check versions as well
+    print("Checking environment for dependencies:")
+    for key,value in DEPENDENCIES.items():
+        try:
+            proc = subprocess.run(["which", value], stdout=subprocess.PIPE, text=True)
+            path = proc.stdout.strip()
+            if proc.returncode == 0:
+                print(f"{value:20} {path}")
+                DEPENDENCIES[key] = path
+            else:
+                print(f"{value:20} NOT FOUND, must be defined in config file as {key}:(path)")
+        except:
+            print(f"ERROR executing 'which {value}'")
+    
+    # Update config with dependencies found in environment
+    DEPENDENCIES.update(config)
+    config = DEPENDENCIES
+
+    # Script path and relative dependencies
+    config['PATH'] = os.path.dirname(os.path.abspath(__file__))
+    config['EXE_FGS+'] = os.path.abspath(f"{config['PATH']}/FGS+/FGS+")
+
+
+    # Sanity Check
+    #TODO: fix due to change in input options
+    #config['IN_PATH'] = config['IN_PATH'].rstrip('/')
+    #for item in config:
+    #    config[item] = os.path.abspath(os.path.expanduser(config[item]))
+    #    print("Checking if exists: " + config[item])
+    #    if item.startswith("DIR_"):
+    #        if not os.path.isdir(config[item]):
+    #            parser.error(f"Unable to find path: {config[item]}")
+        
+    #    if item.startswith("EXE_") and not os.path.isfile(config[item]):
+    #        parser.error(f"Unable to find file: {config[item]}")
+
+    config['EXT_FASTA'] = FILES_FASTA
+    config['EXT_FASTQ'] = FILES_FASTQ
+    config['EXT_AMINO'] = FILES_AMINO
+
+    # Add CPU info to config
+    if "CPUS" not in config:
+        config["CPUS"] = mp.cpu_count()
+    print(f"Using {config['CPUS']} CPUs per node")
+
+    if 'DIR_OUT' not in config:
+        config['DIR_OUT'] = os.path.abspath("./pipeline")
     else:
-        print("File extension \" %s \" not recognized. Please name file(s) appropriately." %(f_ext))
+        config['DIR_OUT'] = os.path.abspath(os.path.join(config['DIR_OUT'], "pipeline"))
+    os.makedirs(config['DIR_OUT'], exist_ok=True)
 
+    # Step 1 - Load Input Files
+    fastq = {}
+    fasta = {}
+    amino = {}
+    print("\nLoading input files:")
+    #TODO: Implementing EUK and MIC options
+    # Check protein input
+    for item in args.prot:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in FILES_AMINO:
+                amino[name] = item
+            else:
+                print(f'{item} is not a valid protein sequence')
+    for item in args.mic:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in FILES_FASTQ:
+                fastq['mic_'+name] = item
+            elif ext in FILES_FASTA:
+                fasta['mic_'+name] = item
+            elif ext in FILES_AMINO:
+                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
+                amino[name] = item
+        elif os.path.isdir(item):
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_FASTQ + FILES_FASTA:
+                    args.mic.append(os.path.join(item, file))
+        else:
+            print(f'{item} is not a valid sequence')
+    for item in args.euk:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in FILES_FASTQ:
+                fastq['euk_'+name] = item
+            elif ext in FILES_FASTA:
+                fasta['euk_'+name] = item
+            elif ext in FILES_AMINO:
+                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
+                amino[name] = item
+        elif os.path.isdir(item):
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_FASTQ + FILES_FASTA:
+                    args.euk.append(os.path.join(item, file))
+        else:
+            print(f'{item} is not a valid sequence')
+
+    print("Loading sequence files from config file or command line.")
+    print(f"\nFastq sequences: {fastq}")
+    print(f"\nFasta sequences: {fasta}")
+    print(f"\nProtein Sequences: {amino}")
+
+
+    # Step 2 (check quality of fastq files)
+    jobs = []
+    if fastq:
+        print("\nSTEP 2: Checking quality of fastq files")
+        for key,value in fastq.items():
+            jobs.append(rayWorker.remote(cerberusQC.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
+
+
+    # Step 3 (trim fastq files)
+    jobTrim = []
+    if fastq:
+        print("\nSTEP 3: Trimming fastq files")
+        for key,value in fastq.items():
+            jobTrim.append(rayWorker.remote(cerberusTrim.trimReads, key, [key, value], config, f"{STEP[3]}/{key}"))
+
+    # Waitfor Trimmed Reads
+    trimmedReads = {}
+    for job in jobTrim:
+        key,value = ray.get(job)
+        trimmedReads[key] = value
+
+    if trimmedReads:
+        print("\nChecking quality of trimmed files")
+        for key,value in trimmedReads.items():
+            jobs.append(rayWorker.remote(cerberusQC.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+
+
+    # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
+    jobDecon = []
+    if trimmedReads:
+        print("\nSTEP 4: Decontaminating trimmed files")
+        for key,value in trimmedReads.items():
+            jobDecon.append(rayWorker.remote(cerberusDecon.deconReads, key, [key, value], config, f"{STEP[4]}/{key}"))
+
+    deconReads = {}
+    for job in jobDecon:
+        key,value = ray.get(job)
+        deconReads[key] = value
+
+
+    # step 5a for cleaning contigs
+    jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
+    if fasta:# and "scaf" in config["FLAGS"]:
+        print("\nSTEP 5a: Removing N's from contig files")
+        for key,value in fasta.items():
+            jobContigs.append(rayWorker.remote(cerberusFormat.removeN, key, value, config, f"{STEP[5]}/{key}"))
+    
+    for job in jobContigs:
+        key,value = ray.get(job)
+        fasta[key] = value
+
+    # step 5b Format (convert fq to fna. Remove quality scores and N's)
+    jobFormat = []
+    if deconReads:
+        print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
+        for key,value in deconReads.items():
+            jobFormat.append(rayWorker.remote(cerberusFormat.reformat, key, value, config, f"{STEP[5]}/{key}"))
+
+    for job in jobFormat:
+        key, value = ray.get(job)
+        fasta[key] = value
+
+
+    # step 6 (ORF Finder)
+    jobGenecall = []
+    if fasta:
+        print("STEP 6: ORF Finder")
+        for key,value in fasta.items():
+            if key.startswith("euk_"):
+                jobGenecall.append(rayWorker.remote(cerberusGenecall.findORF_euk, key, value, config, f"{STEP[6]}/{key}"))
+            else:
+                jobGenecall.append(rayWorker.remote(cerberusGenecall.findORF_mic, key, value, config, f"{STEP[6]}/{key}"))
+
+    # Waiting for GeneCall
+    for job in jobGenecall:
+        key,value = ray.get(job)
+        amino[key] = value
+
+
+    # step 7 (HMMER)
+    print("STEP 7: HMMER Search")
+    jobHMM = []
+    for key,value in amino.items():
+        jobHMM.append(rayWorker.remote(cerberusHMMER.search, key, value, config, f"{STEP[7]}/{key}"))
+
+    print("Waiting for HMMER")
+    hmmFoam = {}
+    for job in jobHMM:
+        key,value = ray.get(job)
+        hmmFoam[key] = value
+
+
+    # step 8 (Parser)
+    print("STEP 8: Parse HMMER results")
+    jobParse = []
+    for key,value in hmmFoam.items():
+        jobParse.append(rayWorker.remote(cerberusParser.parseHmmer, key, value, config, f"{STEP[8]}/{key}"))
+
+    print("Waiting for parsed results")
+    hmmRollup = {}
+    hmmTables = {}
+    for job in jobParse:
+        key,value = ray.get(job)
+        hmmRollup[key] = value
+        hmmTables[key] = cerberusParser.createTables(value)
+
+
+    # step 9 (Report)
+    print("Creating Reports")
+    if len(hmmTables) > 2:
+        cerberusReport.graphPCA(f"{STEP[9]}", hmmTables.values())
+    cerberusReport.createReport(hmmTables, hmmRollup, config, f"{STEP[9]}")
+    
+
+
+    # Wait for misc jobs
+    print("Waiting for lingering jobs")
+    ready, pending = ray.wait(jobs)
+    while(pending):
+        print(f"Waiting for {len(pending)} jobs.")
+        ready, pending = ray.wait(pending)
+
+    # Finished!
+    print("\nFinished Pipeline")
+    return 0
+
+
+## loadConfig
+def loadConfig(configFile):
+    config = {}
+    for line in configFile:
+        line = line.strip()
+        if re.match("#", line) or line == "":
+            continue
+        line = line.split(":", 1)
+        config[line[0].strip()] = line[1].strip()
+    
+    return config
+
+
+## Start main method
 if __name__ == "__main__":
-    parser, args = get_args()
-    path, file_list, euk = get_file_list(args)
+    sys.exit(main())
 
-    table_list=[]
-    time_list=[]
-    for f in file_list:
-        start_time = time.time()
-        size=os.path.getsize(path+os.sep+f)
-        size=round(size / (1024 * 1024), 2)
-        main(path, f, table_list, euk)
-        time_taken=time.time() - start_time
-        time_taken=round(time_taken / (60), 2)
-        time_list.append((time_taken,size))
-    # print("--- %s seconds ---" % (time.time() - start_time))
-    len_tab = len(table_list)
-    time_graph(path,time_list)
-    print(f"Table Length: {len_tab}")
-    if len_tab==1:
-        visual(table_list[0])
-    elif len_tab<=3:
-        # new_visual()
-        # PCA1()
-        new_visual(path,table_list)
-    elif len_tab<=6:
-        PCA1(path,table_list)
-        new_visual(path,table_list)
-    elif len_tab>6:
-        PCA1(path,table_list)
+## End of script
