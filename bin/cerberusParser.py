@@ -119,6 +119,7 @@ def createTables(fileRollup):
     dictFoam = {}
     dictKO = {}
     for row in range(len(df)):
+        # FOAM
         for j in range(len(df['Foam'][row])):
             # Store name in dictionary, default is zero count
             dictFoam[df['Foam'][row][j]] = dictFoam.get(df['Foam'][row][j], ["",0])
@@ -126,7 +127,7 @@ def createTables(fileRollup):
             n,m = dictFoam[df['Foam'][row][j]]
             # j+1 is Level, m is count
             dictFoam[df['Foam'][row][j]] = [j+1, m+df['Count'][row]]
-        
+        # KO
         for j in range(len(df['KO'][row])):
             dictKO[df['KO'][row][j]] = dictKO.get(df['KO'][row][j],["",0])
             n,m = dictKO[df['KO'][row][j]]

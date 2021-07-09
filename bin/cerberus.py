@@ -11,8 +11,7 @@ __version__ = "1.0"
 import sys
 import os
 import subprocess
-import argparse
-import shutil
+import configargparse as argparse
 import re
 import multiprocessing as mp
 import time
@@ -66,28 +65,38 @@ def rayWorker(func, key, value, config, path):
 
 ## MAIN
 def main():
+    # TODO: Load default args from config file
+    # https://pypi.org/project/ConfigArgParse/ looks very user friendly
+
+
     ## Parse the command line
     parser = argparse.ArgumentParser(add_help=False)
+    parser.set_defaults()
     required = parser.add_argument_group('required arguments')
     required = parser.add_argument_group('''At least one sequence is required
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
 > cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
 > cerberus.py --config file.config''')
+    required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--euk', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
     required.add_argument('--mic', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
     required.add_argument('--fgs', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
     required.add_argument('--prod', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
     required.add_argument('--prot', action='append', default=[], help='Protein Amino Acid sequence')
-    required.add_argument('--config', help = 'path to configuration file', type=argparse.FileType('r'))
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument('--outpath', help = 'path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
+    optional.add_argument('--outpath', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
+    optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
     optional.add_argument('--version', '-v', action='version',
                         version='Cerberus: \n version: {} June 24th 2021'.format(__version__),
                         help='show the version number and exit')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
+    hidden = parser.add_argument_group()
+    hidden.add_argument("--EXE_PRODIGAL", help=argparse.SUPPRESS)
     args = parser.parse_args()
+
+    print(args)
 
     # Merge redundant flags
     if args.prod:
@@ -98,40 +107,17 @@ Example:
         args.euk += args.super
         args.mic += args.super
 
-    # Initialize RAY for Multithreading
-    ray.init()
-
-    config = {}
-    config["FLAGS"] = []
-    if args.config:
-        print("\nLoading Configuration File")
-        for line in args.config:
-            line = line.strip()
-            if re.match("#", line) or line == "":
-                continue
-            line = line.split(" ", 1)
-            if line[0] in ['euk', 'prod', 'super']:
-                args.euk += [line[1]]
-            if line[0] in ['mic', 'fgs', 'super']:
-                args.mic += [line[1]]
-            if line[0] == 'prot':
-                args.prot += [line[1]]
-            if line[0] == 'outpath':
-                config['DIR_OUT'] = line[1]
-        args.config.close()
-
-    if not any([args.euk, args.mic]):
+    if not any([args.euk, args.mic, args.prot]):
         parser.print_help()
         parser.error('At least one sequence must be declared either in the command line or through the config file')
 
-    # Merge config with parsed arguments
-    if args.euk:
-        config['EUK'] = args.euk
-    if args.mic:
-        config['MIC'] = args.mic
+    # Initialize RAY for Multithreading
+    ray.init()
+
+    # Initialize Config
+    config = {}
     if args.outpath:
         config['DIR_OUT'] = args.outpath
-    print(config)
 
     # search dependency paths
     # TODO: Check versions as well
@@ -186,12 +172,20 @@ Example:
     os.makedirs(config['DIR_OUT'], exist_ok=True)
 
     # Step 1 - Load Input Files
-    fastq = fastq = {}
-    fasta = fasta = {}
+    fastq = {}
+    fasta = {}
     amino = {}
     print("\nLoading input files:")
     #TODO: Implementing EUK and MIC options
-    # Check
+    # Check protein input
+    for item in args.prot:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in FILES_AMINO:
+                amino[name] = item
+            else:
+                print(f'{item} is not a valid protein sequence')
     for item in args.mic:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -201,6 +195,7 @@ Example:
             elif ext in FILES_FASTA:
                 fasta['mic_'+name] = item
             elif ext in FILES_AMINO:
+                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
                 amino[name] = item
         elif os.path.isdir(item):
             for file in os.listdir(item):
@@ -208,7 +203,7 @@ Example:
                 if ext in FILES_FASTQ + FILES_FASTA:
                     args.mic.append(os.path.join(item, file))
         else:
-            print(f'{item} is not a valid file')
+            print(f'{item} is not a valid sequence')
     for item in args.euk:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -218,6 +213,7 @@ Example:
             elif ext in FILES_FASTA:
                 fasta['euk_'+name] = item
             elif ext in FILES_AMINO:
+                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
                 amino[name] = item
         elif os.path.isdir(item):
             for file in os.listdir(item):
@@ -225,7 +221,7 @@ Example:
                 if ext in FILES_FASTQ + FILES_FASTA:
                     args.euk.append(os.path.join(item, file))
         else:
-            print(f'{item} is not a valid file')
+            print(f'{item} is not a valid sequence')
 
     print("Loading sequence files from config file or command line.")
     print(f"\nFastq sequences: {fastq}")
@@ -331,10 +327,12 @@ Example:
     for key,value in hmmFoam.items():
         jobParse.append(rayWorker.remote(cerberusParser.parseHmmer, key, value, config, f"{STEP[8]}/{key}"))
 
-    hmmTables = {}
     print("Waiting for parsed results")
+    hmmRollup = {}
+    hmmTables = {}
     for job in jobParse:
         key,value = ray.get(job)
+        hmmRollup[key] = value
         hmmTables[key] = cerberusParser.createTables(value)
 
 
@@ -342,7 +340,8 @@ Example:
     print("Creating Reports")
     if len(hmmTables) > 2:
         cerberusReport.graphPCA(f"{STEP[9]}", hmmTables.values())
-    cerberusReport.createReport(hmmTables, config, f"{STEP[9]}")
+    cerberusReport.createReport(hmmTables, hmmRollup, config, f"{STEP[9]}")
+    
 
 
     # Wait for misc jobs

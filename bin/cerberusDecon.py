@@ -33,6 +33,7 @@ def deconSingleReads(fileFQ, config, subdir):
     matched = f"matched-{key}"
     #command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={path}/{outFile} qin=33 qtrim=r trimq=25 maq=25 minlen=50 outm={path}/{matched} ref={config['REFSEQ']} k=31 stats={path}/{outFile}.txt"
     #command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={path}/{outFile} qin=33 qtrim=r minlen=50 outm={path}/{matched} ref={config['REFSEQ']} k=31 stats={path}/{outFile}.txt"
+    #TODO: Add reference file
     command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=33 qtrim=r minlen=50 outm={path}/{matched} k=31 stats={path}/{outFile}.txt"
     try:
         subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
