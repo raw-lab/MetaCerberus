@@ -56,12 +56,20 @@ def removeN(fasta, config, subdir):
             line = line.strip()
             if line.startswith('>'):
                 if len(name) > 0:
-                    sequences = splitSequence(name, sequence)
-                    fileOut.write('\n'.join(sequences))
+                    if 'N' in sequence:
+                        sequences = splitSequence(name, sequence)
+                        fileOut.write('\n'.join(sequences))
+                    else:
+                        fileOut.write(f">{name}\n")
+                        fileOut.write('\n'.join(textwrap.wrap(sequence, 80)))
                 name = line[1:]
                 sequence = ""
             else:
                 sequence += line
-        sequences = splitSequence(name, sequence)
-        fileOut.write('\n'.join(sequences))
+        if 'N' in sequence:
+            sequences = splitSequence(name, sequence)
+            fileOut.write('\n'.join(sequences))
+        else:
+            fileOut.write(f">{name}\n")
+            fileOut.write('\n'.join(textwrap.wrap(sequence, 80)))
     return outFasta
