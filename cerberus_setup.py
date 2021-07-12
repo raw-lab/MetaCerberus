@@ -59,7 +59,7 @@ def download_db(path):
 
 ######################################Install dependencies#####################################
 def install_dependencies():
-    conda_cmd = "conda create -n cerberus -c conda-forge -c bioconda hmmer prodigal fastqc fastp porechop bbmap pandas numpy plotly openpyxl matplotlib scikit-learn configargparse python=3.7 -y"
+    conda_cmd = "conda create -n cerberus -c conda-forge -c bioconda hmmer prodigal fastqc fastp porechop bbmap pandas numpy plotly openpyxl matplotlib scikit-learn configargparse python-kaleido python=3.7 -y"
     subprocess.call(conda_cmd, shell=True)
     # TODO: 'conda activate' command not working through script, manually install ray for now.
     #pip_cmd = "conda activate cerberus ; pip install ray[default]"

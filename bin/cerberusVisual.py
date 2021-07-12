@@ -4,16 +4,62 @@ import os
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 from functools import reduce
 import plotly.express as px  # (version 4.7.0)
 import plotly.graph_objects as go
 
 
 ######### Create PCA Graph ##########
-def graphPCA(path, table_list):
+def graphPCA(table_list):
+
+    dfFOAM = pd.DataFrame()
+    dfKEGG = pd.DataFrame()
+    for sample,table in table_list.items():
+        # FOAM
+        df = table[table['Type']=="Foam"]
+        row = dict(zip(df['Name'].tolist(), df['Count'].tolist()))
+        row = pd.Series(row, name=sample)
+        dfFOAM = dfFOAM.append(row)
+
+        # KEGG
+        df = table[table['Type']=="KO"]
+        row = dict(zip(df['Name'].tolist(), df['Count'].tolist()))
+        row = pd.Series(row, name=sample)
+        dfKEGG = dfKEGG.append(row)
+
+    dfFOAM = dfFOAM.fillna(0).astype(int)
+    dfKEGG = dfKEGG.fillna(0).astype(int)
+    
+    X = dfFOAM.values
+    print("Values: ", X)
+    print("Shape: ", X.shape)
+    
+    scaler = StandardScaler()
+    scaler.fit(X)
+    
+    X_scaled = scaler.transform(X)
+
+    print("Scaled:\n", X_scaled)
+
+    pcaFOAM = PCA()
+
+    X_pca = pcaFOAM.fit_transform(X_scaled)
+    print("Explained Variance:\n", pcaFOAM.explained_variance_ratio_ * 100, sum(pcaFOAM.explained_variance_ratio_[0:2]))
+    print("PCA Transformed:\n", X_pca)
+
+    labels = {
+        str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
+        for i,var in enumerate(pcaFOAM.explained_variance_ratio_ * 100)}
+
+    fig = px.scatter_3d(
+        X_pca, x=0, y=1, z=2, color=dfFOAM.index,
+        labels=labels)
+
+    return fig
+
     filelist = []
     for table in table_list:
-        print(table)
         table = table.values
         a = table[0]
         y = table[2]
@@ -25,11 +71,12 @@ def graphPCA(path, table_list):
         filelist.append(a)
 
     print(filelist)
-    df_merged = reduce(lambda  left,
-                        right: pd.merge(left,
-                        right,
-                        on=['Name'],
-                        how='outer'), filelist)
+    df_merged = reduce(lambda  left,right:
+                        pd.merge(left,
+                            right,
+                            on=['Name'],
+                            how='outer'),
+                        filelist)
     result = df_merged.replace(np.nan, 0)
     pivoted = result.T
     res = pivoted.rename(columns=pivoted.iloc[0])
@@ -38,7 +85,7 @@ def graphPCA(path, table_list):
     X_train = pca.fit_transform(res1)
     labels = {
         str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
-        for i, var in enumerate(pca.explained_variance_ratio_ * 100)}
+        for i,var in enumerate(pca.explained_variance_ratio_ * 100)}
 
     fig = px.scatter_3d(
         X_train, x=0, y=1, z=2, color=res1.index,
@@ -151,9 +198,10 @@ def graphBarcharts(rollupFiles):
                     dictFoam[level1][0][level2][0][level3] = {}, foamCounts[name]
             else:
                 level4 = name
-                if name in dictFoam[level1][0][level2][0][level3][0]:
-                    print("WARNING: Possible bug???", row)
-                dictFoam[level1][0][level2][0][level3][0][level4] = foamCounts[name]
+                if level4 not in dictFoam[level1][0][level2][0][level3][0]:
+                    dictFoam[level1][0][level2][0][level3][0][level4] = foamCounts[name]
+                #else:
+                    #print("WARNING: duplicate line in rollup: FOAM: ", row, name, df_FOAM['Info'][row]) #TODO: Remove when bugs not found
     koCounts = {}
     for row in range(len(df_KEGG)):
         for name in df_KEGG['Info'][row]:
@@ -180,9 +228,10 @@ def graphBarcharts(rollupFiles):
                     dictKO[level1][0][level2][0][level3] = {}, koCounts[name]
             else:
                 level4 = name
-                if name in dictKO[level1][0][level2][0][level3][0]:
-                    print("WARNING: Possible bug???", row) #TODO: Remove when bugs not found
-                dictKO[level1][0][level2][0][level3][0][level4] = koCounts[name]
+                if level4 not in dictKO[level1][0][level2][0][level3][0]:
+                    dictKO[level1][0][level2][0][level3][0][level4] = koCounts[name]
+                #else:
+                    #print("WARNING: duplicate line in rollup: KEGG: ", row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
 
     return createHierarchyFigures(dictFoam), createHierarchyFigures(dictKO)
 

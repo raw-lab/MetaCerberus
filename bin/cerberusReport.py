@@ -7,8 +7,17 @@ import re
 import cerberusVisual
 
 
+#GLOBAL standard html header to include plotly script
+htmlHeader = [
+    '<html>',
+    '<head><meta charset="utf-8" />',
+    '    <script src="plotly-2.0.0.min.js"></script>',
+    '</head>',
+    '<body>\n']
+
+
 ######### Create Report ##########
-def createReport(dicTables, dicRollup, config, subdir):
+def createReport(dicTables, dicRollup, pcaFigure, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
@@ -21,8 +30,24 @@ def createReport(dicTables, dicRollup, config, subdir):
         table.to_csv(save_path+'.csv', index = False, header=True)
         figSunburst = cerberusVisual.graphSunburst(table, path)
         FOAM_Charts, KO_Charts = cerberusVisual.graphBarcharts(dicRollup[name])
-        outfile = os.path.join(path, name+'_report.html')
+        outfile = os.path.join(path, name+"_report.html")
         writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts)
+
+    # PCA Plot
+    if pcaFigure:
+        outfile = os.path.join(path, "PCA.pdf")
+        pcaFigure.write_image(outfile)
+
+        outfile = os.path.join(path, "PCA_standalone.html")
+        pcaFigure.write_html(outfile)
+
+        outfile = os.path.join(path, "PCA.html")
+        with open(outfile, 'w') as htmlOut:
+            htmlOut.write("\n".join(htmlHeader))
+            htmlOut.write("<h1>Report<h1>\n")
+            htmlFig = pcaFigure.to_html(full_html=False, include_plotlyjs=False)
+            htmlOut.write(htmlFig + '\n')
+            htmlOut.write('\n</body>\n</html>\n')
 
     return None
 
@@ -30,12 +55,6 @@ def createReport(dicTables, dicRollup, config, subdir):
 ########## Write HTML File ##########
 def writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts):
     # Create HTML Report
-    htmlHeader = [
-        '<html>',
-        '<head><meta charset="utf-8" />',
-        '    <script src="plotly-2.0.0.min.js"></script>',
-        '</head>',
-        '<body>\n']
     
     with open(outfile, 'w') as htmlOut:
         htmlOut.write("\n".join(htmlHeader))

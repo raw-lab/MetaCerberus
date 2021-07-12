@@ -45,19 +45,20 @@ def parseHmmer(fileHmmer, config, subdir):
 
 
     # Create dictionary with found KO IDs and counts
-    KO_ID_dict = {}
+    KO_ID_counts = {}
     for line in BH_dict.values():
         KO_IDs = [KO_ID.split(":")[1].split("_")[0] for KO_ID in line[3].split(",") if "KO:" in KO_ID]
         for KO_ID in KO_IDs:
-            if KO_ID not in KO_ID_dict:
-                KO_ID_dict[KO_ID] = 0
-            KO_ID_dict[KO_ID] += 1
+            if KO_ID not in KO_ID_counts:
+                KO_ID_counts[KO_ID] = 0
+            KO_ID_counts[KO_ID] += 1
 
     #TODO: add 'REPLACE' flag here
-    rollupFOAM(KO_ID_dict, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), rollupFileFOAM)
-    rollupKEGG(KO_ID_dict, os.path.join(config["PATH"], "cerberusDB", "KO_classification.txt"), rollupFileKEGG)
+    # Write rollup files to disk
+    rollupFOAM(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), rollupFileFOAM)
+    rollupKEGG(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "KO_classification.txt"), rollupFileKEGG)
 
-    return rollupFileFOAM, rollupFileKEGG
+    return (rollupFileFOAM, rollupFileKEGG)
 
 
 ######### FOAM Roll-Up #########
@@ -173,7 +174,10 @@ def createTables(fileRollup):
     FT.drop(FT[FT['Name']==''].index, inplace=True)
     FT.drop(FT[FT['Name']=='NA'].index, inplace=True)
     
-    dataKO = {'Type':'KO','Name':list(dictKEGG.keys()),'Level':[x[0] for x in dictKEGG.values()],'Count':[x[1] for x in dictKEGG.values()]}
+    dataKO = {'Type':'KO',
+        'Name':list(dictKEGG.keys()),
+        'Level':[x[0] for x in dictKEGG.values()],
+        'Count':[x[1] for x in dictKEGG.values()]}
     KT = pd.DataFrame(data=dataKO)
     KT.drop(KT[KT['Name']==''].index, inplace=True)
     KT.drop(KT[KT['Name']=='NA'].index, inplace=True)

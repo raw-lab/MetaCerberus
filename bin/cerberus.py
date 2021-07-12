@@ -12,7 +12,6 @@ import sys
 import os
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
-import re
 import time
 import socket
 import ray
@@ -333,9 +332,10 @@ Example:
 
     # step 9 (Report)
     print("Creating Reports")
-    cerberusReport.createReport(hmmTables, hmmRollup, config, f"{STEP[9]}")
+    pcaFigure = None
     if len(hmmTables) > 2:
-        cerberusVisual.graphPCA(f"{STEP[9]}", hmmTables.values())
+        pcaFigure = cerberusVisual.graphPCA(hmmTables)
+    cerberusReport.createReport(hmmTables, hmmRollup, pcaFigure, config, f"{STEP[9]}")
 
 
     # Wait for misc jobs
@@ -348,19 +348,6 @@ Example:
     # Finished!
     print("\nFinished Pipeline")
     return 0
-
-
-## loadConfig
-#def loadConfig(configFile):
-#    config = {}
-#    for line in configFile:
-#        line = line.strip()
-#        if re.match("#", line) or line == "":
-#            continue
-#        line = line.split(":", 1)
-#        config[line[0].strip()] = line[1].strip()
-#    
-#    return config
 
 
 ## Start main method
