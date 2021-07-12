@@ -2,11 +2,9 @@
 
 import os
 import numpy as np
-from numpy.core.numeric import roll
 import pandas as pd
 from sklearn.decomposition import PCA
 from functools import reduce
-from plotly.offline import plot
 import plotly.express as px  # (version 4.7.0)
 import plotly.graph_objects as go
 
@@ -14,11 +12,15 @@ import plotly.graph_objects as go
 ######### Create PCA Graph ##########
 def graphPCA(path, table_list):
     filelist = []
-    for file in table_list:
-        print(file)
-        a = file.iloc[0]
-        y = file.iloc[2]
+    for table in table_list:
+        print(table)
+        table = table.values
+        a = table[0]
+        y = table[2]
+        print(a)
+        print(y)
         a = a[['Name','Count']]
+        print(a)
         a = a.rename(columns={'Count':y })
         filelist.append(a)
 
@@ -65,7 +67,6 @@ def graphPCA(path, table_list):
                 showbackground=True,
                 zerolinecolor="black")))
 
-    plot(fig, filename=path+'/PCA_plot.html', auto_open=False)
     return fig
 
 
@@ -108,41 +109,32 @@ def graphSunburst(table, path=None):
 
 
 ########## Create Bar Chart Figures ##########
-def graphBarcharts(fileRollup):
-#    if table is not None:
-#        FT = table[table['Type']=='Foam'].drop(['Type'],axis=1)
-#        KT = table[table['Type']=='KO'].drop(['Type'],axis=1)
-#        print("FOAM Hierarchy")
-#        FOAM_Charts = createHierarchyFigures(FT)
-#        print("KO Hierarchy")
-#        KO_Charts = createHierarchyFigures(KT)
-#        return FOAM_Charts, KO_Charts
+def graphBarcharts(rollupFiles):
+    #TODO: restructure code to avoid loading rollup files and counting twice (fist in parser.py)
+    df_FOAM = pd.read_csv(rollupFiles[0], names=['Id','Count','Info'], delimiter='\t')
+    df_KEGG = pd.read_csv(rollupFiles[1], names=['Id','Count','Info'], delimiter='\t')
 
-    df = pd.read_csv(fileRollup, names=['Id','Count','Foam','KO'], delimiter='\t')
-
-    # This method avoids chained indexing
-    # Reformat data. Splits string into list, strips brackets and quotes
-    def helper(x):
-        x = x.strip('[]').split("', ")
-        return [i.strip("'") for i in x]
-    
-    # Convert 'Count" column to numeric
-    df["Count"] = pd.to_numeric(df["Count"])
+    # Reformat data. This lambda method avoids chained indexing
+    # Splits string into list, strips brackets and quotes
+    helper = lambda x : [i.strip("'") for i in x.strip('[]').split("', ")]
     # call helper method to reformat 'FOAM' and 'KO' columns
-    df['Foam'] = df['Foam'].apply(helper)
-    df['KO'] = df['KO'].apply(helper)
+    df_FOAM['Info'] = df_FOAM['Info'].apply(helper)
+    df_KEGG['Info'] = df_KEGG['Info'].apply(helper)
+    # Convert 'Count" column to numeric
+    df_FOAM["Count"] = pd.to_numeric(df_FOAM["Count"])
+    df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
 
     # Enumerate data
     foamCounts = {}
-    for row in range(len(df)):
-        for name in df['Foam'][row]:
+    for row in range(len(df_FOAM)):
+        for name in df_FOAM['Info'][row]:
             if name not in foamCounts:
-                foamCounts[name] = df['Count'][row]
+                foamCounts[name] = df_FOAM['Count'][row]
             foamCounts[name] += 1
     dictFoam = {}
     # FOAM
-    for row in range(len(df['Foam'])):
-        for i,name in enumerate(df['Foam'][row], 1):
+    for row in range(len(df_FOAM)):
+        for i,name in enumerate(df_FOAM['Info'][row], 1):
             if name == '':
                 continue
             if i == 1:
@@ -163,15 +155,15 @@ def graphBarcharts(fileRollup):
                     print("WARNING: Possible bug???", row)
                 dictFoam[level1][0][level2][0][level3][0][level4] = foamCounts[name]
     koCounts = {}
-    for row in range(len(df)):
-        for name in df['KO'][row]:
+    for row in range(len(df_KEGG)):
+        for name in df_KEGG['Info'][row]:
             if name not in koCounts:
-                koCounts[name] = df['Count'][row]
+                koCounts[name] = df_KEGG['Count'][row]
             koCounts[name] += 1
     dictKO = {}
     # KO
-    for row in range(len(df['KO'])):
-        for i,name in enumerate(df['KO'][row], 1):
+    for row in range(len(df_KEGG)):
+        for i,name in enumerate(df_KEGG['Info'][row], 1):
             if name == '':
                 continue
             if i == 1:
@@ -191,8 +183,20 @@ def graphBarcharts(fileRollup):
                 if name in dictKO[level1][0][level2][0][level3][0]:
                     print("WARNING: Possible bug???", row) #TODO: Remove when bugs not found
                 dictKO[level1][0][level2][0][level3][0][level4] = koCounts[name]
-    
+
     return createHierarchyFigures(dictFoam), createHierarchyFigures(dictKO)
+
+# TODO: recursive function for replacing createHierarchyFigures()
+#chart = {}
+#def hierarchy(level, i):
+#    print(type(level), i)
+#    if type(level) is dict:
+#        for k,v in level.items():
+#            print(i, k, v[1])
+#            chart[k] = {}
+#            hierarchy(v[0], i+1)
+#    return chart
+#print(hierarchy(data, 1))
 
 
 ### Create hierarchy figures from table with levels

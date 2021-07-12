@@ -18,6 +18,9 @@ def reformat(fastq, config, subdir):
     fasta = os.path.basename(fasta) + ".fna"
     fasta = os.path.join(path, fasta)
 
+    if not config['REPLACE'] and os.path.exists(fasta):
+        return fasta
+
     command = "sed -n '1~4s/^@/>/p;2~4p' " +fastq+ " > " +fasta
     subprocess.call(command, shell=True)
     return fasta

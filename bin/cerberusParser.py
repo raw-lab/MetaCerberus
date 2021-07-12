@@ -10,14 +10,21 @@ import csv
 import pandas as pd
 
 
-def parseHmmer(hmmer, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
+def parseHmmer(fileHmmer, config, subdir):
+    path = os.path.join(config['DIR_OUT'], subdir)
     os.makedirs(path, exist_ok=True)
+
+    minscore = config["MINSCORE"]
+
+    rollupFileFOAM = os.path.join(path, "HMMER_BH_FOAM.rollup")
+    rollupFileKEGG = os.path.join(path, "HMMER_BH_KO.rollup")
+
+    #if not config['REPLACE'] and os.path.exists(rollup_file):
+    #    return rollup_file
 
     # Calculate Best Hit
     BH_dict = {}
-    minscore = 25 #TODO: Move to config file, user specifies this
-    with open(hmmer, "r") as reader:
+    with open(fileHmmer, "r") as reader:
         for line in reader:
             if line.startswith("#"):        # Skip commented lines
                 continue
@@ -46,28 +53,43 @@ def parseHmmer(hmmer, config, subdir):
                 KO_ID_dict[KO_ID] = 0
             KO_ID_dict[KO_ID] += 1
 
-    rollup_file = f"{path}/FOAM.BH.KO.rollup"
-    return roll_up(KO_ID_dict, rollup_file, f'{config["PATH"]}/cerberusDB')
+    #TODO: add 'REPLACE' flag here
+    rollupFOAM(KO_ID_dict, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), rollupFileFOAM)
+    rollupKEGG(KO_ID_dict, os.path.join(config["PATH"], "cerberusDB", "KO_classification.txt"), rollupFileKEGG)
+
+    return rollupFileFOAM, rollupFileKEGG
 
 
-######### Roll-Up #########
-def roll_up(KO_ID_dict, rollup_file, dbPath):
-
+######### FOAM Roll-Up #########
+def rollupFOAM(KO_ID_dict, dbFile, outFile):
     # Read FOAM information
-    FOAM_file = os.path.join(dbPath, "FOAM-onto_rel1.tsv")
     FOAM_dict = {}
-    with open(FOAM_file, "r") as csvFile:
+    with open(dbFile, "r") as csvFile:
         reader = csv.reader(csvFile, delimiter="\t")
         next(reader)    # Skip header
         for line in reader:
             KO_ID = line[4]
             FOAM_info = line[0:4]
-            FOAM_dict[KO_ID] = FOAM_info
+            if KO_ID not in FOAM_dict:
+                FOAM_dict[KO_ID] = []
+            if FOAM_info not in FOAM_dict.values():
+                FOAM_dict[KO_ID].append(FOAM_info)
 
+    # Match FOAM info with found KO
+    with open(outFile, "w") as fileWriter:
+        for KO_ID in sorted(KO_ID_dict.keys()):
+            FOAM_info = FOAM_dict[KO_ID] if KO_ID in FOAM_dict else [['NA']]
+            for info in FOAM_info:
+                outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], info]])
+                fileWriter.write(outline + "\n")
+    return
+
+
+######### KEGG Roll-Up #########
+def rollupKEGG(KO_ID_dict, dbFile, outFile):
     # Read KEGG information
-    KEGG_file = f"{dbPath}/KO_classification.txt"
     KEGG_dict = {}
-    with open(KEGG_file, "r") as csvFile:
+    with open(dbFile, "r") as csvFile:
         reader = csv.reader(csvFile, delimiter="\t")
         for line in reader:
             if line[0] != "":
@@ -86,66 +108,80 @@ def roll_up(KO_ID_dict, rollup_file, dbPath):
             KEGG_dict[KO_ID].append(KEGG_info)
 
     # Match FOAM and KEGG info with found KO
-    with open(rollup_file, "w") as outfile:
+    with open(outFile, "w") as fileWriter:
         for KO_ID in sorted(KO_ID_dict.keys()):
-            FOAM_info = FOAM_dict[KO_ID] if KO_ID in FOAM_dict else ["NA"]
-            KEGG_info = KEGG_dict[KO_ID] if KO_ID in KEGG_dict else ["NA"]
-            for match in KEGG_info:
-                outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], FOAM_info, match]])
-                outfile.write(outline + "\n")
-
-    return rollup_file
+            KEGG_info = KEGG_dict[KO_ID] if KO_ID in KEGG_dict else [['NA']]
+            for info in KEGG_info:
+                outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], info]])
+                fileWriter.write(outline + "\n")
+    return
 
 
 ########## createTables #########
 def createTables(fileRollup):
-    df = pd.read_csv(fileRollup, names=['Id','Count','Foam','KO'], delimiter='\t')
-    if df.empty:
-        return
+    df_FOAM = pd.read_csv(fileRollup[0], names=['Id','Count','Info'], delimiter='\t')
+    df_KEGG = pd.read_csv(fileRollup[1], names=['Id','Count','Info'], delimiter='\t')
 
-    # Reformat data. This method avoids chained indexing
+    # Reformat data. This lambda method avoids chained indexing
     # Splits string into list, strips brackets and quotes
-    def helper(x):
-        x = x.strip('[]').split("', ")
-        return [i.strip("'") for i in x]
-    
-    # Convert 'Count" column to numeric
-    df["Count"] = pd.to_numeric(df["Count"])
+    helper = lambda x : [i.strip("'") for i in x.strip('[]').split("', ")]
     # call helper method to reformat 'FOAM' and 'KO' columns
-    df['Foam'] = df['Foam'].apply(helper)
-    df['KO'] = df['KO'].apply(helper)
-
-    # Calculate Level and Count #TODO: Refactor this section for clarity
-    dictFoam = {}
-    dictKO = {}
-    for row in range(len(df)):
-        # FOAM
-        for j in range(len(df['Foam'][row])):
-            # Store name in dictionary, default is zero count
-            dictFoam[df['Foam'][row][j]] = dictFoam.get(df['Foam'][row][j], ["",0])
-            # Get current name count from dictionary
-            n,m = dictFoam[df['Foam'][row][j]]
-            # j+1 is Level, m is count
-            dictFoam[df['Foam'][row][j]] = [j+1, m+df['Count'][row]]
-        # KO
-        for j in range(len(df['KO'][row])):
-            dictKO[df['KO'][row][j]] = dictKO.get(df['KO'][row][j],["",0])
-            n,m = dictKO[df['KO'][row][j]]
-            dictKO[df['KO'][row][j]] = [j+1,m+df['Count'][row]]
+    df_FOAM['Info'] = df_FOAM['Info'].apply(helper)
+    df_KEGG['Info'] = df_KEGG['Info'].apply(helper)
+    # Convert 'Count" column to numeric
+    df_FOAM["Count"] = pd.to_numeric(df_FOAM["Count"])
+    df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
     
+    # Calculate Level and Count #TODO: Refactor this section for clarity
+    #def countLevels(df):
+    #    dictDF = {}
+    #    for row in range(len(df)):
+    #        for j in range(len(df['Info'][row])):
+    #            dictDF[df['Info'][row][j]] = dictDF.get(df['Info'][row][j],["",0])
+    #            n,m = dictDF[df['Info'][row][j]]
+    #            dictDF[df['Info'][row][j]] = [j+1,m+df['Count'][row]]
+    #    return dictDF
+
+    #dictFoam = countLevels(df_FOAM)
+    #dictKEGG = countLevels(df_KEGG)
+    #for key,value in dictFoam.items():
+    #    print('\t'*value[0], key, value)
+
+    # Enumerate data TODO: Replaced counting method with these for loops. Need to make sure not getting off by one error in math
+    dictFOAM = {}
+    for row in range(len(df_FOAM)):
+        for level,name in enumerate(df_FOAM['Info'][row], 1):
+            if name not in dictFOAM:
+                dictFOAM[name] = [level, df_FOAM['Count'][row]]
+            dictFOAM[name][1] += 1
+    dictKEGG = {}
+    for row in range(len(df_KEGG)):
+        for level,name in enumerate(df_KEGG['Info'][row], 1):
+            if name not in dictKEGG:
+                dictKEGG[name] = [level, df_KEGG['Count'][row]]
+            dictKEGG[name][1] += 1
+    #for key,value in dictFoam.items():
+    #    print('\t'*value[0], key, value)
+
 
     # Create Level and Count Columns
     dataFOAM = {'Type':'Foam',
-        'Name':list(dictFoam.keys()),
-        'Level':[x[0] for x in dictFoam.values()],
-        'Count':[x[1] for x in dictFoam.values()]}
+        'Name':list(dictFOAM.keys()),
+        'Level':[x[0] for x in dictFOAM.values()],
+        'Count':[x[1] for x in dictFOAM.values()]}
     FT = pd.DataFrame(data=dataFOAM)
     FT.drop(FT[FT['Name']==''].index, inplace=True)
     FT.drop(FT[FT['Name']=='NA'].index, inplace=True)
     
-    dataKO = {'Type':'KO','Name':list(dictKO.keys()),'Level':[x[0] for x in dictKO.values()],'Count':[x[1] for x in dictKO.values()]}
+    dataKO = {'Type':'KO','Name':list(dictKEGG.keys()),'Level':[x[0] for x in dictKEGG.values()],'Count':[x[1] for x in dictKEGG.values()]}
     KT = pd.DataFrame(data=dataKO)
     KT.drop(KT[KT['Name']==''].index, inplace=True)
     KT.drop(KT[KT['Name']=='NA'].index, inplace=True)
 
+    # TODO: Debug info, don't print this in final. Exports to excel and CSV in visual.py
+    #print("FOAM")
+    #print(FT)
+    #print("KEGG")
+    #print(KT)
+    
     return pd.concat([FT,KT])

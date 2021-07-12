@@ -15,13 +15,13 @@ def createReport(dicTables, dicRollup, config, subdir):
     shutil.copy(f"{config['PATH']}/plotly-2.0.0.min.js", path)
 
     # Save XLS and CVS reports and HTML files
-    for f_name,table in dicTables.items():
-        save_path = os.path.join(path, f_name)
+    for name,table in dicTables.items():
+        save_path = os.path.join(path, name)
         table.to_excel(save_path+'.xlsx', index = False, header=True)
         table.to_csv(save_path+'.csv', index = False, header=True)
         figSunburst = cerberusVisual.graphSunburst(table, path)
-        FOAM_Charts, KO_Charts = cerberusVisual.graphBarcharts(dicRollup[f_name])
-        outfile = os.path.join(path, f_name+'_report.html')
+        FOAM_Charts, KO_Charts = cerberusVisual.graphBarcharts(dicRollup[name])
+        outfile = os.path.join(path, name+'_report.html')
         writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts)
 
     return None

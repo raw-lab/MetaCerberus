@@ -11,29 +11,33 @@ __version__ = "1.0"
 import sys
 import os
 import subprocess
-import configargparse as argparse
+import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
 import re
-import multiprocessing as mp
 import time
 import socket
 import ray
 
 import cerberusQC, cerberusTrim, cerberusDecon, cerberusFormat
 import cerberusGenecall, cerberusHMMER, cerberusParser, cerberusReport
+import cerberusVisual
 
 
-## Global variables
+##### Global Variables #####
+# file extensions
 FILES_FASTQ = ['.fastq', '.fastq.gz']
 FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
 FILES_AMINO = [".faa"]
 
+# external dependencies
 DEPENDENCIES = {
         'EXE_FASTQC': 'fastqc',
         'EXE_FASTP': 'fastp',
+        'EXE_PORECHOP': 'porechop',
         'EXE_BBDUK': 'bbduk.sh',
-        'EXE_PRODIGAL': 'prodigal'
-        }
+        'EXE_PRODIGAL': 'prodigal',
+        'EXE_HMMSEARCH': 'hmmsearch'}
 
+# step names
 STEP = {
     1:"step_01-loadFiles",
     2:"step_02-QC",
@@ -43,13 +47,13 @@ STEP = {
     6:"step_06-geneCall",
     7:"step_07-hmmer",
     8:"step_08-parse",
-    9:"step_09-visualizeData"
-    }
+    9:"step_09-visualizeData"}
 
 
 ## PRINT to stderr ##
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
+    return
 
 
 ## RAY WORKER THREAD ##
@@ -65,119 +69,109 @@ def rayWorker(func, key, value, config, path):
 
 ## MAIN
 def main():
-    # TODO: Load default args from config file
-    # https://pypi.org/project/ConfigArgParse/ looks very user friendly
-
-
     ## Parse the command line
     parser = argparse.ArgumentParser(add_help=False)
     parser.set_defaults()
-    required = parser.add_argument_group('required arguments')
+    # At least one of these options are required
     required = parser.add_argument_group('''At least one sequence is required
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
 > cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
 > cerberus.py --config file.config''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
-    required.add_argument('--euk', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
-    required.add_argument('--mic', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
-    required.add_argument('--fgs', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
-    required.add_argument('--prod', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
+    required.add_argument('--euk', '--prod', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
+    required.add_argument('--mic', '--fgs', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
-    required.add_argument('--prot', action='append', default=[], help='Protein Amino Acid sequence')
+    required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
+    # optional flags
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument('--outpath', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
+    optional.add_argument('--dir_out', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
     optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
+    optional.add_argument('--meta', action="store_true", help="Metagenomic flag for Prodigal (Eukaryote)")
+    optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
+    optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
+    optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. True by default")
     optional.add_argument('--version', '-v', action='version',
                         version='Cerberus: \n version: {} June 24th 2021'.format(__version__),
                         help='show the version number and exit')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
-    hidden = parser.add_argument_group()
-    hidden.add_argument("--EXE_PRODIGAL", help=argparse.SUPPRESS)
+    # Hidden from help, expected to load from config file
+    dependencies = parser.add_argument_group()
+    for key in DEPENDENCIES:
+        dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
+
     args = parser.parse_args()
 
-    print(args)
-
-    # Merge redundant flags
-    if args.prod:
-        args.euk += args.prod
-    if args.fgs:
-        args.mic += args.fgs
+    # Merge related arguments
     if args.super:
         args.euk += args.super
         args.mic += args.super
 
+    # Check if required flags are set
     if not any([args.euk, args.mic, args.prot]):
         parser.print_help()
         parser.error('At least one sequence must be declared either in the command line or through the config file')
 
-    # Initialize RAY for Multithreading
-    ray.init()
-
-    # Initialize Config
+    # Initialize Config Dictionary
     config = {}
-    if args.outpath:
-        config['DIR_OUT'] = args.outpath
+    config['PATH'] = os.path.dirname(os.path.abspath(__file__))
+    config['EXE_FGS+'] = os.path.abspath(os.path.join(config['PATH'], "FGS+/FGS+"))
 
-    # search dependency paths
-    # TODO: Check versions as well
-    print("Checking environment for dependencies:")
+    # load all args into config
+    for arg,value in args.__dict__.items():
+        if value is not None:
+            arg = arg.upper()
+            if arg.startswith("EXE_"):
+                value = os.path.abspath(os.path.expanduser(value))
+            if arg.startswith("DIR_"):
+                value = os.path.abspath(os.path.expanduser(os.path.join(value, "pipeline")))
+                os.makedirs(value, exist_ok=True)
+            config[arg] = value
+
+    # Sequence File extensions
+    config['EXT_FASTA'] = FILES_FASTA
+    config['EXT_FASTQ'] = FILES_FASTQ
+    config['EXT_AMINO'] = FILES_AMINO
+
+    # search dependency paths TODO: Check versions as well
+    print("Checking for external dependencies:")
     for key,value in DEPENDENCIES.items():
+        # skip environment check if declared in config
+        if key in config:
+            print(f"{value:20} {config[key]}")
+            continue
+        # search environment for executable
         try:
             proc = subprocess.run(["which", value], stdout=subprocess.PIPE, text=True)
             path = proc.stdout.strip()
             if proc.returncode == 0:
                 print(f"{value:20} {path}")
-                DEPENDENCIES[key] = path
+                config[key] = path
             else:
                 print(f"{value:20} NOT FOUND, must be defined in config file as {key}:(path)")
         except:
             print(f"ERROR executing 'which {value}'")
-    
-    # Update config with dependencies found in environment
-    DEPENDENCIES.update(config)
-    config = DEPENDENCIES
 
-    # Script path and relative dependencies
-    config['PATH'] = os.path.dirname(os.path.abspath(__file__))
-    config['EXE_FGS+'] = os.path.abspath(f"{config['PATH']}/FGS+/FGS+")
+    # Sanity Check of config file
+    for key,value in config.items():
+        if key.startswith("EXE_") and not os.path.isfile(value):
+            parser.error(f"Unable to find file: {value}")
 
+    # Initialize RAY for Multithreading
+    ray.init()
 
-    # Sanity Check
-    #TODO: fix due to change in input options
-    #config['IN_PATH'] = config['IN_PATH'].rstrip('/')
-    #for item in config:
-    #    config[item] = os.path.abspath(os.path.expanduser(config[item]))
-    #    print("Checking if exists: " + config[item])
-    #    if item.startswith("DIR_"):
-    #        if not os.path.isdir(config[item]):
-    #            parser.error(f"Unable to find path: {config[item]}")
-        
-    #    if item.startswith("EXE_") and not os.path.isfile(config[item]):
-    #        parser.error(f"Unable to find file: {config[item]}")
-
-    config['EXT_FASTA'] = FILES_FASTA
-    config['EXT_FASTQ'] = FILES_FASTQ
-    config['EXT_AMINO'] = FILES_AMINO
-
-    # Add CPU info to config
-    if "CPUS" not in config:
-        config["CPUS"] = mp.cpu_count()
+    if 'CPUS' not in config:
+        config['CPUS'] = int(ray.available_resources()['CPU'])
+    print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
-
-    if 'DIR_OUT' not in config:
-        config['DIR_OUT'] = os.path.abspath("./pipeline")
-    else:
-        config['DIR_OUT'] = os.path.abspath(os.path.join(config['DIR_OUT'], "pipeline"))
-    os.makedirs(config['DIR_OUT'], exist_ok=True)
-
+    
+    
     # Step 1 - Load Input Files
     fastq = {}
     fasta = {}
     amino = {}
-    print("\nLoading input files:")
-    #TODO: Implementing EUK and MIC options
-    # Check protein input
+    print("\nLoading sequence files:")
+    # Load protein input
     for item in args.prot:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -186,6 +180,7 @@ Example:
                 amino[name] = item
             else:
                 print(f'{item} is not a valid protein sequence')
+    # Load microbial input
     for item in args.mic:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -204,6 +199,7 @@ Example:
                     args.mic.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
+    # Load eukaryotic input
     for item in args.euk:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -223,7 +219,6 @@ Example:
         else:
             print(f'{item} is not a valid sequence')
 
-    print("Loading sequence files from config file or command line.")
     print(f"\nFastq sequences: {fastq}")
     print(f"\nFasta sequences: {fasta}")
     print(f"\nProtein Sequences: {amino}")
@@ -338,10 +333,9 @@ Example:
 
     # step 9 (Report)
     print("Creating Reports")
-    if len(hmmTables) > 2:
-        cerberusReport.graphPCA(f"{STEP[9]}", hmmTables.values())
     cerberusReport.createReport(hmmTables, hmmRollup, config, f"{STEP[9]}")
-    
+    if len(hmmTables) > 2:
+        cerberusVisual.graphPCA(f"{STEP[9]}", hmmTables.values())
 
 
     # Wait for misc jobs
@@ -357,16 +351,16 @@ Example:
 
 
 ## loadConfig
-def loadConfig(configFile):
-    config = {}
-    for line in configFile:
-        line = line.strip()
-        if re.match("#", line) or line == "":
-            continue
-        line = line.split(":", 1)
-        config[line[0].strip()] = line[1].strip()
-    
-    return config
+#def loadConfig(configFile):
+#    config = {}
+#    for line in configFile:
+#        line = line.strip()
+#        if re.match("#", line) or line == "":
+#            continue
+#        line = line.split(":", 1)
+#        config[line[0].strip()] = line[1].strip()
+#    
+#    return config
 
 
 ## Start main method
