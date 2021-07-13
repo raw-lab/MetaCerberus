@@ -49,6 +49,9 @@ def removeN(fasta, config, subdir):
     outFasta = os.path.basename(outFasta) + "_clean"+ ext
     outFasta = os.path.join(path, outFasta)
 
+    if not config['REPLACE'] and os.path.exists(outFasta):
+        return outFasta
+
     with open(fasta) as fileIn, open(outFasta, 'w') as fileOut:
         name = ""
         sequence = ""

@@ -4,8 +4,6 @@ import os
 import shutil
 import re
 
-import cerberusVisual
-
 
 #GLOBAL standard html header to include plotly script
 htmlHeader = [
@@ -17,7 +15,7 @@ htmlHeader = [
 
 
 ######### Create Report ##########
-def createReport(dicTables, dicRollup, pcaFigure, config, subdir):
+def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
@@ -28,10 +26,8 @@ def createReport(dicTables, dicRollup, pcaFigure, config, subdir):
         save_path = os.path.join(path, name)
         table.to_excel(save_path+'.xlsx', index = False, header=True)
         table.to_csv(save_path+'.csv', index = False, header=True)
-        figSunburst = cerberusVisual.graphSunburst(table, path)
-        FOAM_Charts, KO_Charts = cerberusVisual.graphBarcharts(dicRollup[name])
         outfile = os.path.join(path, name+"_report.html")
-        writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts)
+        writeHTML(outfile, figSunburst[name], figCharts[name][0], figCharts[name][1])
 
     # PCA Plot
     if pcaFigure:
@@ -67,7 +63,7 @@ def writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts):
         # FOAM Charts
         dicFOAM = {}
         htmlOut.write('<H2>Foam Levels</H2>\n')
-        #htmlOut.write('<input type="button" value="Level 1 id="foam-reset"')
+
         for title, fig in FOAM_Charts.items():
             if title == "Level 1":
                 title = "Level 1: FOAM"

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
@@ -8,6 +7,21 @@ from sklearn.preprocessing import StandardScaler
 from functools import reduce
 import plotly.express as px  # (version 4.7.0)
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+
+def doPCA(values):
+    X = values
+    
+    scaler = StandardScaler()
+    scaler.fit(X)
+    
+    X_scaled = scaler.transform(X)
+
+    pcaFOAM = PCA()
+
+    #print("Explained Variance:\n", pcaFOAM.explained_variance_ratio_ * 100, sum(pcaFOAM.explained_variance_ratio_[0:2]))
+    return (pcaFOAM.fit_transform(X_scaled), pcaFOAM.explained_variance_ratio_)
 
 
 ######### Create PCA Graph ##########
@@ -30,95 +44,57 @@ def graphPCA(table_list):
 
     dfFOAM = dfFOAM.fillna(0).astype(int)
     dfKEGG = dfKEGG.fillna(0).astype(int)
-    
-    X = dfFOAM.values
-    print("Values: ", X)
-    print("Shape: ", X.shape)
-    
-    scaler = StandardScaler()
-    scaler.fit(X)
-    
-    X_scaled = scaler.transform(X)
 
-    print("Scaled:\n", X_scaled)
 
-    pcaFOAM = PCA()
 
-    X_pca = pcaFOAM.fit_transform(X_scaled)
-    print("Explained Variance:\n", pcaFOAM.explained_variance_ratio_ * 100, sum(pcaFOAM.explained_variance_ratio_[0:2]))
-    print("PCA Transformed:\n", X_pca)
+    figPCA = make_subplots(
+        rows=1, cols=2,
+        specs=[[{"type": "scene"}, {"type": "scene"}]])
 
+    for col,df in enumerate([dfFOAM, dfKEGG], 1):
+        X_pca, explained_variance_ratio = doPCA(df.values)
+        labels = {
+            str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
+                for i,var in enumerate(explained_variance_ratio * 100)}
+        fig = px.scatter_3d(
+            X_pca, x=0, y=1, z=2, color=df.index,
+            labels=labels)
+
+        figPCA.add_trace(go.Scatter3d(
+                x=X_pca.T[0], y=X_pca.T[1], z=X_pca.T[2], mode='markers',
+                marker=dict(
+                    size=10,
+                    color=[1,2,3,4,5],                # set color to an array/list of desired values
+                    colorscale='Viridis',   # choose a colorscale
+                    opacity=0.8),
+                ),
+            row=1, col=col)
+
+    return figPCA
+
+    X_pca, explained_variance_ratio = doPCA(dfFOAM.values)
     labels = {
         str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
-        for i,var in enumerate(pcaFOAM.explained_variance_ratio_ * 100)}
-
-    fig = px.scatter_3d(
+            for i,var in enumerate(explained_variance_ratio * 100)}
+    figFOAM = px.scatter_3d(
         X_pca, x=0, y=1, z=2, color=dfFOAM.index,
         labels=labels)
 
-    return fig
-
-    filelist = []
-    for table in table_list:
-        table = table.values
-        a = table[0]
-        y = table[2]
-        print(a)
-        print(y)
-        a = a[['Name','Count']]
-        print(a)
-        a = a.rename(columns={'Count':y })
-        filelist.append(a)
-
-    print(filelist)
-    df_merged = reduce(lambda  left,right:
-                        pd.merge(left,
-                            right,
-                            on=['Name'],
-                            how='outer'),
-                        filelist)
-    result = df_merged.replace(np.nan, 0)
-    pivoted = result.T
-    res = pivoted.rename(columns=pivoted.iloc[0])
-    res1 = res.drop(res.index[0])
-    pca = PCA(n_components=3, svd_solver='randomized')
-    X_train = pca.fit_transform(res1)
+    X_pca, explained_variance_ratio = doPCA(dfKEGG.values)
     labels = {
         str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
-        for i,var in enumerate(pca.explained_variance_ratio_ * 100)}
-
-    fig = px.scatter_3d(
-        X_train, x=0, y=1, z=2, color=res1.index,
+            for i,var in enumerate(explained_variance_ratio * 100)}
+    figKEGG = px.scatter_3d(
+        X_pca, x=0, y=1, z=2, color=dfKEGG.index,
         labels=labels)
-
-    fig.update_layout({
-        'plot_bgcolor' : '#7f7f7f',
-        'paper_bgcolor': '#FFFFFF',
-        'paper_bgcolor': "rgba(0,0,0,0)",
-        'plot_bgcolor' : '#7f7f7f'})
-
-    fig.update_layout(scene = dict(
-            xaxis = dict(
-                backgroundcolor="rgb(255,255, 255)",
-                gridcolor="black",
-                showbackground=True,
-                zerolinecolor="black",),
-            yaxis = dict(
-                backgroundcolor="rgb(255,255, 255)",
-                gridcolor="black",
-                showbackground=True,
-                zerolinecolor="black"),
-            zaxis = dict(
-                backgroundcolor="rgb(255,255, 255)",
-                gridcolor="black",
-                showbackground=True,
-                zerolinecolor="black")))
-
-    return fig
+    
+    
+          
+    return figPCA
 
 
 ########## Create Sunburst Figures ##########
-def graphSunburst(table, path=None):
+def graphSunburst(table):
     dfFoam = table[table["Type"]=='Foam']
     dfKO = table[table["Type"]=='KO']
     count = table['Count']
@@ -150,8 +126,7 @@ def graphSunburst(table, path=None):
         figSunburst.update_traces(textfont=dict(size=[40]))
         col += 1
     figSunburst.update_traces(textfont=dict(size=[40]))
-    if path:
-        figSunburst.write_html(file=os.path.join(path, "sunburst.htm"), include_plotlyjs="plotly-2.0.0.min.js")
+
     return figSunburst
 
 

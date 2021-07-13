@@ -6,7 +6,11 @@
 Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data.
 """
 
+
+
 __version__ = "1.0"
+
+
 
 import sys
 import os
@@ -16,9 +20,16 @@ import time
 import socket
 import ray
 
-import cerberusQC, cerberusTrim, cerberusDecon, cerberusFormat
-import cerberusGenecall, cerberusHMMER, cerberusParser, cerberusReport
-import cerberusVisual
+# our package import.
+from cerberus import (
+    cerberusQC, cerberusTrim, cerberusDecon, cerberusFormat,
+    cerberusGenecall, cerberusHMMER, cerberusParser,
+    cerberusVisual, cerberusReport
+)
+
+#import cerberusQC, cerberusTrim, cerberusDecon, cerberusFormat
+#import cerberusGenecall, cerberusParser, cerberusReport
+#import cerberusVisual
 
 
 ##### Global Variables #####
@@ -77,19 +88,28 @@ def main():
 Example:
 > cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
 > cerberus.py --config file.config''')
+    readtype = parser.add_mutually_exclusive_group(required=False)
+    optional = parser.add_argument_group('optional arguments')
+    
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--euk', '--prod', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
     required.add_argument('--mic', '--fgs', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
     required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
+    
+    #args = parser.parse_known_args()
+
+    # Raw-read identification
+    readtype.add_argument('--nanopore')
+    readtype.add_argument('--illumina')
+    readtype.add_argument('--pacbio')
     # optional flags
-    optional = parser.add_argument_group('optional arguments')
     optional.add_argument('--dir_out', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
     optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
     optional.add_argument('--meta', action="store_true", help="Metagenomic flag for Prodigal (Eukaryote)")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
-    optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. True by default")
+    optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
     optional.add_argument('--version', '-v', action='version',
                         version='Cerberus: \n version: {} June 24th 2021'.format(__version__),
                         help='show the version number and exit')
@@ -324,18 +344,23 @@ Example:
     print("Waiting for parsed results")
     hmmRollup = {}
     hmmTables = {}
+    figSunburst = {}
+    figCharts = {}
     for job in jobParse:
         key,value = ray.get(job)
         hmmRollup[key] = value
         hmmTables[key] = cerberusParser.createTables(value)
+        figSunburst[key] = cerberusVisual.graphSunburst(hmmTables[key])
+        figCharts[key] = cerberusVisual.graphBarcharts(value)
 
 
     # step 9 (Report)
     print("Creating Reports")
-    pcaFigure = None
+    pcaFigures = None
     if len(hmmTables) > 2:
-        pcaFigure = cerberusVisual.graphPCA(hmmTables)
-    cerberusReport.createReport(hmmTables, hmmRollup, pcaFigure, config, f"{STEP[9]}")
+        pcaFigures = cerberusVisual.graphPCA(hmmTables)
+    
+    cerberusReport.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[9]}")
 
 
     # Wait for misc jobs
