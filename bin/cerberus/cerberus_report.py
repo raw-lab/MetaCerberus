@@ -25,27 +25,27 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
     # Save XLS and CVS reports and HTML files
     dfFOAM = pd.DataFrame()
     dfKEGG = pd.DataFrame()
-    for name,table in dicTables.items():
-        os.makedirs(os.path.join(path, name), exist_ok=True)
+    for sample,table in dicTables.items():
+        os.makedirs(os.path.join(path, sample), exist_ok=True)
         # Write rollup tables
-        outfile = os.path.join(path, name, name+'_rollup.tsv')
+        outfile = os.path.join(path, sample, sample+'_rollup.tsv')
         table.to_csv(outfile, index = False, header=True, sep='\t')
 
         # Create spreadsheet of counts
         # FOAM
         X = table[table['Type']=="Foam"]
         row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-        row = pd.Series(row, name=name)
+        row = pd.Series(row, name=sample)
         dfFOAM = dfFOAM.append(row)
         # KEGG
         X = table[table['Type']=="KO"]
         row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-        row = pd.Series(row, name=name)
+        row = pd.Series(row, name=sample)
         dfKEGG = dfKEGG.append(row)
 
         # Write HTML Report
-        outfile = os.path.join(path, name, name+"_report"+".html")
-        writeHTML(outfile, figSunburst[name], figCharts[name][0], figCharts[name][1])
+        outfile = os.path.join(path, sample, sample+"_report"+".html")
+        writeHTML(outfile, sample, figSunburst[sample], figCharts[sample][0], figCharts[sample][1])
 
     dfFOAM = dfFOAM.T.fillna(0).astype(int)
     dfKEGG = dfKEGG.T.fillna(0).astype(int)
@@ -73,22 +73,23 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
 
 
 ########## Write HTML File ##########
-def writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts):
+def writeHTML(outfile, sample, figSunburst, FOAM_Charts, KO_Charts):
     # Create HTML Report
     
     with open(outfile, 'w') as htmlOut:
         plotly = 'cdn' # TODO: Option for how to include plotly.js. False uses script in <head>, 'cdn' loads from internet.
         htmlOut.write("\n".join(htmlHeader))
-        htmlOut.write("<h1>Report<h1>\n")
+        htmlOut.write(f"<h1>Cerberus Report for '{sample}<h1>\n")
 
         # Sunburst Plots
+        htmlOut.write('<H2>Sunburst summary of FOAM and KEGG Levels</H2>\n')
         htmlFig = figSunburst.to_html(full_html=False, include_plotlyjs=plotly)
         htmlOut.write(htmlFig + '\n')
 
-        # FOAM Charts
+        # FOAM Bar Charts
         dicFOAM = {}
         htmlOut.write('<H2>Foam Levels</H2>\n')
-
+        htmlOut.write("<H4>*Clicking on a bar in the graph displays the next level.</br>The graph will cycle back to the first level after reaching the last level.</H4>")
         for title, fig in FOAM_Charts.items():
             if title == "Level 1":
                 title = "Level 1: FOAM"
@@ -101,9 +102,10 @@ def writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts):
             display = "block" if title=="Level 1: FOAM" else "none"
             htmlFig = htmlFig.replace('<div>', f'<div id="{title}" style="display:{display};">', 1)
             htmlOut.write(htmlFig + '\n')
-        # KO Charts
+        # KO Bar Charts
         dicKO = {}
         htmlOut.write('<H2>KO Levels</H2>')
+        htmlOut.write("<H4>*Clicking on a bar in the graph displays the next level.</br>The graph will cycle back to the first level after reaching the last level.</H4>")
         for title, fig in KO_Charts.items():
             if title == "Level 1":
                 title = "Level 1: KO"

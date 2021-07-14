@@ -78,27 +78,25 @@ def main():
     parser = argparse.ArgumentParser(add_help=False)
     parser.set_defaults()
     # At least one of these options are required
-    required = parser.add_argument_group('''At least one sequence is required
+    required = parser.add_argument_group('''Required arguments
+At least one sequence is required.
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
 > cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
-> cerberus.py --config file.config''')
-    readtype = parser.add_mutually_exclusive_group(required=False)
-    optional = parser.add_argument_group('optional arguments')
-    
+> cerberus.py --config file.config
+*Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--euk', '--prod', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
     required.add_argument('--mic', '--fgs', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
     required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
-    
-    #args = parser.parse_known_args()
-
     # Raw-read identification
-    readtype.add_argument('--nanopore')
-    readtype.add_argument('--illumina')
-    readtype.add_argument('--pacbio')
+    readtype = parser.add_mutually_exclusive_group(required=False)
+    readtype.add_argument('--nanopore', action="store_true", help="Specifies that the given FASTQ files are from Nanopore")
+    readtype.add_argument('--illumina', action="store_true", help="Specifies that the given FASTQ files are from Illumina")
+    readtype.add_argument('--pacbio', action="store_true", help="Specifies that the given FASTQ files are from PacBio")
     # optional flags
+    optional = parser.add_argument_group('optional arguments')
     optional.add_argument('--dir_out', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
     optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
     optional.add_argument('--meta', action="store_true", help="Metagenomic flag for Prodigal (Eukaryote)")
@@ -125,6 +123,12 @@ Example:
     if not any([args.euk, args.mic, args.prot]):
         parser.print_help()
         parser.error('At least one sequence must be declared either in the command line or through the config file')
+
+    print(args.euk + args.mic + args.prot)
+    for file in args.euk + args.mic + args.prot:
+        if '.fastq' in file:
+            if not any([args.nanopore, args.illumina, args.pacbio]):
+                parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --nanopore, --illumina, or --pacbio')
 
     # Initialize Config Dictionary
     config = {}

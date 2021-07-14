@@ -129,29 +129,17 @@ def graphBarcharts(rollupFiles):
 
 
     # Enumerate data
-    foamCounts = {}
-    for row in range(len(df_FOAM)):
-        for name in df_FOAM['Info'][row]:
-            if name not in foamCounts:
-                foamCounts[name] = df_FOAM['Count'][row]
-            foamCounts[name] += 1
-    koCounts = {}
-    for row in range(len(df_KEGG)):
-        for name in df_KEGG['Info'][row]:
-            if name not in koCounts:
-                koCounts[name] = df_KEGG['Count'][row]
-            koCounts[name] += 1
     # TODO: Refactor this
     def countLevels(df):
-        dictDF = {}
+        dictCount = {}
         for row in range(len(df)):
-            for j in range(len(df['Info'][row])):
-                dictDF[df['Info'][row][j]] = dictDF.get(df['Info'][row][j],["", 0])
-                n,m = dictDF[df['Info'][row][j]]
-                dictDF[df['Info'][row][j]] = [j+1, m+df['Count'][row]]
-        return dictDF
-    #foamCounts = countLevels(df_FOAM)
-    #koCounts = countLevels(df_KEGG)
+            for name in df['Info'][row]:
+                if name not in dictCount:
+                    dictCount[name] = 0
+                dictCount[name] += df['Count'][row]
+        return dictCount
+    foamCounts = countLevels(df_FOAM)
+    keggCounts = countLevels(df_KEGG)
 
     # FOAM
     dictFoam = {}
@@ -187,19 +175,19 @@ def graphBarcharts(rollupFiles):
             if i == 1:
                 level1 = name
                 if name not in dictKO:
-                    dictKO[level1] = {}, koCounts[name]
+                    dictKO[level1] = {}, keggCounts[name]
             elif i == 2:
                 level2 = name
                 if name not in dictKO[level1][0]:
-                    dictKO[level1][0][level2] = {}, koCounts[name]
+                    dictKO[level1][0][level2] = {}, keggCounts[name]
             elif i == 3:
                 level3 = name
                 if name not in dictKO[level1][0][level2][0]:
-                    dictKO[level1][0][level2][0][level3] = {}, koCounts[name]
+                    dictKO[level1][0][level2][0][level3] = {}, keggCounts[name]
             else:
                 level4 = name
                 if level4 not in dictKO[level1][0][level2][0][level3][0]:
-                    dictKO[level1][0][level2][0][level3][0][level4] = koCounts[name]
+                    dictKO[level1][0][level2][0][level3][0][level4] = keggCounts[name]
                 #else:
                     #print("WARNING: duplicate line in rollup: KEGG: ", row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
 
