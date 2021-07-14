@@ -16,14 +16,13 @@ def parseHmmer(fileHmmer, config, subdir):
 
     minscore = config["MINSCORE"]
 
+    top5File = os.path.join(path, "HMMER_BH.tsv")
     rollupFileFOAM = os.path.join(path, "HMMER_BH_FOAM.rollup")
     rollupFileKEGG = os.path.join(path, "HMMER_BH_KO.rollup")
 
-    #if not config['REPLACE'] and os.path.exists(rollup_file):
-    #    return rollup_file
-
     # Calculate Best Hit
     BH_dict = {}
+    BH_top5 = {}
     with open(fileHmmer, "r") as reader:
         for line in reader:
             if line.startswith("#"):        # Skip commented lines
@@ -37,12 +36,30 @@ def parseHmmer(fileHmmer, config, subdir):
             score = line[13]
             if score < minscore:            # Skip scores less than minscore
                 continue
+
+            # store top 5 per query
+            if query not in BH_top5:
+                BH_top5[query] = [line]
+            elif len(BH_top5[query]) < 5:
+                BH_top5[query].append(line)
+            else:
+                BH_top5[query].sort(key = lambda x: x[13])
+                if score > BH_top5[query][0][13]:
+                    BH_top5[query][0] = line
+
             # Check for Best Score per query
             if query not in BH_dict:
                 BH_dict[query] = line
             elif score > BH_dict[query][13]:
                 BH_dict[query] = line
 
+    # Save Top 5 hits tsv rollup
+    if config['REPLACE'] or not os.path.exists(top5File):
+        with open(top5File, 'w') as writer:
+            for query in sorted(BH_top5.keys()):
+                BH_top5[query].sort(key = lambda x: x[13])
+                for line in BH_top5[query]:
+                    print(line[0], line[3], line[13], file=writer, sep='\t')
 
     # Create dictionary with found KO IDs and counts
     KO_ID_counts = {}
@@ -53,10 +70,11 @@ def parseHmmer(fileHmmer, config, subdir):
                 KO_ID_counts[KO_ID] = 0
             KO_ID_counts[KO_ID] += 1
 
-    #TODO: add 'REPLACE' flag here
     # Write rollup files to disk
-    rollupFOAM(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), rollupFileFOAM)
-    rollupKEGG(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "KO_classification.txt"), rollupFileKEGG)
+    if config['REPLACE'] or not os.path.exists(rollupFileFOAM):
+        rollupFOAM(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), rollupFileFOAM)
+    if config['REPLACE'] or not os.path.exists(rollupFileKEGG):
+        rollupKEGG(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "KO_classification.txt"), rollupFileKEGG)
 
     return (rollupFileFOAM, rollupFileKEGG)
 
@@ -148,18 +166,19 @@ def createTables(fileRollup):
     #for key,value in dictFoam.items():
     #    print('\t'*value[0], key, value)
 
-    # Enumerate data TODO: Replaced counting method with these for loops. Need to make sure not getting off by one error in math
+    # Enumerate data TODO: Replaced counting method with this.
+    # Need to make sure not getting off by one error in counting
     dictFOAM = {}
     for row in range(len(df_FOAM)):
         for level,name in enumerate(df_FOAM['Info'][row], 1):
             if name not in dictFOAM:
-                dictFOAM[name] = [level, df_FOAM['Count'][row]]
+                dictFOAM[name] = [level, df_FOAM['Count'][row], df_FOAM['Id'][row]]
             dictFOAM[name][1] += 1
     dictKEGG = {}
     for row in range(len(df_KEGG)):
         for level,name in enumerate(df_KEGG['Info'][row], 1):
             if name not in dictKEGG:
-                dictKEGG[name] = [level, df_KEGG['Count'][row]]
+                dictKEGG[name] = [level, df_KEGG['Count'][row], df_KEGG['Id'][row]]
             dictKEGG[name][1] += 1
     #for key,value in dictFoam.items():
     #    print('\t'*value[0], key, value)
@@ -168,6 +187,7 @@ def createTables(fileRollup):
     # Create Level and Count Columns
     dataFOAM = {'Type':'Foam',
         'Name':list(dictFOAM.keys()),
+        'Id':[x[2] for x in dictFOAM.values()],
         'Level':[x[0] for x in dictFOAM.values()],
         'Count':[x[1] for x in dictFOAM.values()]}
     FT = pd.DataFrame(data=dataFOAM)
@@ -176,6 +196,7 @@ def createTables(fileRollup):
     
     dataKO = {'Type':'KO',
         'Name':list(dictKEGG.keys()),
+        'Id':[x[2] for x in dictKEGG.values()],
         'Level':[x[0] for x in dictKEGG.values()],
         'Count':[x[1] for x in dictKEGG.values()]}
     KT = pd.DataFrame(data=dataKO)

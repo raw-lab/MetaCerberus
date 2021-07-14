@@ -26,24 +26,25 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
         save_path = os.path.join(path, name)
         table.to_excel(save_path+'.xlsx', index = False, header=True)
         table.to_csv(save_path+'.csv', index = False, header=True)
-        outfile = os.path.join(path, name+"_report.html")
+        outfile = os.path.join(path, "report_"+name+".html")
         writeHTML(outfile, figSunburst[name], figCharts[name][0], figCharts[name][1])
 
     # PCA Plot
     if pcaFigure:
-        outfile = os.path.join(path, "PCA.pdf")
-        pcaFigure.write_image(outfile)
+        for type,fig in pcaFigure.items():
+            outfile = os.path.join(path, f"report_{type}_PCA.pdf")
+            fig.write_image(outfile)
 
-        outfile = os.path.join(path, "PCA_standalone.html")
-        pcaFigure.write_html(outfile)
+            outfile = os.path.join(path, f"report_{type}_PCA_standalone.html")
+            fig.write_html(outfile)
 
-        outfile = os.path.join(path, "PCA.html")
-        with open(outfile, 'w') as htmlOut:
-            htmlOut.write("\n".join(htmlHeader))
-            htmlOut.write("<h1>Report<h1>\n")
-            htmlFig = pcaFigure.to_html(full_html=False, include_plotlyjs=False)
-            htmlOut.write(htmlFig + '\n')
-            htmlOut.write('\n</body>\n</html>\n')
+            outfile = os.path.join(path, f"report_{type}_PCA.html")
+            with open(outfile, 'w') as htmlOut:
+                htmlOut.write("\n".join(htmlHeader))
+                htmlOut.write("<h1>Report<h1>\n")
+                htmlFig = fig.to_html(full_html=False, include_plotlyjs=False)
+                htmlOut.write(htmlFig + '\n')
+                htmlOut.write('\n</body>\n</html>\n')
 
     return None
 

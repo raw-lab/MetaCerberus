@@ -29,6 +29,7 @@ def graphPCA(table_list):
 
     dfFOAM = pd.DataFrame()
     dfKEGG = pd.DataFrame()
+    names = ["Foam", "KO"]
     for sample,table in table_list.items():
         # FOAM
         df = table[table['Type']=="Foam"]
@@ -45,51 +46,35 @@ def graphPCA(table_list):
     dfFOAM = dfFOAM.fillna(0).astype(int)
     dfKEGG = dfKEGG.fillna(0).astype(int)
 
+    # Run PCA and add to Plots
+    #figPCA = make_subplots(
+    #    rows=1, cols=2,
+    #    specs=[[{"type": "scene"}, {"type": "scene"}]])
 
-
-    figPCA = make_subplots(
-        rows=1, cols=2,
-        specs=[[{"type": "scene"}, {"type": "scene"}]])
-
-    for col,df in enumerate([dfFOAM, dfKEGG], 1):
+    figPCA = {}
+    for col,df in enumerate([dfFOAM, dfKEGG], 0):
         X_pca, explained_variance_ratio = doPCA(df.values)
         labels = {
             str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
                 for i,var in enumerate(explained_variance_ratio * 100)}
         fig = px.scatter_3d(
             X_pca, x=0, y=1, z=2, color=df.index,
+            #title=names[col],
             labels=labels)
+        figPCA[names[col]] = fig
+        #X_pca = X_pca.T
+        #figPCA.add_trace(go.Scatter3d(
+        #        x=X_pca[0], y=X_pca[1], z=X_pca[2], mode='markers',
+        #        name=["FOAM", "KEGG"][col-1],
+        #        marker=dict(
+        #            size=10,
+        #            color=[1,2,3,4,5],                # set color to an array/list of desired values
+        #            colorscale='Viridis',   # choose a colorscale
+        #            opacity=0.8),
+        #            text=df.index.tolist()
+        #        ),
+        #    row=1, col=col)
 
-        figPCA.add_trace(go.Scatter3d(
-                x=X_pca.T[0], y=X_pca.T[1], z=X_pca.T[2], mode='markers',
-                marker=dict(
-                    size=10,
-                    color=[1,2,3,4,5],                # set color to an array/list of desired values
-                    colorscale='Viridis',   # choose a colorscale
-                    opacity=0.8),
-                ),
-            row=1, col=col)
-
-    return figPCA
-
-    X_pca, explained_variance_ratio = doPCA(dfFOAM.values)
-    labels = {
-        str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
-            for i,var in enumerate(explained_variance_ratio * 100)}
-    figFOAM = px.scatter_3d(
-        X_pca, x=0, y=1, z=2, color=dfFOAM.index,
-        labels=labels)
-
-    X_pca, explained_variance_ratio = doPCA(dfKEGG.values)
-    labels = {
-        str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
-            for i,var in enumerate(explained_variance_ratio * 100)}
-    figKEGG = px.scatter_3d(
-        X_pca, x=0, y=1, z=2, color=dfKEGG.index,
-        labels=labels)
-    
-    
-          
     return figPCA
 
 
