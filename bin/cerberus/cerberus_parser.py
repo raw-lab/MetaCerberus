@@ -152,34 +152,34 @@ def createTables(fileRollup):
     df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
     
     # Calculate Level and Count #TODO: Refactor this section for clarity
-    #def countLevels(df):
-    #    dictDF = {}
-    #    for row in range(len(df)):
-    #        for j in range(len(df['Info'][row])):
-    #            dictDF[df['Info'][row][j]] = dictDF.get(df['Info'][row][j],["",0])
-    #            n,m = dictDF[df['Info'][row][j]]
-    #            dictDF[df['Info'][row][j]] = [j+1,m+df['Count'][row]]
-    #    return dictDF
+    def countLevels(df):
+        dictDF = {}
+        for row in range(len(df)):
+            for j in range(len(df['Info'][row])):
+                dictDF[df['Info'][row][j]] = dictDF.get(df['Info'][row][j],["", 0, df_FOAM['Id'][row]])
+                n,m,id = dictDF[df['Info'][row][j]]
+                dictDF[df['Info'][row][j]] = [j+1, m+df['Count'][row], df_FOAM['Id'][row]]
+        return dictDF
 
-    #dictFoam = countLevels(df_FOAM)
-    #dictKEGG = countLevels(df_KEGG)
+    dictFOAM = countLevels(df_FOAM)
+    dictKEGG = countLevels(df_KEGG)
     #for key,value in dictFoam.items():
     #    print('\t'*value[0], key, value)
 
     # Enumerate data TODO: Replaced counting method with this.
     # Need to make sure not getting off by one error in counting
-    dictFOAM = {}
-    for row in range(len(df_FOAM)):
-        for level,name in enumerate(df_FOAM['Info'][row], 1):
-            if name not in dictFOAM:
-                dictFOAM[name] = [level, df_FOAM['Count'][row], df_FOAM['Id'][row]]
-            dictFOAM[name][1] += 1
-    dictKEGG = {}
-    for row in range(len(df_KEGG)):
-        for level,name in enumerate(df_KEGG['Info'][row], 1):
-            if name not in dictKEGG:
-                dictKEGG[name] = [level, df_KEGG['Count'][row], df_KEGG['Id'][row]]
-            dictKEGG[name][1] += 1
+    #dictFOAM = {}
+    #for row in range(len(df_FOAM)):
+    #    for level,name in enumerate(df_FOAM['Info'][row], 1):
+    #        if name not in dictFOAM:
+    #            dictFOAM[name] = [level, df_FOAM['Count'][row], df_FOAM['Id'][row]]
+    #        dictFOAM[name][1] += 1
+    #dictKEGG = {}
+    #for row in range(len(df_KEGG)):
+    #    for level,name in enumerate(df_KEGG['Info'][row], 1):
+    #        if name not in dictKEGG:
+    #            dictKEGG[name] = [level, df_KEGG['Count'][row], df_KEGG['Id'][row]]
+    #        dictKEGG[name][1] += 1
     #for key,value in dictFoam.items():
     #    print('\t'*value[0], key, value)
 

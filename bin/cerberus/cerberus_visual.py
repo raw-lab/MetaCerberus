@@ -10,36 +10,23 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
-def doPCA(values):
-    X = values
-    
-    scaler = StandardScaler()
-    scaler.fit(X)
-    
-    X_scaled = scaler.transform(X)
-
-    pcaFOAM = PCA()
-
-    #print("Explained Variance:\n", pcaFOAM.explained_variance_ratio_ * 100, sum(pcaFOAM.explained_variance_ratio_[0:2]))
-    return (pcaFOAM.fit_transform(X_scaled), pcaFOAM.explained_variance_ratio_)
-
-
 ######### Create PCA Graph ##########
 def graphPCA(table_list):
 
     dfFOAM = pd.DataFrame()
     dfKEGG = pd.DataFrame()
-    names = ["Foam", "KO"]
+    types = ["Foam", "KO"]
+    
     for sample,table in table_list.items():
         # FOAM
-        df = table[table['Type']=="Foam"]
-        row = dict(zip(df['Name'].tolist(), df['Count'].tolist()))
+        X = table[table['Type']=="Foam"]
+        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
         row = pd.Series(row, name=sample)
         dfFOAM = dfFOAM.append(row)
 
         # KEGG
-        df = table[table['Type']=="KO"]
-        row = dict(zip(df['Name'].tolist(), df['Count'].tolist()))
+        X = table[table['Type']=="KO"]
+        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
         row = pd.Series(row, name=sample)
         dfKEGG = dfKEGG.append(row)
 
@@ -47,34 +34,43 @@ def graphPCA(table_list):
     dfKEGG = dfKEGG.fillna(0).astype(int)
 
     # Run PCA and add to Plots
-    #figPCA = make_subplots(
-    #    rows=1, cols=2,
-    #    specs=[[{"type": "scene"}, {"type": "scene"}]])
-
     figPCA = {}
-    for col,df in enumerate([dfFOAM, dfKEGG], 0):
-        X_pca, explained_variance_ratio = doPCA(df.values)
-        labels = {
-            str(i): ('PC '+str(i+1)+' (' +'%.1f'+ '%s'+')') % (var,'%')
-                for i,var in enumerate(explained_variance_ratio * 100)}
-        fig = px.scatter_3d(
-            X_pca, x=0, y=1, z=2, color=df.index,
-            #title=names[col],
-            labels=labels)
-        figPCA[names[col]] = fig
-        #X_pca = X_pca.T
-        #figPCA.add_trace(go.Scatter3d(
-        #        x=X_pca[0], y=X_pca[1], z=X_pca[2], mode='markers',
-        #        name=["FOAM", "KEGG"][col-1],
-        #        marker=dict(
-        #            size=10,
-        #            color=[1,2,3,4,5],                # set color to an array/list of desired values
-        #            colorscale='Viridis',   # choose a colorscale
-        #            opacity=0.8),
-        #            text=df.index.tolist()
-        #        ),
-        #    row=1, col=col)
+    for count,df in enumerate([dfFOAM, dfKEGG], 0):
+        data_type = types[count]
 
+        # Do PCA
+        X = df
+        scaler = StandardScaler()
+        scaler.fit(X)
+        X_scaled = scaler.transform(X)
+
+        pca = PCA()
+        X_pca = pca.fit_transform(X_scaled)
+        #print("Original Data:\n", X)
+        #print("Fit and transformed data:\n", X_pca)
+        #print("N Components\n", pca.n_components_, pca.components_)
+        #print("Explained Variance:\n", pca.explained_variance_)
+        #print("Explained Variance Ratio\n", pca.explained_variance_ratio_*100)
+        
+        # Create Scree Plot
+        figScree = px.line(
+            x=range(1, pca.n_components_+1),
+            y=pca.explained_variance_ratio_*100,
+            labels={'x':'Principal Component', 'y':'Percent Variance Explained'}
+        )
+        figPCA[data_type+"_scree"] = figScree
+        
+        # Create 3D Plot
+        labels = {
+            str(i): f"PC {str(i+1)} ({var:.2f}%)"
+                for i,var in enumerate(pca.explained_variance_ratio_ * 100)}
+        
+        fig3d = px.scatter_3d(
+            X_pca, x=0, y=1, z=2, color=X.index,
+            #title=data_type,
+            labels=labels)
+        figPCA[data_type] = fig3d
+    
     return figPCA
 
 
@@ -131,6 +127,7 @@ def graphBarcharts(rollupFiles):
     df_FOAM["Count"] = pd.to_numeric(df_FOAM["Count"])
     df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
 
+
     # Enumerate data
     foamCounts = {}
     for row in range(len(df_FOAM)):
@@ -138,8 +135,26 @@ def graphBarcharts(rollupFiles):
             if name not in foamCounts:
                 foamCounts[name] = df_FOAM['Count'][row]
             foamCounts[name] += 1
-    dictFoam = {}
+    koCounts = {}
+    for row in range(len(df_KEGG)):
+        for name in df_KEGG['Info'][row]:
+            if name not in koCounts:
+                koCounts[name] = df_KEGG['Count'][row]
+            koCounts[name] += 1
+    # TODO: Refactor this
+    def countLevels(df):
+        dictDF = {}
+        for row in range(len(df)):
+            for j in range(len(df['Info'][row])):
+                dictDF[df['Info'][row][j]] = dictDF.get(df['Info'][row][j],["", 0])
+                n,m = dictDF[df['Info'][row][j]]
+                dictDF[df['Info'][row][j]] = [j+1, m+df['Count'][row]]
+        return dictDF
+    #foamCounts = countLevels(df_FOAM)
+    #koCounts = countLevels(df_KEGG)
+
     # FOAM
+    dictFoam = {}
     for row in range(len(df_FOAM)):
         for i,name in enumerate(df_FOAM['Info'][row], 1):
             if name == '':
@@ -162,14 +177,9 @@ def graphBarcharts(rollupFiles):
                     dictFoam[level1][0][level2][0][level3][0][level4] = foamCounts[name]
                 #else:
                     #print("WARNING: duplicate line in rollup: FOAM: ", row, name, df_FOAM['Info'][row]) #TODO: Remove when bugs not found
-    koCounts = {}
-    for row in range(len(df_KEGG)):
-        for name in df_KEGG['Info'][row]:
-            if name not in koCounts:
-                koCounts[name] = df_KEGG['Count'][row]
-            koCounts[name] += 1
-    dictKO = {}
+
     # KO
+    dictKO = {}
     for row in range(len(df_KEGG)):
         for i,name in enumerate(df_KEGG['Info'][row], 1):
             if name == '':

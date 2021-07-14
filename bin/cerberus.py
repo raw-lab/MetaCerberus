@@ -7,7 +7,6 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-
 __version__ = "1.0"
 
 
@@ -26,10 +25,6 @@ from cerberus import (
     cerberus_genecall, cerberus_hmmer, cerberus_parser,
     cerberus_visual, cerberus_report
 )
-
-#import cerberusQC, cerberusTrim, cerberusDecon, cerberusFormat
-#import cerberusGenecall, cerberusParser, cerberusReport
-#import cerberusVisual
 
 
 ##### Global Variables #####
@@ -356,10 +351,7 @@ Example:
 
     # step 9 (Report)
     print("Creating Reports")
-    pcaFigures = None
-    if len(hmmTables) > 2:
-        pcaFigures = cerberus_visual.graphPCA(hmmTables)
-    
+    pcaFigures = None if len(hmmTables) < 3 else cerberus_visual.graphPCA(hmmTables)
     cerberus_report.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[9]}")
 
 

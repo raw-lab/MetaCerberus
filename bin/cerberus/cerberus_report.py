@@ -3,6 +3,7 @@
 import os
 import shutil
 import re
+import pandas as pd
 
 
 #GLOBAL standard html header to include plotly script
@@ -22,23 +23,45 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
     shutil.copy(f"{config['PATH']}/plotly-2.0.0.min.js", path)
 
     # Save XLS and CVS reports and HTML files
+    dfFOAM = pd.DataFrame()
+    dfKEGG = pd.DataFrame()
     for name,table in dicTables.items():
-        save_path = os.path.join(path, name)
-        table.to_excel(save_path+'.xlsx', index = False, header=True)
-        table.to_csv(save_path+'.csv', index = False, header=True)
-        outfile = os.path.join(path, "report_"+name+".html")
+        os.makedirs(os.path.join(path, name), exist_ok=True)
+        # Write rollup tables
+        outfile = os.path.join(path, name, name+'_rollup.tsv')
+        table.to_csv(outfile, index = False, header=True, sep='\t')
+
+        # Create spreadsheet of counts
+        # FOAM
+        X = table[table['Type']=="Foam"]
+        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
+        row = pd.Series(row, name=name)
+        dfFOAM = dfFOAM.append(row)
+        # KEGG
+        X = table[table['Type']=="KO"]
+        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
+        row = pd.Series(row, name=name)
+        dfKEGG = dfKEGG.append(row)
+
+        # Write HTML Report
+        outfile = os.path.join(path, name, name+"_report"+".html")
         writeHTML(outfile, figSunburst[name], figCharts[name][0], figCharts[name][1])
+
+    dfFOAM = dfFOAM.T.fillna(0).astype(int)
+    dfKEGG = dfKEGG.T.fillna(0).astype(int)
+    dfFOAM.to_csv(os.path.join(path, 'FOAM_counts.tsv'), index = True, header=True, sep='\t')
+    dfKEGG.to_csv(os.path.join(path, 'KEGG_counts.tsv'), index = True, header=True, sep='\t')
 
     # PCA Plot
     if pcaFigure:
-        for type,fig in pcaFigure.items():
-            outfile = os.path.join(path, f"report_{type}_PCA.pdf")
+        for db_type,fig in pcaFigure.items():
+            outfile = os.path.join(path, f"report_{db_type}_PCA.pdf")
             fig.write_image(outfile)
 
-            outfile = os.path.join(path, f"report_{type}_PCA_standalone.html")
+            outfile = os.path.join(path, f"report_{db_type}_PCA_standalone.html")
             fig.write_html(outfile)
 
-            outfile = os.path.join(path, f"report_{type}_PCA.html")
+            outfile = os.path.join(path, f"report_{db_type}_PCA.html")
             with open(outfile, 'w') as htmlOut:
                 htmlOut.write("\n".join(htmlHeader))
                 htmlOut.write("<h1>Report<h1>\n")
@@ -54,11 +77,12 @@ def writeHTML(outfile, figSunburst, FOAM_Charts, KO_Charts):
     # Create HTML Report
     
     with open(outfile, 'w') as htmlOut:
+        plotly = 'cdn' # TODO: Option for how to include plotly.js. False uses script in <head>, 'cdn' loads from internet.
         htmlOut.write("\n".join(htmlHeader))
         htmlOut.write("<h1>Report<h1>\n")
 
         # Sunburst Plots
-        htmlFig = figSunburst.to_html(full_html=False, include_plotlyjs=False)
+        htmlFig = figSunburst.to_html(full_html=False, include_plotlyjs=plotly)
         htmlOut.write(htmlFig + '\n')
 
         # FOAM Charts
