@@ -106,8 +106,11 @@ def rollupFOAM(KO_ID_dict, dbFile, outFile):
     # Match FOAM info with found KO
     with open(outFile, "w") as fileWriter:
         for KO_ID in sorted(KO_ID_dict.keys()):
-            FOAM_info = FOAM_dict[KO_ID] if KO_ID in FOAM_dict else [['NA']]
-            for info in FOAM_info:
+            if KO_ID not in FOAM_dict:
+                with open(os.path.dirname(outFile)+'/foam.err', 'a+') as errlog:
+                    print("WARNING: not found in FOAM DB:", KO_ID, file=errlog)
+                continue
+            for info in FOAM_dict[KO_ID]:
                 outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], info]])
                 fileWriter.write(outline + "\n")
     return
@@ -135,11 +138,14 @@ def rollupKEGG(KO_ID_dict, dbFile, outFile):
                 KEGG_dict[KO_ID] = []
             KEGG_dict[KO_ID].append(KEGG_info)
 
-    # Match FOAM and KEGG info with found KO
+    # Match KEGG info with found KO
     with open(outFile, "w") as fileWriter:
         for KO_ID in sorted(KO_ID_dict.keys()):
-            KEGG_info = KEGG_dict[KO_ID] if KO_ID in KEGG_dict else [['NA']]
-            for info in KEGG_info:
+            if KO_ID not in KEGG_dict:
+                with open(os.path.dirname(outFile)+'/kegg.err', 'a+') as errlog:
+                    print("WARNING: not found in KEGG DB:", KO_ID, file=errlog)
+                continue
+            for info in KEGG_dict[KO_ID]:
                 outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], info]])
                 fileWriter.write(outline + "\n")
     return
@@ -160,16 +166,7 @@ def createTables(fileRollup):
     df_FOAM["Count"] = pd.to_numeric(df_FOAM["Count"])
     df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
     
-    # Calculate Level and KO Count #TODO: Refactor this section for clarity (pick one of these methods)
-    # bottom one is more concise and easier to read
-    def countLevels(df):
-        dictDF = {}
-        for row in range(len(df)):
-            for j in range(len(df['Info'][row])):
-                dictDF[df['Info'][row][j]] = dictDF.get(df['Info'][row][j], ["", 0, df_FOAM['Id'][row]])
-                n,m,id = dictDF[df['Info'][row][j]]
-                dictDF[df['Info'][row][j]] = [j+1, m+df['Count'][row], df_FOAM['Id'][row]]
-        return dictDF
+    # Calculate Level and KO Count TODO: Refactor embedded method out of here
     def countKO(df):
         dictCount = {}
         for row in range(len(df)):
