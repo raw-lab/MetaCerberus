@@ -86,8 +86,9 @@ Example:
 > cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
-    required.add_argument('--euk', '--prod', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
     required.add_argument('--mic', '--fgs', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
+    required.add_argument('--euk', '--prod', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
+    required.add_argument('--meta', action="append", default=[], help="Metagenomic sequences flag for Prodigal")
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
     required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
@@ -99,7 +100,6 @@ Example:
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument('--dir_out', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
     optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
-    optional.add_argument('--meta', action="store_true", help="Metagenomic flag for Prodigal (Eukaryote)")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")

@@ -43,7 +43,7 @@ def parseHmmer(fileHmmer, config, subdir):
             elif len(BH_top5[query]) < 5:
                 BH_top5[query].append(line)
             else:
-                BH_top5[query].sort(key = lambda x: x[13])
+                BH_top5[query].sort(key = lambda x: x[13], reverse=True)
                 if score > BH_top5[query][0][13]:
                     BH_top5[query][0] = line
 
@@ -56,10 +56,19 @@ def parseHmmer(fileHmmer, config, subdir):
     # Save Top 5 hits tsv rollup
     if config['REPLACE'] or not os.path.exists(top5File):
         with open(top5File, 'w') as writer:
+            print("Target Name", "KO ID", "EC value", "E-Value (sequence)", "Score (domain)", file=writer, sep='\t')
             for query in sorted(BH_top5.keys()):
-                BH_top5[query].sort(key = lambda x: x[13])
+                BH_top5[query].sort(key = lambda x: x[13], reverse=True)
                 for line in BH_top5[query]:
-                    print(line[0], line[3], line[13], file=writer, sep='\t')
+                    ko = []
+                    ec = []
+                    for id in line[3].split(','):
+                        if "KO:" in id:
+                            id = id.split(':')[1].split('_')
+                            ko += [id[0]]
+                            if len(id)>1:
+                                ec += [id[1]]
+                    print(line[0], ','.join(ko), ','.join(ec), line[6], line[13], file=writer, sep='\t')
 
     # Create dictionary with found KO IDs and counts
     KO_ID_counts = {}
