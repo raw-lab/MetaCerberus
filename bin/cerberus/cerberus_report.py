@@ -4,6 +4,7 @@ import os
 import shutil
 import re
 import pandas as pd
+import copy
 
 
 #GLOBAL standard html header to include plotly script
@@ -13,6 +14,11 @@ htmlHeader = [
     '    <script src="plotly-2.0.0.min.js"></script>',
     '</head>',
     '<body>\n']
+
+# TODO: Option for how to include plotly.js.
+# False uses script in <head>, 'cdn' loads from internet.
+# Can I use both???
+plotly_source = 'cdn'
 
 
 ######### Create Report ##########
@@ -28,9 +34,16 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
     dfKEGG = pd.DataFrame()
     for sample,table in dicTables.items():
         os.makedirs(os.path.join(path, sample), exist_ok=True)
+        
         # Write rollup tables
         outfile = os.path.join(path, sample, sample+'_rollup.tsv')
-        table.to_csv(outfile, index = False, header=True, sep='\t')
+        tbl = copy.deepcopy(table) # Make a copy or will damage table for counts spreadsheet
+        tbl['Name'] = tbl['Name'].apply(lambda x: x.split(':',1)[1])
+        tbl.to_csv(outfile, index = False, header=True, sep='\t')
+
+        # Write HTML Report
+        outfile = os.path.join(path, sample, sample+"_report"+".html")
+        writeHTML(outfile, sample, figSunburst[sample], figCharts[sample][0], figCharts[sample][1])
 
         # Create spreadsheet of counts
         # FOAM
@@ -44,31 +57,24 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
         row = pd.Series(row, name=sample)
         dfKEGG = dfKEGG.append(row)
 
-        # Write HTML Report
-        outfile = os.path.join(path, sample, sample+"_report"+".html")
-        writeHTML(outfile, sample, figSunburst[sample], figCharts[sample][0], figCharts[sample][1])
-
+    # Write spreadsheet of counts as TSV
     dfFOAM = dfFOAM.T.fillna(0).astype(int)
     dfKEGG = dfKEGG.T.fillna(0).astype(int)
     dfFOAM.to_csv(os.path.join(path, "combined", 'FOAM_counts.tsv'), index = True, header=True, sep='\t')
     dfKEGG.to_csv(os.path.join(path, "combined", 'KEGG_counts.tsv'), index = True, header=True, sep='\t')
 
-    # PCA Plot
+    # PCA HTML Plots
     if pcaFigure:
-        for db_type,fig in pcaFigure.items():
-            outfile = os.path.join(path, "combined", f"report_{db_type}_PCA.pdf")
-            fig.write_image(outfile)
-
-            outfile = os.path.join(path, "combined", f"report_{db_type}_PCA_standalone.html")
-            fig.write_html(outfile)
-
-            outfile = os.path.join(path, "combined", f"report_{db_type}_PCA.html")
-            with open(outfile, 'w') as htmlOut:
-                htmlOut.write("\n".join(htmlHeader))
-                htmlOut.write("<h1>Report<h1>\n")
-                htmlFig = fig.to_html(full_html=False, include_plotlyjs=False)
+        outfile = os.path.join(path, "combined", "combined_report_PCA.html")
+        with open(outfile, 'w') as htmlOut:
+            htmlOut.write("\n".join(htmlHeader))
+            samples = [s.replace("mic_", '').replace("euk_", '') for s in dicTables.keys()]
+            htmlOut.write(f"<h1>PCA Report for: {', '.join(samples)}<h1>\n")
+            for db_type,fig in pcaFigure.items():
+                htmlOut.write(f"<h2 style='text-align:center'>{db_type.replace('_', ' ')}</h2>")
+                htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
                 htmlOut.write(htmlFig + '\n')
-                htmlOut.write('\n</body>\n</html>\n')
+            htmlOut.write('\n</body>\n</html>\n')
 
     return None
 
@@ -78,13 +84,12 @@ def writeHTML(outfile, sample, figSunburst, FOAM_Charts, KO_Charts):
     # Create HTML Report
     
     with open(outfile, 'w') as htmlOut:
-        plotly = 'cdn' # TODO: Option for how to include plotly.js. False uses script in <head>, 'cdn' loads from internet.
         htmlOut.write("\n".join(htmlHeader))
         htmlOut.write(f"<h1>Cerberus Report for '{sample}<h1>\n")
 
         # Sunburst Plots
         htmlOut.write('<H2>Sunburst summary of FOAM and KEGG Levels</H2>\n')
-        htmlFig = figSunburst.to_html(full_html=False, include_plotlyjs=plotly)
+        htmlFig = figSunburst.to_html(full_html=False, include_plotlyjs=plotly_source)
         htmlOut.write(htmlFig + '\n')
 
         # FOAM Bar Charts
@@ -94,7 +99,7 @@ def writeHTML(outfile, sample, figSunburst, FOAM_Charts, KO_Charts):
         for title, fig in FOAM_Charts.items():
             if title == "Level 1":
                 title = "Level 1: FOAM"
-            htmlFig = fig.to_html(full_html=False, include_plotlyjs=False)
+            htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
             try:
                 id = re.search('<div id="([a-​z0-9-]*)"', htmlFig).group(1)
             except:
@@ -110,7 +115,7 @@ def writeHTML(outfile, sample, figSunburst, FOAM_Charts, KO_Charts):
         for title, fig in KO_Charts.items():
             if title == "Level 1":
                 title = "Level 1: KO"
-            htmlFig = fig.to_html(full_html=False, include_plotlyjs=False)
+            htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
             try:
                 id = re.search('<div id="([a-​z0-9-]*)"', htmlFig).group(1)
             except:

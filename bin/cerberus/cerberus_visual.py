@@ -15,7 +15,7 @@ def graphPCA(table_list):
 
     dfFOAM = pd.DataFrame()
     dfKEGG = pd.DataFrame()
-    types = ["Foam", "KO"]
+    types = ["FOAM", "KEGG"]
     
     for sample,table in table_list.items():
         # FOAM
@@ -53,12 +53,12 @@ def graphPCA(table_list):
         #print("Explained Variance Ratio\n", pca.explained_variance_ratio_*100)
         
         # Create Scree Plot
-        figScree = px.line(
+        figScree = px.bar(
             x=range(1, pca.n_components_+1),
-            y=pca.explained_variance_ratio_*100,
+            y=np.round(pca.explained_variance_ratio_*100, decimals=2),
             labels={'x':'Principal Component', 'y':'Percent Variance Explained'}
         )
-        figPCA[data_type+"_scree"] = figScree
+        figScree.update_xaxes(dtick=1)
         
         # Create 3D Plot
         labels = {
@@ -69,7 +69,11 @@ def graphPCA(table_list):
             X_pca, x=0, y=1, z=2, color=X.index,
             #title=data_type,
             labels=labels)
-        figPCA[data_type] = fig3d
+
+        # Add Figures to Dictionary
+        # (Key is displayed in the HTML Report and file names)
+        figPCA[data_type+"_PCA"] = fig3d
+        figPCA[data_type+"_Scree_Plot"] = figScree
     
     return figPCA
 

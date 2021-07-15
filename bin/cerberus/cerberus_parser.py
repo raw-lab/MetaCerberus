@@ -202,7 +202,4 @@ def createTables(fileRollup):
     KT.drop(KT[KT['Name']==''].index, inplace=True)
     KT.drop(KT[KT['Name']=='NA'].index, inplace=True)
 
-    print(FT)
-    print(KT)
-
     return pd.concat([FT,KT])
