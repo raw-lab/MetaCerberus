@@ -111,6 +111,8 @@ Example:
     dependencies = parser.add_argument_group()
     for key in DEPENDENCIES:
         dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
+    dependencies.add_argument('--adapters', type=str, default="", help="Adapter file in fasta format")
+    dependencies.add_argument('--refseq', type=str, default="", help="Adapter file in fasta format")
 
     args = parser.parse_args()
 
@@ -255,18 +257,31 @@ Example:
     if fastq:
         print("\nSTEP 3: Trimming fastq files")
         for key,value in fastq.items():
-            jobTrim.append(rayWorker.remote(cerberus_trim.trimReads, key, [key, value], config, f"{STEP[3]}/{key}"))
+            if "R1.fastq" in value:
+                reverse = value.replace("R1.fastq", "R2.fastq")
+                print(reverse)
+                if reverse in fastq.values():
+                    print("Paired end found: ", key, value, reverse)
+                    jobTrim.append(rayWorker.remote(cerberus_trim.trimPairedRead, key, [key, [value,reverse]], config, f"{STEP[3]}/{key}"))
+                    continue
+            if "R2.fastq" in value and value.replace("R2.fastq", "R1.fastq") in fastq.values():
+                print("Skipping reverse read")
+                continue
+            jobTrim.append(rayWorker.remote(cerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
 
     # Waitfor Trimmed Reads
     trimmedReads = {}
     for job in jobTrim:
         key,value = ray.get(job)
-        trimmedReads[key] = value
-
-    if trimmedReads:
-        print("\nChecking quality of trimmed files")
-        for key,value in trimmedReads.items():
+        if type(value) is str:
+            trimmedReads[key] = value
             jobs.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+        else:
+            rev = key.replace("R1", "R2")
+            trimmedReads[key] = value[0]
+            trimmedReads[rev] = value[1]
+            jobs.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+    print(trimmedReads)
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)

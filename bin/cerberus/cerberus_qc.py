@@ -10,6 +10,7 @@ import subprocess
 
 
 ## checkQuality
+#
 def checkQuality(rawRead, config, subdir):
     if type(rawRead) is str:
         return checkSingleRead(rawRead, config, subdir)
@@ -22,12 +23,11 @@ def checkQuality(rawRead, config, subdir):
 def checkSingleRead(singleRead, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
-    fout = open(f"{path}/stdout.txt", 'w')
-    ferr = open(f"{path}/stderr.txt", 'w')
+
     command = f"{config['EXE_FASTQC']} -o {path} {singleRead}"
-    subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    fout.close()
-    ferr.close()
+    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+
     return
 
 
@@ -36,12 +36,11 @@ def checkSingleRead(singleRead, config, subdir):
 def checkPairedRead(pairedRead, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
-    fout = open(f"{path}/stdout.txt", 'w')
-    ferr = open(f"{path}/stderr.txt", 'w')
+    
     command = f"{config['EXE_FASTQC']} -o {path} {pairedRead[0]} {pairedRead[1]}"
-    subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    fout.close()
-    ferr.close()
+    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+
     return
 
 

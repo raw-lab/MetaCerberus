@@ -24,23 +24,23 @@ def deconSingleReads(fileFQ, config, subdir):
     # TODO: Find good long read mapper
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
-    fout = open(f"{path}/stdout.txt", 'w')
-    ferr = open(f"{path}/stderr.txt", 'w')
+
     key = fileFQ[0]
     value = fileFQ[1]
-    outFile = f""
-    deconReads = f'{path}/decon-{key}.fastq'
-    matched = f"matched-{key}"
-    #command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={path}/{outFile} qin=33 qtrim=r trimq=25 maq=25 minlen=50 outm={path}/{matched} ref={config['REFSEQ']} k=31 stats={path}/{outFile}.txt"
-    #command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={path}/{outFile} qin=33 qtrim=r minlen=50 outm={path}/{matched} ref={config['REFSEQ']} k=31 stats={path}/{outFile}.txt"
-    #TODO: Add reference file
-    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=33 qtrim=r minlen=50 outm={path}/{matched} k=31 stats={path}/{outFile}.txt"
+
+    deconReads = os.path.join(path, f"decon-{key}.fastq")
+    matched = os.path.join(path, "matched_"+key)
+    stats = os.path.join(path, "stats.txt")
+
+    refseq = "ref="+config['REFSEQ'] if config['REFSEQ'] else ""
+
+    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=33 qtrim=r minlen=50 outm={matched} {refseq} k=31 stats={stats}.txt"
     try:
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except:
         print("Failed to execute bbduk Single End")
-    fout.close()
-    ferr.close()
+
     return deconReads
 
 

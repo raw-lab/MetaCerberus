@@ -36,7 +36,8 @@ def findORF_euk(contig, config, subdir):
     if not config['REPLACE'] and os.path.exists(faaOut):
         return faaOut
 
-    command = f"{config['EXE_FGS+']} -s {contig} -o {baseOut} -w 1 -r {FGStrain} -t complete -p {config['CPUS']}"
+    # TODO: FGS+ freezes when using max CPUs, try to find way around this or force to 1 CPU
+    command = f"{config['EXE_FGS+']} -s {contig} -o {baseOut} -w 1 -r {FGStrain} -t complete -p 10"
     with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
         subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
 
