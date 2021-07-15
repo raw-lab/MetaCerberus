@@ -20,7 +20,8 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
-    shutil.copy(f"{config['PATH']}/plotly-2.0.0.min.js", path)
+    os.makedirs(os.path.join(path, "combined"), exist_ok=True)
+    shutil.copy(os.path.join(config['PATH'], "plotly-2.0.0.min.js"), path)
 
     # Save XLS and CVS reports and HTML files
     dfFOAM = pd.DataFrame()
@@ -49,19 +50,19 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
 
     dfFOAM = dfFOAM.T.fillna(0).astype(int)
     dfKEGG = dfKEGG.T.fillna(0).astype(int)
-    dfFOAM.to_csv(os.path.join(path, 'FOAM_counts.tsv'), index = True, header=True, sep='\t')
-    dfKEGG.to_csv(os.path.join(path, 'KEGG_counts.tsv'), index = True, header=True, sep='\t')
+    dfFOAM.to_csv(os.path.join(path, "combined", 'FOAM_counts.tsv'), index = True, header=True, sep='\t')
+    dfKEGG.to_csv(os.path.join(path, "combined", 'KEGG_counts.tsv'), index = True, header=True, sep='\t')
 
     # PCA Plot
     if pcaFigure:
         for db_type,fig in pcaFigure.items():
-            outfile = os.path.join(path, f"report_{db_type}_PCA.pdf")
+            outfile = os.path.join(path, "combined", f"report_{db_type}_PCA.pdf")
             fig.write_image(outfile)
 
-            outfile = os.path.join(path, f"report_{db_type}_PCA_standalone.html")
+            outfile = os.path.join(path, "combined", f"report_{db_type}_PCA_standalone.html")
             fig.write_html(outfile)
 
-            outfile = os.path.join(path, f"report_{db_type}_PCA.html")
+            outfile = os.path.join(path, "combined", f"report_{db_type}_PCA.html")
             with open(outfile, 'w') as htmlOut:
                 htmlOut.write("\n".join(htmlHeader))
                 htmlOut.write("<h1>Report<h1>\n")

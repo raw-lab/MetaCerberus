@@ -133,10 +133,14 @@ def graphBarcharts(rollupFiles):
     def countLevels(df):
         dictCount = {}
         for row in range(len(df)):
+            ko_id = df['Id'][row]
             for name in df['Info'][row]:
-                if name not in dictCount:
-                    dictCount[name] = 0
-                dictCount[name] += df['Count'][row]
+                if name == '':
+                    continue
+                id = f"{ko_id}:{name}"
+                if id not in dictCount:
+                    dictCount[id] = 0
+                dictCount[id] += df['Count'][row]
         return dictCount
     foamCounts = countLevels(df_FOAM)
     keggCounts = countLevels(df_KEGG)
@@ -144,9 +148,11 @@ def graphBarcharts(rollupFiles):
     # FOAM
     dictFoam = {}
     for row in range(len(df_FOAM)):
+        ko_id = df_FOAM['Id'][row]
         for i,name in enumerate(df_FOAM['Info'][row], 1):
             if name == '':
                 continue
+            name = f"{ko_id}:{name}"
             if i == 1:
                 level1 = name
                 if name not in dictFoam:
@@ -169,9 +175,11 @@ def graphBarcharts(rollupFiles):
     # KO
     dictKO = {}
     for row in range(len(df_KEGG)):
+        ko_id = df_KEGG['Id'][row]
         for i,name in enumerate(df_KEGG['Info'][row], 1):
             if name == '':
                 continue
+            name = f"{ko_id}:{name}"
             if i == 1:
                 level1 = name
                 if name not in dictKO:
@@ -210,10 +218,13 @@ def graphBarcharts(rollupFiles):
 def createHierarchyFigures(data):
     ### Helper method for conciseness below ###
     def buildFigure(x, y, title):
-        return go.Figure(layout={'title':title,
+        fig = go.Figure(
+            layout={'title':title,
                 #'xaxis_title':"Name",
                 'yaxis_title':"Count"},
-                data=[go.Bar(x=list(x), y=list(y))])
+            data=[go.Bar(x=list(x), y=list(y))])
+        fig.update_yaxes(dtick=1)
+        return fig
     
     # Create figures in hierarchy format
     # TODO: This is probably better as a recursive function

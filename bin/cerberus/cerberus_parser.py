@@ -170,10 +170,14 @@ def createTables(fileRollup):
     def countKO(df):
         dictCount = {}
         for row in range(len(df)):
+            ko_id = df['Id'][row]
             for level,name in enumerate(df['Info'][row], 1):
-                if name not in dictCount:
-                    dictCount[name] = [level, 0, df['Id'][row]]
-                dictCount[name][1] += df['Count'][row]
+                if name == '':
+                    continue
+                id = f"{ko_id}:{name}"
+                if id not in dictCount:
+                    dictCount[id] = [level, 0, ko_id]
+                dictCount[id][1] += df['Count'][row]
         return dictCount
 
     dictFOAM = countKO(df_FOAM)
@@ -188,7 +192,7 @@ def createTables(fileRollup):
     FT = pd.DataFrame(data=dataFOAM)
     FT.drop(FT[FT['Name']==''].index, inplace=True)
     FT.drop(FT[FT['Name']=='NA'].index, inplace=True)
-    
+
     dataKO = {'Type':'KO',
         'KO Id':[x[2] for x in dictKEGG.values()],
         'Name':list(dictKEGG.keys()),
@@ -197,5 +201,8 @@ def createTables(fileRollup):
     KT = pd.DataFrame(data=dataKO)
     KT.drop(KT[KT['Name']==''].index, inplace=True)
     KT.drop(KT[KT['Name']=='NA'].index, inplace=True)
+
+    print(FT)
+    print(KT)
 
     return pd.concat([FT,KT])

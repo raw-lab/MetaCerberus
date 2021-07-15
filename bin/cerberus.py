@@ -371,7 +371,7 @@ Example:
     # step 9 (Report)
     print("Creating Reports")
     pcaFigures = None if len(hmmTables) < 3 else cerberus_visual.graphPCA(hmmTables)
-    cerberus_report.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[9]}/combined")
+    cerberus_report.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[9]}")
 
 
     # Wait for misc jobs
