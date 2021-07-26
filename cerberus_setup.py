@@ -74,26 +74,37 @@ def install_dependencies():
 def main():
     ## Parse the command line
     parser = argparse.ArgumentParser(add_help=False)
-    required = parser.add_argument_group('required arguments')
-    required.add_argument('-p', "--path", type=str, help='path to install directory. Default is to install in downloaded path', required=True)
+    #required = parser.add_argument_group('required arguments')
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument('-i', '--install', action='store_true', help='Only copy the scripts to "path"')
-    optional.add_argument('-d', '--download', action='store_true', help='Only download FOAM and KO database')
-    optional.add_argument('-e', '--environment', action='store_true', help='Only create the cerberus conda environment with dependencies installed')
+    optional.add_argument('-p', "--path", type=str, help='path to install directory. Default is to install in downloaded path', required=True)
+    optional.add_argument('-i', '--install', action='store_true', help='Copy the scripts to "path"')
+    optional.add_argument('-d', '--download', action='store_true', help='Download FOAM and KO database')
+    optional.add_argument('-e', '--environment', action='store_true', help='Create the cerberus conda environment with dependencies installed')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
     args = parser.parse_args()
 
+    #TODO: Check for dependencies (conda, )
+
     if any([args.install, args.download, args.environment]):
         if args.install:
+            if not args.path:
+                print("\nERROR: Please specify a path with the -p or --path option")
+                exit()
             install(args.path)
         if args.download:
+            if not args.path:
+                print("\nERROR: Please specify a path with the -p or --path option")
+                exit()
             download_db(args.path)
         if args.environment:
             install_dependencies()
     else:
+        if not args.path:
+            print("\nERROR: Please specify a path with the -p or --path option")
+            exit()
         install(args.path)
         download_db(args.path)
-        install_dependencies()
+        #install_dependencies()
 
 if __name__ == "__main__":
     main()

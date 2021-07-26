@@ -1,91 +1,104 @@
-# Welcome to Cerberus
+Welcome to Cerberus
+===================
+
 Python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data
 
 ![GitHub Logo](cerberus_logo.jpg)
 
-Input formats:
------
-- From any NextGen sequencing technology (from Illumina, Pacbio, Oxford Nanopore)
+Input formats
+--------------
+
+- From any NextGen sequencing technology (from Illumina, PacBio, Oxford Nanopore)
 - type 1 raw reads (.fastq format)
 - type 2 nucleotide fasta (.fasta, .fa, .fna, .ffn format), assembled raw reads into contigs
-- type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence 
+- type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence
 
-Installing Cerberus (from source): 
------
+Installing Cerberus (from source)
+----------------------------------
+
 Clone github Repo
-- Run the below code to clone the Robomax Repository.
+
+- Run the below code to clone the Cerberus Repository.
 
 ```bash
 git clone https://github.com/raw-lab/cerberus.git
 ```
 
 Run Setup File
-- Open Cerberus repo Folder
-- Run setup “Cerberus_setup.py”
+
+- Open Cerberus repo folder
+- Run setup “cerberus_setup.py”
 
 ```bash
 cd cerberus
-python3 cerberus_setup.py
+python3 cerberus_setup.py -p PATH
 ```
 
-- It will create directory “cerberus” on ~/bin/cerberus
-- It will install all dependencies from the setup file
-- It also download osf files and Latest Version of Primary code file(Wrapper).
+- It will create directory specified by the path and copy binary and package files
+- It also downloads the FOAM and KO database files
+
+- The setup script can also create an Anaconda environment with all dependencies installed.
+
+```bash
+cd cerberus
+python3 cerberus_setup.py -e
+```
 
 Running code by passing data file
------
-- Go to the desktop folder 
-- Open Cerberus in new terminal.
-- Activate Cerberus environment by running the following code.
+---------------------------------
+
+- If needed, activate Cerberus environment
 
 ```bash
-conda activate cerberus_env
+conda activate cerberus
 ```
 
-- Activating cerberus_env is must before running cerberus.
-- Give `input file path` followed by '-i' while running the Wrapper File.
+- If the Cerberus environment is not used, make sure executable scripts are in the PATH or specified in the config file.
+- Run cerberus.py with the options required for your project.
 
 ```bash
-python cerberus.py -i <input file path>
+usage: cerberus.py [-c CONFIG] [--mic MIC] [--euk EUK] [--super SUPER]
+                   [--prot PROT] [--nanopore | --illumina | --pacbio]
+                   [--dir_out DIR_OUT] [--scaf] [--minscore MINSCORE]
+                   [--cpus CPUS] [--replace] [--version] [-h]
+                   [--adapters ADAPTERS] [--refseq REFSEQ]
 ```
 
-- Here the input path can either be folder path or file path.
-- For microbial option: you should give argument `-mic` along with `<input file path>`.
+- One of --mic, --euk, --super, or --prot is required.
+- cerberus.py -h will show more details about each option.
+- For example, to use the microbial option: you should use the argument `--mic` along with `<input file path>`.
 
 ```bash
-python cerberus.py -i <input file path> -mic
+python3 cerberus.py --mic <input file path>
 ```
 
-- For eukaryote option: you should give argument `-euk` along with `<input file path>`.
+- For eukaryote option: you should use the argument `--euk` along with `<input file path>`.
 
 ```bash
-python cerberus.py -i <input file path> -euk
+python cerberus.py --euk <input file path> 
 ```
-
-- By Default it takes microbial option which includes bacteriophage
 
 Output Files
------
-- Output folder will be created on the input folder path.
-- Let the Input be RW2.faa, the output folder created will be RW2_output.
+------------
 
-Visualisation of outputs
------
-- We are Using Dash and Plotly for visualise the data
-- Once the program is executed the visuals will be displayed on screen.
-- If you want to open those visuals again,
-- Give `rollup file path` (which created in output folder) followed by '-i' while running the Wrapper File.
+- If an output directory is given a 'pipeline' subfolder will be created there.
+- If no output directory is specified the 'pipeline' subfolder will be created in the current directory.
 
-```bash
-python cerberus.py -i <rollup file path>
-```
+Visualization of outputs
+------------------------
+
+- We use Plotly to visualize the data
+- Once the program is executed the html reports with the visuals will be saved to the last step of the pipeline.
+- The HTML files require plotly.js to be present. One has been provided in the package and is saved to the report folder.
 
 Citing Cerberus
--------------
-Cerberus: python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints. 
+---------------
+
+Cerberus: python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints.
 
 CONTACT
 -------
+
 The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw-lab).<br />
 If you have any questions or feedback, please feel free to get in touch by email.<br />
 Dr. Richard Allen White III - rwhit101@uncc.edu or raw937@gmail.com.  <br />
