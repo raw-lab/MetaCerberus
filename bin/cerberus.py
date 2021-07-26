@@ -21,7 +21,7 @@ import ray
 
 # our package import.
 from cerberus import (
-    cerberus_qc, cerberus_trim, cerberus_decon, cerberus_format,
+    cerberus_qc, cerberus_trim, cerberus_decon, cerberus_format, cerberus_metastats,
     cerberus_genecall, cerberus_hmmer, cerberus_parser,
     cerberus_visual, cerberus_report
 )
@@ -287,7 +287,7 @@ Example:
                 continue
             jobTrim.append(rayWorker.remote(cerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
 
-    # Waitfor Trimmed Reads
+    # Wait for Trimmed Reads
     trimmedReads = {}
     for job in jobTrim:
         key,value = ray.get(job)
@@ -335,6 +335,12 @@ Example:
     for job in jobFormat:
         key, value = ray.get(job)
         fasta[key] = value
+
+    # step 5c Metaome Stats
+    if fasta:
+        print("\nMetaome Stats of FASTA files.\n")
+        for key,value in fasta.items():
+            jobsQC.append(rayWorker.remote(cerberus_metastats.checkContigs, key, value, config, f"{STEP[5]}/{key}/QC"))
 
 
     # step 6 (ORF Finder)

@@ -59,15 +59,16 @@ def download_db(path):
 
 ######################################Install dependencies#####################################
 def install_dependencies():
-    conda_cmd = "conda create -n cerberus -c conda-forge -c bioconda hmmer prodigal fastqc fastp porechop bbmap pandas numpy plotly openpyxl matplotlib scikit-learn configargparse python-kaleido python=3.7 -y"
+    conda_cmd = "conda create -n cerberus -c conda-forge -c bioconda fastqc fastp porechop bbmap checkm-genome magpurify prodigal hmmer pandas numpy plotly openpyxl scikit-learn configargparse python-kaleido python=3.7 -y"
     subprocess.call(conda_cmd, shell=True)
     # TODO: 'conda activate' command not working through script, manually install ray for now.
     #pip_cmd = "conda activate cerberus ; pip install ray[default]"
     #subprocess.call(pip_cmd, shell=True)
     print("WARNING")
-    print("Please manually install 'ray' by issuing the following commands:")
+    print("Please manually install 'ray' and 'metaomestats' by issuing the following commands:")
     print("> conda activate cerberus")
     print("> pip install ray[default]")
+    print("> pip install metaomestats")
     return
 
 
@@ -76,7 +77,7 @@ def main():
     parser = argparse.ArgumentParser(add_help=False)
     #required = parser.add_argument_group('required arguments')
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument('-p', "--path", type=str, help='path to install directory. Default is to install in downloaded path', required=True)
+    optional.add_argument('-p', "--path", type=str, help='path to install directory. Default is to install in downloaded path')
     optional.add_argument('-i', '--install', action='store_true', help='Copy the scripts to "path"')
     optional.add_argument('-d', '--download', action='store_true', help='Download FOAM and KO database')
     optional.add_argument('-e', '--environment', action='store_true', help='Create the cerberus conda environment with dependencies installed')
