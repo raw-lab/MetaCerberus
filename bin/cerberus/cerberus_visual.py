@@ -7,7 +7,7 @@ from sklearn.preprocessing import StandardScaler
 from functools import reduce
 import plotly.express as px  # (version 4.7.0)
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+#import plotly.subplots as sp
 
 
 ######### Create PCA Graph ##########
@@ -46,12 +46,32 @@ def graphPCA(table_list):
 
         pca = PCA()
         X_pca = pca.fit_transform(X_scaled)
-        #print("Original Data:\n", X)
-        #print("Fit and transformed data:\n", X_pca)
-        #print("N Components\n", pca.n_components_, pca.components_)
-        #print("Explained Variance:\n", pca.explained_variance_)
-        #print("Explained Variance Ratio\n", pca.explained_variance_ratio_*100)
-        
+
+        # Loadings table
+        loadings = pd.DataFrame(
+            pca.components_.T,
+            columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
+        loadings.reset_index(inplace=True) # Move index to column and re-index
+        loadings.rename(columns={'index':''}, inplace = True)
+
+        # Loading Matrix
+        loadings_matrix = pd.DataFrame(
+            pca.components_.T * np.sqrt(pca.explained_variance_),
+            columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
+        #print(loadings_matrix)
+        loadings_matrix.reset_index(inplace=True) # Move index to column and re-index
+        loadings_matrix.rename(columns={'index':''}, inplace = True)
+
+        figLoadings = go.Figure(data=[go.Table(
+            header=dict(values=list(loadings.columns),
+                fill_color='paleturquoise',
+                align='left'),
+            cells=dict(
+                values=[loadings[col] for col in loadings.columns],
+                fill_color='lavender',
+                align='left')
+        )])
+
         # Create Scree Plot
         figScree = px.bar(
             x=range(1, pca.n_components_+1),
@@ -61,9 +81,8 @@ def graphPCA(table_list):
         figScree.update_xaxes(dtick=1)
         
         # Create 3D Plot
-        labels = {
-            str(i): f"PC {str(i+1)} ({var:.2f}%)"
-                for i,var in enumerate(pca.explained_variance_ratio_ * 100)}
+        labels = {str(i): f"PC {str(i+1)} ({var:.2f}%)"
+            for i,var in enumerate(pca.explained_variance_ratio_ * 100)}
         
         fig3d = px.scatter_3d(
             X_pca, x=0, y=1, z=2, color=X.index,
@@ -74,7 +93,9 @@ def graphPCA(table_list):
         # (Key is displayed in the HTML Report and file names)
         figPCA[data_type+"_PCA"] = fig3d
         figPCA[data_type+"_Scree_Plot"] = figScree
-    
+        figPCA[data_type+"_Loadings"] = figLoadings
+        #figPCA[data_type+"_Loading_Matrix"]
+
     return figPCA
 
 

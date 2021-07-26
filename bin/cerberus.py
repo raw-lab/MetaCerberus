@@ -88,7 +88,7 @@ Example:
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--mic', '--fgs', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
     required.add_argument('--euk', '--prod', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
-    required.add_argument('--meta', action="append", default=[], help="Metagenomic sequences flag for Prodigal")
+    #required.add_argument('--meta', action="append", default=[], help="Metagenomic sequence (Uses prodigal)")
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
     required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
@@ -126,7 +126,6 @@ Example:
         parser.print_help()
         parser.error('At least one sequence must be declared either in the command line or through the config file')
 
-    print(args.euk + args.mic + args.prot)
     for file in args.euk + args.mic + args.prot:
         if '.fastq' in file:
             if not any([args.nanopore, args.illumina, args.pacbio]):
@@ -239,9 +238,9 @@ Example:
         else:
             print(f'{item} is not a valid sequence')
 
-    print(f"\nFastq sequences: {fastq}")
-    print(f"\nFasta sequences: {fasta}")
-    print(f"\nProtein Sequences: {amino}")
+    print(f"Fastq sequences:\n  {fastq}")
+    print(f"Fasta sequences:\n  {fasta}")
+    print(f"Protein Sequences:\n  {amino}")
 
 
     # Step 2 (check quality of fastq files)
@@ -281,7 +280,6 @@ Example:
             trimmedReads[key] = value[0]
             trimmedReads[rev] = value[1]
             jobs.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
-    print(trimmedReads)
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
@@ -323,7 +321,7 @@ Example:
     # step 6 (ORF Finder)
     jobGenecall = []
     if fasta:
-        print("STEP 6: ORF Finder")
+        print("\nSTEP 6: ORF Finder")
         for key,value in fasta.items():
             if key.startswith("euk_"):
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_euk, key, value, config, f"{STEP[6]}/{key}"))
@@ -337,7 +335,7 @@ Example:
 
 
     # step 7 (HMMER)
-    print("STEP 7: HMMER Search")
+    print("\nSTEP 7: HMMER Search")
     jobHMM = []
     for key,value in amino.items():
         jobHMM.append(rayWorker.remote(cerberus_hmmer.search, key, value, config, f"{STEP[7]}/{key}"))
@@ -350,7 +348,7 @@ Example:
 
 
     # step 8 (Parser)
-    print("STEP 8: Parse HMMER results")
+    print("\nSTEP 8: Parse HMMER results")
     jobParse = []
     for key,value in hmmFoam.items():
         jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[8]}/{key}"))
@@ -369,13 +367,17 @@ Example:
 
 
     # step 9 (Report)
-    print("Creating Reports")
-    pcaFigures = None if len(hmmTables) < 3 else cerberus_visual.graphPCA(hmmTables)
+    print("\nCreating Reports")
+    pcaFigures = None
+    if len(hmmTables) < 3:
+        print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
+    else:
+        pcaFigures = cerberus_visual.graphPCA(hmmTables)
     cerberus_report.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[9]}")
 
 
     # Wait for misc jobs
-    print("Waiting for lingering jobs")
+    print("\nWaiting for lingering jobs")
     ready, pending = ray.wait(jobs)
     while(pending):
         print(f"Waiting for {len(pending)} jobs.")
