@@ -39,6 +39,7 @@ DEPENDENCIES = {
         'EXE_FASTP': 'fastp',
         'EXE_PORECHOP': 'porechop',
         'EXE_BBDUK': 'bbduk.sh',
+        'EXE_MAGPURIFY': 'magpurify',
         'EXE_PRODIGAL': 'prodigal',
         'EXE_HMMSEARCH': 'hmmsearch'}
 
@@ -86,9 +87,9 @@ Example:
 > cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
-    required.add_argument('--mic', '--fgs', action='append', default=[], help='Microbial sequence (includes bacteriophage)')
-    required.add_argument('--euk', '--prod', action='append', default=[], help='Eukaryote sequence (includes other viruses)')
-    #required.add_argument('--meta', action="append", default=[], help="Metagenomic sequence (Uses prodigal)")
+    required.add_argument('--mic', '--prod', action='append', default=[], help='Microbial nucleotide sequence (includes bacteriophage)')
+    required.add_argument('--euk', '--fgs', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses)')
+    required.add_argument('--meta', action="append", default=[], help="Metagenomic nucleotide sequences (Uses prodigal)")
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
     required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
@@ -104,7 +105,7 @@ Example:
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
     optional.add_argument('--version', '-v', action='version',
-                        version='Cerberus: \n version: {} June 24th 2021'.format(__version__),
+                        version=f'Cerberus: \n version: {__version__} June 24th 2021',
                         help='show the version number and exit')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
     # Hidden from help, expected to load from config file
@@ -122,11 +123,10 @@ Example:
         args.mic += args.super
 
     # Check if required flags are set
-    if not any([args.euk, args.mic, args.prot]):
-        parser.print_help()
+    if not any([args.euk, args.mic, args.meta, args.prot]):
         parser.error('At least one sequence must be declared either in the command line or through the config file')
 
-    for file in args.euk + args.mic + args.prot:
+    for file in args.euk + args.mic + args.meta:
         if '.fastq' in file:
             if not any([args.nanopore, args.illumina, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --nanopore, --illumina, or --pacbio')
@@ -237,18 +237,37 @@ Example:
                     args.euk.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
-
+    # Load metagenomic input
+    for item in args.meta:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in FILES_FASTQ:
+                fastq['meta_'+name] = item
+            elif ext in FILES_FASTA:
+                fasta['meta_'+name] = item
+            elif ext in FILES_AMINO:
+                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
+                amino[name] = item
+        elif os.path.isdir(item):
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_FASTQ + FILES_FASTA:
+                    args.meta.append(os.path.join(item, file))
+        else:
+            print(f'{item} is not a valid sequence')
+    
     print(f"Fastq sequences:\n  {fastq}")
     print(f"Fasta sequences:\n  {fasta}")
     print(f"Protein Sequences:\n  {amino}")
 
 
     # Step 2 (check quality of fastq files)
-    jobs = []
+    jobsQC = []
     if fastq:
         print("\nSTEP 2: Checking quality of fastq files")
         for key,value in fastq.items():
-            jobs.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
+            jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
 
 
     # Step 3 (trim fastq files)
@@ -274,12 +293,12 @@ Example:
         key,value = ray.get(job)
         if type(value) is str:
             trimmedReads[key] = value
-            jobs.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+            jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
         else:
             rev = key.replace("R1", "R2")
             trimmedReads[key] = value[0]
             trimmedReads[rev] = value[1]
-            jobs.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+            jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
@@ -325,6 +344,8 @@ Example:
         for key,value in fasta.items():
             if key.startswith("euk_"):
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_euk, key, value, config, f"{STEP[6]}/{key}"))
+            elif key.startswith("meta_"):
+                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_meta, key, value, config, f"{STEP[6]}/{key}"))
             else:
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_mic, key, value, config, f"{STEP[6]}/{key}"))
 
@@ -378,7 +399,7 @@ Example:
 
     # Wait for misc jobs
     print("\nWaiting for lingering jobs")
-    ready, pending = ray.wait(jobs)
+    ready, pending = ray.wait(jobsQC)
     while(pending):
         print(f"Waiting for {len(pending)} jobs.")
         ready, pending = ray.wait(pending)
