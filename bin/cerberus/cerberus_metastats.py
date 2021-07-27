@@ -16,22 +16,24 @@ import subprocess
 def checkContigs(contig, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
-    fout = open(f"{path}/stdout.txt", 'w')
-    ferr = open(f"{path}/stderr.txt", 'w')
     
     contigPath = os.path.dirname(contig)
     ext = os.path.splitext(contig)[1][1:]
     
     # checkm
     try:
-        command = f"checkm lineage_wf -t 28 -x {ext} -f {path}/out.tab --tab_table {contigPath} {path}"
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+        command = f"{config['EXE_CHECKM']} lineage_wf -t {config['CPUS']} -x {ext} -f {path}/out.tab --tab_table {contigPath} {path}"
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            print(f"\nCheckM: {contigPath}\n", file=fout, flush=True)
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except:
         print(f"Error: checkm processing{contigPath}")
     # countAssembly.py
     try:
         command = f"countAssembly.py -f {contigPath} -i 100 > {path}/stats.txt"
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+        with open(f"{path}/stdout.txt", 'a') as fout, open(f"{path}/stderr.txt", 'a') as ferr:
+            print(f"\ncoutAssembly: {contigPath}\n", file=fout, flush=True)
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except:
         print("Error: countAssembly.py failed: " + contigPath)
     # magpurify
@@ -39,9 +41,9 @@ def checkContigs(contig, config, subdir):
         if filename.endswith(tuple(config['EXT_FASTA'])):
             filepath = f"{contigPath}/{filename}"
             command = f"{config['EXE_MAGPURIFY']} clean-bin {filepath} {path}/mag {path}/mag-{filename}"
-            subprocess.run(command, shell=True, stdout=fout, stderr=ferr)
-    
+            with open(f"{path}/stdout.txt", 'a') as fout, open(f"{path}/stderr.txt", 'a') as ferr:
+                print(f"\nMag Purify: {contig}\n", file=fout, flush=True)
+                subprocess.run(command, shell=True, stdout=fout, stderr=ferr)
 
-    fout.close()
-    ferr.close()
+
     return

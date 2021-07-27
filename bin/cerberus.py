@@ -8,7 +8,7 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 
 
 __version__ = "1.0"
-
+__author__ = "Jose Figueroa"
 
 
 import sys
@@ -28,7 +28,9 @@ from cerberus import (
 
 
 ##### Global Variables #####
-# file extensions
+ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) 
+
+# known file extensions
 FILES_FASTQ = ['.fastq', '.fastq.gz']
 FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
 FILES_AMINO = [".faa"]
@@ -39,6 +41,7 @@ DEPENDENCIES = {
         'EXE_FASTP': 'fastp',
         'EXE_PORECHOP': 'porechop',
         'EXE_BBDUK': 'bbduk.sh',
+        'EXE_CHECKM': 'checkm',
         'EXE_MAGPURIFY': 'magpurify',
         'EXE_PRODIGAL': 'prodigal',
         'EXE_HMMSEARCH': 'hmmsearch'}
@@ -50,10 +53,11 @@ STEP = {
     3:"step_03-trim",
     4:"step_04-decontaminate",    
     5:"step_05-format",
-    6:"step_06-geneCall",
-    7:"step_07-hmmer",
-    8:"step_08-parse",
-    9:"step_09-visualizeData"}
+    6:"step_06-metaomeQC",
+    7:"step_07-geneCall",
+    8:"step_08-hmmer",
+    9:"step_09-parse",
+    10:"step_10-visualizeData"}
 
 
 ## PRINT to stderr ##
@@ -99,7 +103,7 @@ Example:
     readtype.add_argument('--pacbio', action="store_true", help="Specifies that the given FASTQ files are from PacBio")
     # optional flags
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument('--dir_out', help='path to output directory, creates "pipeline" folder. Defaults to current directory.', type=str)
+    optional.add_argument('--dir_out', type=str, default='./', help='path to output directory, creates "pipeline" folder. Defaults to current directory.')
     optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
@@ -112,8 +116,8 @@ Example:
     dependencies = parser.add_argument_group()
     for key in DEPENDENCIES:
         dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
-    dependencies.add_argument('--adapters', type=str, default="", help="Adapter file in fasta format")
-    dependencies.add_argument('--refseq', type=str, default="", help="Adapter file in fasta format")
+    dependencies.add_argument('--adapters', type=str, default=f"{ROOT_DIR}/../data/adapters.fna", help="FASTA File containing adapter sequences for trimming")
+    dependencies.add_argument('--refseq', type=str, default="", help="FASTA File containing control sequence for decontamination")
 
     args = parser.parse_args()
 
@@ -130,22 +134,28 @@ Example:
         if '.fastq' in file:
             if not any([args.nanopore, args.illumina, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --nanopore, --illumina, or --pacbio')
+            elif not args.refseq and args.nanopore:
+                args.refseq = f"{ROOT_DIR}/../data/lambda-phage.fna"
+            elif not args.refseq and args.illumina:
+                args.refseq = f"{ROOT_DIR}/../data/phix174_ill.ref.fna"
+            elif not args.refseq and args.pacbio:
+                args.refseq = f"{ROOT_DIR}/../data/PacBio_quality-control.fna"
 
     # Initialize Config Dictionary
     config = {}
     config['PATH'] = os.path.dirname(os.path.abspath(__file__))
     config['EXE_FGS+'] = os.path.abspath(os.path.join(config['PATH'], "FGS+/FGS+"))
-
+    
     # load all args into config
     for arg,value in args.__dict__.items():
         if value is not None:
             arg = arg.upper()
-            if arg.startswith("EXE_"):
+            if type(value) is str and os.path.isfile(value):
                 value = os.path.abspath(os.path.expanduser(value))
-            if arg.startswith("DIR_"):
-                value = os.path.abspath(os.path.expanduser(os.path.join(value, "pipeline")))
-                os.makedirs(value, exist_ok=True)
             config[arg] = value
+
+    config['DIR_OUT'] = os.path.abspath(os.path.expanduser(os.path.join(args.dir_out, "pipeline")))
+    os.makedirs(config['DIR_OUT'], exist_ok=True)
 
     # Sequence File extensions
     config['EXT_FASTA'] = FILES_FASTA
@@ -293,12 +303,11 @@ Example:
         key,value = ray.get(job)
         if type(value) is str:
             trimmedReads[key] = value
-            jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
         else:
             rev = key.replace("R1", "R2")
             trimmedReads[key] = value[0]
             trimmedReads[rev] = value[1]
-            jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
@@ -306,8 +315,9 @@ Example:
     if trimmedReads:
         print("\nSTEP 4: Decontaminating trimmed files")
         for key,value in trimmedReads.items():
-            jobDecon.append(rayWorker.remote(cerberus_decon.deconReads, key, [key, value], config, f"{STEP[4]}/{key}"))
+            jobDecon.append(rayWorker.remote(cerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
 
+    # Wait for Decontaminating Reads
     deconReads = {}
     for job in jobDecon:
         key,value = ray.get(job)
@@ -316,7 +326,7 @@ Example:
 
     # step 5a for cleaning contigs
     jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
-    if fasta:# and "scaf" in config["FLAGS"]:
+    if fasta:# and "scaf" in config flags:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
             jobContigs.append(rayWorker.remote(cerberus_format.removeN, key, value, config, f"{STEP[5]}/{key}"))
@@ -336,24 +346,24 @@ Example:
         key, value = ray.get(job)
         fasta[key] = value
 
-    # step 5c Metaome Stats
+    # step 6 Metaome Stats
     if fasta:
-        print("\nMetaome Stats of FASTA files.\n")
+        print("\nSTEP 6: Metaome Stats\n")
         for key,value in fasta.items():
-            jobsQC.append(rayWorker.remote(cerberus_metastats.checkContigs, key, value, config, f"{STEP[5]}/{key}/QC"))
+            jobsQC.append(rayWorker.remote(cerberus_metastats.checkContigs, key, value, config, f"{STEP[6]}/{key}"))
 
 
-    # step 6 (ORF Finder)
+    # step 7 (ORF Finder)
     jobGenecall = []
     if fasta:
-        print("\nSTEP 6: ORF Finder")
+        print("\nSTEP 7: ORF Finder")
         for key,value in fasta.items():
             if key.startswith("euk_"):
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_euk, key, value, config, f"{STEP[6]}/{key}"))
+                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_euk, key, value, config, f"{STEP[7]}/{key}"))
             elif key.startswith("meta_"):
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_meta, key, value, config, f"{STEP[6]}/{key}"))
+                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
             else:
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_mic, key, value, config, f"{STEP[6]}/{key}"))
+                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_mic, key, value, config, f"{STEP[7]}/{key}"))
 
     # Waiting for GeneCall
     for job in jobGenecall:
@@ -361,11 +371,11 @@ Example:
         amino[key] = value
 
 
-    # step 7 (HMMER)
-    print("\nSTEP 7: HMMER Search")
+    # step 8 (HMMER)
+    print("\nSTEP 8: HMMER Search")
     jobHMM = []
     for key,value in amino.items():
-        jobHMM.append(rayWorker.remote(cerberus_hmmer.search, key, value, config, f"{STEP[7]}/{key}"))
+        jobHMM.append(rayWorker.remote(cerberus_hmmer.search, key, value, config, f"{STEP[8]}/{key}"))
 
     print("Waiting for HMMER")
     hmmFoam = {}
@@ -374,11 +384,11 @@ Example:
         hmmFoam[key] = value
 
 
-    # step 8 (Parser)
-    print("\nSTEP 8: Parse HMMER results")
+    # step 9 (Parser)
+    print("\nSTEP 9: Parse HMMER results")
     jobParse = []
     for key,value in hmmFoam.items():
-        jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[8]}/{key}"))
+        jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
 
     print("Waiting for parsed results")
     hmmRollup = {}
@@ -393,14 +403,14 @@ Example:
         figCharts[key] = cerberus_visual.graphBarcharts(value)
 
 
-    # step 9 (Report)
+    # step 10 (Report)
     print("\nCreating Reports")
     pcaFigures = None
     if len(hmmTables) < 3:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
     else:
         pcaFigures = cerberus_visual.graphPCA(hmmTables)
-    cerberus_report.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[9]}")
+    cerberus_report.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[10]}")
 
 
     # Wait for misc jobs

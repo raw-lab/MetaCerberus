@@ -7,7 +7,6 @@ $ fastp -i in.R1.fq.gz -I in.R2.fq.gz -o trim.R1.fq.gz -O trim.R2.fq.gz
 """
 
 import os
-from posixpath import join
 import subprocess
 
 
@@ -25,7 +24,7 @@ def trimSingleRead(key_value, config, subdir):
     adapters = "" if not config['ADAPTERS'] else f"--adapter_fasta {config['ADAPTERS']}"
 
     if config['NANOPORE']:
-        command = f"{config['EXE_PORECHOP']} -i {value} -o {trimmedRead}"
+        command = f"{config['EXE_PORECHOP']} -i {value} -o {trimmedRead} --threads {config['CPUS']}"
     else:
         command = f"{config['EXE_FASTP']} -i {value} -o {trimmedRead} -p 20 -M 30 -q 30 --low_complexity_filter {adapters} -h {path}/fastp.{key}.html -j {path}/fastp.{key}.json"
     try:
@@ -39,12 +38,12 @@ def trimSingleRead(key_value, config, subdir):
 
 ## trimPairedRead
 #
-def trimPairedRead(fileFQ, config, subdir):
+def trimPairedRead(key_value, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
-    key = fileFQ[0]
-    value = fileFQ[1]
+    key = key_value[0]
+    value = key_value[1]
     outR1 = f"trimmed_{os.path.basename(value[0])}"
     outR2 = f"trimmed_{os.path.basename(value[1])}"
 
@@ -57,7 +56,7 @@ def trimPairedRead(fileFQ, config, subdir):
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=False, stdout=fout, stderr=ferr)
     except:
-        print("Error: Failed to execute trimPairedRead: " + fileFQ)
+        print("Error: Failed to execute trimPairedRead: " + key_value)
 
     return trimmedReads
 
