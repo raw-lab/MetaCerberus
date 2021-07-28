@@ -1,15 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import json
 
 # read file
-f = open('ko00001.json')
+f = open('../data/ko00001.json')
 data = json.load(f)
 f.close()
 
-count = 0
-for key, value in data.items():
-   print("Key:", key, "Value:", value)
-   count += 1
-   if count > 10:
-       break
+filename = f"cerberusDB/ko.db"
+open(filename, 'w').close()
+def parse_json(dicData, level):
+    if level > 0:
+        with open(filename, 'a') as dbOut:
+            name = dicData['name'].split(maxsplit=1)
+            if level < 3:
+               name = name[1]
+            else:
+                name = f"{name[0]}\t{name[1]}"
+            print('\t'*(level-1), name, sep='', file=dbOut)
+    for key,value in dicData.items():
+        if type(value) is list:
+            for item in value:
+                parse_json(item, level+1)
+
+parse_json(data, 0)
