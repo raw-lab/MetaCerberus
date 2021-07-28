@@ -59,16 +59,17 @@ def download_db(path):
 
 ######################################Install dependencies#####################################
 def install_dependencies():
-    conda_cmd = "conda create -n cerberus -c conda-forge -c bioconda fastqc fastp porechop bbmap checkm-genome magpurify prodigal hmmer pandas numpy plotly openpyxl scikit-learn configargparse python-kaleido python=3.7 -y"
+    conda_cmd = "conda create -n cerberus -c conda-forge -c bioconda gzip fastqc fastp porechop bbmap checkm-genome magpurify prodigal hmmer pandas numpy plotly openpyxl scikit-learn configargparse python=3.7 -y"
     subprocess.call(conda_cmd, shell=True)
     # TODO: 'conda activate' command not working through script, manually install ray for now.
     #pip_cmd = "conda activate cerberus ; pip install ray[default]"
     #subprocess.call(pip_cmd, shell=True)
     print("WARNING")
-    print("Please manually install 'ray' and 'metaomestats' by issuing the following commands:")
+    print("Please manually install pip dependencies by issuing the following commands:")
     print("> conda activate cerberus")
     print("> pip install ray[default]")
     print("> pip install metaomestats")
+    #print("> pip install checkm") conda gives a size error for checkm-genome, although it seems to be working
     return
 
 

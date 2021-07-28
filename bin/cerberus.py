@@ -35,16 +35,23 @@ FILES_FASTQ = ['.fastq', '.fastq.gz']
 FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
 FILES_AMINO = [".faa"]
 
+# refseq default locations (for decontamination)
+REFSEQ = {
+     "illumina": f"{ROOT_DIR}/../data/phix174_ill.ref.fna",
+     "lambda": f"{ROOT_DIR}/../data/lambda-phage.fna",
+     "pacbio": f"{ROOT_DIR}/../data/PacBio_quality-control.fna"
+}
+
 # external dependencies
 DEPENDENCIES = {
-        'EXE_FASTQC': 'fastqc',
-        'EXE_FASTP': 'fastp',
-        'EXE_PORECHOP': 'porechop',
-        'EXE_BBDUK': 'bbduk.sh',
-        'EXE_CHECKM': 'checkm',
-        'EXE_MAGPURIFY': 'magpurify',
-        'EXE_PRODIGAL': 'prodigal',
-        'EXE_HMMSEARCH': 'hmmsearch'}
+    'EXE_FASTQC': 'fastqc',
+    'EXE_FASTP': 'fastp',
+    'EXE_PORECHOP': 'porechop',
+    'EXE_BBDUK': 'bbduk.sh',
+    'EXE_CHECKM': 'checkm',
+    'EXE_MAGPURIFY': 'magpurify',
+    'EXE_PRODIGAL': 'prodigal',
+    'EXE_HMMSEARCH': 'hmmsearch'}
 
 # step names
 STEP = {
@@ -98,8 +105,8 @@ Example:
     required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
     readtype = parser.add_mutually_exclusive_group(required=False)
-    readtype.add_argument('--nanopore', action="store_true", help="Specifies that the given FASTQ files are from Nanopore")
     readtype.add_argument('--illumina', action="store_true", help="Specifies that the given FASTQ files are from Illumina")
+    readtype.add_argument('--nanopore', action="store_true", help="Specifies that the given FASTQ files are from Nanopore")
     readtype.add_argument('--pacbio', action="store_true", help="Specifies that the given FASTQ files are from PacBio")
     # optional flags
     optional = parser.add_argument_group('optional arguments')
@@ -117,7 +124,7 @@ Example:
     for key in DEPENDENCIES:
         dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
     dependencies.add_argument('--adapters', type=str, default=f"{ROOT_DIR}/../data/adapters.fna", help="FASTA File containing adapter sequences for trimming")
-    dependencies.add_argument('--refseq', type=str, default="", help="FASTA File containing control sequence for decontamination")
+    dependencies.add_argument('--refseq', type=str, default="default", help="FASTA File containing control sequence for decontamination")
 
     args = parser.parse_args()
 
@@ -132,14 +139,15 @@ Example:
 
     for file in args.euk + args.mic + args.meta:
         if '.fastq' in file:
-            if not any([args.nanopore, args.illumina, args.pacbio]):
-                parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --nanopore, --illumina, or --pacbio')
-            elif not args.refseq and args.nanopore:
-                args.refseq = f"{ROOT_DIR}/../data/lambda-phage.fna"
-            elif not args.refseq and args.illumina:
-                args.refseq = f"{ROOT_DIR}/../data/phix174_ill.ref.fna"
-            elif not args.refseq and args.pacbio:
-                args.refseq = f"{ROOT_DIR}/../data/PacBio_quality-control.fna"
+            if not any([args.illumina, args.nanopore, args.pacbio]):
+                parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
+            elif args.refseq =="default":
+                if args.illumina:
+                    args.refseq = REFSEQ["illumina"]
+                if args.nanopore:
+                    args.refseq = REFSEQ["lambda"]
+                if args.pacbio:
+                    args.refseq = REFSEQ["pacbio"]
 
     # Initialize Config Dictionary
     config = {}
@@ -287,13 +295,12 @@ Example:
         for key,value in fastq.items():
             if "R1.fastq" in value:
                 reverse = value.replace("R1.fastq", "R2.fastq")
-                print(reverse)
                 if reverse in fastq.values():
-                    print("Paired end found: ", key, value, reverse)
+                    print("Paired end found:", key)
                     jobTrim.append(rayWorker.remote(cerberus_trim.trimPairedRead, key, [key, [value,reverse]], config, f"{STEP[3]}/{key}"))
                     continue
             if "R2.fastq" in value and value.replace("R2.fastq", "R1.fastq") in fastq.values():
-                print("Skipping reverse read")
+                print("Skipping reverse read:", key)
                 continue
             jobTrim.append(rayWorker.remote(cerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
 
@@ -314,14 +321,34 @@ Example:
     jobDecon = []
     if trimmedReads:
         print("\nSTEP 4: Decontaminating trimmed files")
+#        for key,value in trimmedReads.items():
+#            jobDecon.append(rayWorker.remote(cerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
         for key,value in trimmedReads.items():
+            if "R1.fastq" in value:
+                reverse = value.replace("R1.fastq", "R2.fastq")
+                if reverse in fastq.values():
+                    print("Paired end found:", key)
+                    jobDecon.append(rayWorker.remote(cerberus_decon.deconPairedReads, key, [key, [value,reverse]], config, f"{STEP[4]}/{key}"))
+                    continue
+            if "R2.fastq" in value and value.replace("R2.fastq", "R1.fastq") in fastq.values():
+                print("Skipping reverse read:", key)
+                continue
             jobDecon.append(rayWorker.remote(cerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
 
     # Wait for Decontaminating Reads
     deconReads = {}
+    #for job in jobDecon:
+        #key,value = ray.get(job)
+        #deconReads[key] = value
     for job in jobDecon:
         key,value = ray.get(job)
-        deconReads[key] = value
+        if type(value) is str:
+            deconReads[key] = value
+        else:
+            rev = key.replace("R1", "R2")
+            deconReads[key] = value[0]
+            deconReads[rev] = value[1]
+        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[4]}/{key}/quality"))
 
 
     # step 5a for cleaning contigs
@@ -414,11 +441,11 @@ Example:
 
 
     # Wait for misc jobs
-    print("\nWaiting for lingering jobs")
-    ready, pending = ray.wait(jobsQC)
+    ready, pending = ray.wait(jobsQC, num_returns=len(jobsQC), timeout=1)
     while(pending):
         print(f"Waiting for {len(pending)} jobs.")
         ready, pending = ray.wait(pending)
+        print("Finished: ", ray.get(ready)[0][0])
 
 
     # Finished!
