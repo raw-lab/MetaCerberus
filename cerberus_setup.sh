@@ -6,7 +6,7 @@ pathDB="cerberusDB"
 function install {
     path=$1
     mkdir -p $path
-
+    # TODO: Translate from python:
     #for file_name in os.listdir('bin/'):
     #    file = os.path.join('bin', file_name)
     #    if os.path.isfile(file):
@@ -26,7 +26,6 @@ function install {
 
 function download_db {
     dbdir="$1/$pathDB"
-    echo $dbdir
 
     mkdir -p $dbdir
 
@@ -43,7 +42,7 @@ function install_dependencies {
 
     # create the cerberus environment in conda
     conda env remove --name cerberus -y
-    conda create -n cerberus -c conda-forge -c bioconda gzip fastqc fastp porechop bbmap checkm-genome magpurify prodigal hmmer pandas numpy plotly openpyxl scikit-learn configargparse python=3.7 -y
+    conda create -n cerberus -c conda-forge -c bioconda gzip fastqc fastp porechop bbmap checkm-genome magpurify prodigal hmmer pandas numpy plotly openpyxl scikit-learn configargparse python-kaleido python=3.7 -y
 
     # install additional pip requirements
     conda activate cerberus
@@ -100,6 +99,6 @@ usage: [--path PATH] [--download] [--dependencies] [--help]
     -e, --environment   Creates a conda environment with all dependencies in it (requires Anaconda3 to be installed)
 " && exit 0
 
-[ $ARG_ENV ] && install_dependencies
-[ $ARG_PATH -a ! $ARG_DOWN ] && echo "Install files and download database to: $ARG_PATH"
-[ $ARG_PATH -a $ARG_DOWN ] && download_db $ARG_PATH
+[ $ARG_ENV ] && install_dependencies && exit 0
+[ $ARG_PATH -a ! $ARG_DOWN ] && echo "Install files and download database to: $ARG_PATH" && exit 0
+[ $ARG_PATH -a $ARG_DOWN ] && download_db $ARG_PATH && exit 0
