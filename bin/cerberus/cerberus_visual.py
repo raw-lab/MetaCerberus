@@ -159,13 +159,14 @@ def graphBarcharts(rollupFiles):
         dictCount = {}
         for row in range(len(df)):
             ko_id = df['Id'][row]
-            for name in df['Info'][row]:
+            for i,name in enumerate(df['Info'][row],1):
                 if name == '':
                     continue
-                id = f"{ko_id}:{name}"
-                if id not in dictCount:
-                    dictCount[id] = 0
-                dictCount[id] += df['Count'][row]
+                if i == 4:
+                    name = f"{ko_id}:{name}"
+                if name not in dictCount:
+                    dictCount[name] = 0
+                dictCount[name] += df['Count'][row]
         return dictCount
     foamCounts = countLevels(df_FOAM)
     keggCounts = countLevels(df_KEGG)
@@ -177,7 +178,8 @@ def graphBarcharts(rollupFiles):
         for i,name in enumerate(df_FOAM['Info'][row], 1):
             if name == '':
                 continue
-            name = f"{ko_id}:{name}"
+            if i == 4:
+                name = f"{ko_id}:{name}"
             if i == 1:
                 level1 = name
                 if name not in dictFoam:
@@ -204,7 +206,8 @@ def graphBarcharts(rollupFiles):
         for i,name in enumerate(df_KEGG['Info'][row], 1):
             if name == '':
                 continue
-            name = f"{ko_id}:{name}"
+            if i == 4:
+                name = f"{ko_id}:{name}"
             if i == 1:
                 level1 = name
                 if name not in dictKO:

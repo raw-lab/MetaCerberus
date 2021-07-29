@@ -16,7 +16,7 @@ def parseHmmer(fileHmmer, config, subdir):
 
     minscore = config["MINSCORE"]
 
-    top5File = os.path.join(path, "HMMER_BH.tsv")
+    top5File = os.path.join(path, "HMMER_top_5.tsv")
     rollupFileFOAM = os.path.join(path, "HMMER_BH_FOAM.rollup")
     rollupFileKEGG = os.path.join(path, "HMMER_BH_KO.rollup")
 
@@ -174,10 +174,11 @@ def createTables(fileRollup):
             for level,name in enumerate(df['Info'][row], 1):
                 if name == '':
                     continue
-                id = f"{ko_id}:{name}"
-                if id not in dictCount:
-                    dictCount[id] = [level, 0, ko_id]
-                dictCount[id][1] += df['Count'][row]
+                if level == 4:
+                    name = f"{ko_id}:{name}"
+                if name not in dictCount:
+                    dictCount[name] = [level, 0, ko_id if level==4 else ""]
+                dictCount[name][1] += df['Count'][row]
         return dictCount
 
     dictFOAM = countKO(df_FOAM)

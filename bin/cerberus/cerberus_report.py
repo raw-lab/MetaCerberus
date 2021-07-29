@@ -38,7 +38,8 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
         # Write rollup tables
         outfile = os.path.join(path, sample, sample+'_rollup.tsv')
         tbl = copy.deepcopy(table) # Make a copy or will damage table for counts spreadsheet
-        tbl['Name'] = tbl['Name'].apply(lambda x: x.split(':',1)[1])
+        #tbl['Name'] = tbl['Name'].apply(lambda x: x.split(':',1)[1] if re.match("^K[0-9]*:", x) else x)
+        tbl['Name'] = tbl['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
         tbl.to_csv(outfile, index = False, header=True, sep='\t')
 
         # Write HTML Report
