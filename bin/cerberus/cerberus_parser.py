@@ -159,7 +159,7 @@ def createTables(fileRollup):
     # Reformat data. This lambda method avoids chained indexing
     # Splits string into list, strips brackets and quotes
     helper = lambda x : [i.strip("'") for i in x.strip('[]').split("', ")]
-    # call helper method to reformat 'FOAM' and 'KO' columns
+    # call helper method to reformat 'FOAM' and 'KEGG' columns
     df_FOAM['Info'] = df_FOAM['Info'].apply(helper)
     df_KEGG['Info'] = df_KEGG['Info'].apply(helper)
     # Convert 'Count" column to numeric
@@ -185,7 +185,7 @@ def createTables(fileRollup):
     dictKEGG = countKO(df_KEGG)
 
     # Create Level and Count Columns
-    dataFOAM = {'Type':'Foam',
+    dataFOAM = {'Type':'FOAM',
         'KO Id':[x[2] for x in dictFOAM.values()],
         'Name':list(dictFOAM.keys()),
         'Level':[x[0] for x in dictFOAM.values()],
@@ -194,7 +194,7 @@ def createTables(fileRollup):
     FT.drop(FT[FT['Name']==''].index, inplace=True)
     FT.drop(FT[FT['Name']=='NA'].index, inplace=True)
 
-    dataKO = {'Type':'KO',
+    dataKO = {'Type':'KEGG',
         'KO Id':[x[2] for x in dictKEGG.values()],
         'Name':list(dictKEGG.keys()),
         'Level':[x[0] for x in dictKEGG.values()],

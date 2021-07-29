@@ -19,13 +19,13 @@ def graphPCA(table_list):
     
     for sample,table in table_list.items():
         # FOAM
-        X = table[table['Type']=="Foam"]
+        X = table[table['Type']=="FOAM"]
         row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
         row = pd.Series(row, name=sample)
         dfFOAM = dfFOAM.append(row)
 
         # KEGG
-        X = table[table['Type']=="KO"]
+        X = table[table['Type']=="KEGG"]
         row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
         row = pd.Series(row, name=sample)
         dfKEGG = dfKEGG.append(row)
@@ -101,40 +101,11 @@ def graphPCA(table_list):
 
 ########## Create Sunburst Figures ##########
 def graphSunburst(table):
-    #dfFoam = table[table["Type"]=='Foam']
-    #dfKO = table[table["Type"]=='KO']
     count = table['Count']
     midpoint = np.average(count, weights=count)*2
 
-    #dfKO = dfKO.replace("KO", "KEGG")
-
-    # Create Sunburst Figures
-    #figSunburst = go.Figure(layout=dict(
-    #    grid = dict(columns=2, rows=1),
-    #    margin = dict(t=0, l=0, r=0, b=0)))
-    #figSunburst.update_traces(font=dict(size=[40]))
-    #col=0
-    #for df in [dfFoam, dfKO]:
-    #    sun = px.sunburst(df, path = ['Type','Level','Name'],
-    #        values = 'Count', color = 'Count',
-    #        color_continuous_scale = 'RdBu',
-    #        color_continuous_midpoint = midpoint)
-    #    sun.update_traces(textfont=dict(size=[40]))
-    #    figSunburst.add_trace(go.Sunburst(
-    #        labels = sun['data'][0]['labels'],
-    #        parents = sun['data'][0]['parents'],
-    #        values = sun['data'][0]['values'],
-    #        ids = sun['data'][0]['ids'],
-    #        domain = dict(column=col),
-    #        textfont = dict(size=[40])
-    #        ))
-    #    sun.update_traces(textfont=dict(size=[40]))
-    #    figSunburst.update_traces(textfont=dict(size=[40]))
-    #    col += 1
-    #figSunburst.update_traces(textfont=dict(size=[40]))
-
     figs = {}
-    for db in ["Foam", "KO"]:
+    for db in ["FOAM", "KEGG"]:
         df = table[table["Type"]==db]
         sun = px.sunburst(df, path = ['Type','Level','Name'],
             values = 'Count', color = 'Count',
@@ -148,7 +119,7 @@ def graphSunburst(table):
 
 
 ########## Create Bar Chart Figures ##########
-def graphBarcharts(rollupFiles):
+def graphBarcharts(key, rollupFiles):
     #TODO: restructure code to avoid loading rollup files and counting twice (fist in parser.py)
     df_FOAM = pd.read_csv(rollupFiles[0], names=['Id','Count','Info'], delimiter='\t')
     df_KEGG = pd.read_csv(rollupFiles[1], names=['Id','Count','Info'], delimiter='\t')
@@ -207,8 +178,8 @@ def graphBarcharts(rollupFiles):
                 level4 = name
                 if level4 not in dictFoam[level1][0][level2][0][level3][0]:
                     dictFoam[level1][0][level2][0][level3][0][level4] = foamCounts[name]
-                #else:
-                    #print("WARNING: duplicate line in rollup: FOAM: ", row, name, df_FOAM['Info'][row]) #TODO: Remove when bugs not found
+                else:
+                    print("WARNING: duplicate line in rollup: FOAM: ", key, row, name, df_FOAM['Info'][row]) #TODO: Remove when bugs not found
 
     # KO
     dictKO = {}
@@ -235,8 +206,8 @@ def graphBarcharts(rollupFiles):
                 level4 = name
                 if level4 not in dictKO[level1][0][level2][0][level3][0]:
                     dictKO[level1][0][level2][0][level3][0][level4] = keggCounts[name]
-                #else:
-                    #print("WARNING: duplicate line in rollup: KEGG: ", row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
+                else:
+                    print("WARNING: duplicate line in rollup: KEGG: ", key, row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
 
     return createHierarchyFigures(dictFoam), createHierarchyFigures(dictKO)
 
@@ -262,7 +233,8 @@ def createHierarchyFigures(data):
                 #'xaxis_title':"Name",
                 'yaxis_title':"Count"},
             data=[go.Bar(x=list(x), y=list(y))])
-        fig.update_yaxes(dtick=1)
+        if max(y) < 20:
+            fig.update_yaxes(dtick=1)
         return fig
     
     # Create figures in hierarchy format
