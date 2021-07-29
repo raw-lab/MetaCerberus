@@ -101,39 +101,50 @@ def graphPCA(table_list):
 
 ########## Create Sunburst Figures ##########
 def graphSunburst(table):
-    dfFoam = table[table["Type"]=='Foam']
-    dfKO = table[table["Type"]=='KO']
+    #dfFoam = table[table["Type"]=='Foam']
+    #dfKO = table[table["Type"]=='KO']
     count = table['Count']
     midpoint = np.average(count, weights=count)*2
 
-    dfKO = dfKO.replace("KO", "KEGG")
+    #dfKO = dfKO.replace("KO", "KEGG")
 
     # Create Sunburst Figures
-    figSunburst = go.Figure(layout=dict(
-        grid = dict(columns=2, rows=1),
-        margin = dict(t=0, l=0, r=0, b=0)))
-    figSunburst.update_traces(font=dict(size=[40]))
-    col=0
-    for df in [dfFoam, dfKO]:
+    #figSunburst = go.Figure(layout=dict(
+    #    grid = dict(columns=2, rows=1),
+    #    margin = dict(t=0, l=0, r=0, b=0)))
+    #figSunburst.update_traces(font=dict(size=[40]))
+    #col=0
+    #for df in [dfFoam, dfKO]:
+    #    sun = px.sunburst(df, path = ['Type','Level','Name'],
+    #        values = 'Count', color = 'Count',
+    #        color_continuous_scale = 'RdBu',
+    #        color_continuous_midpoint = midpoint)
+    #    sun.update_traces(textfont=dict(size=[40]))
+    #    figSunburst.add_trace(go.Sunburst(
+    #        labels = sun['data'][0]['labels'],
+    #        parents = sun['data'][0]['parents'],
+    #        values = sun['data'][0]['values'],
+    #        ids = sun['data'][0]['ids'],
+    #        domain = dict(column=col),
+    #        textfont = dict(size=[40])
+    #        ))
+    #    sun.update_traces(textfont=dict(size=[40]))
+    #    figSunburst.update_traces(textfont=dict(size=[40]))
+    #    col += 1
+    #figSunburst.update_traces(textfont=dict(size=[40]))
+
+    figs = {}
+    for db in ["Foam", "KO"]:
+        df = table[table["Type"]==db]
         sun = px.sunburst(df, path = ['Type','Level','Name'],
             values = 'Count', color = 'Count',
             color_continuous_scale = 'RdBu',
             color_continuous_midpoint = midpoint)
         sun.update_traces(textfont=dict(size=[40]))
-        figSunburst.add_trace(go.Sunburst(
-            labels = sun['data'][0]['labels'],
-            parents = sun['data'][0]['parents'],
-            values = sun['data'][0]['values'],
-            ids = sun['data'][0]['ids'],
-            domain = dict(column=col),
-            textfont = dict(size=[40])
-            ))
-        sun.update_traces(textfont=dict(size=[40]))
-        figSunburst.update_traces(textfont=dict(size=[40]))
-        col += 1
-    figSunburst.update_traces(textfont=dict(size=[40]))
+        figs[db] = sun
 
-    return figSunburst
+    #return figSunburst
+    return figs
 
 
 ########## Create Bar Chart Figures ##########
