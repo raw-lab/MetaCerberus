@@ -30,12 +30,22 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
 
     # Save XLS and CVS reports and HTML files
     for sample,table in dicTables.items():
+        table = table.copy()
         os.makedirs(os.path.join(path, sample), exist_ok=True)
         
         # Write rollup tables
-        outfile = os.path.join(path, sample, sample+'_rollup.tsv')
+        outpath = os.path.join(path, sample)
+        outfile = os.path.join(outpath, sample+'_rollup.tsv')
         table['Name'] = table['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
         table.to_csv(outfile, index = False, header=True, sep='\t')
+        outfile = os.path.join(outpath, sample+'_lvl-1.tsv')
+        table[table['Level']==1][['Type','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
+        outfile = os.path.join(outpath, sample+'_lvl-2.tsv')
+        table[table['Level']==2][['Type','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
+        outfile = os.path.join(outpath, sample+'_lvl-3.tsv')
+        table[table['Level']==3][['Type','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
+        outfile = os.path.join(outpath, sample+'_lvl-4.tsv')
+        table[table['Level']==4][['Type','KO Id','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
 
         # Write HTML Report
         outpath = os.path.join(path, sample)
