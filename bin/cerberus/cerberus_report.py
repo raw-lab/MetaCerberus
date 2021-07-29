@@ -26,54 +26,38 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
-    os.makedirs(os.path.join(path, "combined"), exist_ok=True)
     shutil.copy(os.path.join(config['PATH'], "plotly-2.0.0.min.js"), path)
 
     # Save XLS and CVS reports and HTML files
-    dfFOAM = pd.DataFrame()
-    dfKEGG = pd.DataFrame()
     for sample,table in dicTables.items():
         os.makedirs(os.path.join(path, sample), exist_ok=True)
         
         # Write rollup tables
         outfile = os.path.join(path, sample, sample+'_rollup.tsv')
-        tbl = copy.deepcopy(table) # Make a copy or will damage table for counts spreadsheet
-        tbl['Name'] = tbl['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
-        tbl.to_csv(outfile, index = False, header=True, sep='\t')
+        table['Name'] = table['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
+        table.to_csv(outfile, index = False, header=True, sep='\t')
 
         # Write HTML Report
         outpath = os.path.join(path, sample)
         write_HTML_files(outpath, sample, figSunburst[sample], figCharts[sample][0], figCharts[sample][1])
+        continue
 
-        # Create spreadsheet of counts
-        # FOAM
-        X = table[table['Type']=="Foam"]
-        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-        row = pd.Series(row, name=sample)
-        dfFOAM = dfFOAM.append(row)
-        # KEGG
-        X = table[table['Type']=="KO"]
-        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-        row = pd.Series(row, name=sample)
-        dfKEGG = dfKEGG.append(row)
-
-    # Write spreadsheet of counts as TSV
-    dfFOAM = dfFOAM.T.fillna(0).astype(int)
-    dfKEGG = dfKEGG.T.fillna(0).astype(int)
-    dfFOAM.to_csv(os.path.join(path, "combined", 'FOAM_counts.tsv'), index = True, header=True, sep='\t')
-    dfKEGG.to_csv(os.path.join(path, "combined", 'KEGG_counts.tsv'), index = True, header=True, sep='\t')
-
-    # PCA HTML Plots
+    # PCA Files
     if pcaFigure:
-        outfile = os.path.join(path, "combined", "combined_report_PCA.html")
+        outpath = os.path.join(path, "combined")
+        os.makedirs(os.path.join(outpath), exist_ok=True)
+        outfile = os.path.join(outpath, "combined_report_PCA.html")
         with open(outfile, 'w') as htmlOut:
             htmlOut.write("\n".join(htmlHeader))
             samples = [s.replace("mic_", '').replace("euk_", '') for s in dicTables.keys()]
             htmlOut.write(f"<h1>PCA Report for: {', '.join(samples)}<h1>\n")
             for db_type,fig in pcaFigure.items():
-                htmlOut.write(f"<h2 style='text-align:center'>{db_type.replace('_', ' ')}</h2>")
-                htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
-                htmlOut.write(htmlFig + '\n')
+                if type(fig) is pd.DataFrame:
+                    fig.to_csv(f"{outpath}/{db_type}.tsv", index=False, header=True, sep='\t')
+                else:
+                    htmlOut.write(f"<h2 style='text-align:center'>{db_type.replace('_', ' ')}</h2>")
+                    htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
+                    htmlOut.write(htmlFig + '\n')
             htmlOut.write('\n</body>\n</html>\n')
 
     return None

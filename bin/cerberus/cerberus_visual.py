@@ -10,6 +10,24 @@ import plotly.graph_objects as go
 #import plotly.subplots as sp
 
 
+########## Create Sunburst Figures ##########
+def graphSunburst(table):
+    count = table['Count']
+    midpoint = np.average(count, weights=count)*2
+
+    figs = {}
+    for db in ["FOAM", "KEGG"]:
+        df = table[table["Type"]==db]
+        sun = px.sunburst(df, path = ['Type','Level','Name'],
+            values = 'Count', color = 'Count',
+            color_continuous_scale = 'RdBu',
+            color_continuous_midpoint = midpoint)
+        sun.update_traces(textfont=dict(size=[20]))
+        figs[db] = sun
+
+    return figs
+
+
 ######### Create PCA Graph ##########
 def graphPCA(table_list):
 
@@ -18,6 +36,8 @@ def graphPCA(table_list):
     types = ["FOAM", "KEGG"]
     
     for sample,table in table_list.items():
+        table = table.drop(table[table['Level']<4].index, inplace=False).copy()
+
         # FOAM
         X = table[table['Type']=="FOAM"]
         row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
@@ -39,7 +59,7 @@ def graphPCA(table_list):
         data_type = types[count]
 
         # Do PCA
-        X = df
+        X = df.copy()
         scaler = StandardScaler()
         scaler.fit(X)
         X_scaled = scaler.transform(X)
@@ -52,25 +72,20 @@ def graphPCA(table_list):
             pca.components_.T,
             columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
         loadings.reset_index(inplace=True) # Move index to column and re-index
-        loadings.rename(columns={'index':''}, inplace = True)
-
+        dfLoadings = pd.DataFrame()
+        dfLoadings[['KO-ID','Name']] = loadings['index'].str.split(':', n=1, expand=True)
+        dfLoadings = pd.merge(dfLoadings, loadings, left_index=True, right_index=True)
+        dfLoadings.drop(labels=['index'], axis=1, inplace=True)
+        
         # Loading Matrix
         loadings_matrix = pd.DataFrame(
             pca.components_.T * np.sqrt(pca.explained_variance_),
             columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
-        #print(loadings_matrix)
         loadings_matrix.reset_index(inplace=True) # Move index to column and re-index
-        loadings_matrix.rename(columns={'index':''}, inplace = True)
-
-        figLoadings = go.Figure(data=[go.Table(
-            header=dict(values=list(loadings.columns),
-                fill_color='paleturquoise',
-                align='left'),
-            cells=dict(
-                values=[loadings[col] for col in loadings.columns],
-                fill_color='lavender',
-                align='left')
-        )])
+        dfLoadings_matrix = pd.DataFrame()
+        dfLoadings_matrix[['KO-ID','Name']] = loadings_matrix['index'].str.split(':', n=1, expand=True)
+        dfLoadings_matrix = pd.merge(dfLoadings_matrix, loadings_matrix, left_index=True, right_index=True)
+        dfLoadings_matrix.drop(labels=['index'], axis=1, inplace=True)
 
         # Create Scree Plot
         figScree = px.bar(
@@ -93,29 +108,12 @@ def graphPCA(table_list):
         # (Key is displayed in the HTML Report and file names)
         figPCA[data_type+"_PCA"] = fig3d
         figPCA[data_type+"_Scree_Plot"] = figScree
-        figPCA[data_type+"_Loadings"] = figLoadings
-        #figPCA[data_type+"_Loading_Matrix"]
+        figPCA[data_type+"_Loadings"] = dfLoadings
+        figPCA[data_type+"_Loading_Matrix"] = loadings_matrix
+        figPCA[data_type+"_PCA_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
+        continue
 
     return figPCA
-
-
-########## Create Sunburst Figures ##########
-def graphSunburst(table):
-    count = table['Count']
-    midpoint = np.average(count, weights=count)*2
-
-    figs = {}
-    for db in ["FOAM", "KEGG"]:
-        df = table[table["Type"]==db]
-        sun = px.sunburst(df, path = ['Type','Level','Name'],
-            values = 'Count', color = 'Count',
-            color_continuous_scale = 'RdBu',
-            color_continuous_midpoint = midpoint)
-        sun.update_traces(textfont=dict(size=[40]))
-        figs[db] = sun
-
-    #return figSunburst
-    return figs
 
 
 ########## Create Bar Chart Figures ##########
@@ -179,6 +177,7 @@ def graphBarcharts(key, rollupFiles):
                 if level4 not in dictFoam[level1][0][level2][0][level3][0]:
                     dictFoam[level1][0][level2][0][level3][0][level4] = foamCounts[name]
                 else:
+                    dictFoam[level1][0][level2][0][level3][0][level4] += foamCounts[name]
                     print("WARNING: duplicate line in rollup: FOAM: ", key, row, name, df_FOAM['Info'][row]) #TODO: Remove when bugs not found
 
     # KO
@@ -207,6 +206,7 @@ def graphBarcharts(key, rollupFiles):
                 if level4 not in dictKO[level1][0][level2][0][level3][0]:
                     dictKO[level1][0][level2][0][level3][0][level4] = keggCounts[name]
                 else:
+                    dictKO[level1][0][level2][0][level3][0][level4] += keggCounts[name]
                     print("WARNING: duplicate line in rollup: KEGG: ", key, row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
 
     return createHierarchyFigures(dictFoam), createHierarchyFigures(dictKO)
