@@ -72,15 +72,18 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
     return
 
+def logTime(dirout, host, funcName, path, time):
+    with open(f'{dirout}/time.txt', 'a+') as outTime:
+        print(host, funcName, time, path, file=outTime, sep='\t')
+    return
 
 ## RAY WORKER THREAD ##
 @ray.remote
 def rayWorker(func, key, value, config, path):
+    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, "start")
     start = time.time()
-    eprint(f"{socket.gethostname()} | {func.__name__} | {path}")
     ret = func(value, config, path)
-    with open(f'{config["DIR_OUT"]}/time.txt', 'a+') as outTime:
-        outTime.write(f'{func.__name__}\t{path}\t{time.time()-start:.2f} seconds\n')
+    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, f"{time.time()-start:.2f} seconds")
     return key, ret
 
 
@@ -201,13 +204,15 @@ Example:
         config['CPUS'] = int(ray.available_resources()['CPU'])
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
-    
-    
+
+
+    start = time.time()
+    logTime(config["DIR_OUT"], socket.gethostname(), "master", config["DIR_OUT"], "START")
     # Step 1 - Load Input Files
+    print("\nSTEP 1: Loading sequence files:")
     fastq = {}
     fasta = {}
     amino = {}
-    print("\nLoading sequence files:")
     # Load protein input
     for item in args.prot:
         item = os.path.abspath(os.path.expanduser(item))
@@ -402,14 +407,14 @@ Example:
     print("\nSTEP 8: HMMER Search")
     jobHMM = []
     for key,value in amino.items():
-        jobHMM.append(rayWorker.remote(cerberus_hmmer.search, key, value, config, f"{STEP[8]}/{key}"))
+        jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
 
     print("Waiting for HMMER")
     hmmFoam = {}
-    for job in jobHMM:
-        key,value = ray.get(job)
+    while(jobHMM):
+        ready, jobHMM = ray.wait(jobHMM)
+        key,value = ray.get(ready[0])
         hmmFoam[key] = value
-
 
     # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")
@@ -422,8 +427,9 @@ Example:
     hmmTables = {}
     figSunburst = {}
     figCharts = {}
-    for job in jobParse:
-        key,value = ray.get(job)
+    while(jobParse):
+        ready, jobParse = ray.wait(jobParse)
+        key,value = ray.get(ready[0])
         hmmRollup[key] = value
         hmmTables[key] = cerberus_parser.createTables(value)
         figSunburst[key] = cerberus_visual.graphSunburst(hmmTables[key])
@@ -441,15 +447,15 @@ Example:
 
 
     # Wait for misc jobs
-    ready, pending = ray.wait(jobsQC, num_returns=len(jobsQC), timeout=1)
+    ready, pending = ray.wait(jobsQC, num_returns=len(jobsQC), timeout=1) # clear buffer
     while(pending):
         print(f"Waiting for {len(pending)} jobs.")
         ready, pending = ray.wait(pending)
-        print("Finished: ", ray.get(ready)[0][0])
 
 
     # Finished!
     print("\nFinished Pipeline")
+    logTime(config["DIR_OUT"], socket.gethostname(), "master", config["DIR_OUT"], f"{time.time()-start:.2f} seconds")
     return 0
 
 

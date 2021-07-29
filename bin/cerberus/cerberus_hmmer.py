@@ -10,7 +10,7 @@ import subprocess
 
 
 ## HMMER Search
-def search(aminoAcid, config, subdir):
+def searchHMM(aminoAcid, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
