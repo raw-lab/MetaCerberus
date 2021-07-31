@@ -150,7 +150,7 @@ def graphBarcharts(key, rollupFiles):
         return dictCount
     foamCounts = countLevels(df_FOAM)
     keggCounts = countLevels(df_KEGG)
-
+    
     # FOAM
     dictFoam = {}
     for row in range(len(df_FOAM)):
@@ -204,68 +204,29 @@ def graphBarcharts(key, rollupFiles):
             else:
                 level4 = name
                 if level4 not in dictKO[level1][0][level2][0][level3][0]:
-                    dictKO[level1][0][level2][0][level3][0][level4] = keggCounts[name]
+                    dictKO[level1][0][level2][0][level3][0][level4] = {}, keggCounts[name]
                 else:
                     dictKO[level1][0][level2][0][level3][0][level4] += keggCounts[name]
                     print("WARNING: duplicate line in rollup: KEGG: ", key, row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
 
-    return createHierarchyFigures(dictFoam), createHierarchyFigures(dictKO)
-
-# TODO: recursive function for replacing createHierarchyFigures()
-#chart = {}
-#def hierarchy(level, i):
-#    print(type(level), i)
-#    if type(level) is dict:
-#        for k,v in level.items():
-#            print(i, k, v[1])
-#            chart[k] = {}
-#            hierarchy(v[0], i+1)
-#    return chart
-#print(hierarchy(data, 1))
+    return createBarFigs(dictFoam), createBarFigs(dictKO)
 
 
-### Create hierarchy figures from table with levels
-def createHierarchyFigures(data):
-    ### Helper method for conciseness below ###
-    def buildFigure(x, y, title):
-        fig = go.Figure(
+##### Create Barchart Figures #####
+def createBarFigs(data, level=1, name=""):
+    chart = {}
+    d = {}
+    for k,v in data.items():
+        #print("\t"*level, k, f" ({v[1]})", sep='')
+        d[k] = v[1] 
+        chart.update(createBarFigs(v[0], level+1, k)) # updating from empty dic does nothing
+    if len(d): #if no data at this level, just return the empty chart{}
+        title = f"Level {level}: {name}".strip().strip(':')
+        fig = go.Figure( # Create the figure of this level's data
             layout={'title':title,
-                #'xaxis_title':"Name",
-                'yaxis_title':"Count"},
-            data=[go.Bar(x=list(x), y=list(y))])
-        if max(y) < 20:
+                'yaxis_title':"KO Count"},
+            data=[go.Bar(x=list(d.keys()), y=list(d.values()))])
+        if max(d.values()) < 20: # to remove decimals from graph with low counts
             fig.update_yaxes(dtick=1)
-        return fig
-    
-    # Create figures in hierarchy format
-    # TODO: This is probably better as a recursive function
-    charts = {}
-    data1 = {}
-    for k1,v1 in data.items():
-        #print("\t", k1, v1[1])
-        data1[k1] = v1[1]
-        data2 = {}
-        for k2,v2 in v1[0].items():
-            #print("\t\t", k2, v2[1])
-            data2[k2] = v2[1]
-            data3 = {}
-            for k3,v3 in v2[0].items():
-                #print("\t\t\t", k3, v3[1])
-                data3[k3] = v3[1]
-                data4 = {}
-                for k4,v4 in v3[0].items():
-                    #print("\t\t\t\t", k4, v4)
-                    data4[k4] = v4
-                if len(data4):
-                    title = f"Level 4: {k3}"
-                    charts[title] = buildFigure(data4.keys(), data4.values(), title)
-            if len(data3):
-                title = f"Level 3: {k2}"
-                charts[title] = buildFigure(data3.keys(), data3.values(), title)
-        if len(data2):
-            title = f"Level 2: {k1}"
-            charts[title] = buildFigure(data2.keys(), data2.values(), title)
-    if len(data1):
-        title = "Level 1"
-        charts[title] = buildFigure(data1.keys(), data1.values(), title)
-    return charts
+        chart[title] = fig
+    return chart
