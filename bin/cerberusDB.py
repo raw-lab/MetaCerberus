@@ -7,11 +7,11 @@ f = open('../data/ko00001.json')
 data = json.load(f)
 f.close()
 
-filename = f"cerberusDB/ko.db"
-open(filename, 'w').close()
+outFile = f"cerberusDB/ko.db"
+open(outFile, 'w').close()
 def parse_json(dicData, level):
     if level > 0:
-        with open(filename, 'a') as dbOut:
+        with open(outFile, 'a') as dbOut:
             name = dicData['name'].split(maxsplit=1)
             if level < 3:
                name = name[1]
