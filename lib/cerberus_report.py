@@ -4,7 +4,7 @@ import os
 import shutil
 import re
 import pandas as pd
-import copy
+import pkg_resources as pkg
 
 
 #GLOBAL standard html header to include plotly script
@@ -26,7 +26,8 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
-    shutil.copy(os.path.join(config['PATH'], "plotly-2.0.0.min.js"), path)
+    plotly = pkg.resource_filename('cerberus_data', 'plotly-2.0.0.min.js')
+    shutil.copy(plotly, path)
 
     # Save XLS and CVS reports and HTML files
     for sample,table in dicTables.items():

@@ -16,7 +16,7 @@ Input formats
 Installing Cerberus (from source)
 ----------------------------------
 
-Clone github Repo
+1. Clone github Repo
 
 - Run the below code to clone the Cerberus Repository.
 
@@ -44,16 +44,32 @@ cd cerberus
 python3 cerberus_setup.py -e
 ```
 
+2. Install from github using pip
+
+```bash
+pip install git+https://github.com/raw-lab/cerberus/
+```
+
+ - Next run the setup script
+
+```bash
+cerberus_setup.py -f -d -e
+```
+
+- -f installs the FGS+ dependency
+- -d downloads the FOAM and KO Databases
+- -e creates a conda environment named 'cerberus'. Anaconda3 needs to be installed to use this option.
+
 Running code by passing data file
 ---------------------------------
 
-- If needed, activate Cerberus environment
+- If needed, activate Cerberus environment in Anaconda
 
 ```bash
 conda activate cerberus
 ```
 
-- If the Cerberus environment is not used, make sure executable scripts are in the PATH or specified in the config file.
+- If the Cerberus environment is not used, make sure the dependencies are in the PATH or specified in the config file.
 - Run cerberus.py with the options required for your project.
 
 ```bash
@@ -66,13 +82,6 @@ usage: cerberus.py [-c CONFIG] [--mic MIC] [--euk EUK] [--super SUPER]
 
 - One of --mic, --euk, --super, or --prot is required.
 - cerberus.py -h will show more details about each option.
-- For example, to use the microbial option: you should use the argument `--mic` along with `<input file path>`.
-
-```bash
-python3 cerberus.py --mic <input file path>
-```
-
-- For eukaryote option: you should use the argument `--euk` along with `<input file path>`.
 
 ```bash
 python cerberus.py --euk <input file path> 
@@ -81,8 +90,8 @@ python cerberus.py --euk <input file path>
 Output Files
 ------------
 
-- If an output directory is given a 'pipeline' subfolder will be created there.
-- If no output directory is specified the 'pipeline' subfolder will be created in the current directory.
+- If an output directory is given, a 'pipeline' subfolder will be created there.
+- If no output directory is specified, the 'pipeline' subfolder will be created in the current directory.
 
 Visualization of outputs
 ------------------------

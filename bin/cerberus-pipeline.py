@@ -7,7 +7,7 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__ = "1.0"
+__version__ = "0.1"
 __author__ = "Jose Figueroa"
 
 
@@ -15,9 +15,11 @@ import sys
 import os
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
+import pkg_resources as pkg
 import time
 import socket
 import ray
+
 
 # our package import.
 from cerberus import (
@@ -28,7 +30,6 @@ from cerberus import (
 
 
 ##### Global Variables #####
-ROOT_DIR = os.path.dirname(os.path.abspath(__file__)) 
 
 # known file extensions
 FILES_FASTQ = ['.fastq', '.fastq.gz']
@@ -37,9 +38,10 @@ FILES_AMINO = [".faa"]
 
 # refseq default locations (for decontamination)
 REFSEQ = {
-     "illumina": f"{ROOT_DIR}/../data/phix174_ill.ref.fna",
-     "lambda": f"{ROOT_DIR}/../data/lambda-phage.fna",
-     "pacbio": f"{ROOT_DIR}/../data/PacBio_quality-control.fna"
+    "adapters": pkg.resource_filename("cerberus_data", "adapters.fna"),
+    "illumina": pkg.resource_filename("cerberus_data", "phix174_ill.ref.fna"),
+    "lambda": pkg.resource_filename("cerberus_data", "lambda-phage.fna"),
+    "pacbio": pkg.resource_filename("cerberus_data", "PacBio_quality-control.fna")
 }
 
 # external dependencies
@@ -126,9 +128,9 @@ Example:
     dependencies = parser.add_argument_group()
     for key in DEPENDENCIES:
         dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
-    dependencies.add_argument('--adapters', type=str, default=f"{ROOT_DIR}/../data/adapters.fna", help="FASTA File containing adapter sequences for trimming")
+    dependencies.add_argument('--adapters', type=str, default=REFSEQ['adapters'], help="FASTA File containing adapter sequences for trimming")
     dependencies.add_argument('--refseq', type=str, default="default", help="FASTA File containing control sequence for decontamination")
-
+    
     args = parser.parse_args()
 
     print("\nStarting Cerberus Pipeline\n")
@@ -153,6 +155,7 @@ Example:
                     args.refseq = REFSEQ["lambda"]
                 if args.pacbio:
                     args.refseq = REFSEQ["pacbio"]
+
 
     # Initialize Config Dictionary
     config = {}
