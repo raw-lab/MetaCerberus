@@ -13,6 +13,7 @@ function install {
     #    if os.path.isfile(file):
     #        shutil.copy(file, path)
     cp bin/*.py $install_path
+    cp bin/*.sh $install_path
     $install_path/cerberus_setup.sh -d
     #$install_path/cerberus_setup.sh -f
     #return
@@ -23,7 +24,7 @@ function install {
     echo 
     echo "Program files copied to '$install_path'"
     echo "Add this to your PATH or .bashrc for easier use:"
-    echo "export PATH='$install_path:$PATH'"
+    echo "export PATH=\"$install_path:\$PATH\""
     return
 }
 
