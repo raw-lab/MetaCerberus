@@ -155,7 +155,7 @@ Example:
                     args.control_seq = REFSEQ["lambda"]
                 if args.pacbio:
                     args.control_seq = REFSEQ["pacbio"]
-
+    args
 
     # Initialize Config Dictionary
     config = {}
@@ -165,6 +165,7 @@ Example:
     # load all args into config
     for arg,value in args.__dict__.items():
         if value is not None:
+            if arg == "control_seq": arg = "refseq"
             arg = arg.upper()
             if type(value) is str and os.path.isfile(value):
                 value = os.path.abspath(os.path.expanduser(value))

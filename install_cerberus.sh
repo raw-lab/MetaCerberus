@@ -23,6 +23,7 @@ function install {
 
 function install_pip {
     # TODO: This option is mainly for developmental purposes.
+    rm -r dist/
     python -m build > /dev/null #2>&1
     rm -r cerberus.egg-info/
     # install latest build version
@@ -47,7 +48,7 @@ function install_conda {
 
     # install additional pip requirements
     conda activate cerberus
-    python -m pip install metaomestats ray[default]
+    python -m pip install setuptools build metaomestats ray[default]
 
     # install cerberus from local folder for now
     # TODO: Change this to proper install once uploaded to pypi and bioconda.

@@ -28,7 +28,7 @@ git clone https://github.com/raw-lab/cerberus.git
 
 ```bash
 cd cerberus
-python3 cerberus_install.py
+python3 install_cerberus.py
 ```
 
 - --instal option copies the script files to a custom folder and downloads database files

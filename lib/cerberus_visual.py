@@ -98,15 +98,21 @@ def graphPCA(table_list):
         # Create 3D Plot
         labels = {str(i): f"PC {str(i+1)} ({var:.2f}%)"
             for i,var in enumerate(pca.explained_variance_ratio_ * 100)}
-        
-        fig3d = px.scatter_3d(
-            X_pca, x=0, y=1, z=2, color=X.index,
-            #title=data_type,
-            labels=labels)
+
+        if len(labels) > 2:
+            fig3d = px.scatter_3d(
+                X_pca, x=0, y=1, z=2, color=X.index,
+                #title=data_type,
+                labels=labels)
+        else:
+            print("Insufficient data in", data_type, "for 3D PCA Plot")
+            fig3d = None
+
 
         # Add Figures to Dictionary
         # (Key is displayed in the HTML Report and file names)
-        figPCA[data_type+"_PCA"] = fig3d
+        if fig3d:
+            figPCA[data_type+"_PCA"] = fig3d
         figPCA[data_type+"_Scree_Plot"] = figScree
         figPCA[data_type+"_Loadings"] = dfLoadings
         figPCA[data_type+"_Loading_Matrix"] = loadings_matrix
@@ -175,9 +181,9 @@ def graphBarcharts(key, rollupFiles):
             else:
                 level4 = name
                 if level4 not in dictFoam[level1][0][level2][0][level3][0]:
-                    dictFoam[level1][0][level2][0][level3][0][level4] = foamCounts[name]
+                    dictFoam[level1][0][level2][0][level3][0][level4] = [{}, foamCounts[name]]
                 else:
-                    dictFoam[level1][0][level2][0][level3][0][level4] += foamCounts[name]
+                    dictFoam[level1][0][level2][0][level3][0][level4][1] += foamCounts[name]
                     print("WARNING: duplicate line in rollup: FOAM: ", key, row, name, df_FOAM['Info'][row]) #TODO: Remove when bugs not found
 
     # KO
@@ -204,9 +210,9 @@ def graphBarcharts(key, rollupFiles):
             else:
                 level4 = name
                 if level4 not in dictKO[level1][0][level2][0][level3][0]:
-                    dictKO[level1][0][level2][0][level3][0][level4] = {}, keggCounts[name]
+                    dictKO[level1][0][level2][0][level3][0][level4] = [{}, keggCounts[name]]
                 else:
-                    dictKO[level1][0][level2][0][level3][0][level4] += keggCounts[name]
+                    dictKO[level1][0][level2][0][level3][0][level4][1] += keggCounts[name]
                     print("WARNING: duplicate line in rollup: KEGG: ", key, row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
 
     return createBarFigs(dictFoam), createBarFigs(dictKO)
@@ -217,8 +223,8 @@ def createBarFigs(data, level=1, name=""):
     chart = {}
     d = {}
     for k,v in data.items():
-        #print("\t"*level, k, f" ({v[1]})", sep='')
-        d[k] = v[1] 
+        #print("\t"*level, k, ' ', v[1], sep='')
+        d[k] = v[1]
         chart.update(createBarFigs(v[0], level+1, k)) # updating from empty dic does nothing
     if len(d): #if no data at this level, just return the empty chart{}
         title = f"Level {level}: {name}".strip().strip(':')
