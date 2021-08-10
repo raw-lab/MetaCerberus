@@ -15,10 +15,10 @@ import sys
 import os
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
-import pkg_resources as pkg
+import pkg_resources as pkg #to import package data files
 import time
 import socket
-import ray
+import ray #multiprocessing
 
 
 # our package import.
@@ -129,7 +129,7 @@ Example:
     for key in DEPENDENCIES:
         dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
     dependencies.add_argument('--adapters', type=str, default=REFSEQ['adapters'], help="FASTA File containing adapter sequences for trimming")
-    dependencies.add_argument('--refseq', type=str, default="default", help="FASTA File containing control sequence for decontamination")
+    dependencies.add_argument('--control_seq', type=str, default="default", help="FASTA File containing control sequences for decontamination")
     
     args = parser.parse_args()
 
@@ -148,13 +148,13 @@ Example:
         if '.fastq' in file:
             if not any([args.illumina, args.nanopore, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
-            elif args.refseq =="default":
+            elif args.control_seq =="default":
                 if args.illumina:
-                    args.refseq = REFSEQ["illumina"]
+                    args.control_seq = REFSEQ["illumina"]
                 if args.nanopore:
-                    args.refseq = REFSEQ["lambda"]
+                    args.control_seq = REFSEQ["lambda"]
                 if args.pacbio:
-                    args.refseq = REFSEQ["pacbio"]
+                    args.control_seq = REFSEQ["pacbio"]
 
 
     # Initialize Config Dictionary

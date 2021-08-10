@@ -6,27 +6,27 @@ pathDB="cerberusDB"
 pathFGS="FGS+"
 
 function install_FGS+ {
-    fgspath="$ABSPATH/$pathFGS"
-    echo
-    echo "Cloning FGS+ to $fgspath"
-    echo
-    git clone https://github.com/hallamlab/FragGeneScanPlus $fgspath
-    make -C $fgspath
-    return
+  fgspath="$ABSPATH/$pathFGS"
+  echo
+  echo "Cloning FGS+ to $fgspath"
+  echo
+  git clone https://github.com/hallamlab/FragGeneScanPlus $fgspath
+  make -C $fgspath
+  return
 }
 
 function download_db {
-    dbdir="$ABSPATH/$pathDB"
-    echo
-    echo "Downloading database to $dbdir"
-    echo
-    mkdir -p $dbdir
+  dbdir="$ABSPATH/$pathDB"
+  echo
+  echo "Downloading database to $dbdir"
+  echo
+  mkdir -p $dbdir
 
-    wget https://osf.io/72p6g/download -v -O "$dbdir/FOAM_readme.txt" -c
-    wget https://osf.io/muan4/download -v -O "$dbdir/FOAM-onto_rel1.tsv" -c
-    wget https://osf.io/k8au2/download -v -O "$dbdir/KO_classification.txt" -c
-    wget https://osf.io/bdpv5/download -v -O "$dbdir/FOAM-hmm_rel1a.hmm.gz" -c
-    return
+  wget https://osf.io/72p6g/download -v -O "$dbdir/FOAM_readme.txt" -c
+  wget https://osf.io/muan4/download -v -O "$dbdir/FOAM-onto_rel1.tsv" -c
+  wget https://osf.io/2hp7t/download -v -O "$dbdir/KO_classification.txt" -c
+  wget https://osf.io/bdpv5/download -v -O "$dbdir/FOAM-hmm_rel1a.hmm.gz" -c
+  return
 }
 
 ### Begin Main Script ###
@@ -60,8 +60,8 @@ No options given.
 [ $ARG_HELP ] && echo "
 usage: [--path PATH] [--download] [--dependencies] [--help]
 
-    -d, --download      Download the database files to <cerberus path>/cerberusDB
-    -f, --fgs           Clone and install FGS+ to <cerberus path>/FGS+
+  -d, --download      Download the database files to <cerberus path>/cerberusDB
+  -f, --fgs           Clone and install FGS+ to <cerberus path>/FGS+
 " && exit 0
 
 [ $ARG_FGS ] && install_FGS+

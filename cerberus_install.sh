@@ -6,17 +6,10 @@ pathDB="cerberusDB"
 function install {
     install_path=$1
     mkdir -p $install_path
-    # TODO: Translate from python:
-
-    #for file_name in os.listdir('bin/'):
-    #    file = os.path.join('bin', file_name)
-    #    if os.path.isfile(file):
-    #        shutil.copy(file, path)
     cp bin/*.py $install_path
     cp bin/*.sh $install_path
+    # TODO: Copy package as well.
     $install_path/cerberus_setup.sh -d
-    #$install_path/cerberus_setup.sh -f
-    #return
     
     unzip src/FragGeneScanPlus-master.zip
     mv FragGeneScanPlus-master "$install_path/FGS+"

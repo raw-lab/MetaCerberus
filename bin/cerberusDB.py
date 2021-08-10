@@ -7,7 +7,7 @@ f = open('../data/ko00001_2021-07.json')
 data = json.load(f)
 f.close()
 
-outFile = f"cerberusDB/ko.db"
+outFile = f"cerberusDB/KO_classification.txt"
 open(outFile, 'w').close()
 def parse_json(dicData, level):
     if level > 0:

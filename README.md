@@ -13,78 +13,86 @@ Input formats
 - type 2 nucleotide fasta (.fasta, .fa, .fna, .ffn format), assembled raw reads into contigs
 - type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence
 
-Installing Cerberus (from source)
-----------------------------------
+Installing Cerberus
+-------------------
+
+### 1) Clone latest build from github
 
 1. Clone github Repo
-
-- Run the below code to clone the Cerberus Repository.
 
 ```bash
 git clone https://github.com/raw-lab/cerberus.git
 ```
 
-Run Setup File
-
-- Open Cerberus repo folder
-- Run setup “cerberus_setup.py”
+2. Run Setup File
 
 ```bash
 cd cerberus
-python3 cerberus_setup.py -p PATH
+python3 cerberus_install.py
 ```
 
-- It will create directory specified by the path and copy binary and package files
-- It also downloads the FOAM and KO database files
+- --instal option copies the script files to a custom folder and downloads database files
+- --pip option uses pip to install Cerberus from the local folder
+- --conda option creates a conda environment named "cerberus" and installs cerberus with all dependencies in it
+- --help use this option for more information
 
-- The setup script can also create an Anaconda environment with all dependencies installed.
-
-```bash
-cd cerberus
-python3 cerberus_setup.py -e
-```
-
-2. Install from github using pip
+### 2) Install directly from github
 
 ```bash
 pip install git+https://github.com/raw-lab/cerberus/
 ```
 
- - Next run the setup script
+- This installs the latest build (may be unstable) using pip
+- Next run the setup script to download the Database and install FGS+
 
 ```bash
-cerberus_setup.py -f -d -e
+cerberus_setup.py -f -d
 ```
 
-- -f installs the FGS+ dependency
-- -d downloads the FOAM and KO Databases
-- -e creates a conda environment named 'cerberus'. Anaconda3 needs to be installed to use this option.
+### 3) Anaconda and pip installs (comming soon, stable versions)
 
-Running code by passing data file
----------------------------------
+1. Anaconda install from bioconda with all dependencies:
 
-- If needed, activate Cerberus environment in Anaconda
+```bash
+conda install -c bioconda cerberus
+```
+
+2. PIP install:
+
+```bash
+pip install cerberus
+```
+
+- The pip installer will not install all dependencies (since they are not available from pip)
+- Many dependencies will need to be installed manually. Running cerberus will let you know what is missing from your environment.
+
+Running Cerberus
+----------------
+
+- If needed, activate the Cerberus environment in Anaconda
 
 ```bash
 conda activate cerberus
 ```
 
-- If the Cerberus environment is not used, make sure the dependencies are in the PATH or specified in the config file.
-- Run cerberus.py with the options required for your project.
+- If the Cerberus environment is not used, make sure the dependencies are in PATH or specified in the config file.
+- Run cerberus-pipeline.py with the options required for your project.
 
 ```bash
-usage: cerberus.py [-c CONFIG] [--mic MIC] [--euk EUK] [--super SUPER]
+usage: cerberus-pipeline.py [-c CONFIG] [--mic MIC] [--euk EUK] [--super SUPER]
                    [--prot PROT] [--nanopore | --illumina | --pacbio]
                    [--dir_out DIR_OUT] [--scaf] [--minscore MINSCORE]
                    [--cpus CPUS] [--replace] [--version] [-h]
-                   [--adapters ADAPTERS] [--refseq REFSEQ]
+                   [--adapters ADAPTERS] [----control_seq SEQUENCE]
 ```
 
 - One of --mic, --euk, --super, or --prot is required.
-- cerberus.py -h will show more details about each option.
+- --help option will show more details about each option.
+
+- example:
 
 ```bash
-python cerberus.py --euk <input file path> 
+python cerberus-pipeline.py --euk <input file path> 
 ```
 
 Output Files
