@@ -3,7 +3,7 @@
 import json
 
 # read file
-f = open('../data/ko00001.json')
+f = open('../data/ko00001_2021-07.json')
 data = json.load(f)
 f.close()
 
