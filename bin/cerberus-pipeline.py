@@ -26,7 +26,7 @@ import ray #multiprocessing
 from cerberus import (
     cerberus_qc, cerberus_trim, cerberus_decon, cerberus_format, cerberus_metastats,
     cerberus_genecall, cerberus_hmmer, cerberus_parser,
-    prot_stats, cerberus_visual, cerberus_report
+    cerberus_prostats, cerberus_visual, cerberus_report
 )
 
 
@@ -421,15 +421,14 @@ Example:
 
     print("Waiting for HMMER")
     hmmFoam = {}
+    jobProtStat = []
     while(jobHMM):
         ready, jobHMM = ray.wait(jobHMM)
         key,value = ray.get(ready[0])
         hmmFoam[key] = value
+        # Protein Stats Jobs
+        jobProtStat.append(rayWorker.remote(cerberus_prostats.getStats, key, [amino[key], value], config, ""))
 
-    #TODO: Testing Protein Stats
-    for key,value in amino.items():
-        prot_stats.getStats([value,hmmFoam[key]], config, "")
-    return
 
     # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")
@@ -453,16 +452,24 @@ Example:
 
     # step 10 (Report)
     print("\nCreating Reports")
+    # Wait for stats jobs
+    protStats = {}
+    while(jobProtStat):
+        ready, jobProtStat = ray.wait(jobProtStat)
+        key,value = ray.get(ready[0])
+        protStats[key] = value
+
     pcaFigures = None
     if len(hmmTables) < 3:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
     else:
         pcaFigures = cerberus_visual.graphPCA(hmmTables)
-    cerberus_report.createReport(hmmTables, figSunburst, figCharts, pcaFigures, config, f"{STEP[10]}")
+    cerberus_report.createReport(hmmTables, protStats, figSunburst, figCharts, pcaFigures, config, f"{STEP[10]}")
 
 
     # Wait for misc jobs
-    ready, pending = ray.wait(jobsQC, num_returns=len(jobsQC), timeout=1) # clear buffer
+    jobs = jobsQC
+    ready, pending = ray.wait(jobs, num_returns=len(jobs), timeout=1) # clear buffer
     while(pending):
         print(f"Waiting for {len(pending)} jobs.")
         ready, pending = ray.wait(pending)

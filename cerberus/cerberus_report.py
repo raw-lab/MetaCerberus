@@ -22,7 +22,7 @@ plotly_source = 'cdn'
 
 
 ######### Create Report ##########
-def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
+def createReport(dicTables, protStats, figSunburst, figCharts, pcaFigure, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
@@ -54,6 +54,16 @@ def createReport(dicTables, figSunburst, figCharts, pcaFigure, config, subdir):
         continue
 
     # PCA Files
+    outpath = os.path.join(path, "combined")
+    os.makedirs(os.path.join(outpath), exist_ok=True)
+    outfile = os.path.join(outpath, "protein_stats.tsv")
+    header = True
+    with open(outfile, 'w') as statsOut:
+        for key,value in protStats.items():
+            if header:
+                print("Sample", *list(value.keys()), sep='\t', file=statsOut)
+                header = False
+            print(key, *value.values(), sep='\t', file=statsOut)
     if pcaFigure:
         outpath = os.path.join(path, "combined")
         os.makedirs(os.path.join(outpath), exist_ok=True)
