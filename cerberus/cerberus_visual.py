@@ -105,7 +105,7 @@ def graphPCA(table_list):
                 #title=data_type,
                 labels=labels)
         else:
-            print("Insufficient data in", data_type, "for 3D PCA Plot")
+            print("WARNING: Insufficient data in", data_type, "results for 3D PCA Plot")
             fig3d = None
 
 
@@ -113,7 +113,7 @@ def graphPCA(table_list):
         # (Key is displayed in the HTML Report and file names)
         if fig3d:
             figPCA[data_type+"_PCA"] = fig3d
-        figPCA[data_type+"_Scree_Plot"] = figScree
+            figPCA[data_type+"_Scree_Plot"] = figScree
         figPCA[data_type+"_Loadings"] = dfLoadings
         figPCA[data_type+"_Loading_Matrix"] = loadings_matrix
         figPCA[data_type+"_PCA_Table"] = df.T.reset_index().rename(columns={'index':'KO'})

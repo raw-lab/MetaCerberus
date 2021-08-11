@@ -56,6 +56,13 @@ function install_conda {
     return
 }
 
+function develop_env {
+  ABSPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+  export PATH="$ABSPATH/bin:$PATH"
+  export PYTHONPATH="$ABSPATH:$PYTHONPATH"
+  return
+}
+
 ### Begin Main Script ###
 
 # Parse Arguments
@@ -78,6 +85,10 @@ while (( "$#" )); do
       ARG_CONDA=true
       shift
       ;;
+    -e|--env)
+      ARG_ENV=true
+      shift
+      ;;
     -h|--help)
       ARG_HELP=true
       shift
@@ -89,7 +100,7 @@ while (( "$#" )); do
   esac
 done
 
-[ ! $ARG_INSTALL $ARG_PIP $ARG_CONDA $ARG_HELP ] && echo "
+[ ! $ARG_INSTALL $ARG_PIP $ARG_CONDA $ARG_ENV $ARG_HELP ] && echo "
 No options given.
 " && ARG_HELP=true
 
@@ -111,3 +122,4 @@ usage: [--path PATH] [--download] [--dependencies] [--help]
 [ $ARG_INSTALL ] && install $ARG_INSTALL && exit 0
 [ $ARG_PIP ] && install_pip && exit 0
 [ $ARG_CONDA ] && install_conda && exit 0
+[ $ARG_ENV ] && develop_env
