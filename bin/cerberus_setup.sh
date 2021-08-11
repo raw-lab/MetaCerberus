@@ -31,8 +31,8 @@ function download_db {
 }
 
 function clean {
-  rm -r "$ABSPATH/$pathFGS"
-  rm -r "$ABSPATH/$pathDB"
+  rm -rf "$ABSPATH/$pathFGS"
+  rm -rf "$ABSPATH/$pathDB"
   return
 }
 ### Begin Main Script ###
@@ -63,7 +63,7 @@ while (( "$#" )); do
   esac
 done
 
-[ ! $ARG_ENV $ARG_DOWN $ARG_FGS $ARG_HELP ] && echo "
+[ ! $ARG_DOWN $ARG_FGS $ARG_CLEAN $ARG_HELP ] && echo "
 No options given.
 " && ARG_HELP=true
 
@@ -77,4 +77,4 @@ usage: [--path PATH] [--download] [--dependencies] [--help]
 
 [ $ARG_FGS ] && install_FGS+
 [ $ARG_DOWN ] && download_db
-[ $ARG_DOWN ] && clean
+[ $ARG_CLEAN ] && clean
