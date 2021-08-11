@@ -11,6 +11,7 @@ function install_FGS+ {
   echo "Cloning FGS+ to $fgspath"
   echo
   git clone https://github.com/hallamlab/FragGeneScanPlus $fgspath
+  rm -rf "$fgspath/.git*"
   make -C $fgspath
   return
 }
@@ -29,6 +30,11 @@ function download_db {
   return
 }
 
+function clean {
+  rm -r "$ABSPATH/$pathFGS"
+  rm -r "$ABSPATH/$pathDB"
+  return
+}
 ### Begin Main Script ###
 
 # Parse Arguments
@@ -40,6 +46,10 @@ while (( "$#" )); do
       ;;
     -f|--fgs)
       ARG_FGS=true
+      shift
+      ;;
+    -c|--clean)
+      ARG_CLEAN=true
       shift
       ;;
     -h|--help)
@@ -62,7 +72,9 @@ usage: [--path PATH] [--download] [--dependencies] [--help]
 
   -d, --download      Download the database files to <cerberus path>/cerberusDB
   -f, --fgs           Clone and install FGS+ to <cerberus path>/FGS+
+  -c, --clean         Removes database files and FGS+
 " && exit 0
 
 [ $ARG_FGS ] && install_FGS+
 [ $ARG_DOWN ] && download_db
+[ $ARG_DOWN ] && clean
