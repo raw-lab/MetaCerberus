@@ -13,6 +13,7 @@ __author__ = "Jose Figueroa"
 
 import sys
 import os
+from os.path import join
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
 import pkg_resources as pkg #to import package data files
@@ -25,7 +26,7 @@ import ray #multiprocessing
 from cerberus import (
     cerberus_qc, cerberus_trim, cerberus_decon, cerberus_format, cerberus_metastats,
     cerberus_genecall, cerberus_hmmer, cerberus_parser,
-    cerberus_visual, cerberus_report
+    prot_stats, cerberus_visual, cerberus_report
 )
 
 
@@ -388,7 +389,10 @@ Example:
     if fasta:
         print("\nSTEP 6: Metaome Stats\n")
         for key,value in fasta.items():
-            jobsQC.append(rayWorker.remote(cerberus_metastats.checkContigs, key, value, config, f"{STEP[6]}/{key}"))
+            if len(ray.nodes()) > 1:
+                jobsQC.append(rayWorker.remote(cerberus_metastats.checkContigs, key, value, config, join(STEP[6], key)))
+            else:
+                cerberus_metastats.checkContigs(value, config, join(STEP[6], key))
 
 
     # step 7 (ORF Finder)
@@ -421,6 +425,11 @@ Example:
         ready, jobHMM = ray.wait(jobHMM)
         key,value = ray.get(ready[0])
         hmmFoam[key] = value
+
+    #TODO: Testing Protein Stats
+    for key,value in amino.items():
+        prot_stats.getStats([value,hmmFoam[key]], config, "")
+    return
 
     # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")
