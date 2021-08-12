@@ -51,10 +51,10 @@ DEPENDENCIES = {
     'EXE_FASTP': 'fastp',
     'EXE_PORECHOP': 'porechop',
     'EXE_BBDUK': 'bbduk.sh',
-    'EXE_CHECKM': 'checkm',
-    'EXE_MAGPURIFY': 'magpurify',
     'EXE_PRODIGAL': 'prodigal',
-    'EXE_HMMSEARCH': 'hmmsearch'}
+    'EXE_HMMSEARCH': 'hmmsearch',
+    'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
+    }
 
 # step names
 STEP = {
@@ -386,14 +386,11 @@ Example:
         fasta[key] = value
 
     # step 6 Metaome Stats
+    jobReadStats = []
     if fasta:
         print("\nSTEP 6: Metaome Stats\n")
         for key,value in fasta.items():
-            if len(ray.nodes()) > 1:
-                jobsQC.append(rayWorker.remote(cerberus_metastats.checkContigs, key, value, config, join(STEP[6], key)))
-            else:
-                cerberus_metastats.checkContigs(value, config, join(STEP[6], key))
-
+                jobReadStats.append(rayWorker.remote(cerberus_metastats.getReadStats, key, value, config, join(STEP[6], key)))
 
     # step 7 (ORF Finder)
     jobGenecall = []
@@ -453,12 +450,19 @@ Example:
     # step 10 (Report)
     print("\nCreating Reports")
     # Wait for stats jobs
+    while(jobReadStats):
+        ready, jobReadStats = ray.wait(jobReadStats)
+        key,value = ray.get(ready[0])
+        outfile = os.path.join(config['DIR_OUT'], STEP[10], key, "read_stats.txt")
+        with open(outfile, 'w') as writer:
+            writer.write(value)
+
     protStats = {}
     while(jobProtStat):
         ready, jobProtStat = ray.wait(jobProtStat)
         key,value = ray.get(ready[0])
         protStats[key] = value
-
+    
     pcaFigures = None
     if len(hmmTables) < 3:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")

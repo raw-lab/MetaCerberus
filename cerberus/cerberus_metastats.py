@@ -2,48 +2,30 @@
 
 """cerberusQCcontigs.py: Module for checking quality of .fastq files
 Uses checkm [https://www.bioinformatics.babraham.ac.uk/projects/fastqc/]
-Uses countfasta.pl
+Uses countfasta.py
 
-$ checkm lineage_wf -t 28 -x fasta -f out.tab --tab_table /data/path/ /data/path/out/
-$ countfasta.pl contigs.fasta >assembly-stats.txt
+$ countfasta.py -f FASTA -i INTERVAL > assembly-stats.txt
 """
+
+#TODO Only run this when using contigs, not RAW Reads, or filtered reads
 
 import os
 import subprocess
 
 
 ## checkContigs
-def checkContigs(contig, config, subdir):
+def getReadStats(contig, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
     
-    contigPath = os.path.dirname(contig)
-    ext = os.path.splitext(contig)[1][1:]
-    
-    # checkm
-    try:
-        command = f"{config['EXE_CHECKM']} lineage_wf -t {config['CPUS']} -x {ext} -f {path}/out.tab --tab_table {contigPath} {path}"
-        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-            print(f"\nCheckM: {contigPath}\n", file=fout, flush=True)
-            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    except:
-        print(f"Error: checkm processing{contigPath}")
     # countAssembly.py
     try:
-        command = f"countAssembly.py -f {contigPath} -i 100 > {path}/stats.txt"
-        with open(f"{path}/stdout.txt", 'a') as fout, open(f"{path}/stderr.txt", 'a') as ferr:
-            print(f"\ncoutAssembly: {contigPath}\n", file=fout, flush=True)
-            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+        command = [ config['EXE_COUNT_ASSEMBLY'], '-f', contig, '-i 100' ]
+        with open(f"{path}/stderr.txt", 'a') as ferr:
+            proc = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=ferr)
+            stats = proc.stdout.decode('utf-8', 'ignore')
     except:
-        print("Error: countAssembly.py failed: " + contigPath)
-    # magpurify
-    for filename in os.listdir(contigPath):
-        if filename.endswith(tuple(config['EXT_FASTA'])):
-            filepath = f"{contigPath}/{filename}"
-            command = f"{config['EXE_MAGPURIFY']} clean-bin {filepath} {path}/mag {path}/mag-{filename}"
-            with open(f"{path}/stdout.txt", 'a') as fout, open(f"{path}/stderr.txt", 'a') as ferr:
-                print(f"\nMag Purify: {contig}\n", file=fout, flush=True)
-                subprocess.run(command, shell=True, stdout=fout, stderr=ferr)
+        print("Error: countAssembly.py failed: " + subdir)
+        print(command)
 
-
-    return
+    return stats
