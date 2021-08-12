@@ -20,6 +20,7 @@ import pkg_resources as pkg #to import package data files
 import time
 import socket
 import ray #multiprocessing
+import re
 
 
 # our package import.
@@ -448,35 +449,52 @@ Example:
 
 
     # step 10 (Report)
-    print("\nCreating Reports")
-    # Wait for stats jobs
+    print("\nSTEP 10: Creating Reports")
+    outpath = os.path.join(config['DIR_OUT'], STEP[10])
+
+    # write read-stats
     while(jobReadStats):
         ready, jobReadStats = ray.wait(jobReadStats)
         key,value = ray.get(ready[0])
-        outfile = os.path.join(config['DIR_OUT'], STEP[10], key, "read_stats.txt")
+        outfile = os.path.join(outpath, key, "read_stats.txt")
+        os.makedirs(os.path.join(outpath, key), exist_ok=True)
         with open(outfile, 'w') as writer:
             writer.write(value)
 
-    protStats = {}
-    while(jobProtStat):
-        ready, jobProtStat = ray.wait(jobProtStat)
-        key,value = ray.get(ready[0])
-        protStats[key] = value
-    
+    # write protein-stats
+    outfile = os.path.join(outpath, "combined", "protein_stats.tsv")
+    os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
+    header = True
+    with open(outfile, 'w') as statsOut:
+        while(jobProtStat):
+            ready, jobProtStat = ray.wait(jobProtStat)
+            key,value = ray.get(ready[0])
+            if header:
+                print("Sample", *list(value.keys()), sep='\t', file=statsOut)
+                header = False
+            print(key, *value.values(), sep='\t', file=statsOut)
+
+    # write roll-up tables
+    for sample,tables in hmmTables.items():
+        for name,table in tables.items():
+            cerberus_report.writeTables(table, figCharts[sample][2][name], f"{outpath}/{sample}/{name}")
+
+    # figures
     pcaFigures = None
     if len(hmmTables) < 3:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
     else:
         pcaFigures = cerberus_visual.graphPCA(hmmTables)
-    cerberus_report.createReport(hmmTables, protStats, figSunburst, figCharts, pcaFigures, config, f"{STEP[10]}")
+    cerberus_report.createReport(figSunburst, figCharts, pcaFigures, config, STEP[10])
 
 
     # Wait for misc jobs
     jobs = jobsQC
-    ready, pending = ray.wait(jobs, num_returns=len(jobs), timeout=1) # clear buffer
-    while(pending):
-        print(f"Waiting for {len(pending)} jobs.")
-        ready, pending = ray.wait(pending)
+    ready, jobs = ray.wait(jobs, num_returns=len(jobs), timeout=1) # clear buffer
+    while(jobs):
+        print(f"Waiting for {len(jobs)} jobs.")
+        ready, jobs = ray.wait(jobs)
+        print("Finished: ", ray.get(ready[0]))
 
 
     # Finished!

@@ -22,7 +22,7 @@ plotly_source = 'cdn'
 
 
 ######### Create Report ##########
-def createReport(dicTables, protStats, figSunburst, figCharts, pcaFigure, config, subdir):
+def createReport(figSunburst, figCharts, pcaFigure, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
@@ -30,24 +30,10 @@ def createReport(dicTables, protStats, figSunburst, figCharts, pcaFigure, config
     shutil.copy(plotly, path)
 
     # Save XLS and CVS reports and HTML files
-    for sample,table in dicTables.items():
+    for sample,table in figSunburst.items():
         table = table.copy()
         os.makedirs(os.path.join(path, sample), exist_ok=True)
         
-        # Write rollup tables
-        outpath = os.path.join(path, sample)
-        outfile = os.path.join(outpath, sample+'_rollup.tsv')
-        table['Name'] = table['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
-        table.to_csv(outfile, index = False, header=True, sep='\t')
-        outfile = os.path.join(outpath, sample+'_lvl-1.tsv')
-        table[table['Level']==1][['Type','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
-        outfile = os.path.join(outpath, sample+'_lvl-2.tsv')
-        table[table['Level']==2][['Type','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
-        outfile = os.path.join(outpath, sample+'_lvl-3.tsv')
-        table[table['Level']==3][['Type','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
-        outfile = os.path.join(outpath, sample+'_lvl-4.tsv')
-        table[table['Level']==4][['Type','KO Id','Name','Count']].to_csv(outfile, index = False, header=True, sep='\t')
-
         # Write HTML Report
         outpath = os.path.join(path, sample)
         write_HTML_files(outpath, sample, figSunburst[sample], figCharts[sample][0], figCharts[sample][1])
@@ -56,21 +42,13 @@ def createReport(dicTables, protStats, figSunburst, figCharts, pcaFigure, config
     # PCA Files
     outpath = os.path.join(path, "combined")
     os.makedirs(os.path.join(outpath), exist_ok=True)
-    outfile = os.path.join(outpath, "protein_stats.tsv")
-    header = True
-    with open(outfile, 'w') as statsOut:
-        for key,value in protStats.items():
-            if header:
-                print("Sample", *list(value.keys()), sep='\t', file=statsOut)
-                header = False
-            print(key, *value.values(), sep='\t', file=statsOut)
     if pcaFigure:
         outpath = os.path.join(path, "combined")
         os.makedirs(os.path.join(outpath), exist_ok=True)
         outfile = os.path.join(outpath, "combined_report_PCA.html")
         with open(outfile, 'w') as htmlOut:
             htmlOut.write("\n".join(htmlHeader))
-            samples = [s.replace("mic_", '').replace("euk_", '') for s in dicTables.keys()]
+            samples = [s.replace("mic_", '').replace("euk_", '') for s in figSunburst.keys()]
             htmlOut.write(f"<h1>PCA Report for: {', '.join(samples)}<h1>\n")
             for db_type,fig in pcaFigure.items():
                 if type(fig) is pd.DataFrame:
@@ -90,7 +68,7 @@ def write_HTML_files(outpath, sample, figSunburst, FOAM_Charts, KO_Charts):
     
     # Sunburst Plots
     for key,fig in figSunburst.items():
-        with open(f"{outpath}/{sample}_sunburst_{key}.html", 'w') as htmlOut:
+        with open(f"{outpath}/sunburst_{key}.html", 'w') as htmlOut:
             htmlOut.write("\n".join(htmlHeader))
             htmlOut.write(f"<H1>Sunburst summary of {key} Levels</H1>\n")
             htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
@@ -99,7 +77,7 @@ def write_HTML_files(outpath, sample, figSunburst, FOAM_Charts, KO_Charts):
 
 
     # FOAM Bar Charts
-    with open(f"{outpath}/{sample}_FOAM.html", 'w') as htmlOut:
+    with open(f"{outpath}/barchart_FOAM.html", 'w') as htmlOut:
         htmlOut.write("\n".join(htmlHeader))
         htmlOut.write(f"<h1>Cerberus FOAM Report for '{sample}<h1>\n")
         dicFOAM = {}
@@ -140,7 +118,7 @@ def write_HTML_files(outpath, sample, figSunburst, FOAM_Charts, KO_Charts):
         htmlOut.write('\n</body>\n</html>\n')
 
     # KO Bar Charts
-    with open(f"{outpath}/{sample}_KEGG.html", 'w') as htmlOut:
+    with open(f"{outpath}/barchart_KEGG.html", 'w') as htmlOut:
         htmlOut.write("\n".join(htmlHeader))
         htmlOut.write(f"<h1>Cerberus KEGG Report for '{sample}<h1>\n")
         dicKO = {}
@@ -180,3 +158,27 @@ def write_HTML_files(outpath, sample, figSunburst, FOAM_Charts, KO_Charts):
         htmlOut.write('</script>\n')
         htmlOut.write('\n</body>\n</html>\n')
         return
+
+
+########## Write Tables ##########
+def writeTables(table, hierarchy, filePrefix):
+    #TODO: change this table to cleaner format
+    #table['Name'] = table['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
+    #table.to_csv(f"{outpath}/{name}_rollup.tsv", index = False, header=True, sep='\t')
+    
+    ##### Create Hierarchy Table (recursive method) #####
+    def createBarFigs(data, writer, level=0):
+        d = {}
+        for k,v in data.items():
+            print("\t"*level, k, f"\t{v[1]}" if level==3 else '', sep='', file=writer)
+            d[k] = v[1]
+            createBarFigs(v[0], writer, level+1)
+        return
+
+    with open(f"{filePrefix}_rollup.tsv", 'w') as writer:
+        print("Level 1", "Level 2", "Level 3", "Level 4", "KO-Count", sep='\t', file=writer)
+        createBarFigs(hierarchy, writer)
+
+    for i in [1,2,3]:
+        table[table['Level']==i][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
+    table[table['Level']==4][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-4.tsv", index = False, header=True, sep='\t')

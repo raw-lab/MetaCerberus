@@ -167,7 +167,8 @@ def createTables(fileRollup):
     df_FOAM["Count"] = pd.to_numeric(df_FOAM["Count"])
     df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
     
-    # Calculate Level and KO Count TODO: Refactor embedded method out of here
+    # Calculate Level and KO Count
+    # TODO: Refactor embedded method out of here
     def countKO(df):
         dictCount = {}
         for row in range(len(df)):
@@ -186,7 +187,7 @@ def createTables(fileRollup):
     dictKEGG = countKO(df_KEGG)
 
     # Create Level and Count Columns
-    dataFOAM = {'Type':'FOAM',
+    dataFOAM = {#'Type':'FOAM',
         'KO Id':[x[2] for x in dictFOAM.values()],
         'Name':list(dictFOAM.keys()),
         'Level':[x[0] for x in dictFOAM.values()],
@@ -195,7 +196,7 @@ def createTables(fileRollup):
     FT.drop(FT[FT['Name']==''].index, inplace=True)
     FT.drop(FT[FT['Name']=='NA'].index, inplace=True)
 
-    dataKO = {'Type':'KEGG',
+    dataKO = {#'Type':'KEGG',
         'KO Id':[x[2] for x in dictKEGG.values()],
         'Name':list(dictKEGG.keys()),
         'Level':[x[0] for x in dictKEGG.values()],
@@ -204,4 +205,4 @@ def createTables(fileRollup):
     KT.drop(KT[KT['Name']==''].index, inplace=True)
     KT.drop(KT[KT['Name']=='NA'].index, inplace=True)
 
-    return pd.concat([FT,KT])
+    return {'FOAM':FT, 'KEGG':KT}

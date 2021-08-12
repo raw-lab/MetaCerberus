@@ -11,19 +11,19 @@ import plotly.graph_objects as go
 
 
 ########## Create Sunburst Figures ##########
-def graphSunburst(table):
-    count = table['Count']
-    midpoint = np.average(count, weights=count)*2
-
+def graphSunburst(tables):
     figs = {}
-    for db in ["FOAM", "KEGG"]:
-        df = table[table["Type"]==db]
-        sun = px.sunburst(df, path = ['Type','Level','Name'],
-            values = 'Count', color = 'Count',
+    for name,table in tables.items():
+        table = table.copy()
+        table.insert(0,'Type',name)
+        sun = px.sunburst(
+            table, path = ['Type','Level','Name'],
+            values = 'Count',
+            color = 'Count',
             color_continuous_scale = 'RdBu',
-            color_continuous_midpoint = midpoint)
+        )
         sun.update_traces(textfont=dict(size=[20]))
-        figs[db] = sun
+        figs[name] = sun
 
     return figs
 
@@ -31,32 +31,20 @@ def graphSunburst(table):
 ######### Create PCA Graph ##########
 def graphPCA(table_list):
 
-    dfFOAM = pd.DataFrame()
-    dfKEGG = pd.DataFrame()
-    types = ["FOAM", "KEGG"]
-    
-    for sample,table in table_list.items():
-        table = table.drop(table[table['Level']<4].index, inplace=False).copy()
-
-        # FOAM
-        X = table[table['Type']=="FOAM"]
-        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-        row = pd.Series(row, name=sample)
-        dfFOAM = dfFOAM.append(row)
-
-        # KEGG
-        X = table[table['Type']=="KEGG"]
-        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-        row = pd.Series(row, name=sample)
-        dfKEGG = dfKEGG.append(row)
-
-    dfFOAM = dfFOAM.fillna(0).astype(int)
-    dfKEGG = dfKEGG.fillna(0).astype(int)
+    dfTables = {}    
+    for sample,tables in table_list.items():
+        for name,table in tables.items():
+            X = table.drop(table[table['Level']<4].index, inplace=False).copy()
+            row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
+            row = pd.Series(row, name=sample)
+            if name not in dfTables:
+                dfTables[name] = pd.DataFrame()
+            dfTables[name] = dfTables[name].append(row)
 
     # Run PCA and add to Plots
     figPCA = {}
-    for count,df in enumerate([dfFOAM, dfKEGG], 0):
-        data_type = types[count]
+    for name,df in dfTables.items():
+        df = df.fillna(0).astype(int)
 
         # Do PCA
         X = df.copy()
@@ -105,18 +93,18 @@ def graphPCA(table_list):
                 #title=data_type,
                 labels=labels)
         else:
-            print("WARNING: Insufficient data in", data_type, "results for 3D PCA Plot")
+            print("WARNING: Insufficient data in", name, "results for 3D PCA Plot")
             fig3d = None
 
 
         # Add Figures to Dictionary
         # (Key is displayed in the HTML Report and file names)
         if fig3d:
-            figPCA[data_type+"_PCA"] = fig3d
-            figPCA[data_type+"_Scree_Plot"] = figScree
-        figPCA[data_type+"_Loadings"] = dfLoadings
-        figPCA[data_type+"_Loading_Matrix"] = loadings_matrix
-        figPCA[data_type+"_PCA_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
+            figPCA[name+"_PCA"] = fig3d
+            figPCA[name+"_Scree_Plot"] = figScree
+        figPCA[name+"_Loadings"] = dfLoadings
+        figPCA[name+"_Loading_Matrix"] = loadings_matrix
+        figPCA[name+"_PCA_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
         continue
 
     return figPCA
@@ -149,7 +137,7 @@ def graphBarcharts(key, rollupFiles):
                 if name == '':
                     continue
                 if i == 4:
-                    name = f"{ko_id}:{name}"
+                    name = f"{ko_id}: {name}"
                 if name not in dictCount:
                     dictCount[name] = 0
                 dictCount[name] += df['Count'][row]
@@ -165,7 +153,7 @@ def graphBarcharts(key, rollupFiles):
             if name == '':
                 continue
             if i == 4:
-                name = f"{ko_id}:{name}"
+                name = f"{ko_id}: {name}"
             if i == 1:
                 level1 = name
                 if name not in dictFoam:
@@ -194,7 +182,7 @@ def graphBarcharts(key, rollupFiles):
             if name == '':
                 continue
             if i == 4:
-                name = f"{ko_id}:{name}"
+                name = f"{ko_id}: {name}"
             if i == 1:
                 level1 = name
                 if name not in dictKO:
@@ -215,7 +203,7 @@ def graphBarcharts(key, rollupFiles):
                     dictKO[level1][0][level2][0][level3][0][level4][1] += keggCounts[name]
                     print("WARNING: duplicate line in rollup: KEGG: ", key, row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
 
-    return createBarFigs(dictFoam), createBarFigs(dictKO)
+    return createBarFigs(dictFoam), createBarFigs(dictKO), {"FOAM":dictFoam, "KEGG":dictKO}
 
 
 ##### Create Barchart Figures #####

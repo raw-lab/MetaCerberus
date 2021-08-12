@@ -1,0 +1,27 @@
+# to run this file:
+# cerberus-pipeline.py -c test.config
+
+dir_out: temp-results
+
+# nanopore and illumina tests are exclusive
+
+# nanopore test
+#mic: nanopore.fastq
+#nanopore
+
+# illumina tests
+# also difference between mic, euk, meta
+#mic: [Test_R1.fastq, Test_R2.fastq]
+#euk: [Test_R1.fastq, Test_R2.fastq]
+#meta: [Test_R1.fastq Test_R2.fastq]
+#illumina: True
+
+
+# Remove NNNN test
+#super: Scaffolds_with-NNN.fna
+
+# Validated KO test
+#prot: KO_validated_proteins.faa
+
+# 5_genome tests
+mic: 5_genome_folder

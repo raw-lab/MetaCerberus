@@ -28,7 +28,7 @@ def checkSingleRead(singleRead, config, subdir):
     with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
         subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
 
-    return
+    return path
 
 
 ## checkPairedQuality
@@ -41,7 +41,7 @@ def checkPairedRead(pairedRead, config, subdir):
     with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
         subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
 
-    return
+    return path
 
 
 ## End of script
