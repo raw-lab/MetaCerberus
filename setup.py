@@ -30,7 +30,7 @@ setuptools.setup(
     package_data=dict(cerberus_data=['*.fna', '*.json', '*.config', 'plotly-2.0.0.min.js']), # add non-python data to package, relative paths
     license="MIT License", # metadata
     platforms=['Unix'], # metadata
-    classifiers=[ # This is the new updated way
+    classifiers=[ # This is the new updated way for metadata, but old way seems to still be used in some of the output
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
         "Operating System :: Unix",
