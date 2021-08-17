@@ -476,6 +476,7 @@ Example:
 
     # write roll-up tables
     for sample,tables in hmmTables.items():
+        os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
             cerberus_report.writeTables(table, figCharts[sample][2][name], f"{outpath}/{sample}/{name}")
 
@@ -485,6 +486,7 @@ Example:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
     else:
         pcaFigures = cerberus_visual.graphPCA(hmmTables)
+        os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
         cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
     
     # Other report files

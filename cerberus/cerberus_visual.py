@@ -45,7 +45,6 @@ def graphPCA(table_list):
             dfTables[name] = dfTables[name].append(row)
 
     # Run PCA and add to Plots
-    figPCA = {}
     figs = {}
     for name,df in dfTables.items():
         df = df.fillna(0).astype(int)
