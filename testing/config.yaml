@@ -6,13 +6,12 @@ dir_out: temp-results
 # nanopore and illumina tests are exclusive
 
 # nanopore test
-#mic: nanopore.fastq
+#prod: nanopore.fastq
 #nanopore
 
 # illumina tests
-# also difference between mic, euk, meta
-#mic: [Test_R1.fastq, Test_R2.fastq]
-#euk: [Test_R1.fastq, Test_R2.fastq]
+#prod: [Test_R1.fastq, Test_R2.fastq]
+#fgs: [Test_R1.fastq, Test_R2.fastq]
 #meta: [Test_R1.fastq Test_R2.fastq]
 #illumina: True
 
@@ -24,4 +23,4 @@ dir_out: temp-results
 #prot: KO_validated_proteins.faa
 
 # 5_genome tests
-mic: 5_genome_folder
+prod: 5_genome_folder

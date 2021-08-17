@@ -26,19 +26,12 @@ def deconSingleReads(key_value, config, subdir):
 
     refseq = "ref="+config['REFSEQ'] if config['REFSEQ'] else ""
 
-    #if config['NANOPORE'] or config['PACBIO']:
-    #    if value.endswith('.gz'):
-    #        command = f"gunzip -c {value} | NanoLyse | gzip > {deconReads}.gz"
-    #    else:
-    #        command = f"cat {value} | NanoLyse > {deconReads}"
-    #        print(command)
-    #elif config['ILLUMINA']:
-    #    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=33 qtrim=r minlen=50 outm={matched} {refseq} k=31 stats={stats}.txt"
     command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=33 qtrim=r minlen=50 outm={matched} {refseq} k=31 stats={stats}"
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    except:
+    except Exception as e:
+        print(e)
         print("ERROR: Failed to execute:\n", command)
 
     return deconReads
@@ -66,7 +59,8 @@ def deconPairedReads(key_value, config, subdir):
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
         deconReads = (outR1, outR2)
-    except:
+    except Exception as e:
+        print(e)
         print("Failed to execute bbduk Paired End")
 
     return deconReads

@@ -63,12 +63,10 @@ def getStats(faa_fileHmmer: list, config: dict, subdir: str):
     found = [ v['found'] for k,v in proteins.items() if v['found']>1 ]
 
     stats = {
-        "Protein Count": len(proteins),
-        f"Above Min Score ({minscore})": len(found),
-        "Percent > Min Score": round(100.0*len(found)/len(proteins), 2),
-        "AVG KO / Protein": round(stat.mean(found), 2),
+        "Total Protein Count": len(proteins),
+        f"Proteins Above Min Score ({minscore})": len(found),
+        "% Proteins > Min Score": round(100.0*len(found)/len(proteins), 2),
         "Average Protein Length": round(stat.mean(lengths), 2),
-        "Total Length": sum(lengths)
     }
 
     return stats

@@ -5,7 +5,7 @@ import subprocess
 
 
 # Eukaryotic option
-def findORF_euk(contig, config, subdir):
+def findORF_fgs(contig, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
@@ -19,14 +19,17 @@ def findORF_euk(contig, config, subdir):
 
     # TODO: FGS+ freezes when using too many CPUs, try to find way around this or force to 1 CPU
     command = f"{config['EXE_FGS+']} -s {contig} -o {baseOut} -w 1 -r {FGStrain} -t complete -p 6"
-    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    try:
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e)
 
     return faaOut
 
 
 # Microbial option
-def findORF_mic(contig, config, subdir):
+def findORF_prod(contig, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
     fout = open(f"{path}/stdout.txt", 'w')
@@ -38,8 +41,11 @@ def findORF_mic(contig, config, subdir):
         return faaOut
 
     command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff"
-    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    try:
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e)
     
     return faaOut
 
@@ -57,7 +63,10 @@ def findORF_meta(contig, config, subdir):
         return faaOut
 
     command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff -p meta"
-    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    
+    try:
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e)
+
     return faaOut

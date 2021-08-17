@@ -25,8 +25,11 @@ def checkSingleRead(singleRead, config, subdir):
     os.makedirs(path, exist_ok=True)
 
     command = f"{config['EXE_FASTQC']} -o {path} {singleRead}"
-    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    try:
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e)
 
     return path
 
@@ -38,8 +41,11 @@ def checkPairedRead(pairedRead, config, subdir):
     os.makedirs(path, exist_ok=True)
     
     command = f"{config['EXE_FASTQC']} -o {path} {pairedRead[0]} {pairedRead[1]}"
-    with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-        subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    try:
+        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e)
 
     return path
 

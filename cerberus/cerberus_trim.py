@@ -30,7 +30,8 @@ def trimSingleRead(key_value, config, subdir):
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    except:
+    except Exception as e:
+        print(e)
         print("Error: Failed to execute trimSingleRead: " + command)
 
     return trimmedRead
@@ -55,7 +56,8 @@ def trimPairedRead(key_value, config, subdir):
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=False, stdout=fout, stderr=ferr)
-    except:
+    except Exception as e:
+        print(e)
         print("Error: Failed to execute trimPairedRead: " + key_value)
 
     return trimmedReads

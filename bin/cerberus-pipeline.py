@@ -101,14 +101,14 @@ def main():
 At least one sequence is required.
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-> cerberus.py --euk file1.fasta --euk file2.fasta --mic file3.fasta
+> cerberus.py --prod file1.fasta
 > cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
-    required.add_argument('--mic', '--prod', action='append', default=[], help='Procaryote nucleotide sequence (includes microbes, bacteriophage)')
-    required.add_argument('--euk', '--fgs', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
+    required.add_argument('--prod', action='append', default=[], help='Procaryote nucleotide sequence (includes microbes, bacteriophage)')
+    required.add_argument('--fgs', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
     required.add_argument('--meta', action="append", default=[], help="Metagenomic nucleotide sequences (Uses prodigal)")
-    required.add_argument('--super', action='append', default=[], help='Run sequence in both --mic and --euk modes')
+    required.add_argument('--super', action='append', default=[], help='Run sequence in both --prod and --fgs modes')
     required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
     readtype = parser.add_mutually_exclusive_group(required=False)
@@ -139,14 +139,14 @@ Example:
 
     # Merge related arguments
     if args.super:
-        args.euk += args.super
-        args.mic += args.super
+        args.prod += args.super
+        args.fgs += args.super
 
     # Check if required flags are set
-    if not any([args.euk, args.mic, args.meta, args.prot]):
+    if not any([args.prod, args.fgs, args.meta, args.prot]):
         parser.error('At least one sequence must be declared either in the command line or through the config file')
 
-    for file in args.euk + args.mic + args.meta:
+    for file in args.prod + args.fgs + args.meta:
         if '.fastq' in file:
             if not any([args.illumina, args.nanopore, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
@@ -230,15 +230,15 @@ Example:
                 amino[name] = item
             else:
                 print(f'{item} is not a valid protein sequence')
-    # Load microbial input
-    for item in args.mic:
+    # Load prodigal input
+    for item in args.prod:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
             if ext in FILES_FASTQ:
-                fastq['mic_'+name] = item
+                fastq['prod_'+name] = item
             elif ext in FILES_FASTA:
-                fasta['mic_'+name] = item
+                fasta['prod_'+name] = item
             elif ext in FILES_AMINO:
                 print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
                 amino[name] = item
@@ -246,18 +246,18 @@ Example:
             for file in os.listdir(item):
                 ext = os.path.splitext(file)[1]
                 if ext in FILES_FASTQ + FILES_FASTA:
-                    args.mic.append(os.path.join(item, file))
+                    args.prod.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
-    # Load eukaryotic input
-    for item in args.euk:
+    # Load FGS+ input
+    for item in args.fgs:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
             if ext in FILES_FASTQ:
-                fastq['euk_'+name] = item
+                fastq['fgs_'+name] = item
             elif ext in FILES_FASTA:
-                fasta['euk_'+name] = item
+                fasta['fgs_'+name] = item
             elif ext in FILES_AMINO:
                 print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
                 amino[name] = item
@@ -265,7 +265,7 @@ Example:
             for file in os.listdir(item):
                 ext = os.path.splitext(file)[1]
                 if ext in FILES_FASTQ + FILES_FASTA:
-                    args.euk.append(os.path.join(item, file))
+                    args.fgs.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
     # Load metagenomic input
@@ -366,7 +366,8 @@ Example:
 
     # step 5a for cleaning contigs
     jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
-    if fasta:# and "scaf" in config flags:
+    # Only do this if a fasta file was given, not if fastq
+    if fasta:# and "scaf" in config:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
             jobContigs.append(rayWorker.remote(cerberus_format.removeN, key, value, config, f"{STEP[5]}/{key}"))
@@ -398,12 +399,12 @@ Example:
     if fasta:
         print("\nSTEP 7: ORF Finder")
         for key,value in fasta.items():
-            if key.startswith("euk_"):
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_euk, key, value, config, f"{STEP[7]}/{key}"))
+            if key.startswith("fsg_"):
+                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_fgs, key, value, config, f"{STEP[7]}/{key}"))
             elif key.startswith("meta_"):
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
             else:
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_mic, key, value, config, f"{STEP[7]}/{key}"))
+                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_prod, key, value, config, f"{STEP[7]}/{key}"))
 
     # Waiting for GeneCall
     for job in jobGenecall:

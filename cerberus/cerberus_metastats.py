@@ -25,7 +25,8 @@ def getReadStats(contig, config, subdir):
             proc = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=ferr)
             stats = proc.stdout.decode('utf-8', 'ignore')
             writer.write(stats)
-    except:
+    except Exception as e:
+        print(e)
         print("Error: countAssembly.py failed: " + subdir)
         print(command)
 

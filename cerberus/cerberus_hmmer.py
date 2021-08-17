@@ -28,7 +28,8 @@ def searchHMM(aminoAcid, config, subdir):
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=ferr)
             #TODO: Add option to redirect output to file
-    except:
+    except Exception as e:
+        print(e)
         print("Error: failed to run: " + command)
 
     return foamOut
