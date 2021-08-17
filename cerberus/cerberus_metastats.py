@@ -21,9 +21,10 @@ def getReadStats(contig, config, subdir):
     # countAssembly.py
     try:
         command = [ config['EXE_COUNT_ASSEMBLY'], '-f', contig, '-i 100' ]
-        with open(f"{path}/stderr.txt", 'a') as ferr:
+        with open(f"{path}/stderr.txt", 'w') as ferr, open(f"{path}/read-stats.txt", 'w') as writer:
             proc = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=ferr)
             stats = proc.stdout.decode('utf-8', 'ignore')
+            writer.write(stats)
     except:
         print("Error: countAssembly.py failed: " + subdir)
         print(command)

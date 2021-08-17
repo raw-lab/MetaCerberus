@@ -485,7 +485,10 @@ Example:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
     else:
         pcaFigures = cerberus_visual.graphPCA(hmmTables)
-    cerberus_report.createReport(figSunburst, figCharts, pcaFigures, config, STEP[10])
+        cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
+    
+    # Other report files
+    cerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
 
 
     # Wait for misc jobs

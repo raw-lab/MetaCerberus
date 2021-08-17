@@ -30,6 +30,9 @@ def graphSunburst(tables):
 
 ######### Create PCA Graph ##########
 def graphPCA(table_list):
+    if len(table_list) < 3:
+        print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
+        return {}
 
     dfTables = {}    
     for sample,tables in table_list.items():
@@ -43,8 +46,10 @@ def graphPCA(table_list):
 
     # Run PCA and add to Plots
     figPCA = {}
+    figs = {}
     for name,df in dfTables.items():
         df = df.fillna(0).astype(int)
+        figs[name] = {}
 
         # Do PCA
         X = df.copy()
@@ -100,14 +105,14 @@ def graphPCA(table_list):
         # Add Figures to Dictionary
         # (Key is displayed in the HTML Report and file names)
         if fig3d:
-            figPCA[name+"_PCA"] = fig3d
-            figPCA[name+"_Scree_Plot"] = figScree
-        figPCA[name+"_Loadings"] = dfLoadings
-        figPCA[name+"_Loading_Matrix"] = loadings_matrix
-        figPCA[name+"_PCA_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
+            figs[name]["PCA"] = fig3d
+            figs[name]["Scree_Plot"] = figScree
+        figs[name]["Loadings"] = dfLoadings
+        figs[name]["Loading_Matrix"] = loadings_matrix
+        figs[name]["PCA_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
         continue
 
-    return figPCA
+    return figs#figPCA
 
 
 ########## Create Bar Chart Figures ##########

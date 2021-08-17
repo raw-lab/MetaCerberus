@@ -22,7 +22,7 @@ plotly_source = 'cdn'
 
 
 ######### Create Report ##########
-def createReport(figSunburst, figCharts, pcaFigure, config, subdir):
+def createReport(figSunburst, figCharts, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
@@ -39,26 +39,28 @@ def createReport(figSunburst, figCharts, pcaFigure, config, subdir):
         write_HTML_files(outpath, sample, figSunburst[sample], figCharts[sample][0], figCharts[sample][1])
         continue
 
+    return None
+
+
+########## Write PCA Report ##########
+def write_PCA(outpath, pcaFigures):
     # PCA Files
-    outpath = os.path.join(path, "combined")
     os.makedirs(os.path.join(outpath), exist_ok=True)
-    if pcaFigure:
-        outpath = os.path.join(path, "combined")
-        os.makedirs(os.path.join(outpath), exist_ok=True)
-        outfile = os.path.join(outpath, "combined_report_PCA.html")
-        with open(outfile, 'w') as htmlOut:
+
+    for database,figures in pcaFigures.items():
+        prefix = f"{outpath}/{database}"
+        with open(prefix+"_PCA.htm", 'w') as htmlOut:
             htmlOut.write("\n".join(htmlHeader))
-            samples = [s.replace("mic_", '').replace("euk_", '') for s in figSunburst.keys()]
-            htmlOut.write(f"<h1>PCA Report for: {', '.join(samples)}<h1>\n")
-            for db_type,fig in pcaFigure.items():
+            htmlOut.write(f"<h1>PCA Report for {database}<h1>\n")
+            for graph,fig in figures.items():
                 if type(fig) is pd.DataFrame:
-                    fig.to_csv(f"{outpath}/{db_type}.tsv", index=False, header=True, sep='\t')
+                    fig.to_csv(f"{prefix}_{graph}.tsv", index=False, header=True, sep='\t')
                 else:
-                    htmlOut.write(f"<h2 style='text-align:center'>{db_type.replace('_', ' ')}</h2>")
+                    # type= plotly.graph_objs._figure.Figure
+                    htmlOut.write(f"<h2 style='text-align:center'>{graph.replace('_', ' ')}</h2>")
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
                     htmlOut.write(htmlFig + '\n')
             htmlOut.write('\n</body>\n</html>\n')
-
     return None
 
 
