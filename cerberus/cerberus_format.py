@@ -52,27 +52,45 @@ def removeN(fasta, config, subdir):
     if not config['REPLACE'] and os.path.exists(outFasta):
         return outFasta
 
-    with open(fasta) as fileIn, open(outFasta, 'w') as fileOut:
+    with open(fasta) as reader, open(outFasta, 'w') as writer:
         name = ""
-        sequence = ""
-        for line in fileIn:
-            line = line.strip()
+        line = reader.readline().strip()
+        while line:
             if line.startswith('>'):
-                if len(name) > 0:
-                    if 'N' in sequence:
-                        sequences = splitSequence(name, sequence)
-                        fileOut.write('\n'.join(sequences))
-                    else:
-                        fileOut.write(f">{name}\n")
-                        fileOut.write('\n'.join(textwrap.wrap(sequence, 80)))
                 name = line[1:]
                 sequence = ""
-            else:
-                sequence += line
-        if 'N' in sequence:
-            sequences = splitSequence(name, sequence)
-            fileOut.write('\n'.join(sequences))
-        else:
-            fileOut.write(f">{name}\n")
-            fileOut.write('\n'.join(textwrap.wrap(sequence, 80)))
+                line = reader.readline().strip()
+                while line:
+                    if line.startswith('>'):
+                        break
+                    sequence += line.strip()
+                    line = reader.readline().strip()
+                if 'N' in sequence:
+                    sequences = splitSequence(name, sequence)
+                    print('\n'.join(sequences), file=writer)
+                else:
+                    print('>', name, sep='', file=writer)
+                    print('\n'.join(textwrap.wrap(sequence, 80)), file=writer)
+            line = reader.readline().strip()
+
+    return outFasta
+
+
+    proteins = {}
+    with open(fasta) as fileIn, open(outFasta, 'w') as reader:
+        name = ""
+        line = reader.readline()
+        while line:
+            if line.startswith('>'):
+                name = line[1:].rstrip().split(sep=None, maxsplit=1)[0]
+                length = 0
+                line = reader.readline()
+                while line:
+                    if line.startswith('>'):
+                        break
+                    length += len(line.strip())
+                    line = reader.readline()
+                proteins[name] = dict(count=0, found=0, length=length)
+                continue
+            line = reader.readline()
     return outFasta
