@@ -98,7 +98,7 @@ def rollupFOAM(KO_ID_dict, dbFile, outFile):
         next(reader)    # Skip header
         for line in reader:
             KO_ID = line[4]
-            FOAM_info = line[0:4]
+            FOAM_info = [ x if x else '_' for x in line[0:3] ] + [line[5]]
             if KO_ID not in FOAM_dict:
                 FOAM_dict[KO_ID] = []
             if FOAM_info not in FOAM_dict.values():

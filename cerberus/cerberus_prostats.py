@@ -52,7 +52,8 @@ def getStats(faa_fileHmmer: list, config: dict, subdir: str):
 
             if query not in proteins:
                 print("WARNING: Possible bug on line", i, "of HMMER file:", fileHmmer)
-                print(line, '\n\n')
+                print(line, '\n')
+                exit()
             else:
                 proteins[query]['count'] += 1
                 if score >= minscore:

@@ -24,7 +24,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/raw-lab/cerberus",
-    scripts=['bin/cerberus-pipeline.py', 'bin/cerberus_setup.sh', 'bin/cerberusDB.py', 'bin/cerberus_slurm.sh'], # scripts to copy to 'bin' path
+    scripts=['bin/cerberus-pipeline.py', 'bin/cerberus_setup.sh', 'bin/cerberus_slurm.sh'], # scripts to copy to 'bin' path
     packages=['cerberus', 'cerberus_data'], # list of packages, installed to site-packages folder
     package_dir=dict(cerberus='cerberus', cerberus_data='cerberus_data'), # dict with 'package'='relative dir'
     package_data=dict(cerberus_data=['*.fna', '*.json', '*.config', 'plotly-2.0.0.min.js']), # add non-python data to package, relative paths
