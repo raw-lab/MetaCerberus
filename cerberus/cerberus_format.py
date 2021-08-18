@@ -54,43 +54,26 @@ def removeN(fasta, config, subdir):
 
     with open(fasta) as reader, open(outFasta, 'w') as writer:
         name = ""
-        line = reader.readline().strip()
+        line = reader.readline()
         while line:
+            line = line.strip()
             if line.startswith('>'):
                 name = line[1:]
                 sequence = ""
-                line = reader.readline().strip()
+                line = reader.readline()
                 while line:
+                    line = line.strip()
                     if line.startswith('>'):
                         break
-                    sequence += line.strip()
-                    line = reader.readline().strip()
+                    sequence += line
+                    line = reader.readline()
                 if 'N' in sequence:
                     sequences = splitSequence(name, sequence)
                     print('\n'.join(sequences), file=writer)
                 else:
                     print('>', name, sep='', file=writer)
                     print('\n'.join(textwrap.wrap(sequence, 80)), file=writer)
-            line = reader.readline().strip()
-
-    return outFasta
-
-
-    proteins = {}
-    with open(fasta) as fileIn, open(outFasta, 'w') as reader:
-        name = ""
-        line = reader.readline()
-        while line:
-            if line.startswith('>'):
-                name = line[1:].rstrip().split(sep=None, maxsplit=1)[0]
-                length = 0
-                line = reader.readline()
-                while line:
-                    if line.startswith('>'):
-                        break
-                    length += len(line.strip())
-                    line = reader.readline()
-                proteins[name] = dict(count=0, found=0, length=length)
-                continue
+                continue #already got next line, next item in loop
             line = reader.readline()
+
     return outFasta
