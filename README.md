@@ -29,28 +29,29 @@ conda install -c conda-forge -c bioconda fastqc fastp porechop bbmap prodigal hm
 
 #### Available from PyPi (pip)
 
+- ray - <https://github.com/ray-project/ray>
+- metaomestats - <https://github.com/raw-lab/metaome_stats>
+
+- configargparse
 - pandas
 - numpy
 - plotly
 - scikit-learn
-- configargparse
-- ray
-- metaomestats
 
 ### 1) Clone latest build from github
 
 1. Clone github Repo
 
-```bash
-git clone https://github.com/raw-lab/cerberus.git
-```
+    ```bash
+    git clone https://github.com/raw-lab/cerberus.git
+    ```
 
 2. Run Setup File
 
-```bash
-cd cerberus
-python3 install_cerberus.py
-```
+    ```bash
+    cd cerberus
+    python3 install_cerberus.py
+    ```
 
 - --instal option copies the script files to a custom folder and downloads database files
 - --pip option uses pip to install Cerberus from the local folder
@@ -74,15 +75,15 @@ cerberus_setup.py -f -d
 
 1. Anaconda install from bioconda with all dependencies:
 
-```bash
-conda install -c bioconda cerberus
-```
+    ```bash
+    conda install -c bioconda cerberus
+    ```
 
 2. PIP install:
 
-```bash
-pip install cerberus
-```
+    ```bash
+    pip install cerberus
+    ```
 
 - The pip installer will not install all dependencies (since they are not available from pip)
 - Many dependencies will need to be installed manually. Running cerberus will let you know what is missing from your environment.
@@ -118,6 +119,55 @@ usage: cerberus-pipeline.py [-c CONFIG] [--mic MIC] [--euk EUK] [--super SUPER]
 
 ```bash
 python cerberus-pipeline.py --euk <input file path> 
+```
+
+### Multiprocessing / Multi-Computing
+
+Cerberus uses Ray for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
+Cerberus has been tested on a cluster using Slurm <https://github.com/SchedMD/slurm>.  
+  
+A script has been included to facilitate running Cerberus on Slurm. To use Cerberus on a Slurm cluster setup your slurm script run it using sbatch.  
+
+```bash
+sbatch example_script.sh
+```
+
+example script:  
+
+```bash
+#!/usr/bin/env bash
+
+#SBATCH --job-name=test-job
+#SBATCH --nodes=3
+#SBATCH --tasks-per-node=1
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=3TB
+#SBATCH --time=48:00:00
+#SBATCH -e slurm-%j.err
+#SBATCH -o slurm-%j.out
+#SBATCH --mail-type=END,FAIL,REQUEUE
+
+echo "====================================================="
+echo "Start Time  : $(date)"
+echo "Submit Dir  : $SLURM_SUBMIT_DIR"
+echo "Job ID/Name : $SLURM_JOBID / $SLURM_JOB_NAME"
+echo "Node List   : $SLURM_JOB_NODELIST"
+echo "Num Tasks   : $SLURM_NTASKS total [$SLURM_NNODES nodes @ $SLURM_CPUS_ON_NODE CPUs/node]"
+echo "======================================================"
+echo ""
+
+# Load any modules or resources here
+conda activate cerberus
+# source the slurm script to initialize the Ray worker nodes
+source cerberus_slurm.sh
+# run Cerberus
+cerberus-pipeline.py --prod [input_folder] --illumina --dir_out [test_folder]
+
+echo ""
+echo "======================================================"
+echo "End Time   : $(date)"
+echo "======================================================"
+echo ""
 ```
 
 ## Input formats
