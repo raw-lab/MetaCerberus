@@ -71,7 +71,7 @@ pip install git+https://github.com/raw-lab/cerberus/
 cerberus_setup.py -f -d
 ```
 
-### 3) Anaconda and pip installs (comming soon, stable versions)
+### 3) Anaconda and pip installs (coming soon, stable versions)
 
 1. Anaconda install from bioconda with all dependencies:
 
