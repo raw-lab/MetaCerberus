@@ -37,7 +37,7 @@ def graphPCA(table_list):
     dfTables = {}    
     for sample,tables in table_list.items():
         for name,table in tables.items():
-            X = table.drop(table[table['Level']<4].index, inplace=False).copy()
+            X = table[table.Level == 'Function'] #.drop(table[table['Level']<4].index, inplace=False).copy()
             row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
             row = pd.Series(row, name=sample)
             if name not in dfTables:
