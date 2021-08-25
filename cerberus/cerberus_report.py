@@ -75,11 +75,8 @@ def write_PCA(outpath, pcaFigures):
 
 ########## Write Tables ##########
 def writeTables(table, tree, filePrefix):
-    #TODO: change this table to cleaner format
-    #table['Name'] = table['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
-    table.to_csv(f"{filePrefix}_rollup.tsv", index = False, header=True, sep='\t')
     
-    ##### Create Hierarchy Table (recursive method) #####
+    ##### Create Tree Table (recursive method) #####
     def createBarFigs(data, writer, level=0):
         d = {}
         for k,v in data.items():

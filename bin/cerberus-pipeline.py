@@ -476,6 +476,10 @@ Example:
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
             cerberus_report.writeTables(table, figCharts[sample][1][name], f"{outpath}/{sample}/{name}")
+    for sample,tables in hmmRollup.items():
+        os.makedirs(f"{outpath}/{sample}", exist_ok=True)
+        for name,table in tables.items():
+            table.to_csv(f"{outpath}/{sample}/{name}_rollup.tsv", index = False, header=True, sep='\t')
 
     # PCA
     pcaFigures = None
