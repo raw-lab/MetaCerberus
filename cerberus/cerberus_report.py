@@ -28,15 +28,24 @@ def createReport(figSunburst, figCharts, config, subdir):
 
     plotly = pkg.resource_filename('cerberus_data', 'plotly-2.0.0.min.js')
     shutil.copy(plotly, path)
-
-    # Save XLS and CVS reports and HTML files
-    for sample,table in figSunburst.items():
-        table = table.copy()
-        os.makedirs(os.path.join(path, sample), exist_ok=True)
-        
-        # Write HTML Report
+    
+    # Sunburst HTML files
+    for sample,figures in figSunburst.items():
         outpath = os.path.join(path, sample)
-        write_HTML_files(outpath, sample, figSunburst[sample], figCharts[sample][0], figCharts[sample][1])
+        for name,fig in figures.items():
+            with open(f"{outpath}/sunburst_{name}.html", 'w') as htmlOut:
+                htmlOut.write("\n".join(htmlHeader))
+                htmlOut.write(f"<H1>Sunburst summary of {name} Levels</H1>\n")
+                htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
+                htmlOut.write(htmlFig + '\n')
+                htmlOut.write("\n</body>\n</html>\n")
+
+    # Bar Charts
+    for sample,figures in figCharts.items():
+        outpath = os.path.join(path, sample)
+        for name,fig in figures[0].items():
+            outfile = os.path.join(outpath, f"barchart_{name}.html")
+            write_HTML_files(outfile, fig, sample, name)
         continue
 
     return None
@@ -64,109 +73,11 @@ def write_PCA(outpath, pcaFigures):
     return None
 
 
-########## Write HTML Files ##########
-def write_HTML_files(outpath, sample, figSunburst, FOAM_Charts, KO_Charts):
-    # Create HTML Report
-    
-    # Sunburst Plots
-    for key,fig in figSunburst.items():
-        with open(f"{outpath}/sunburst_{key}.html", 'w') as htmlOut:
-            htmlOut.write("\n".join(htmlHeader))
-            htmlOut.write(f"<H1>Sunburst summary of {key} Levels</H1>\n")
-            htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
-            htmlOut.write(htmlFig + '\n')
-            htmlOut.write("\n</body>\n</html>\n")
-
-
-    # FOAM Bar Charts
-    with open(f"{outpath}/barchart_FOAM.html", 'w') as htmlOut:
-        htmlOut.write("\n".join(htmlHeader))
-        htmlOut.write(f"<h1>Cerberus FOAM Report for '{sample}<h1>\n")
-        dicFOAM = {}
-        htmlOut.write('<H2>Foam Levels</H2>\n')
-        htmlOut.write("<H4>*Clicking on a bar in the graph displays the next level.</br>The graph will cycle back to the first level after reaching the last level.</H4>")
-        for title, fig in FOAM_Charts.items():
-            if title == "Level 1":
-                title = "Level 1: FOAM"
-            htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
-            try:
-                id = re.search('<div id="([a-​z0-9-]*)"', htmlFig).group(1)
-            except:
-                continue
-            dicFOAM[id] = title
-            display = "block" if title=="Level 1: FOAM" else "none"
-            htmlFig = htmlFig.replace('<div>', f'<div id="{title}" style="display:{display};">', 1)
-            htmlOut.write(htmlFig + '\n')
-        # Scripts
-        htmlOut.write('<script>\n')
-        for id, title in dicFOAM.items():
-            level = int(title.split(':')[0][-1])
-            htmlOut.write(f"""
-        document.getElementById("{id}").on('plotly_click', function(data){{
-            var name = data.points[0].x;
-            var id = "Level {level+1}: " + name
-            element = document.getElementById(id)
-            if (element !== null)
-                element.style.display = "block";
-            else
-                document.getElementById("Level 1: FOAM").style.display = "block";
-            document.getElementById("{title}").style.display = "none";
-            // Refresh size
-            var event = document.createEvent("HTMLEvents");
-            event.initEvent("resize", true, false);
-            document.dispatchEvent(event);
-        }});""")
-        htmlOut.write('</script>\n')
-        htmlOut.write('\n</body>\n</html>\n')
-
-    # KO Bar Charts
-    with open(f"{outpath}/barchart_KEGG.html", 'w') as htmlOut:
-        htmlOut.write("\n".join(htmlHeader))
-        htmlOut.write(f"<h1>Cerberus KEGG Report for '{sample}<h1>\n")
-        dicKO = {}
-        htmlOut.write('<H2>KO Levels</H2>')
-        htmlOut.write("<H4>*Clicking on a bar in the graph displays the next level.</br>The graph will cycle back to the first level after reaching the last level.</H4>")
-        for title, fig in KO_Charts.items():
-            if title == "Level 1":
-                title = "Level 1: KO"
-            htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
-            try:
-                id = re.search('<div id="([a-​z0-9-]*)"', htmlFig).group(1)
-            except:
-                continue
-            dicKO[id] = title
-            display = "block" if title=="Level 1: KO" else "none"
-            htmlFig = htmlFig.replace('<div>', f'<div id="{title}" style="display:{display};">', 1)
-            htmlOut.write(htmlFig + '\n')
-        # Scripts
-        htmlOut.write('<script>\n')
-        for id, title in dicKO.items():
-            level = int(title.split(':')[0][-1])
-            htmlOut.write(f"""
-        document.getElementById("{id}").on('plotly_click', function(data){{
-            var name = data.points[0].x;
-            var id = "Level {level+1}: " + name
-            element = document.getElementById(id)
-            if (element !== null)
-                element.style.display = "block";
-            else
-                document.getElementById("Level 1: KO").style.display = "block";
-            document.getElementById("{title}").style.display = "none";
-            // Refresh size
-            var event = document.createEvent("HTMLEvents");
-            event.initEvent("resize", true, false);
-            document.dispatchEvent(event);
-        }});""")
-        htmlOut.write('</script>\n')
-        htmlOut.write('\n</body>\n</html>\n')
-        return
-
-
 ########## Write Tables ##########
-def writeTables(table, hierarchy, filePrefix):
+def writeTables(table, tree, filePrefix):
     #TODO: change this table to cleaner format
     #table['Name'] = table['Name'].apply(lambda x: re.sub("^K[0-9]*:", "", x))
-    #table.to_csv(f"{outpath}/{name}_rollup.tsv", index = False, header=True, sep='\t')
+    table.to_csv(f"{filePrefix}_rollup.tsv", index = False, header=True, sep='\t')
     
     ##### Create Hierarchy Table (recursive method) #####
     def createBarFigs(data, writer, level=0):
@@ -177,10 +88,55 @@ def writeTables(table, hierarchy, filePrefix):
             createBarFigs(v[0], writer, level+1)
         return
 
-    with open(f"{filePrefix}_rollup.tsv", 'w') as writer:
+    with open(f"{filePrefix}_tree.tsv", 'w') as writer:
         print("Level 1", "Level 2", "Level 3", "Level 4", "KO-Count", sep='\t', file=writer)
-        createBarFigs(hierarchy, writer)
+        createBarFigs(tree, writer)
+    
+    levels = int(max(table[table.Level != 'Function'].Level))
+    for i in range(1,levels+1):
+        table[table['Level']==str(i)][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
+    table[table['Level']=='Function'][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-ko.tsv", index = False, header=True, sep='\t')
 
-    for i in [1,2,3]:
-        table[table['Level']==i][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
-    table[table['Level']==4][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-4.tsv", index = False, header=True, sep='\t')
+
+########## Write HTML Files ##########
+def write_HTML_files(outfile, figure, sample, name):
+
+    with open(outfile, 'w') as htmlOut:
+        htmlOut.write("\n".join(htmlHeader))
+        htmlOut.write(f"<h1>Cerberus {name} Report for '{sample}<h1>\n")
+        levels = {}
+        htmlOut.write(f'<H2>{name} Levels</H2>\n')
+        htmlOut.write("<H4>*Clicking on a bar in the graph displays the next level.</br>The graph will cycle back to the first level after reaching the last level.</H4>")
+        for title, figure in figure.items():
+            htmlFig = figure.to_html(full_html=False, include_plotlyjs=plotly_source)
+            try:
+                id = re.search('<div id="([a-​z0-9-]*)"', htmlFig).group(1)
+            except:
+                continue
+            levels[id] = title
+            display = "block" if title=="Level 1" else "none"
+            htmlFig = htmlFig.replace('<div>', f'<div id="{title}" style="display:{display};">', 1)
+            htmlOut.write(htmlFig + '\n')
+        # Scripts
+        htmlOut.write('<script>\n')
+        for id, title in levels.items():
+            level = int(title.split(':')[0][-1])
+            htmlOut.write(f"""
+        document.getElementById("{id}").on('plotly_click', function(data){{
+            var name = data.points[0].x;
+            var id = "Level {level+1}: " + name
+            element = document.getElementById(id)
+            if (element !== null)
+                element.style.display = "block";
+            else
+                document.getElementById("Level 1").style.display = "block";
+            document.getElementById("{title}").style.display = "none";
+            // Refresh size
+            var event = document.createEvent("HTMLEvents");
+            event.initEvent("resize", true, false);
+            document.dispatchEvent(event);
+        }});""")
+        htmlOut.write('</script>\n')
+        htmlOut.write('\n</body>\n</html>\n')
+
+        return

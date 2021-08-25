@@ -6,6 +6,8 @@
 3) Convert rollup file to table
 """
 
+from collections import OrderedDict
+from io import FileIO
 import os
 import csv
 import pandas as pd
@@ -81,128 +83,71 @@ def parseHmmer(fileHmmer, config, subdir):
             KO_ID_counts[KO_ID] += 1
 
     # Write rollup files to disk
-    if config['REPLACE'] or not os.path.exists(rollupFileFOAM):
-        rollupFOAM(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), rollupFileFOAM)
-    if config['REPLACE'] or not os.path.exists(rollupFileKEGG):
-        rollupKEGG(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "KO_classification.txt"), rollupFileKEGG)
+    dfRollup = dict()
 
-    return (rollupFileFOAM, rollupFileKEGG)
+    dfRollup['FOAM'] = rollup(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), path)
+    dfRollup['KEGG'] = rollup(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "KEGG-onto_rel.tsv"), path)
+
+    for name,df in dfRollup.items():
+        outfile = os.path.join( path, "HMMER_BH_"+name+"_rollup.tsv" )
+        if config['REPLACE'] or not os.path.exists(outfile):
+            df.to_csv(outfile, index=False, header=True, sep='\t')
+        else:
+            dfRollup[name] = pd.read_csv(outfile, sep='\t', dtype=dict(Count=int))
+            dfRollup[name] = dfRollup[name].fillna('')
+
+    return dfRollup
 
 
-######### FOAM Roll-Up #########
-def rollupFOAM(KO_ID_dict, dbFile, outFile):
-    # Read FOAM information
-    FOAM_dict = {}
-    with open(dbFile, "r") as csvFile:
-        reader = csv.reader(csvFile, delimiter="\t")
-        next(reader)    # Skip header
-        for line in reader:
-            KO_ID = line[4]
-            FOAM_info = [ x if x else '_' for x in line[0:3] ] + [line[5]]
-            if KO_ID not in FOAM_dict:
-                FOAM_dict[KO_ID] = []
-            if FOAM_info not in FOAM_dict.values():
-                FOAM_dict[KO_ID].append(FOAM_info)
+######### Roll-Up #########
+def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
+    dfLookup = pd.read_csv(lookupFile, sep='\t')
+    dfRollup = pd.DataFrame()
 
-    # Match FOAM info with found KO
-    with open(outFile, "w") as fileWriter:
-        for KO_ID in sorted(KO_ID_dict.keys()):
-            if KO_ID not in FOAM_dict:
-                with open(os.path.dirname(outFile)+'/foam.err', 'a+') as errlog:
-                    print("WARNING: not found in FOAM DB:", KO_ID, file=errlog)
+    errfile = os.path.join( outpath, os.path.basename(lookupFile)+'.err' )
+    with open(errfile, 'w') as errlog:
+        for KO_ID,count in KO_COUNTS.items():
+            rows = pd.DataFrame(dfLookup[dfLookup.KO==KO_ID]).fillna('')
+            if rows.empty:
+                print("WARNING:'", KO_ID, "'not found in Lookup File", file=errlog)
                 continue
-            for info in FOAM_dict[KO_ID]:
-                outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], info]])
-                fileWriter.write(outline + "\n")
-    return
+            rows.drop(rows[rows['Function']==''].index, inplace=True)
+            if rows.empty:
+                print("WARNING:'", KO_ID, "'Does not have a 'Function' in Lookup File", file=errlog)
+                continue
+            rows['Count'] = count
+            dfRollup = dfRollup.append(rows, ignore_index=True)
 
-
-######### KEGG Roll-Up #########
-def rollupKEGG(KO_ID_dict, dbFile, outFile):
-    # Read KEGG information
-    KEGG_dict = {}
-    with open(dbFile, "r") as csvFile:
-        reader = csv.reader(csvFile, delimiter="\t")
-        for line in reader:
-            if line[0] != "":
-                tier_1 = line[0]
-                continue
-            if line[1] != "":
-                tier_2 = line[1]
-                continue
-            if line[2] != "":
-                pathway = line[3]
-                continue
-            KO_ID = line[3]
-            KEGG_info = [tier_1, tier_2, pathway] + line[4:]
-            if KO_ID not in KEGG_dict:
-                KEGG_dict[KO_ID] = []
-            KEGG_dict[KO_ID].append(KEGG_info)
-
-    # Match KEGG info with found KO
-    with open(outFile, "w") as fileWriter:
-        for KO_ID in sorted(KO_ID_dict.keys()):
-            if KO_ID not in KEGG_dict:
-                with open(os.path.dirname(outFile)+'/kegg.err', 'a+') as errlog:
-                    print("WARNING: not found in KEGG DB:", KO_ID, file=errlog)
-                continue
-            for info in KEGG_dict[KO_ID]:
-                outline = "\t".join([str(s) for s in [KO_ID, KO_ID_dict[KO_ID], info]])
-                fileWriter.write(outline + "\n")
-    return
+    return dfRollup
 
 
 ########## createTables #########
-def createTables(fileRollup):
-    df_FOAM = pd.read_csv(fileRollup[0], names=['Id','Count','Info'], delimiter='\t')
-    df_KEGG = pd.read_csv(fileRollup[1], names=['Id','Count','Info'], delimiter='\t')
-
-    # Reformat data. This lambda method avoids chained indexing
-    # Splits string into list, strips brackets and quotes
-    helper = lambda x : [i.strip("'") for i in x.strip('[]').split("', ")]
-    # call helper method to reformat 'FOAM' and 'KEGG' columns
-    df_FOAM['Info'] = df_FOAM['Info'].apply(helper)
-    df_KEGG['Info'] = df_KEGG['Info'].apply(helper)
-    # Convert 'Count" column to numeric
-    df_FOAM["Count"] = pd.to_numeric(df_FOAM["Count"])
-    df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
-    
-    # Calculate Level and KO Count
-    # TODO: Refactor embedded method out of here
-    def countKO(df):
+def createCountTables(dfRollup):
+    dfCounts = dict()
+    for dbName,df in dfRollup.items():
         dictCount = {}
-        for row in range(len(df)):
-            ko_id = df['Id'][row]
-            for level,name in enumerate(df['Info'][row], 1):
-                if name == '':
+        for _,row in df.iterrows():
+            for colName,colData in row.iteritems():
+                if not colName.startswith('L'):
                     continue
-                if level == 4:
-                    name = f"{ko_id}:{name}"
+                level = colName[1]
+                name = colData
+                if not name:
+                    continue
                 if name not in dictCount:
-                    dictCount[name] = [level, 0, ko_id if level==4 else ""]
-                dictCount[name][1] += df['Count'][row]
-        return dictCount
+                    dictCount[name] = [level, 0, ""]
+                dictCount[name][1] += row['Count']
+            name = row.Function
+            if not name:
+                continue
+            if name not in dictCount:
+                dictCount[name] = ['Function', 0, row.KO]
+            dictCount[name][1] += row['Count']
+        data = {
+        'KO Id':[x[2] for x in dictCount.values()],
+        'Name':list(dictCount.keys()),
+        'Level':[x[0] for x in dictCount.values()],
+        'Count':[x[1] for x in dictCount.values()]}
+        dfCounts[dbName] = pd.DataFrame(data=data)
 
-    dictFOAM = countKO(df_FOAM)
-    dictKEGG = countKO(df_KEGG)
-
-    # Create Level and Count Columns
-    dataFOAM = {#'Type':'FOAM',
-        'KO Id':[x[2] for x in dictFOAM.values()],
-        'Name':list(dictFOAM.keys()),
-        'Level':[x[0] for x in dictFOAM.values()],
-        'Count':[x[1] for x in dictFOAM.values()]}
-    FT = pd.DataFrame(data=dataFOAM)
-    FT.drop(FT[FT['Name']==''].index, inplace=True)
-    FT.drop(FT[FT['Name']=='NA'].index, inplace=True)
-
-    dataKO = {#'Type':'KEGG',
-        'KO Id':[x[2] for x in dictKEGG.values()],
-        'Name':list(dictKEGG.keys()),
-        'Level':[x[0] for x in dictKEGG.values()],
-        'Count':[x[1] for x in dictKEGG.values()]}
-    KT = pd.DataFrame(data=dataKO)
-    KT.drop(KT[KT['Name']==''].index, inplace=True)
-    KT.drop(KT[KT['Name']=='NA'].index, inplace=True)
-
-    return {'FOAM':FT, 'KEGG':KT}
+    return dfCounts

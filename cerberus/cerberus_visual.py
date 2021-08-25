@@ -14,15 +14,15 @@ import plotly.graph_objects as go
 def graphSunburst(tables):
     figs = {}
     for name,table in tables.items():
-        table = table.copy()
-        table.insert(0,'Type',name)
+        data = table.copy()
+        data['Type'] = name
         sun = px.sunburst(
-            table, path = ['Type','Level','Name'],
+            data, path = ['Type','Level','Name'],
             values = 'Count',
             color = 'Count',
             color_continuous_scale = 'RdBu',
         )
-        sun.update_traces(textfont=dict(size=[20]))
+        sun.update_traces(textfont=dict(family=['Arial Black', 'Arial'],size=[15]))
         figs[name] = sun
 
     return figs
@@ -115,116 +115,81 @@ def graphPCA(table_list):
 
 
 ########## Create Bar Chart Figures ##########
-def graphBarcharts(key, rollupFiles):
-    #TODO: restructure code to avoid loading rollup files and counting twice (fist in parser.py)
-    df_FOAM = pd.read_csv(rollupFiles[0], names=['Id','Count','Info'], delimiter='\t')
-    df_KEGG = pd.read_csv(rollupFiles[1], names=['Id','Count','Info'], delimiter='\t')
-
-    # Reformat data. This lambda method avoids chained indexing
-    # Splits string into list, strips brackets and quotes
-    helper = lambda x : [i.strip("'") for i in x.strip('[]').split("', ")]
-    # call helper method to reformat 'FOAM' and 'KO' columns
-    df_FOAM['Info'] = df_FOAM['Info'].apply(helper)
-    df_KEGG['Info'] = df_KEGG['Info'].apply(helper)
-    # Convert 'Count" column to numeric
-    df_FOAM["Count"] = pd.to_numeric(df_FOAM["Count"])
-    df_KEGG["Count"] = pd.to_numeric(df_KEGG["Count"])
-
-
-    # Enumerate data
-    # TODO: Refactor this
-    def countLevels(df):
-        dictCount = {}
-        for row in range(len(df)):
-            ko_id = df['Id'][row]
-            for i,name in enumerate(df['Info'][row],1):
-                if name == '':
+def graphBarcharts(key, dfRollup):
+    # Count layers
+    dictCount = dict()
+    for dbName,df in dfRollup.items():
+        if dbName not in dictCount:
+            dictCount[dbName] = dict()
+        for _,row in df.iterrows():
+            for colName,colData in row.iteritems():
+                if not colName.startswith('L'):
                     continue
-                if i == 4:
-                    name = f"{ko_id}: {name}"
-                if name not in dictCount:
-                    dictCount[name] = 0
-                dictCount[name] += df['Count'][row]
-        return dictCount
-    foamCounts = countLevels(df_FOAM)
-    keggCounts = countLevels(df_KEGG)
-    
-    # FOAM
-    dictFoam = {}
-    for row in range(len(df_FOAM)):
-        ko_id = df_FOAM['Id'][row]
-        for i,name in enumerate(df_FOAM['Info'][row], 1):
-            if name == '':
+                level = colName[1]
+                name = colData
+                if not name:
+                    continue
+                if name not in dictCount[dbName]:
+                    dictCount[dbName][name] = 0
+                dictCount[dbName][name] += row.Count
+            level = int(level) + 1
+            if not row.Function:
                 continue
-            if i == 4:
-                name = f"{ko_id}: {name}"
-            if i == 1:
-                level1 = name
-                if name not in dictFoam:
-                    dictFoam[level1] = {}, foamCounts[name]
-            elif i == 2:
-                level2 = name
-                if name not in dictFoam[level1][0]:
-                    dictFoam[level1][0][level2] = {}, foamCounts[name]
-            elif i == 3:
-                level3 = name
-                if name not in dictFoam[level1][0][level2][0]:
-                    dictFoam[level1][0][level2][0][level3] = {}, foamCounts[name]
-            else:
-                level4 = name
-                if level4 not in dictFoam[level1][0][level2][0][level3][0]:
-                    dictFoam[level1][0][level2][0][level3][0][level4] = [{}, foamCounts[name]]
-                else:
-                    dictFoam[level1][0][level2][0][level3][0][level4][1] += foamCounts[name]
-                    print("WARNING: duplicate line in rollup: FOAM: ", key, row, name, df_FOAM['Info'][row]) #TODO: Remove when bugs not found
+            name = f"{row.KO}: {row.Function}"
+            if name not in dictCount[dbName]:
+                dictCount[dbName][name] = 0
+            dictCount[dbName][name] += row.Count
 
-    # KO
-    dictKO = {}
-    for row in range(len(df_KEGG)):
-        ko_id = df_KEGG['Id'][row]
-        for i,name in enumerate(df_KEGG['Info'][row], 1):
-            if name == '':
+    # Recursively add branches to tree    
+    def buildTree(branch, cols, dbName):
+        if cols:
+            name = cols.pop(0)
+            while not name:
+                name = cols.pop(0)
+            if name not in branch[0]:
+                branch[0][name] = ({}, 0) if not name else ({}, dictCount[dbName][name])
+            #else:
+                #print("WARNING: duplicate line in rollup: ", dbName, name, cols) #TODO: Remove when bugs not found
+            buildTree(branch[0][name], cols, dbName)
+
+    # Add rows to tree
+    dbTrees = dict()
+    for dbName,df in dfRollup.items():
+        tree = [dict(), 0]
+        for _,row in df.iterrows():
+            cols = list()
+            for colName,colData in row.iteritems():
+                if colName.startswith('L'):
+                    cols.append(colData)
+            if not row.Function:
                 continue
-            if i == 4:
-                name = f"{ko_id}: {name}"
-            if i == 1:
-                level1 = name
-                if name not in dictKO:
-                    dictKO[level1] = {}, keggCounts[name]
-            elif i == 2:
-                level2 = name
-                if name not in dictKO[level1][0]:
-                    dictKO[level1][0][level2] = {}, keggCounts[name]
-            elif i == 3:
-                level3 = name
-                if name not in dictKO[level1][0][level2][0]:
-                    dictKO[level1][0][level2][0][level3] = {}, keggCounts[name]
-            else:
-                level4 = name
-                if level4 not in dictKO[level1][0][level2][0][level3][0]:
-                    dictKO[level1][0][level2][0][level3][0][level4] = [{}, keggCounts[name]]
-                else:
-                    dictKO[level1][0][level2][0][level3][0][level4][1] += keggCounts[name]
-                    print("WARNING: duplicate line in rollup: KEGG: ", key, row, name, df_KEGG['Info'][row]) #TODO: Remove when bugs not found
+            cols.append(f"{row.KO}: {row.Function}")
+            buildTree(tree, cols, dbName)
+        dbTrees[dbName] = tree[0]
 
-    return createBarFigs(dictFoam), createBarFigs(dictKO), {"FOAM":dictFoam, "KEGG":dictKO}
+    # Create Figures
+    figs = dict()
+    for dbName,tree in dbTrees.items():
+        figs[dbName] = createBarFigs(tree)
+
+    return figs, dbTrees
 
 
 ##### Create Barchart Figures #####
-def createBarFigs(data, level=1, name=""):
+def createBarFigs(tree, level=1, name=""):
     chart = {}
-    d = {}
-    for k,v in data.items():
+    data = {}
+    for k,v in tree.items():
         #print("\t"*level, k, ' ', v[1], sep='')
-        d[k] = v[1]
+        data[k] = v[1]
         chart.update(createBarFigs(v[0], level+1, k)) # updating from empty dic does nothing
-    if len(d): #if no data at this level, just return the empty chart{}
+    if len(data): #if no data at this level, just return the empty chart{}
         title = f"Level {level}: {name}".strip().strip(':')
         fig = go.Figure( # Create the figure of this level's data
             layout={'title':title,
                 'yaxis_title':"KO Count"},
-            data=[go.Bar(x=list(d.keys()), y=list(d.values()))])
-        if max(d.values()) < 20: # to remove decimals from graph with low counts
+            data=[go.Bar(x=list(data.keys()), y=list(data.values()))])
+        if max(data.values()) < 20: # to remove decimals from graph with low counts
             fig.update_yaxes(dtick=1)
         chart[title] = fig
     return chart

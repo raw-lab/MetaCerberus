@@ -3,12 +3,14 @@
 import json
 import re
 import pandas as pd
+from collections import OrderedDict
 
 
 in_FOAM = "../bin/cerberusDB/FOAM-onto_rel1.tsv"
 out_FOAM = "FOAM-onto_rel1.tsv"
 in_KO = "ko00001_2021-07.json"
 out_KO = "KO_classification.txt"
+out_KEGG = "KEGG-onto_rel.tsv"
 
 
 #### Recursive Method to load nested json file ####
@@ -30,6 +32,27 @@ def parse_json(dicData, writer, level=0):
     return table
 
 
+#### Recursive Method to load nested json file ####
+regex = re.compile(" \[EC:([^;]*)\]")
+def convert_json(dicData, writer, level=0, parents={}):
+    table = {}
+    if level > 0: #first level contains no writable data
+        name = dicData['name'].split(maxsplit=1)
+        if level < 4:
+            parents[level] = name[1]
+        else:
+            match = regex.search(name[1])
+            ec = match.group(1) if match else ''
+            name[1] = regex.sub("", name[1])
+            print('\t'.join(parents.values()), name[0], name[1], ec, sep='\t', file=writer)
+            table[ name[0] ] = name[1]
+    for value in dicData.values():
+        if type(value) is list:
+            for item in value:
+                table.update( convert_json(item, writer, level+1, parents) )
+    return table
+
+
 #### START ####
 
 # read file
@@ -37,7 +60,11 @@ with open(in_KO) as reader:
     data = json.load(reader)
 
 # parse json
-table = parse_json(data, open(out_KO, 'w'))
+#with open(out_KO, 'w') as writer:
+#    table = parse_json(data, writer)
+with open(out_KEGG, 'w') as writer:
+    print("L1", "L2", "L3", "KO", "Function", "EC", sep='\t', file=writer)
+    table = convert_json(data, writer)
 
 # add functions from KEGG to FOAM
 koNames = {}

@@ -12,7 +12,7 @@ python=3.7
 
 Cerberus currently runs best with Python version 3.7 due to compatibility with dependencies, namely "Ray".
 
-#### Available from bioconda
+#### Available from Bioconda
 
 - fastqc - <https://github.com/s-andrews/FastQC>
 - fastp - <https://github.com/OpenGene/fastp>
@@ -71,7 +71,7 @@ pip install git+https://github.com/raw-lab/cerberus/
 cerberus_setup.py -f -d
 ```
 
-### 3) Anaconda and pip installs (comming soon, stable versions)
+### 3) Anaconda and pip installs (coming soon, stable versions)
 
 1. Anaconda install from bioconda with all dependencies:
 
@@ -141,8 +141,7 @@ example script:
 #SBATCH --nodes=3
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=3TB
-#SBATCH --time=48:00:00
+#SBATCH --mem=256MB
 #SBATCH -e slurm-%j.err
 #SBATCH -o slurm-%j.out
 #SBATCH --mail-type=END,FAIL,REQUEUE

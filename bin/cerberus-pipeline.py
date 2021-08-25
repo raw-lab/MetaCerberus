@@ -77,7 +77,7 @@ def eprint(*args, **kwargs):
     return
 
 def logTime(dirout, host, funcName, path, time):
-    with open(f'{dirout}/time.txt', 'a+') as outTime:
+    with open(f'{dirout}/time.tsv', 'a+') as outTime:
         print(host, funcName, time, path, file=outTime, sep='\t')
     return
 
@@ -418,34 +418,30 @@ Example:
     for key,value in amino.items():
         jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
 
-    print("Waiting for HMMER")
     hmmFoam = {}
     jobProtStat = []
-    while(jobHMM):
-        ready, jobHMM = ray.wait(jobHMM)
-        key,value = ray.get(ready[0])
-        hmmFoam[key] = value
-        # Protein Stats Jobs
-        jobProtStat.append(rayWorker.remote(cerberus_prostats.getStats, key, [amino[key], value], config, ""))
-
-
-    # step 9 (Parser)
-    print("\nSTEP 9: Parse HMMER results")
     jobParse = []
-    for key,value in hmmFoam.items():
+    ray.wait(jobHMM) # Pause for message
+    print("\nSTEP 9: Parse HMMER results")
+    while(jobHMM):
+        readyHMM, jobHMM = ray.wait(jobHMM)
+        key,value = ray.get(readyHMM[0])
+        hmmFoam[key] = value
+        # step 9 (Parser)
         jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
+        # Protein Stats Jobs
+        jobProtStat.append(rayWorker.remote(cerberus_prostats.getStats, key, [amino[key], value], config, f"{STEP[8]}/{key}"))
 
-    print("Waiting for parsed results")
     hmmRollup = {}
-    hmmTables = {}
+    hmmCounts = {}
     figSunburst = {}
     figCharts = {}
     while(jobParse):
         ready, jobParse = ray.wait(jobParse)
         key,value = ray.get(ready[0])
         hmmRollup[key] = value
-        hmmTables[key] = cerberus_parser.createTables(value)
-        figSunburst[key] = cerberus_visual.graphSunburst(hmmTables[key])
+        hmmCounts[key] = cerberus_parser.createCountTables(value)
+        figSunburst[key] = cerberus_visual.graphSunburst(hmmCounts[key])
         figCharts[key] = cerberus_visual.graphBarcharts(key, value)
 
 
@@ -476,21 +472,21 @@ Example:
             print(key, *value.values(), sep='\t', file=statsOut)
 
     # write roll-up tables
-    for sample,tables in hmmTables.items():
+    for sample,tables in hmmCounts.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            cerberus_report.writeTables(table, figCharts[sample][2][name], f"{outpath}/{sample}/{name}")
+            cerberus_report.writeTables(table, figCharts[sample][1][name], f"{outpath}/{sample}/{name}")
 
-    # figures
+    # PCA
     pcaFigures = None
-    if len(hmmTables) < 3:
+    if len(hmmCounts) < 3:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
     else:
-        pcaFigures = cerberus_visual.graphPCA(hmmTables)
+        pcaFigures = cerberus_visual.graphPCA(hmmCounts)
         os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
         cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
     
-    # Other report files
+    # Figures
     cerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
 
 
