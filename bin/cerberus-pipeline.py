@@ -105,7 +105,7 @@ Example:
 > cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
-    required.add_argument('--prod', action='append', default=[], help='Procaryote nucleotide sequence (includes microbes, bacteriophage)')
+    required.add_argument('--prod', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
     required.add_argument('--fgs', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
     required.add_argument('--meta', action="append", default=[], help="Metagenomic nucleotide sequences (Uses prodigal)")
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --prod and --fgs modes')
