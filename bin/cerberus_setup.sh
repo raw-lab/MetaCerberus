@@ -25,7 +25,7 @@ function download_db {
 
   wget https://osf.io/72p6g/download -v -O "$dbdir/FOAM_readme.txt" -c
   wget https://osf.io/muan4/download -v -O "$dbdir/FOAM-onto_rel1.tsv" -c
-  wget https://osf.io/2hp7t/download -v -O "$dbdir/KO_classification.txt" -c
+  wget https://osf.io/2hp7t/download -v -O "$dbdir/KEGG-onto_rel1.tsv" -c
   wget https://osf.io/bdpv5/download -v -O "$dbdir/FOAM-hmm_rel1a.hmm.gz" -c
   return
 }

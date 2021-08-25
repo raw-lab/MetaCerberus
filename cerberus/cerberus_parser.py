@@ -85,8 +85,11 @@ def parseHmmer(fileHmmer, config, subdir):
     # Write rollup files to disk
     dfRollup = dict()
 
-    dfRollup['FOAM'] = rollup(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv"), path)
-    dfRollup['KEGG'] = rollup(KO_ID_counts, os.path.join(config["PATH"], "cerberusDB", "KEGG-onto_rel.tsv"), path)
+    dbPath = os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv")
+    dfRollup['FOAM'] = rollup(KO_ID_counts, dbPath, path)
+
+    dbPath = os.path.join(config["PATH"], "cerberusDB", "KEGG-onto_rel1.tsv")
+    dfRollup['KEGG'] = rollup(KO_ID_counts, dbPath, path)
 
     for name,df in dfRollup.items():
         outfile = os.path.join( path, "HMMER_BH_"+name+"_rollup.tsv" )
@@ -109,11 +112,11 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
         for KO_ID,count in KO_COUNTS.items():
             rows = pd.DataFrame(dfLookup[dfLookup.KO==KO_ID]).fillna('')
             if rows.empty:
-                print("WARNING:'", KO_ID, "'not found in Lookup File", file=errlog)
+                print("WARNING:'", KO_ID, "'not found in the Lookup File", file=errlog)
                 continue
             rows.drop(rows[rows['Function']==''].index, inplace=True)
             if rows.empty:
-                print("WARNING:'", KO_ID, "'Does not have a 'Function' in Lookup File", file=errlog)
+                print("WARNING:'", KO_ID, "'Does not have a 'Function' in the Lookup File", file=errlog)
                 continue
             rows['Count'] = count
             dfRollup = dfRollup.append(rows, ignore_index=True)
