@@ -136,13 +136,16 @@ def createCountTables(dfRollup):
                 level = colName[1]
                 name = colData
                 if not name:
-                    continue
+                    name = f"Level {level}"
+                else:
+                    name = f"lvl{level}: {name}"
                 if name not in dictCount:
                     dictCount[name] = [level, 0, ""]
                 dictCount[name][1] += row['Count']
             name = row.Function
             if not name:
                 continue
+            name = f"{row.KO}: {name}"
             if name not in dictCount:
                 dictCount[name] = ['Function', 0, row.KO]
             dictCount[name][1] += row['Count']

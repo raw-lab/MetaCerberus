@@ -8,12 +8,9 @@ import os
 import statistics as stat
 
 
-def getStats(faa_fileHmmer: list, config: dict, subdir: str):
+def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict):
     #path = os.path.join(config['DIR_OUT'], subdir)
     #os.makedirs(path, exist_ok=True)
-
-    faa = faa_fileHmmer[0]
-    fileHmmer = faa_fileHmmer[1]
 
     minscore = config["MINSCORE"]
 
@@ -67,7 +64,9 @@ def getStats(faa_fileHmmer: list, config: dict, subdir: str):
         "Total Protein Count": len(proteins),
         f"Proteins Above Min Score ({minscore})": len(found),
         "% Proteins > Min Score": round(100.0*len(found)/len(proteins), 2),
-        "Average Protein Length": round(stat.mean(lengths), 2),
+        "Average Protein Length": round(stat.mean(lengths), 2)
     }
+    for dbName,df in dfCount.items():
+        stats[dbName+' KO Count'] = df[df['Level']=='Function']['Count'].sum()
 
     return stats

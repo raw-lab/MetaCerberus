@@ -5,9 +5,8 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from functools import reduce
-import plotly.express as px  # (version 4.7.0)
+import plotly.express as px
 import plotly.graph_objects as go
-#import plotly.subplots as sp
 
 
 ########## Create Sunburst Figures ##########
@@ -115,39 +114,21 @@ def graphPCA(table_list):
 
 
 ########## Create Bar Chart Figures ##########
-def graphBarcharts(key, dfRollup):
-    # Count layers
-    dictCount = dict()
-    for dbName,df in dfRollup.items():
-        if dbName not in dictCount:
-            dictCount[dbName] = dict()
-        for _,row in df.iterrows():
-            for colName,colData in row.iteritems():
-                if not colName.startswith('L'):
-                    continue
-                level = colName[1]
-                name = colData
-                if not name:
-                    continue
-                if name not in dictCount[dbName]:
-                    dictCount[dbName][name] = 0
-                dictCount[dbName][name] += row.Count
-            level = int(level) + 1
-            if not row.Function:
-                continue
-            name = f"{row.KO}: {row.Function}"
-            if name not in dictCount[dbName]:
-                dictCount[dbName][name] = 0
-            dictCount[dbName][name] += row.Count
+def graphBarcharts(dfRollup, dfCounts):
+    dfCounts = dfCounts.copy()
 
+    # Set index for our dataframes
+    for dbName,df in dfCounts.items():
+        dfCounts[dbName] = df.set_index('Name', inplace=False)
+    
     # Recursively add branches to tree    
     def buildTree(branch, cols, dbName):
         if cols:
             name = cols.pop(0)
             while not name:
-                name = cols.pop(0)
+                 name = cols.pop(0)
             if name not in branch[0]:
-                branch[0][name] = ({}, 0) if not name else ({}, dictCount[dbName][name])
+                branch[0][name] = ({}, 0) if not name else ({}, dfCounts[dbName].loc[name,'Count'])
             #else:
                 #print("WARNING: duplicate line in rollup: ", dbName, name, cols) #TODO: Remove when bugs not found
             buildTree(branch[0][name], cols, dbName)
@@ -160,7 +141,11 @@ def graphBarcharts(key, dfRollup):
             cols = list()
             for colName,colData in row.iteritems():
                 if colName.startswith('L'):
-                    cols.append(colData)
+                    level = colName[1]
+                    if not colData:
+                        cols.append(f"Level {level}")
+                    else:
+                        cols.append(f"lvl{level}: {colData}")
             if not row.Function:
                 continue
             cols.append(f"{row.KO}: {row.Function}")
@@ -185,6 +170,7 @@ def createBarFigs(tree, level=1, name=""):
         chart.update(createBarFigs(v[0], level+1, k)) # updating from empty dic does nothing
     if len(data): #if no data at this level, just return the empty chart{}
         title = f"Level {level}: {name}".strip().strip(':')
+        data = dict(sorted(data.items(), key=lambda item: item[1], reverse=True)[:20])
         fig = go.Figure( # Create the figure of this level's data
             layout={'title':title,
                 'yaxis_title':"KO Count"},

@@ -20,7 +20,6 @@ import pkg_resources as pkg #to import package data files
 import time
 import socket
 import ray #multiprocessing
-import re
 
 
 # our package import.
@@ -419,7 +418,6 @@ Example:
         jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
 
     hmmFoam = {}
-    jobProtStat = []
     jobParse = []
     ray.wait(jobHMM) # Pause for message
     print("\nSTEP 9: Parse HMMER results")
@@ -430,19 +428,20 @@ Example:
         # step 9 (Parser)
         jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
         # Protein Stats Jobs
-        jobProtStat.append(rayWorker.remote(cerberus_prostats.getStats, key, [amino[key], value], config, f"{STEP[8]}/{key}"))
 
     hmmRollup = {}
     hmmCounts = {}
+    protStats = {}
     figSunburst = {}
     figCharts = {}
     while(jobParse):
         ready, jobParse = ray.wait(jobParse)
         key,value = ray.get(ready[0])
         hmmRollup[key] = value
-        hmmCounts[key] = cerberus_parser.createCountTables(value)
+        hmmCounts[key] = cerberus_parser.createCountTables(hmmRollup[key])
+        protStats[key] = cerberus_prostats.getStats(amino[key], hmmFoam[key], hmmCounts[key], config)
         figSunburst[key] = cerberus_visual.graphSunburst(hmmCounts[key])
-        figCharts[key] = cerberus_visual.graphBarcharts(key, value)
+        figCharts[key] = cerberus_visual.graphBarcharts(hmmRollup[key], hmmCounts[key])
 
 
     # step 10 (Report)
@@ -463,9 +462,7 @@ Example:
     os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
     header = True
     with open(outfile, 'w') as statsOut:
-        while(jobProtStat):
-            ready, jobProtStat = ray.wait(jobProtStat)
-            key,value = ray.get(ready[0])
+        for key,value in protStats.items():
             if header:
                 print("Sample", *list(value.keys()), sep='\t', file=statsOut)
                 header = False
@@ -506,6 +503,7 @@ Example:
     # Finished!
     print("\nFinished Pipeline")
     logTime(config["DIR_OUT"], socket.gethostname(), "master", config["DIR_OUT"], f"{time.time()-start:.2f} seconds")
+
     return 0
 
 

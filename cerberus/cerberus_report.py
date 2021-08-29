@@ -74,8 +74,12 @@ def write_PCA(outpath, pcaFigures):
 
 
 ########## Write Tables ##########
-def writeTables(table, tree, filePrefix):
-    
+def writeTables(table: pd.DataFrame, tree, filePrefix):
+    table = table.copy()
+
+    regex = re.compile(r"^lvl[0-9]: ")
+    table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
+
     ##### Create Tree Table (recursive method) #####
     def createBarFigs(data, writer, level=0):
         d = {}
@@ -89,9 +93,12 @@ def writeTables(table, tree, filePrefix):
         print("Level 1", "Level 2", "Level 3", "Level 4", "KO-Count", sep='\t', file=writer)
         createBarFigs(tree, writer)
     
+
     levels = int(max(table[table.Level != 'Function'].Level))
     for i in range(1,levels+1):
         table[table['Level']==str(i)][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
+    regex = re.compile(r"^K[0-9]*: ")
+    table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
     table[table['Level']=='Function'][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-ko.tsv", index = False, header=True, sep='\t')
 
 
