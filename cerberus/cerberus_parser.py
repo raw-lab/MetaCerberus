@@ -124,24 +124,22 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
     return dfRollup
 
 
-########## createTables #########
+########## Counts Table #########
 def createCountTables(dfRollup):
     dfCounts = dict()
     for dbName,df in dfRollup.items():
         dictCount = {}
-        for _,row in df.iterrows():
+        for i,row in df.iterrows():
             for colName,colData in row.iteritems():
                 if not colName.startswith('L'):
                     continue
                 level = colName[1]
                 name = colData
-                if not name:
-                    name = f"Level {level}"
-                else:
+                if name:
                     name = f"lvl{level}: {name}"
-                if name not in dictCount:
-                    dictCount[name] = [level, 0, ""]
-                dictCount[name][1] += row['Count']
+                    if name not in dictCount:
+                        dictCount[name] = [level, 0, ""]
+                    dictCount[name][1] += row['Count']
             name = row.Function
             if not name:
                 continue

@@ -66,7 +66,7 @@ def write_PCA(outpath, pcaFigures):
                     fig.to_csv(f"{prefix}_{graph}.tsv", index=False, header=True, sep='\t')
                 else:
                     # type= plotly.graph_objs._figure.Figure
-                    htmlOut.write(f"<h2 style='text-align:center'>{graph.replace('_', ' ')}</h2>")
+                    #htmlOut.write(f"<h2 style='text-align:center'>{graph.replace('_', ' ')}</h2>")
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
                     htmlOut.write(htmlFig + '\n')
             htmlOut.write('\n</body>\n</html>\n')
@@ -74,29 +74,16 @@ def write_PCA(outpath, pcaFigures):
 
 
 ########## Write Tables ##########
-def writeTables(table: pd.DataFrame, tree, filePrefix):
+def writeTables(table: pd.DataFrame, filePrefix: os.PathLike):
     table = table.copy()
 
     regex = re.compile(r"^lvl[0-9]: ")
     table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
 
-    ##### Create Tree Table (recursive method) #####
-    def createBarFigs(data, writer, level=0):
-        d = {}
-        for k,v in data.items():
-            print("\t"*level, k, f"\t{v[1]}" if level==3 else '', sep='', file=writer)
-            d[k] = v[1]
-            createBarFigs(v[0], writer, level+1)
-        return
-
-    with open(f"{filePrefix}_tree.tsv", 'w') as writer:
-        print("Level 1", "Level 2", "Level 3", "Level 4", "KO-Count", sep='\t', file=writer)
-        createBarFigs(tree, writer)
-    
-
     levels = int(max(table[table.Level != 'Function'].Level))
     for i in range(1,levels+1):
-        table[table['Level']==str(i)][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
+        filter = table['Level']==str(i)
+        table[filter][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
     regex = re.compile(r"^K[0-9]*: ")
     table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
     table[table['Level']=='Function'][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-ko.tsv", index = False, header=True, sep='\t')

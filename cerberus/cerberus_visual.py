@@ -2,27 +2,46 @@
 
 import numpy as np
 import pandas as pd
+from pandas.core.frame import DataFrame
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from functools import reduce
 import plotly.express as px
 import plotly.graph_objects as go
 
+# global vars
+BAR_LIMIT = 20
+SUN_LIMIT = 50
+
 
 ########## Create Sunburst Figures ##########
 def graphSunburst(tables):
     figs = {}
-    for name,table in tables.items():
-        data = table.copy()
-        data['Type'] = name
+    for dbName,table in tables.items():
+        df: pd.DataFrame = table.copy()
+
+        # Filter top MAX_DEPTH
+        levels = int(max(df[df.Level != 'Function'].Level))
+        dfLevels = []
+        for i in range(1,levels+1):
+            filter = df['Level']==str(i)
+            dfLevels.append( df[filter].sort_values(by='Count', ascending=False, inplace=False).head(SUN_LIMIT) )
+        filter = df['Level']=='Function'
+        dfLevels.append( df[df['Level']=='Function'].sort_values(by='Count', ascending=False, inplace=False).head(SUN_LIMIT) )
+        df = pd.concat(dfLevels)
+
+        # Add the Database Type for parent
+        df['Type'] = dbName
+
+        # Create Sunburst Figure
         sun = px.sunburst(
-            data, path = ['Type','Level','Name'],
+            df, path = ['Type','Level','Name'],
             values = 'Count',
             color = 'Count',
-            color_continuous_scale = 'RdBu',
+            color_continuous_scale = 'RdBu'
         )
         sun.update_traces(textfont=dict(family=['Arial Black', 'Arial'],size=[15]))
-        figs[name] = sun
+        figs[dbName] = sun
 
     return figs
 
@@ -82,7 +101,8 @@ def graphPCA(table_list):
         figScree = px.bar(
             x=range(1, pca.n_components_+1),
             y=np.round(pca.explained_variance_ratio_*100, decimals=2),
-            labels={'x':'Principal Component', 'y':'Percent Variance Explained'}
+            labels={'x':'Principal Component', 'y':'Percent Variance Explained'},
+            title="Scree Plot"
         )
         figScree.update_xaxes(dtick=1)
         
@@ -142,14 +162,11 @@ def graphBarcharts(dfRollup, dfCounts):
             for colName,colData in row.iteritems():
                 if colName.startswith('L'):
                     level = colName[1]
-                    if not colData:
-                        cols.append(f"Level {level}")
-                    else:
+                    if colData:
                         cols.append(f"lvl{level}: {colData}")
-            if not row.Function:
-                continue
-            cols.append(f"{row.KO}: {row.Function}")
-            buildTree(tree, cols, dbName)
+            if row.Function:
+                cols.append(f"{row.KO}: {row.Function}")
+                buildTree(tree, cols, dbName)
         dbTrees[dbName] = tree[0]
 
     # Create Figures
@@ -167,15 +184,16 @@ def createBarFigs(tree, level=1, name=""):
     for k,v in tree.items():
         #print("\t"*level, k, ' ', v[1], sep='')
         data[k] = v[1]
-        chart.update(createBarFigs(v[0], level+1, k)) # updating from empty dic does nothing
+        chart.update(createBarFigs(v[0], level+1, k)) # updating from empty dict does nothing
     if len(data): #if no data at this level, just return the empty chart{}
         title = f"Level {level}: {name}".strip().strip(':')
-        data = dict(sorted(data.items(), key=lambda item: item[1], reverse=True)[:20])
+        data = dict(sorted(data.items(), key=lambda item: item[1], reverse=True)[:BAR_LIMIT])
         fig = go.Figure( # Create the figure of this level's data
             layout={'title':title,
                 'yaxis_title':"KO Count"},
-            data=[go.Bar(x=list(data.keys()), y=list(data.values()))])
-        if max(data.values()) < 20: # to remove decimals from graph with low counts
+            data=[go.Bar(x=list(data.keys()), y=list(data.values()))]
+            )
+        if max(data.values()) < 20: # to remove decimals from graph with low counts, let plotly decide tick marks otherwise
             fig.update_yaxes(dtick=1)
         chart[title] = fig
     return chart

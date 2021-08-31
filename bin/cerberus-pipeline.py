@@ -452,7 +452,7 @@ Example:
     while(jobReadStats):
         ready, jobReadStats = ray.wait(jobReadStats)
         key,value = ray.get(ready[0])
-        outfile = os.path.join(outpath, key, "read_stats.txt")
+        outfile = os.path.join(outpath, key, "fasta_stats.txt")
         os.makedirs(os.path.join(outpath, key), exist_ok=True)
         with open(outfile, 'w') as writer:
             writer.write(value)
@@ -472,13 +472,13 @@ Example:
     for sample,tables in hmmCounts.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            cerberus_report.writeTables(table, figCharts[sample][1][name], f"{outpath}/{sample}/{name}")
+            cerberus_report.writeTables(table, f"{outpath}/{sample}/{name}")
     for sample,tables in hmmRollup.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
             table.to_csv(f"{outpath}/{sample}/{name}_rollup.tsv", index = False, header=True, sep='\t')
 
-    # PCA
+    # HTML of PCA
     pcaFigures = None
     if len(hmmCounts) < 3:
         print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
@@ -487,7 +487,7 @@ Example:
         os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
         cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
     
-    # Figures
+    # HTML of Figures
     cerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
 
 
