@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""rheaDecon.py: Module to clean trimmed .fastq files
+"""cerberus_decon.py: Module to clean trimmed .fastq files
 Uses bbduk [https://sourceforge.net/projects/bbmap/]
 
 $ bbduk.sh -Xmx1g in=trim.fastq out=decon.fastq qtrim=rtrimq=25 maq=25 minlen=50 outm=matched.fq ref=~/bbmap/resources/phix174_ill.ref.fa.gz k=31 stats=out.txt

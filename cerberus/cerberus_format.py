@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""rheaFormat.py: Module for reformating FASTQ files to FASTA files
+"""cerberus_format.py: Module for reformating FASTQ files to FASTA files
 Also removes N's
 
 """

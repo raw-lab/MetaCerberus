@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""cerberusQCcontigs.py: Module for checking quality of .fastq files
+"""cerberus_metastats.py: Module for checking quality of .fastq files
 Uses checkm [https://www.bioinformatics.babraham.ac.uk/projects/fastqc/]
 Uses countfasta.py
 

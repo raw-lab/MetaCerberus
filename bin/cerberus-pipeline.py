@@ -24,7 +24,7 @@ import ray #multiprocessing
 
 # our package import.
 from cerberus import (
-    cerberus_qc, cerberus_trim, cerberus_decon, cerberus_format, cerberus_metastats,
+    cerberus_qc, cerberus_merge, cerberus_trim, cerberus_decon, cerberus_format, cerberus_metastats,
     cerberus_genecall, cerberus_hmmer, cerberus_parser,
     cerberus_prostats, cerberus_visual, cerberus_report
 )
@@ -48,6 +48,7 @@ REFSEQ = {
 # external dependencies
 DEPENDENCIES = {
     'EXE_FASTQC': 'fastqc',
+    'EXE_FLASH' : 'flash2',
     'EXE_FASTP': 'fastp',
     'EXE_PORECHOP': 'porechop',
     'EXE_BBDUK': 'bbduk.sh',
@@ -304,57 +305,33 @@ Example:
     jobTrim = []
     if fastq:
         print("\nSTEP 3: Trimming fastq files")
+        # Merge Paired End Reads
+        fastqPaired = {k:v for k,v in fastq.items() if "R1.fastq" in v and v.replace("R1.fastq", "R2.fastq") in fastq.values() }
+        for key,value in fastqPaired.items():
+            reverse = fastq.pop(key.replace("R1", "R2"))
+            fastq[key] = cerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
+        # Trim
         for key,value in fastq.items():
-            if "R1.fastq" in value:
-                reverse = value.replace("R1.fastq", "R2.fastq")
-                if reverse in fastq.values():
-                    print("Paired end found:", key)
-                    jobTrim.append(rayWorker.remote(cerberus_trim.trimPairedRead, key, [key, [value,reverse]], config, f"{STEP[3]}/{key}"))
-                    continue
-            if "R2.fastq" in value and value.replace("R2.fastq", "R1.fastq") in fastq.values():
-                print("Skipping reverse read:", key)
-                continue
             jobTrim.append(rayWorker.remote(cerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
 
     # Wait for Trimmed Reads
-    trimmedReads = {}
     for job in jobTrim:
         key,value = ray.get(job)
-        if type(value) is str:
-            trimmedReads[key] = value
-        else:
-            rev = key.replace("R1", "R2")
-            trimmedReads[key] = value[0]
-            trimmedReads[rev] = value[1]
+        fastq[key] = value
         jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
     jobDecon = []
-    if trimmedReads:
+    if fastq and config['ILLUMINA']:
         print("\nSTEP 4: Decontaminating trimmed files")
-        for key,value in trimmedReads.items():
-            if "R1.fastq" in value:
-                reverse = value.replace("R1.fastq", "R2.fastq")
-                if reverse in fastq.values():
-                    print("Paired end found:", key)
-                    jobDecon.append(rayWorker.remote(cerberus_decon.deconPairedReads, key, [key, [value,reverse]], config, f"{STEP[4]}/{key}"))
-                    continue
-            if "R2.fastq" in value and value.replace("R2.fastq", "R1.fastq") in fastq.values():
-                print("Skipping reverse read:", key)
-                continue
+        for key,value in fastq.items():
             jobDecon.append(rayWorker.remote(cerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
 
     # Wait for Decontaminating Reads
-    deconReads = {}
     for job in jobDecon:
         key,value = ray.get(job)
-        if type(value) is str:
-            deconReads[key] = value
-        else:
-            rev = key.replace("R1", "R2")
-            deconReads[key] = value[0]
-            deconReads[rev] = value[1]
+        fastq[key] = value
         jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[4]}/{key}/quality"))
 
 
@@ -372,9 +349,9 @@ Example:
 
     # step 5b Format (convert fq to fna. Remove quality scores and N's)
     jobFormat = []
-    if deconReads:
+    if fastq:
         print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
-        for key,value in deconReads.items():
+        for key,value in fastq.items():
             jobFormat.append(rayWorker.remote(cerberus_format.reformat, key, value, config, f"{STEP[5]}/{key}"))
 
     for job in jobFormat:
@@ -473,9 +450,9 @@ Example:
     jobs = jobsQC
     ready, jobs = ray.wait(jobs, num_returns=len(jobs), timeout=1) # clear buffer
     while(jobs):
-        print(f"Waiting for {len(jobs)} jobs.")
+        print(f"Waiting for {len(jobs)} jobs:", end=' ')
         ready, jobs = ray.wait(jobs)
-        print("Finished: ", ray.get(ready[0]))
+        print(ray.get(ready[0]))
 
 
     # Finished!

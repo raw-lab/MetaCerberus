@@ -44,7 +44,7 @@ function install_conda {
 
     # create the cerberus environment in conda
     conda env remove --name cerberus -y
-    conda create -n cerberus -c conda-forge -c bioconda fastqc fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn configargparse python=3.7 -y
+    conda create -n cerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn configargparse python=3.7 -y
 
     # install additional pip requirements
     conda activate cerberus
@@ -112,7 +112,7 @@ usage: [--path PATH] [--download] [--dependencies] [--help]
                         Assumes dependencies are already installed.
                         (requires 'unzip', 'wget', and 'git')
     -p, --pip           Instal Cerberus using pip from local folder.
-                        Assumes dependencies are already installed.
+                        Dependencies must be installed manually.
                         (requires 'pip')
     -c, --conda         Creates a conda environment named 'cerberus' with all dependencies and installs Cerberus in it
                         (requires Anaconda3 to be installed)
