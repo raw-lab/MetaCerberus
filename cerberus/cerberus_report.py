@@ -52,6 +52,59 @@ def createReport(figSunburst, figCharts, config, subdir):
 
 
 ########## Write PCA Report ##########
+def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: dict):
+    dictStats = protStats.copy()
+
+    # Merge Stats
+    nstatLabels = ['N25', 'N50', 'N75', 'N90']
+    trimLabels = ['passed', 'low quality', 'too many Ns', 'too short', 'low complexity', 'adapter trimmed', 'bases: adapters', 'duplication rate %']
+    deconLabels = ['contaminants', 'QTrimmed', 'Total Removed', 'Results']
+    reNstats = re.compile(r"N25[\w\s:%()]*>= ([0-9]*)[\w\s:%()]*>= ([0-9]*)[\w\s:%()]*>= ([0-9]*)[\w\s:%()]*>= ([0-9]*)")
+    reGC = re.compile(r"GC count:\s*([0-9]*)[\w\s]*%:\s*([.0-9]*)")
+    reTrim = re.compile(r"Filtering result:[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)")
+    reDecon = re.compile(r"([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)")
+    for key,value in readStats.items():
+        # GC Count
+        gcCount = reGC.search(value, re.MULTILINE)
+        if gcCount: dictStats[key]['GC count'] = gcCount.group(1)
+        if gcCount: dictStats[key]['GC %'] = gcCount.group(2)
+        # N25-N90
+        Nstats = reNstats.search(value, re.MULTILINE)
+        if Nstats:
+            for i,label in enumerate(nstatLabels, 1):
+                dictStats[key][label] = Nstats.group(i)
+        # Trimmed stats
+        infile = os.path.join(config['DIR_OUT'], config['STEP'][3], key, "stderr.txt")
+        try:
+            trimStats = '\n'.join(open(infile).readlines())
+            trim = reTrim.search(trimStats, re.MULTILINE)
+            if trim:
+                for i,label in enumerate(trimLabels, 1):
+                    dictStats[key]['trim: '+label] = trim.group(i)
+        except: pass
+        # Decon stats
+        infile = os.path.join(config['DIR_OUT'], config['STEP'][4], key, "stderr.txt")
+        try:
+            deconStats = '\n'.join(open(infile).readlines())
+            decon = reDecon.search(deconStats, re.MULTILINE)
+            if decon:
+                for i,label in enumerate(deconLabels, 0):
+                    dictStats[key]['decon: reads'+label] = decon.group(i*2+1)
+                    dictStats[key]['decon: bases'+label] = decon.group(i*2+2)
+        except: pass
+        # Write fasta stats to file
+        outfile = os.path.join(outpath, key, "fasta_stats.txt")
+        os.makedirs(os.path.join(outpath, key), exist_ok=True)
+        with open(outfile, 'w') as writer:
+            writer.write(value)
+    #Write Combined Stats to File
+    outfile = os.path.join(outpath, "combined", "stats.tsv")
+    os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
+    pd.DataFrame(dictStats).to_csv(outfile, sep='\t')
+    return
+
+
+########## Write PCA Report ##########
 def write_PCA(outpath, pcaFigures):
     # PCA Files
     os.makedirs(os.path.join(outpath), exist_ok=True)

@@ -83,7 +83,7 @@ def logTime(dirout, host, funcName, path, time):
 ## RAY WORKER THREAD ##
 @ray.remote
 def rayWorker(func, key, value, config, path):
-    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, "start")
+    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, time.strftime("%H:%M:%S", time.localtime()))
     start = time.time()
     ret = func(value, config, path)
     logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, f"{time.time()-start:.2f} seconds")
@@ -156,12 +156,12 @@ Example:
                     args.control_seq = REFSEQ["lambda"]
                 if args.pacbio:
                     args.control_seq = REFSEQ["pacbio"]
-    args
 
     # Initialize Config Dictionary
     config = {}
     config['PATH'] = os.path.dirname(os.path.abspath(__file__))
     config['EXE_FGS+'] = os.path.abspath(os.path.join(config['PATH'], "FGS+/FGS+"))
+    config['STEP'] = STEP
     
     # load all args into config
     for arg,value in args.__dict__.items():
@@ -333,8 +333,6 @@ Example:
     jobDecon = []
     if trimmedReads:
         print("\nSTEP 4: Decontaminating trimmed files")
-#        for key,value in trimmedReads.items():
-#            jobDecon.append(rayWorker.remote(cerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
         for key,value in trimmedReads.items():
             if "R1.fastq" in value:
                 reverse = value.replace("R1.fastq", "R2.fastq")
@@ -349,9 +347,6 @@ Example:
 
     # Wait for Decontaminating Reads
     deconReads = {}
-    #for job in jobDecon:
-        #key,value = ray.get(job)
-        #deconReads[key] = value
     for job in jobDecon:
         key,value = ray.get(job)
         if type(value) is str:
@@ -387,11 +382,11 @@ Example:
         fasta[key] = value
 
     # step 6 Metaome Stats
-    jobReadStats = []
+    readStats = {}
     if fasta:
         print("\nSTEP 6: Metaome Stats\n")
         for key,value in fasta.items():
-                jobReadStats.append(rayWorker.remote(cerberus_metastats.getReadStats, key, value, config, join(STEP[6], key)))
+                readStats[key] = cerberus_metastats.getReadStats(value, config, join(STEP[6], key))
 
     # step 7 (ORF Finder)
     jobGenecall = []
@@ -448,25 +443,8 @@ Example:
     print("\nSTEP 10: Creating Reports")
     outpath = os.path.join(config['DIR_OUT'], STEP[10])
 
-    # write read-stats
-    while(jobReadStats):
-        ready, jobReadStats = ray.wait(jobReadStats)
-        key,value = ray.get(ready[0])
-        outfile = os.path.join(outpath, key, "fasta_stats.txt")
-        os.makedirs(os.path.join(outpath, key), exist_ok=True)
-        with open(outfile, 'w') as writer:
-            writer.write(value)
-
-    # write protein-stats
-    outfile = os.path.join(outpath, "combined", "protein_stats.tsv")
-    os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
-    header = True
-    with open(outfile, 'w') as statsOut:
-        for key,value in protStats.items():
-            if header:
-                print("Sample", *list(value.keys()), sep='\t', file=statsOut)
-                header = False
-            print(key, *value.values(), sep='\t', file=statsOut)
+    # Write Stats
+    cerberus_report.write_Stats(outpath, readStats, protStats, config)
 
     # write roll-up tables
     for sample,tables in hmmCounts.items():
