@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import shutil
+import base64
 import re
+from dominate.util import raw
 import pandas as pd
 import pkg_resources as pkg
+import plotly.express as px
+import dominate
+from dominate.tags import *
 
 
-#GLOBAL standard html header to include plotly script
+### GLOBAL Variables ###
+
+# standard html header to include plotly script
 htmlHeader = [
     '<html>',
     '<head><meta charset="utf-8" />',
@@ -18,7 +26,10 @@ htmlHeader = [
 # TODO: Option for how to include plotly.js.
 # False uses script in <head>, 'cdn' loads from internet.
 # Can I use both???
-plotly_source = 'cdn'
+PLOTLY_SOURCE = 'cdn'
+
+# style.css
+STYLESHEET = pkg.resource_stream('cerberus_data', 'style.css').read().decode()
 
 
 ######### Create Report ##########
@@ -36,7 +47,7 @@ def createReport(figSunburst, figCharts, config, subdir):
             with open(f"{outpath}/sunburst_{name}.html", 'w') as htmlOut:
                 htmlOut.write("\n".join(htmlHeader))
                 htmlOut.write(f"<H1>Sunburst summary of {name} Levels</H1>\n")
-                htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
+                htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                 htmlOut.write(htmlFig + '\n')
                 htmlOut.write("\n</body>\n</html>\n")
 
@@ -51,7 +62,7 @@ def createReport(figSunburst, figCharts, config, subdir):
     return None
 
 
-########## Write PCA Report ##########
+########## Write Stats ##########
 def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: dict):
     dictStats = protStats.copy()
 
@@ -97,11 +108,59 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
         os.makedirs(os.path.join(outpath, key), exist_ok=True)
         with open(outfile, 'w') as writer:
             writer.write(value)
+
     #Write Combined Stats to File
     outfile = os.path.join(outpath, "combined", "stats.tsv")
     os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
-    pd.DataFrame(dictStats).to_csv(outfile, sep='\t')
-    return
+    dfStats = pd.DataFrame(dictStats)
+    dfStats.to_csv(outfile, sep='\t')
+
+    outfile = os.path.join(outpath, "combined", "stats.html")
+    df = dfStats.T[['Total Protein Count', 'Proteins Above Min Score (25)']].reset_index()
+    df = df.melt(id_vars=['index'], var_name='proteins', value_name='value')
+
+    figStats = px.bar(df, x='index', y='value',
+        color='proteins', barmode='overlay',
+        labels=dict(proteins="", index="Sample Name", value="Protein Count")
+    )
+    # HTML Plots of Stats
+    with dominate.document(title='Stats Report') as doc:
+        with doc.head:
+            meta(charset="utf-8")
+            script(type="text/javascript", src="plotly-2.0.0.min.js")
+            with style(type="text/css"):
+                raw('\n'+STYLESHEET)
+        with div(cls="document", id="cerberus-summary"):
+            with h1(cls="title"):
+                a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
+                raw(" - Assembly Summary")
+            with div(cls="contents topic", id="contents"):
+                with ul(cls="simple"):
+                    li(a("Summary", cls="reference internal", href="#summary"))
+                    with ul():
+                        li(a("Protein Counts", cls="reference internal", href="#Protein Counts"))
+                    li(a("Downloads", cls="reference internal", href="#downloads"))
+            with div(h1("Summary"), cls="section", id="summary"):
+                with div(h2('Protein Counts'), cls="section", id="Protein Counts"):
+                    raw(figStats.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE))
+            with div(cls="section", id="downloads"):
+                h1("Downloads")
+                with div(cls="docutils container", id="attachments"):
+                    with blockquote():
+                        with div(cls="docutils container", id="table-1"):
+                            with dl(cls="docutils"):
+                                tsv_stats = base64.b64encode(dfStats.to_csv(sep='\t').encode('utf-8')).decode('utf-8')
+                                data_URI = f"data:text/tab-separated-values;base64,{tsv_stats}"
+                                dt("Combined Stats:")
+                                dd(a("combined_stats.tsv", href=data_URI, download="combined_stats.tsv", draggable="true"))
+                div(time.strftime("%Y-%m-%d", time.localtime()), cls="docutils container", id="metadata")
+
+
+    with open(outfile, 'w') as writer:
+        writer.write(doc.render())
+    #figStats.write_html(outfile, full_html=False, include_plotlyjs=PLOTLY_SOURCE)
+
+    return dfStats
 
 
 ########## Write PCA Report ##########
@@ -120,7 +179,7 @@ def write_PCA(outpath, pcaFigures):
                 else:
                     # type= plotly.graph_objs._figure.Figure
                     #htmlOut.write(f"<h2 style='text-align:center'>{graph.replace('_', ' ')}</h2>")
-                    htmlFig = fig.to_html(full_html=False, include_plotlyjs=plotly_source)
+                    htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     htmlOut.write(htmlFig + '\n')
             htmlOut.write('\n</body>\n</html>\n')
     return None
@@ -152,7 +211,7 @@ def write_HTML_files(outfile, figure, sample, name):
         htmlOut.write(f'<H2>{name} Levels</H2>\n')
         htmlOut.write("<H4>*Clicking on a bar in the graph displays the next level.</br>The graph will cycle back to the first level after reaching the last level.</H4>")
         for title, figure in figure.items():
-            htmlFig = figure.to_html(full_html=False, include_plotlyjs=plotly_source)
+            htmlFig = figure.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
             try:
                 id = re.search('<div id="([a-​z0-9-]*)"', htmlFig).group(1)
             except:
