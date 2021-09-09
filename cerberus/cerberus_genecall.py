@@ -18,7 +18,7 @@ def findORF_fgs(contig, config, subdir):
         return faaOut
 
     # TODO: FGS+ freezes when using too many CPUs, try to find way around this or force to 1 CPU
-    command = f"{config['EXE_FGS+']} -s {contig} -o {baseOut} -w 1 -r {FGStrain} -t complete -p 6"
+    command = f"{config['EXE_FGS+']} -s {contig} -o {baseOut} -w 1 -r {FGStrain} -t complete"
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)

@@ -115,15 +115,37 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
     dfStats = pd.DataFrame(dictStats)
     dfStats.to_csv(outfile, sep='\t')
 
+    # HTML Plots of Stats
     outfile = os.path.join(outpath, "combined", "stats.html")
-    df = dfStats.T[['Total Protein Count', 'Proteins Above Min Score (25)']].reset_index()
+    dfStats = dfStats.apply(pd.to_numeric)
+    df = dfStats.T[['Total Protein Count', 'Proteins Above Min Score']].reset_index()
     df = df.melt(id_vars=['index'], var_name='proteins', value_name='value')
-
-    figStats = px.bar(df, x='index', y='value',
+    figCounts = px.bar(df, x='index', y='value',
         color='proteins', barmode='overlay',
         labels=dict(proteins="", index="Sample Name", value="Protein Count")
     )
-    # HTML Plots of Stats
+    df = dfStats.T.reset_index()
+    figLength = px.bar(df, x='index', y='Average Protein Length',
+        labels={'index':"Sample Name", 'Average Protein Length':"Number of Peptides"}
+    )
+    df = dfStats.T[['FOAM KO Count', 'KEGG KO Count']].reset_index()
+    df = df.melt(id_vars=['index'], var_name='group', value_name='value')
+    figKOCounts = px.bar(df, x='index', y='value',
+        color='group', barmode='group',
+        labels=dict(group="", index="Sample Name", value="Protein Count")
+    )
+    df = dfStats.T[['GC %']].reset_index()
+    print(df)
+    figGC = px.bar(df, x='index', y='GC %',
+        labels={'index':"Sample Name", 'GC %':'Percent'}
+    )
+    df = dfStats.T[['N25', 'N50', 'N75', 'N90']].reset_index()
+    df = df.melt(id_vars=['index'], var_name='group', value_name='value')
+    print(df)
+    figN = px.bar(df, x='index', y='value',
+        color='group', barmode='group',
+        labels=dict(group="", index="Sample Name", value="Nucleotide Threshold")
+    )
     with dominate.document(title='Stats Report') as doc:
         with doc.head:
             meta(charset="utf-8")
@@ -139,10 +161,22 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
                     li(a("Summary", cls="reference internal", href="#summary"))
                     with ul():
                         li(a("Protein Counts", cls="reference internal", href="#Protein Counts"))
+                        li(a("Average Protein Length", cls="reference internal", href="#Average Protein Length"))
+                        li(a("KO Counts", cls="reference internal", href="#KO Counts"))
+                        li(a("GC Counts", cls="reference internal", href="#GC Counts"))
+                        li(a("N Stats", cls="reference internal", href="#N Stats"))
                     li(a("Downloads", cls="reference internal", href="#downloads"))
             with div(h1("Summary"), cls="section", id="summary"):
                 with div(h2('Protein Counts'), cls="section", id="Protein Counts"):
-                    raw(figStats.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE))
+                    raw(figCounts.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE))
+                with div(h2('Average Protein Length'), cls="section", id="Average Protein Length"):
+                    raw(figLength.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE))
+                with div(h2('KO Counts'), cls="section", id="KO Counts"):
+                    raw(figKOCounts.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE))
+                with div(h2('GC Counts'), cls="section", id="GC Counts"):
+                    raw(figGC.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE))
+                with div(h2('N Stats'), cls="section", id="N Stats"):
+                    raw(figN.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE))
             with div(cls="section", id="downloads"):
                 h1("Downloads")
                 with div(cls="docutils container", id="attachments"):
