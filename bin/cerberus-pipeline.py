@@ -52,6 +52,7 @@ DEPENDENCIES = {
     'EXE_FASTP': 'fastp',
     'EXE_PORECHOP': 'porechop',
     'EXE_BBDUK': 'bbduk.sh',
+    'EXE_FGS+': 'FGS+',
     'EXE_PRODIGAL': 'prodigal',
     'EXE_HMMSEARCH': 'hmmsearch',
     'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
@@ -161,7 +162,7 @@ Example:
     # Initialize Config Dictionary
     config = {}
     config['PATH'] = os.path.dirname(os.path.abspath(__file__))
-    config['EXE_FGS+'] = os.path.abspath(os.path.join(config['PATH'], "FGS+/FGS+"))
+    config['EXE_FGS+'] = pkg.resource_filename("cerberus_data", "FGS+")
     config['STEP'] = STEP
     
     # load all args into config
@@ -370,7 +371,7 @@ Example:
     if fasta:
         print("\nSTEP 7: ORF Finder")
         for key,value in fasta.items():
-            if key.startswith("fsg_"):
+            if key.startswith("fgs_"):
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_fgs, key, value, config, f"{STEP[7]}/{key}"))
             elif key.startswith("meta_"):
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))

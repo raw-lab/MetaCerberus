@@ -6,6 +6,7 @@ pathDB="cerberusDB"
 pathFGS="FGS+"
 
 function install_FGS+ {
+  return # TODO: Removing this, moving pre-compiled to cerberus_data
   fgspath="$ABSPATH/$pathFGS"
   echo
   echo "Cloning FGS+ to $fgspath"
@@ -31,7 +32,7 @@ function download_db {
 }
 
 function clean {
-  rm -rf "$ABSPATH/$pathFGS"
+  #rm -rf "$ABSPATH/$pathFGS"
   rm -rf "$ABSPATH/$pathDB"
   return
 }
