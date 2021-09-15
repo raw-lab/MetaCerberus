@@ -237,9 +237,9 @@ Example:
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
             if ext in FILES_FASTQ:
-                fastq['prod_'+name] = item
+                fastq['prodigal_'+name] = item
             elif ext in FILES_FASTA:
-                fasta['prod_'+name] = item
+                fasta['prodigal_'+name] = item
             elif ext in FILES_AMINO:
                 print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
                 amino[name] = item
@@ -256,9 +256,9 @@ Example:
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
             if ext in FILES_FASTQ:
-                fastq['fgs_'+name] = item
+                fastq['FragGeneScan_'+name] = item
             elif ext in FILES_FASTA:
-                fasta['fgs_'+name] = item
+                fasta['FragGeneScan_'+name] = item
             elif ext in FILES_AMINO:
                 print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
                 amino[name] = item
@@ -293,7 +293,6 @@ Example:
     print(f"Fasta sequences:\n  {fasta}")
     print(f"Protein Sequences:\n  {amino}")
 
-
     # Step 2 (check quality of fastq files)
     jobsQC = []
     if fastq:
@@ -311,13 +310,15 @@ Example:
         for key,value in fastqPaired.items():
             reverse = fastq.pop(key.replace("R1", "R2"))
             fastq[key] = cerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
+        del fastqPaired # memory cleanup
         # Trim
         for key,value in fastq.items():
             jobTrim.append(rayWorker.remote(cerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
 
     # Wait for Trimmed Reads
-    for job in jobTrim:
-        key,value = ray.get(job)
+    while jobTrim:
+        ready,jobTrim = ray.wait(jobTrim)
+        key,value = ray.get(ready)
         fastq[key] = value
         jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
 
@@ -330,8 +331,9 @@ Example:
             jobDecon.append(rayWorker.remote(cerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
 
     # Wait for Decontaminating Reads
-    for job in jobDecon:
-        key,value = ray.get(job)
+    while jobDecon:
+        ready,jobDecon = ray.wait(jobDecon)
+        key,value = ray.get(ready)
         fastq[key] = value
         jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[4]}/{key}/quality"))
 
@@ -371,7 +373,7 @@ Example:
     if fasta:
         print("\nSTEP 7: ORF Finder")
         for key,value in fasta.items():
-            if key.startswith("fgs_"):
+            if key.startswith("FragGeneScan_"):
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_fgs, key, value, config, f"{STEP[7]}/{key}"))
             elif key.startswith("meta_"):
                 jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
