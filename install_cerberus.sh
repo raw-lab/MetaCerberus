@@ -8,7 +8,7 @@ function install {
     mkdir -p $install_path
     cp bin/*.py $install_path
     cp bin/*.sh $install_path
-    # TODO: Copy package as well.
+    # TODO: Copy packages as well.
     $install_path/cerberus_setup.sh -d
     
     unzip src/FragGeneScanPlus-master.zip
@@ -24,6 +24,7 @@ function install {
 function install_pip {
     # TODO: This option is mainly for developmental purposes.
     rm -r dist/
+    echo "Building Cerberus distribution..."
     python -m build > /dev/null #2>&1
     rm -r cerberus.egg-info/
     # install latest build version

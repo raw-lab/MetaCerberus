@@ -24,7 +24,7 @@ Cerberus currently runs best with Python version 3.7 due to compatibility with d
 These can be installed manually and the paths added to a config file, or installed in an Anaconda environment with this command:
 
 ```bash
-conda install -c conda-forge -c bioconda fastqc fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn configargparse python=3.7 -y
+conda create -n cerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn dominate configargparse python=3.7 -y
 ```
 
 #### Available from PyPi (pip)
@@ -33,10 +33,12 @@ conda install -c conda-forge -c bioconda fastqc fastp porechop bbmap prodigal hm
 - metaomestats - <https://github.com/raw-lab/metaome_stats>
 
 - configargparse
+- scikit-learn
 - pandas
 - numpy
 - plotly
-- scikit-learn
+- psutil
+- dominate
 
 ### 1) Clone latest build from github
 
@@ -71,7 +73,9 @@ pip install git+https://github.com/raw-lab/cerberus/
 cerberus_setup.py -f -d
 ```
 
-### 3) Anaconda and pip installs (coming soon, stable versions)
+- *Dependencies should be installed manually and specified in the config file or path
+
+### 3) Anaconda and pip installs (COMING SOON, stable versions)
 
 1. Anaconda install from bioconda with all dependencies:
 
@@ -160,7 +164,7 @@ conda activate cerberus
 # source the slurm script to initialize the Ray worker nodes
 source cerberus_slurm.sh
 # run Cerberus
-cerberus-pipeline.py --prod [input_folder] --illumina --dir_out [test_folder]
+cerberus-pipeline.py --prod [input_folder] --illumina --dir_out [out_folder]
 
 echo ""
 echo "======================================================"

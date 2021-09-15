@@ -6,7 +6,6 @@ pathDB="cerberusDB"
 pathFGS="FGS+"
 
 function install_FGS+ {
-  return # TODO: Removing this, moving pre-compiled to cerberus_data
   fgspath="$ABSPATH/$pathFGS"
   echo
   echo "Cloning FGS+ to $fgspath"
@@ -32,7 +31,7 @@ function download_db {
 }
 
 function clean {
-  #rm -rf "$ABSPATH/$pathFGS"
+  rm -rf "$ABSPATH/$pathFGS"
   rm -rf "$ABSPATH/$pathDB"
   return
 }
@@ -43,6 +42,10 @@ while (( "$#" )); do
   case "$1" in
     -d|--download)
       ARG_DOWN=true
+      shift
+      ;;
+    -f|--fgs)
+      ARG_FGS=true
       shift
       ;;
     -c|--clean)
@@ -68,8 +71,10 @@ No options given.
 usage: [--path PATH] [--download] [--dependencies] [--help]
 
   -d, --download      Download the database files to <cerberus path>/cerberusDB
+  -f, --fgs           Install FGS+ from git repository
   -c, --clean         Removes database files and FGS+
 " && exit 0
 
 [ $ARG_DOWN ] && download_db
+[ $ARG_FGS ] && install_FGS+
 [ $ARG_CLEAN ] && clean
