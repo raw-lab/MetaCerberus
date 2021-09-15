@@ -45,10 +45,6 @@ while (( "$#" )); do
       ARG_DOWN=true
       shift
       ;;
-    -f|--fgs)
-      ARG_FGS=true
-      shift
-      ;;
     -c|--clean)
       ARG_CLEAN=true
       shift
@@ -72,10 +68,8 @@ No options given.
 usage: [--path PATH] [--download] [--dependencies] [--help]
 
   -d, --download      Download the database files to <cerberus path>/cerberusDB
-  -f, --fgs           Clone and install FGS+ to <cerberus path>/FGS+
   -c, --clean         Removes database files and FGS+
 " && exit 0
 
-[ $ARG_FGS ] && install_FGS+
 [ $ARG_DOWN ] && download_db
 [ $ARG_CLEAN ] && clean

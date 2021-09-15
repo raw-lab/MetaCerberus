@@ -56,5 +56,6 @@ setuptools.setup(
             'numpy',
             'plotly',
             'psutil',
+            'dominate',
             ],
 )

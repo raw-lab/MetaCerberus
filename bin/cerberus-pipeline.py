@@ -85,10 +85,11 @@ def logTime(dirout, host, funcName, path, time):
 ## RAY WORKER THREAD ##
 @ray.remote
 def rayWorker(func, key, value, config, path):
-    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, time.strftime("%H:%M:%S", time.localtime()))
+    #logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, time.strftime("%H:%M:%S", time.localtime()))
     start = time.time()
     ret = func(value, config, path)
-    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, f"{time.time()-start:.2f} seconds")
+    end = time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
+    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)# f"{time.time()-start:.2f} seconds")
     return key, ret
 
 
@@ -215,8 +216,7 @@ Example:
     print(f"Using {config['CPUS']} CPUs per node")
 
 
-    start = time.time()
-    logTime(config["DIR_OUT"], socket.gethostname(), "master", config["DIR_OUT"], "START")
+    startTime = time.time()
     # Step 1 - Load Input Files
     print("\nSTEP 1: Loading sequence files:")
     fastq = {}
@@ -318,7 +318,7 @@ Example:
     # Wait for Trimmed Reads
     while jobTrim:
         ready,jobTrim = ray.wait(jobTrim)
-        key,value = ray.get(ready)
+        key,value = ray.get(ready[0])
         fastq[key] = value
         jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
 
@@ -333,7 +333,7 @@ Example:
     # Wait for Decontaminating Reads
     while jobDecon:
         ready,jobDecon = ray.wait(jobDecon)
-        key,value = ray.get(ready)
+        key,value = ray.get(ready[0])
         fastq[key] = value
         jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[4]}/{key}/quality"))
 
@@ -460,7 +460,8 @@ Example:
 
     # Finished!
     print("\nFinished Pipeline")
-    logTime(config["DIR_OUT"], socket.gethostname(), "master", config["DIR_OUT"], f"{time.time()-start:.2f} seconds")
+    end = time.strftime("%H:%M:%S", time.gmtime(time.time()-startTime))
+    logTime(config["DIR_OUT"], socket.gethostname(), "Total_Time", config["DIR_OUT"], end)
 
     return 0
 
