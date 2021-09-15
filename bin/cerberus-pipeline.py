@@ -18,6 +18,7 @@ import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
 import pkg_resources as pkg #to import package data files
 import time
+import datetime
 import socket
 import ray #multiprocessing
 
@@ -88,8 +89,8 @@ def rayWorker(func, key, value, config, path):
     #logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, time.strftime("%H:%M:%S", time.localtime()))
     start = time.time()
     ret = func(value, config, path)
-    end = time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
-    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)# f"{time.time()-start:.2f} seconds")
+    end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
+    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)
     return key, ret
 
 
@@ -460,7 +461,7 @@ Example:
 
     # Finished!
     print("\nFinished Pipeline")
-    end = time.strftime("%H:%M:%S", time.gmtime(time.time()-startTime))
+    end = str(datetime.timedelta(seconds=time.time()-startTime)) #end = time.strftime("%H:%M:%S", time.gmtime(time.time()-startTime))
     logTime(config["DIR_OUT"], socket.gethostname(), "Total_Time", config["DIR_OUT"], end)
 
     return 0
