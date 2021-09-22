@@ -108,11 +108,11 @@ Example:
 > cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
-    required.add_argument('--prod', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
-    required.add_argument('--fgs', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
+    required.add_argument('--prodigal', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
+    required.add_argument('--fraggenescan', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
     required.add_argument('--meta', action="append", default=[], help="Metagenomic nucleotide sequences (Uses prodigal)")
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --prod and --fgs modes')
-    required.add_argument('--prot', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
+    required.add_argument('--protein', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
     readtype = parser.add_mutually_exclusive_group(required=False)
     readtype.add_argument('--illumina', action="store_true", help="Specifies that the given FASTQ files are from Illumina")
@@ -121,7 +121,7 @@ Example:
     # optional flags
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument('--dir_out', type=str, default='./', help='path to output directory, creates "pipeline" folder. Defaults to current directory.')
-    optional.add_argument('--scaf', action="store_true", help="Sequences are treated as scaffolds")
+    optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
@@ -146,10 +146,10 @@ Example:
         args.fgs += args.super
 
     # Check if required flags are set
-    if not any([args.prod, args.fgs, args.meta, args.prot]):
+    if not any([args.prodigal, args.fraggenescan, args.meta, args.protein]):
         parser.error('At least one sequence must be declared either in the command line or through the config file')
-
-    for file in args.prod + args.fgs + args.meta:
+    # Check sequence type
+    for file in args.prodigal + args.fraggenescan + args.meta:
         if '.fastq' in file:
             if not any([args.illumina, args.nanopore, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
@@ -164,7 +164,7 @@ Example:
     # Initialize Config Dictionary
     config = {}
     config['PATH'] = os.path.dirname(os.path.abspath(__file__))
-    config['EXE_FGS+'] = pkg.resource_filename("cerberus_data", "FGS+")
+    config['EXE_FGS+'] = os.path.join(config['PATH'], 'FGS+', 'FGS+')#pkg.resource_filename("cerberus_data", "FGS+")
     config['STEP'] = STEP
     
     # load all args into config
@@ -176,6 +176,7 @@ Example:
                 value = os.path.abspath(os.path.expanduser(value))
             config[arg] = value
 
+    # Create output directory
     config['DIR_OUT'] = os.path.abspath(os.path.expanduser(os.path.join(args.dir_out, "pipeline")))
     os.makedirs(config['DIR_OUT'], exist_ok=True)
 
@@ -210,10 +211,10 @@ Example:
 
     # Initialize RAY for Multithreading
     try:
-        ray.init(address='auto')
+        ray.init(address='auto') # First try if ray is setup for a cluster
     except:
         ray.init()
-
+    # Get CPU Count
     if 'CPUS' not in config:
         config['CPUS'] = int(ray.available_resources()['CPU'])
     print(f"Running RAY on {len(ray.nodes())} node(s)")
@@ -227,16 +228,21 @@ Example:
     fasta = {}
     amino = {}
     # Load protein input
-    for item in args.prot:
+    for item in args.protein:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
             if ext in FILES_AMINO:
-                amino[name] = item
+                amino['Protein_'+name] = item
             else:
                 print(f'{item} is not a valid protein sequence')
+        elif os.path.isdir(item):
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_AMINO:
+                    args.protein.append(os.path.join(item, file))
     # Load prodigal input
-    for item in args.prod:
+    for item in args.prodigal:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
@@ -245,17 +251,16 @@ Example:
             elif ext in FILES_FASTA:
                 fasta['prodigal_'+name] = item
             elif ext in FILES_AMINO:
-                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
-                amino[name] = item
+                print(f"WARNING: Ignoring protein sequence '{item}', please use --protein option for these.")
         elif os.path.isdir(item):
             for file in os.listdir(item):
                 ext = os.path.splitext(file)[1]
                 if ext in FILES_FASTQ + FILES_FASTA:
-                    args.prod.append(os.path.join(item, file))
+                    args.prodigal.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
     # Load FGS+ input
-    for item in args.fgs:
+    for item in args.fraggenescan:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
@@ -264,13 +269,12 @@ Example:
             elif ext in FILES_FASTA:
                 fasta['FragGeneScan_'+name] = item
             elif ext in FILES_AMINO:
-                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
-                amino[name] = item
+                print(f"WARNING: Ignoring protein sequence '{item}', please use --protein option for these.")
         elif os.path.isdir(item):
             for file in os.listdir(item):
                 ext = os.path.splitext(file)[1]
                 if ext in FILES_FASTQ + FILES_FASTA:
-                    args.fgs.append(os.path.join(item, file))
+                    args.fraggenescan.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
     # Load metagenomic input
