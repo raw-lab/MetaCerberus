@@ -209,7 +209,10 @@ Example:
             parser.error(f"Unable to find file: {value}")
 
     # Initialize RAY for Multithreading
-    ray.init()
+    try:
+        ray.init(address='auto')
+    except:
+        ray.init()
 
     if 'CPUS' not in config:
         config['CPUS'] = int(ray.available_resources()['CPU'])
