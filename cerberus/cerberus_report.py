@@ -129,42 +129,52 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
         dfPre = dfStats[dfStats['Sample'].str.startswith(prefix)]
         dfPre['Sample'] = dfPre['Sample'].apply(lambda x: regex.sub('', x))
         # ORF Calling Results
-        df = dfPre[["Sample", 'Protein Count (Total)', 'Protein Count (>Min Score)']]
-        df = df.melt(id_vars=['Sample'], var_name='count', value_name='value')
-        fig = px.bar(df, x='Sample', y='value',
-            color='count', barmode='group',
-            labels=dict(count="", value="Count"))
-        fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
-        figPlots[f'ORF Calling Results ({prefix[:-1]})'] = fig
+        try:
+            df = dfPre[["Sample", 'Protein Count (Total)', 'Protein Count (>Min Score)']]
+            df = df.melt(id_vars=['Sample'], var_name='count', value_name='value')
+            fig = px.bar(df, x='Sample', y='value',
+                color='count', barmode='group',
+                labels=dict(count="", value="Count"))
+            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            figPlots[f'ORF Calling Results ({prefix[:-1]})'] = fig
+        except: pass
         # Average Protein Length
-        fig = px.bar(dfPre, x='Sample', y='Average Protein Length',
-            labels={'Average Protein Length':"Peptide Length"})
-        fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
-        figPlots[f'Average Protein Length ({prefix[:-1]})'] = fig
+        try:
+            fig = px.bar(dfPre, x='Sample', y='Average Protein Length',
+                labels={'Average Protein Length':"Peptide Length"})
+            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            figPlots[f'Average Protein Length ({prefix[:-1]})'] = fig
+        except: pass
         # Annotations
-        df = dfPre[['Sample', 'FOAM KO Count', 'KEGG KO Count']]
-        df.rename(columns={'FOAM KO Count': 'FOAM KO', 'KEGG KO Count':'KEGG KO'}, inplace=True)
-        df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
-        fig = px.bar(df, x='Sample', y='value', color='group', barmode='group',
-            labels={'value': 'count', 'group':''})
-        fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
-        figPlots[f'Annotations ({prefix[:-1]})'] = fig
+        try:
+            df = dfPre[['Sample', 'FOAM KO Count', 'KEGG KO Count']]
+            df.rename(columns={'FOAM KO Count': 'FOAM KO', 'KEGG KO Count':'KEGG KO'}, inplace=True)
+            df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
+            fig = px.bar(df, x='Sample', y='value', color='group', barmode='group',
+                labels={'value': 'count', 'group':''})
+            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            figPlots[f'Annotations ({prefix[:-1]})'] = fig
+        except: pass
         # GC %
-        df = dfPre[['Sample', 'GC %']]
-        fig = px.bar(df, x='Sample', y='GC %',
-            labels={'GC %':'GC Percent (%)'}
-        )
-        fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
-        figPlots[f'GC (%) ({prefix[:-1]})'] = fig
+        try:
+            df = dfPre[['Sample', 'GC %']]
+            fig = px.bar(df, x='Sample', y='GC %',
+                labels={'GC %':'GC Percent (%)'}
+            )
+            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            figPlots[f'GC (%) ({prefix[:-1]})'] = fig
+        except: pass
         # Metaome Stats
-        df = dfPre[['Sample', 'N25', 'N50', 'N75', 'N90']]
-        df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
-        fig = px.bar(df, x='Sample', y='value',
-            color='group', barmode='group',
-            labels=dict(group="", value="Sequence Length")
-        )
-        fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
-        figPlots[f'Assembly Stats ({prefix[:-1]})'] = fig
+        try:
+            df = dfPre[['Sample', 'N25', 'N50', 'N75', 'N90']]
+            df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
+            fig = px.bar(df, x='Sample', y='value',
+                color='group', barmode='group',
+                labels=dict(group="", value="Sequence Length")
+            )
+            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            figPlots[f'Assembly Stats ({prefix[:-1]})'] = fig
+        except: pass
     
     #figPlots = OrderedDict(sorted(figPlots.items()))
     with dominate.document(title='Stats Report') as doc:
