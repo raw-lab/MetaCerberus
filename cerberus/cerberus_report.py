@@ -16,6 +16,8 @@ from dominate.tags import *
 
 ### GLOBAL Variables ###
 
+WHITE = 'rgba(0, 0, 0, 0)'
+
 # standard html header to include plotly script
 htmlHeader = [
     '<html>',
@@ -64,7 +66,7 @@ def createReport(figSunburst, figCharts, config, subdir):
 
 
 ########## Write Stats ##########
-def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: dict):
+def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict, config:dict):
     dictStats = protStats.copy()
 
     # Merge Stats
@@ -72,6 +74,7 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
     trimLabels = ['passed', 'low quality', 'too many Ns', 'too short', 'low complexity', 'adapter trimmed', 'bases: adapters', 'duplication rate %']
     deconLabels = ['contaminants', 'QTrimmed', 'Total Removed', 'Results']
     reNstats = re.compile(r"N25[\w\s:%()]*>= ([0-9]*)[\w\s:%()]*>= ([0-9]*)[\w\s:%()]*>= ([0-9]*)[\w\s:%()]*>= ([0-9]*)")
+    reMinMax = re.compile(r"Max.*:.([0-9]*)\nMin.*:.([0-9]*)")
     reGC = re.compile(r"GC count:\s*([0-9]*)[\w\s]*%:\s*([.0-9]*)")
     reTrim = re.compile(r"Filtering result:[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)")
     reDecon = re.compile(r"([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)")
@@ -85,9 +88,13 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
         if Nstats:
             for i,label in enumerate(nstatLabels, 1):
                 dictStats[key][label] = Nstats.group(i)
+        # Min-Max fasta
+        min_max = reMinMax.search(value, re.MULTILINE)
+        if min_max: dictStats[key]['Contig Min Length'] = min_max.group(2)
+        if min_max: dictStats[key]['Contig Max Length'] = min_max.group(1)
         # Trimmed stats
-        infile = os.path.join(config['DIR_OUT'], config['STEP'][3], key, "stderr.txt")
         try:
+            infile = os.path.join(config['DIR_OUT'], config['STEP'][3], key, "stderr.txt")
             trimStats = '\n'.join(open(infile).readlines())
             trim = reTrim.search(trimStats, re.MULTILINE)
             if trim:
@@ -95,8 +102,8 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
                     dictStats[key]['trim: '+label] = trim.group(i)
         except: pass
         # Decon stats
-        infile = os.path.join(config['DIR_OUT'], config['STEP'][4], key, "stderr.txt")
         try:
+            infile = os.path.join(config['DIR_OUT'], config['STEP'][4], key, "stderr.txt")
             deconStats = '\n'.join(open(infile).readlines())
             decon = reDecon.search(deconStats, re.MULTILINE)
             if decon:
@@ -110,10 +117,20 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
         with open(outfile, 'w') as writer:
             writer.write(value)
 
+    # N-Stats
+    for key,value in NStats.items():
+        repeats = [y for x in value.values() for y in x]
+        dictStats[key]["Contigs w/ N-repeats:"] = len(value)
+        dictStats[key]["N-repeat Count"] = len(repeats)
+        dictStats[key]["N-repeat Total Length"] = sum(repeats)
+        dictStats[key]["N-repeat Average "] = round(sum(repeats)/len(repeats), 2)
+
+
     #Write Combined Stats to File
     outfile = os.path.join(outpath, "combined", "stats.tsv")
     os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
     dfStats = pd.DataFrame(dictStats)
+    print(dfStats)
     dfStats.to_csv(outfile, sep='\t')
 
     # HTML Plots of Stats
@@ -135,14 +152,14 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
             fig = px.bar(df, x='Sample', y='value',
                 color='count', barmode='group',
                 labels=dict(count="", value="Count"))
-            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'ORF Calling Results ({prefix[:-1]})'] = fig
         except: pass
         # Average Protein Length
         try:
             fig = px.bar(dfPre, x='Sample', y='Average Protein Length',
                 labels={'Average Protein Length':"Peptide Length"})
-            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'Average Protein Length ({prefix[:-1]})'] = fig
         except: pass
         # Annotations
@@ -152,7 +169,7 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
             df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
             fig = px.bar(df, x='Sample', y='value', color='group', barmode='group',
                 labels={'value': 'count', 'group':''})
-            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'Annotations ({prefix[:-1]})'] = fig
         except: pass
         # GC %
@@ -161,7 +178,7 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
             fig = px.bar(df, x='Sample', y='GC %',
                 labels={'GC %':'GC Percent (%)'}
             )
-            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'GC (%) ({prefix[:-1]})'] = fig
         except: pass
         # Metaome Stats
@@ -172,11 +189,23 @@ def write_Stats(outpath: os.PathLike, readStats: dict, protStats: dict, config: 
                 color='group', barmode='group',
                 labels=dict(group="", value="Sequence Length")
             )
-            fig.update_layout(dict(plot_bgcolor= 'rgba(0, 0, 0, 0)', paper_bgcolor= 'rgba(0, 0, 0, 0)'))
+            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'Assembly Stats ({prefix[:-1]})'] = fig
         except: pass
+        # Contig Min Max
+        try:
+            df = dfPre[['Sample', 'Contig Min Length', 'Contig Max Length']]
+            df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
+            fig = px.bar(df, x='Sample', y='value', text='value',
+                color='group', barmode='group',
+                labels=dict(group="", value="Sequence Length")
+            )
+            fig.update_traces(textposition='outside')
+            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
+            figPlots[f'Min-Max FASTA Length ({prefix[:-1]})'] = fig
+        except: pass
     
-    #figPlots = OrderedDict(sorted(figPlots.items()))
+    # Create HTML with Figures
     with dominate.document(title='Stats Report') as doc:
         with doc.head:
             meta(charset="utf-8")

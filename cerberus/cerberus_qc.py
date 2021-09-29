@@ -23,15 +23,16 @@ def checkQuality(rawRead, config, subdir):
 def checkSingleRead(singleRead, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
-
+    
     command = f"{config['EXE_FASTQC']} -o {path} {singleRead}"
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+        return os.path.join(path, os.path.splitext(os.path.basename(singleRead))[0]+'_fastqc.html')
     except Exception as e:
         print(e)
 
-    return path
+    return None
 
 
 ## checkPairedQuality

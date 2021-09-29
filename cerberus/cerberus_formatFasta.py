@@ -5,6 +5,7 @@ Also removes N's
 """
 
 import os
+import re
 import subprocess
 import textwrap
 
@@ -26,18 +27,22 @@ def reformat(fastq, config, subdir):
     return fasta
 
 
-def splitSequence(name, sequence):
-    sequences = sequence.split("N")
-    sequences = [seq for seq in sequences if len(seq)>0]
+def split_sequenceN(name, sequence):
+    N_lengths = []
+    regex = re.compile(r"(N+)")
+    for match in regex.finditer(sequence):
+        N_lengths.append(len(match.group(1)))
+    sequences = regex.sub('\n', sequence).split('\n')
     name = name.split()
     basename = name[0]
     info = ' '.join(name[1:])
     seqs = []
     for i, seq in enumerate(sequences, 1):
-        n = f">{basename}_{i} {info}"
-        seqs.append(n)
+        header = f">{basename}_{i} {info}"
+        seqs.append(header)
         seqs += textwrap.wrap(seq, 80)
-    return seqs
+    
+    return seqs, N_lengths
 
 
 # Remove N's
@@ -49,11 +54,13 @@ def removeN(fasta, config, subdir):
     outFasta = os.path.basename(outFasta) + "_clean"+ ext
     outFasta = os.path.join(path, outFasta)
 
-    if not config['REPLACE'] and os.path.exists(outFasta):
-        return outFasta
+    proc = subprocess.run(['grep', '-cE', '^[^>].*N', fasta], stdout=subprocess.PIPE, text=True)
+    res = int(proc.stdout.strip())
+    if res == 0:
+        return fasta, None
 
     with open(fasta) as reader, open(outFasta, 'w') as writer:
-        name = ""
+        NStats = dict()
         line = reader.readline()
         while line:
             line = line.strip()
@@ -68,7 +75,8 @@ def removeN(fasta, config, subdir):
                     sequence += line
                     line = reader.readline()
                 if 'N' in sequence:
-                    sequences = splitSequence(name, sequence)
+                    sequences, stats = split_sequenceN(name, sequence)
+                    NStats[name] = stats
                     print('\n'.join(sequences), file=writer)
                 else:
                     print('>', name, sep='', file=writer)
@@ -76,4 +84,4 @@ def removeN(fasta, config, subdir):
                 continue #already got next line, next item in loop
             line = reader.readline()
 
-    return outFasta
+    return outFasta, NStats

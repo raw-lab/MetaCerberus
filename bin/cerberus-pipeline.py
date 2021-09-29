@@ -13,7 +13,7 @@ __author__ = "Jose Figueroa"
 
 import sys
 import os
-from os.path import join
+import shutil
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
 import pkg_resources as pkg #to import package data files
@@ -25,7 +25,7 @@ import ray #multiprocessing
 
 # our package import.
 from cerberus import (
-    cerberus_qc, cerberus_merge, cerberus_trim, cerberus_decon, cerberus_format, cerberus_metastats,
+    cerberus_qc, cerberus_merge, cerberus_trim, cerberus_decon, cerberus_formatFasta, cerberus_metastats,
     cerberus_genecall, cerberus_hmmer, cerberus_parser,
     cerberus_prostats, cerberus_visual, cerberus_report
 )
@@ -328,7 +328,7 @@ Example:
         ready,jobTrim = ray.wait(jobTrim)
         key,value = ray.get(ready[0])
         fastq[key] = value
-        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[3]}/{key}/quality"))
+        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key+'_trim', value, config, f"{STEP[3]}/{key}/quality"))
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
@@ -343,27 +343,30 @@ Example:
         ready,jobDecon = ray.wait(jobDecon)
         key,value = ray.get(ready[0])
         fastq[key] = value
-        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[4]}/{key}/quality"))
+        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key+'_decon', value, config, f"{STEP[4]}/{key}/quality"))
 
 
     # step 5a for cleaning contigs
     jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
     # Only do this if a fasta file was given, not if fastq
-    if fasta:# and "scaf" in config:
+    if fasta:# and "scaffold" in config:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
-            jobContigs.append(rayWorker.remote(cerberus_format.removeN, key, value, config, f"{STEP[5]}/{key}"))
+            jobContigs.append(rayWorker.remote(cerberus_formatFasta.removeN, key, value, config, f"{STEP[5]}/{key}"))
     
+    NStats = {}
     for job in jobContigs:
         key,value = ray.get(job)
-        fasta[key] = value
+        fasta[key] = value[0]
+        if value[1]:
+            NStats[key] = value[1]
 
     # step 5b Format (convert fq to fna. Remove quality scores and N's)
     jobFormat = []
     if fastq:
         print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
         for key,value in fastq.items():
-            jobFormat.append(rayWorker.remote(cerberus_format.reformat, key, value, config, f"{STEP[5]}/{key}"))
+            jobFormat.append(rayWorker.remote(cerberus_formatFasta.reformat, key, value, config, f"{STEP[5]}/{key}"))
 
     for job in jobFormat:
         key, value = ray.get(job)
@@ -374,7 +377,7 @@ Example:
     if fasta:
         print("\nSTEP 6: Metaome Stats\n")
         for key,value in fasta.items():
-                readStats[key] = cerberus_metastats.getReadStats(value, config, join(STEP[6], key))
+                readStats[key] = cerberus_metastats.getReadStats(value, config, os.path.join(STEP[6], key))
 
     # step 7 (ORF Finder)
     jobGenecall = []
@@ -431,8 +434,20 @@ Example:
     print("\nSTEP 10: Creating Reports")
     outpath = os.path.join(config['DIR_OUT'], STEP[10])
 
+    # Copy report files from QC, Parser
+    while(jobsQC):
+        ready, jobsQC = ray.wait(jobsQC)
+        key,value = ray.get(ready[0])
+        name = key
+        key = key.rstrip('_decon').rstrip('_trim')
+        os.makedirs(os.path.join(outpath, key), exist_ok=True)
+        shutil.copy(value, os.path.join(outpath, key, f"qc_{name}.html"))
+    for key,value in hmmRollup.items():
+        os.makedirs(os.path.join(outpath, key), exist_ok=True)
+        shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(outpath, key) )
+
     # Write Stats
-    cerberus_report.write_Stats(outpath, readStats, protStats, config)
+    cerberus_report.write_Stats(outpath, readStats, protStats, NStats, config)
 
     # write roll-up tables
     for sample,tables in hmmCounts.items():

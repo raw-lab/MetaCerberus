@@ -4,7 +4,6 @@
 
 """
 
-import os
 import statistics as stat
 
 
