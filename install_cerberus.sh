@@ -45,11 +45,11 @@ function install_conda {
 
     # create the cerberus environment in conda
     conda env remove --name cerberus -y
-    conda create -n cerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn dominate configargparse python=3.7 -y
+    conda create -n cerberus -c conda-forge -c bioconda gcc make fastqc flash2 fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn dominate configargparse python=3.7 -y
 
     # install additional pip requirements
     conda activate cerberus
-    python -m pip install setuptools build metaomestats ray[default]
+    pip install setuptools build metaomestats ray[default]
 
     # install cerberus from local folder for now
     # TODO: Change this to proper install once uploaded to pypi and bioconda.

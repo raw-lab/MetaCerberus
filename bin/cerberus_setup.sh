@@ -12,7 +12,7 @@ function install_FGS+ {
   echo
   git clone https://github.com/hallamlab/FragGeneScanPlus $fgspath
   rm -rf "$fgspath/.git*"
-  make -C $fgspath
+  make CFLAG="-fcommon -w" -C $fgspath
   return
 }
 
