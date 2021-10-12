@@ -15,8 +15,8 @@ def searchHMM(aminoAcid, config, subdir):
     os.makedirs(path, exist_ok=True)
 
     foamDB = f'{config["PATH"]}/cerberusDB/FOAM-hmm_rel1a.hmm.gz'
-    name = os.path.basename(path)
-    name = os.path.splitext(name)[0] + ".FOAM.out"
+    name = os.path.basename(aminoAcid)
+    name = os.path.splitext(name)[0] + ".FOAM.hmm"
     foamOut = os.path.join(path, name)
 
     if not config['REPLACE'] and os.path.exists(foamOut):
