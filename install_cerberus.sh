@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+ABSPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 access_rights=0o755
 pathDB="cerberusDB"
 
@@ -58,7 +59,8 @@ function install_conda {
 }
 
 function develop_env {
-  ABSPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+  ABSPATH=$(pwd)
+  echo $ABSPATH
   export PATH="$ABSPATH/bin:$PATH"
   export PYTHONPATH="$ABSPATH:$PYTHONPATH"
   return
