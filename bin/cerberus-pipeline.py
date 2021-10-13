@@ -404,7 +404,7 @@ Example:
     jobHMM = []
     for key,value in amino.items():
         if config['CHUNKER'] > 0:
-            chunker = Chunker.Chunker(value, os.path.join(config['DIR_OUT'], 'chunks', key), "1M", '>')
+            chunker = Chunker.Chunker(value, os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
             for chunk in chunker.files:
                 jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, chunk, config, f"{STEP[8]}/{key}"))
         else:
@@ -415,20 +415,24 @@ Example:
     while(jobHMM):
         readyHMM, jobHMM = ray.wait(jobHMM)
         key,value = ray.get(readyHMM[0])
-        if True:# config['CHUNKER'] > 0:
+        if config['CHUNKER'] > 0:
             if key not in dictChunks:
                 dictChunks[key] = []
             dictChunks[key].append(value)
         else:
             hmmFoam[key] = value
     # Merge chunked files
-    if True:# config['CHUNKER'] > 0:
+    if config['CHUNKER'] > 0:
         for key,value in dictChunks.items():
-            with open(f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm", 'w') as writer:
+            hmmFile = f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm"
+            with open(hmmFile, 'w') as writer:
                 for item in value: # TODO: Remove repeated headers
                     writer.write(open(item).read())
-                    hmmFoam[key] = item
-
+                    os.remove(item)
+            hmmFoam[key] = hmmFile
+            subprocess.run(["sed", "-i", '4,$ {/^#/d}', hmmFile])
+    for value in hmmFoam.values():
+        subprocess.run(["sed", "-i", '4,$ {/^#/d}', value])
 
     print("\nSTEP 9: Parse HMMER results")
     jobParse = []
