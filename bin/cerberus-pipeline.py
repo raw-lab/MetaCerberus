@@ -27,7 +27,7 @@ import ray #multiprocessing
 from cerberus import (
     cerberus_qc, cerberus_merge, cerberus_trim, cerberus_decon, cerberus_formatFasta, cerberus_metastats,
     cerberus_genecall, cerberus_hmmer, cerberus_parser,
-    cerberus_prostats, cerberus_visual, cerberus_report
+    cerberus_prostats, cerberus_visual, cerberus_report, Chunker
 )
 
 
@@ -124,6 +124,7 @@ Example:
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
+    optional.add_argument('--chunker', type=int, default=0, help="Split files into slammer chunks, in Megabytes")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
@@ -399,21 +400,56 @@ Example:
 
     # step 8 (HMMER)
     print("\nSTEP 8: HMMER Search")
+
     jobHMM = []
     for key,value in amino.items():
-        jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
+        if config['CHUNKER'] > 0:
+            chunker = Chunker.Chunker(value, os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+            for chunk in chunker.files:
+                jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, chunk, config, f"{STEP[8]}/{key}"))
+        else:
+            jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
 
     hmmFoam = {}
-    jobParse = []
-    ray.wait(jobHMM) # Pause for message
-    print("\nSTEP 9: Parse HMMER results")
+    dictChunks = dict()
     while(jobHMM):
         readyHMM, jobHMM = ray.wait(jobHMM)
         key,value = ray.get(readyHMM[0])
-        hmmFoam[key] = value
-        # step 9 (Parser)
+        if config['CHUNKER'] > 0:
+            if key not in dictChunks:
+                dictChunks[key] = []
+            dictChunks[key].append(value)
+        else:
+            hmmFoam[key] = value
+    # Merge chunked files
+    if config['CHUNKER'] > 0:
+        for key,value in dictChunks.items():
+            hmmFile = f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm"
+            with open(hmmFile, 'w') as writer:
+                for item in value: # TODO: Remove repeated headers
+                    writer.write(open(item).read())
+                    os.remove(item)
+            hmmFoam[key] = hmmFile
+            subprocess.run(["sed", "-i", '4,$ {/^#/d}', hmmFile])
+    for value in hmmFoam.values():
+        subprocess.run(["sed", "-i", '4,$ {/^#/d}', value])
+
+    print("\nSTEP 9: Parse HMMER results")
+    jobParse = []
+    for key,value in hmmFoam.items():
         jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
-        # Protein Stats Jobs
+
+    #hmmFoam = {}
+    #jobParse = []
+    #ray.wait(jobHMM) # Pause for message
+    #print("\nSTEP 9: Parse HMMER results")
+    #while(jobHMM):
+    #    readyHMM, jobHMM = ray.wait(jobHMM)
+    #    key,value = ray.get(readyHMM[0])
+    #    hmmFoam[key] = value
+    #    # step 9 (Parser)
+    #    jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
+    #    # Protein Stats Jobs
 
     hmmRollup = {}
     hmmCounts = {}

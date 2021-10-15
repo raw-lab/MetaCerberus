@@ -60,7 +60,6 @@ function install_conda {
 
 function develop_env {
   ABSPATH=$(pwd)
-  echo $ABSPATH
   export PATH="$ABSPATH/bin:$PATH"
   export PYTHONPATH="$ABSPATH:$PYTHONPATH"
   return
