@@ -130,7 +130,6 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
     outfile = os.path.join(outpath, "combined", "stats.tsv")
     os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
     dfStats = pd.DataFrame(dictStats)
-    print(dfStats)
     dfStats.to_csv(outfile, sep='\t')
 
     # HTML Plots of Stats

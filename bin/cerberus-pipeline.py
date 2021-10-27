@@ -124,7 +124,7 @@ Example:
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
-    optional.add_argument('--chunker', type=int, default=0, help="Split files into slammer chunks, in Megabytes")
+    optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
@@ -136,7 +136,7 @@ Example:
         dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
     dependencies.add_argument('--adapters', type=str, default=REFSEQ['adapters'], help="FASTA File containing adapter sequences for trimming")
     dependencies.add_argument('--control_seq', type=str, default="default", help="FASTA File containing control sequences for decontamination")
-    
+
     args = parser.parse_args()
 
     print("\nStarting Cerberus Pipeline\n")
@@ -354,7 +354,7 @@ Example:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
             jobContigs.append(rayWorker.remote(cerberus_formatFasta.removeN, key, value, config, f"{STEP[5]}/{key}"))
-    
+
     NStats = {}
     for job in jobContigs:
         key,value = ray.get(job)
@@ -403,15 +403,18 @@ Example:
 
     jobHMM = []
     for key,value in amino.items():
+        # Split files into chunks
         if config['CHUNKER'] > 0:
             chunker = Chunker.Chunker(value, os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
             for chunk in chunker.files:
                 jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, chunk, config, f"{STEP[8]}/{key}"))
+        # Run without Chunker
         else:
             jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
 
     hmmFoam = {}
     dictChunks = dict()
+    started = []
     while(jobHMM):
         readyHMM, jobHMM = ray.wait(jobHMM)
         key,value = ray.get(readyHMM[0])
@@ -423,14 +426,15 @@ Example:
             hmmFoam[key] = value
     # Merge chunked files
     if config['CHUNKER'] > 0:
+        print(dictChunks)
         for key,value in dictChunks.items():
             hmmFile = f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm"
             with open(hmmFile, 'w') as writer:
-                for item in value: # TODO: Remove repeated headers
+                for item in sorted(value): # TODO: Remove repeated headers
                     writer.write(open(item).read())
                     os.remove(item)
             hmmFoam[key] = hmmFile
-            subprocess.run(["sed", "-i", '4,$ {/^#/d}', hmmFile])
+    # Clean HMM File
     for value in hmmFoam.values():
         subprocess.run(["sed", "-i", '4,$ {/^#/d}', value])
 
@@ -438,18 +442,6 @@ Example:
     jobParse = []
     for key,value in hmmFoam.items():
         jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
-
-    #hmmFoam = {}
-    #jobParse = []
-    #ray.wait(jobHMM) # Pause for message
-    #print("\nSTEP 9: Parse HMMER results")
-    #while(jobHMM):
-    #    readyHMM, jobHMM = ray.wait(jobHMM)
-    #    key,value = ray.get(readyHMM[0])
-    #    hmmFoam[key] = value
-    #    # step 9 (Parser)
-    #    jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
-    #    # Protein Stats Jobs
 
     hmmRollup = {}
     hmmCounts = {}
