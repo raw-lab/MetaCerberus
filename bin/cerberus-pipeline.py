@@ -104,14 +104,14 @@ def main():
 At least one sequence is required.
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-> cerberus.py --prod file1.fasta
+> cerberus.py --prodigal file1.fasta
 > cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--prodigal', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
     required.add_argument('--fraggenescan', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
     required.add_argument('--meta', action="append", default=[], help="Metagenomic nucleotide sequences (Uses prodigal)")
-    required.add_argument('--super', action='append', default=[], help='Run sequence in both --prod and --fgs modes')
+    required.add_argument('--super', action='append', default=[], help='Run sequence in both --prodigal and --graggenescan modes')
     required.add_argument('--protein', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
     readtype = parser.add_mutually_exclusive_group(required=False)
@@ -143,8 +143,8 @@ Example:
 
     # Merge related arguments
     if args.super:
-        args.prod += args.super
-        args.fgs += args.super
+        args.prodigal += args.super
+        args.fraggenescan += args.super
 
     # Check if required flags are set
     if not any([args.prodigal, args.fraggenescan, args.meta, args.protein]):

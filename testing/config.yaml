@@ -7,12 +7,12 @@ chunker: 1
 # nanopore and illumina tests are exclusive
 
 # nanopore test
-#prod: nanopore.fastq
+#prodigal: nanopore.fastq
 #nanopore
 
 # illumina tests
-#prod: [Test_R1.fastq, Test_R2.fastq]
-#fgs: [Test_R1.fastq, Test_R2.fastq]
+#prodigal: [Test_R1.fastq, Test_R2.fastq]
+#fraggenescan: [Test_R1.fastq, Test_R2.fastq]
 #meta: [Test_R1.fastq Test_R2.fastq]
 #illumina: True
 
@@ -21,10 +21,10 @@ chunker: 1
 #super: Scaffolds_with-NNN.fna
 
 # Validated KO test
-#prot: KO_validated_proteins.faa
+#protein: KO_validated_proteins.faa
 
 # 5_genome tests
-prod: 5_genome_folder
+#prodigal: 5_genome_folder
 
 # Rhizobium Comparison Test
-#prod: [GIC31_complete.fna, JQGI01_HUD.fna, RW2_complete.fna, S17.fna, SH31.fna, gsA_SM152B.fna, gsB_3841.fna, gsC_SM41.fna, gsD_SM51.fna, gsE_BIHB1217.fna, gsF_Vaf-108.fna]
+prodigal: [GIC31_complete.fna, JQGI01_HUD.fna, RW2_complete.fna, S17.fna, SH31.fna, gsA_SM152B.fna, gsB_3841.fna, gsC_SM41.fna, gsD_SM51.fna, gsE_BIHB1217.fna, gsF_Vaf-108.fna]
