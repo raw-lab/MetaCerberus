@@ -131,11 +131,6 @@ def human2bytes(s):
     return int(num * prefix[letter])
 
 
-def mercat_chunker(infile,outfolder,chunksize,delim,lines=None):
-    Chunker(infile, outfolder, chunksize=chunksize, delim=delim, lines=lines)
-
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Split input file into pieces.')
 
