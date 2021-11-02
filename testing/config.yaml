@@ -1,8 +1,8 @@
 # to run this file:
 # cerberus-pipeline.py -c test.config
 
-dir_out: temp-results-chunker
-chunker: 1
+dir_out: temp-results
+#chunker: 1
 
 # nanopore and illumina tests are exclusive
 
@@ -24,7 +24,7 @@ chunker: 1
 #protein: KO_validated_proteins.faa
 
 # 5_genome tests
-#prodigal: 5_genome_folder
+prodigal: 5_genome_folder
 
 # Rhizobium Comparison Test
-prodigal: [GIC31_complete.fna, JQGI01_HUD.fna, RW2_complete.fna, S17.fna, SH31.fna, gsA_SM152B.fna, gsB_3841.fna, gsC_SM41.fna, gsD_SM51.fna, gsE_BIHB1217.fna, gsF_Vaf-108.fna]
+#prodigal: [GIC31_complete.fna, JQGI01_HUD.fna, RW2_complete.fna, S17.fna, SH31.fna, gsA_SM152B.fna, gsB_3841.fna, gsC_SM41.fna, gsD_SM51.fna, gsE_BIHB1217.fna, gsF_Vaf-108.fna]
