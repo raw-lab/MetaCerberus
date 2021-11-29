@@ -21,14 +21,17 @@ def graphSunburst(tables):
         df: pd.DataFrame = table.copy()
 
         # Filter top MAX_DEPTH
-        levels = int(max(df[df.Level != 'Function'].Level))
-        dfLevels = []
-        for i in range(1,levels+1):
-            filter = df['Level']==str(i)
-            dfLevels.append( df[filter].sort_values(by='Count', ascending=False, inplace=False).head(SUN_LIMIT) )
-        filter = df['Level']=='Function'
-        dfLevels.append( df[df['Level']=='Function'].sort_values(by='Count', ascending=False, inplace=False).head(SUN_LIMIT) )
-        df = pd.concat(dfLevels)
+        try:
+            levels = int(max(df[df.Level != 'Function'].Level))
+            dfLevels = []
+            for i in range(1,levels+1):
+                filter = df['Level']==str(i)
+                dfLevels.append( df[filter].sort_values(by='Count', ascending=False, inplace=False).head(SUN_LIMIT) )
+            filter = df['Level']=='Function'
+            dfLevels.append( df[df['Level']=='Function'].sort_values(by='Count', ascending=False, inplace=False).head(SUN_LIMIT) )
+            df = pd.concat(dfLevels)
+        except:
+            continue
 
         # Add the Database Type for parent
         df['Type'] = dbName
@@ -65,6 +68,8 @@ def graphPCA(table_list):
     # Run PCA and add to Plots
     figs = {}
     for name,df in dfTables.items():
+        if df.empty:
+            continue
         df = df.fillna(0).astype(int)
         figs[name] = {}
 

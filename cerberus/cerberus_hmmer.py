@@ -14,22 +14,25 @@ def searchHMM(aminoAcid, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
-    foamDB = f'{config["PATH"]}/cerberusDB/FOAM-hmm_rel1a.hmm.gz'
+    if config['HMM']:
+        hmmDB = config['HMM']
+    else:
+        hmmDB = f'{config["PATH"]}/cerberusDB/FOAM-hmm_rel1a.hmm.gz'
     name = os.path.basename(aminoAcid)
-    name = os.path.splitext(name)[0] + ".FOAM.hmm"
-    foamOut = os.path.join(path, name)
+    name = os.path.splitext(name)[0] + ".hmm"
+    hmmOut = os.path.join(path, name)
 
-    if not config['REPLACE'] and os.path.exists(foamOut):
-        return foamOut
+    if not config['REPLACE'] and os.path.exists(hmmOut):
+        return hmmOut
     
     # HMMER
     try:
-        command = f"{config['EXE_HMMSEARCH']} --cpu {config['CPUS']} --domtblout {foamOut} {foamDB} {aminoAcid}"
-        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+        command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {config['CPUS']} --domtblout {hmmOut} {hmmDB} {aminoAcid}"
+        with open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=ferr)
             #TODO: Add option to redirect output to file
     except Exception as e:
         print(e)
         print("Error: failed to run: " + command)
 
-    return foamOut
+    return hmmOut
