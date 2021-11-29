@@ -126,6 +126,7 @@ Example:
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
+    optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
                         help='show the version number and exit')
@@ -298,9 +299,9 @@ Example:
         else:
             print(f'{item} is not a valid sequence')
     
-    print(f"Fastq sequences:\n  {fastq}")
-    print(f"Fasta sequences:\n  {fasta}")
-    print(f"Protein Sequences:\n  {amino}")
+    print(f"Processing {len(fastq)} fastq sequences")
+    print(f"Processing {len(fasta)} fasta sequences")
+    print(f"Processing {len(amino)} protein Sequences")
 
     # Step 2 (check quality of fastq files)
     jobsQC = []
@@ -412,32 +413,29 @@ Example:
         else:
             jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
 
+    print("Waiting for HMMER")
     hmmFoam = {}
     dictChunks = dict()
-    started = []
     while(jobHMM):
         readyHMM, jobHMM = ray.wait(jobHMM)
         key,value = ray.get(readyHMM[0])
-        if config['CHUNKER'] > 0:
-            if key not in dictChunks:
-                dictChunks[key] = []
-            dictChunks[key].append(value)
-        else:
-            hmmFoam[key] = value
+        if key not in dictChunks:
+            dictChunks[key] = []
+        dictChunks[key].append(value)
     # Merge chunked files
-    if config['CHUNKER'] > 0:
-        print(dictChunks)
-        for key,value in dictChunks.items():
-            hmmFile = f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm"
-            with open(hmmFile, 'w') as writer:
-                for item in sorted(value): # TODO: Remove repeated headers
-                    writer.write(open(item).read())
-                    os.remove(item)
-            hmmFoam[key] = hmmFile
+    for key,value in dictChunks.items():
+        hmmFile = f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm"
+        with open(hmmFile, 'w') as writer:
+            for item in sorted(value): # TODO: Remove repeated headers
+                writer.write(open(item).read())
+                os.remove(item)
+        hmmFoam[key] = hmmFile
+    del dictChunks
     # Clean HMM File
     for value in hmmFoam.values():
         subprocess.run(["sed", "-i", '4,$ {/^#/d}', value])
 
+    # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")
     jobParse = []
     for key,value in hmmFoam.items():
@@ -485,7 +483,7 @@ Example:
     for sample,tables in hmmRollup.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            table.to_csv(f"{outpath}/{sample}/{name}_rollup.tsv", index = False, header=True, sep='\t')
+            table.to_csv(f"{outpath}/{sample}/{name}_rollup.tsv", index=False, header=True, sep='\t')
 
     # HTML of PCA
     pcaFigures = None

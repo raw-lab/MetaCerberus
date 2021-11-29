@@ -274,14 +274,17 @@ def writeTables(table: pd.DataFrame, filePrefix: os.PathLike):
 
     regex = re.compile(r"^lvl[0-9]: ")
     table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
-
-    levels = int(max(table[table.Level != 'Function'].Level))
-    for i in range(1,levels+1):
-        filter = table['Level']==str(i)
-        table[filter][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
-    regex = re.compile(r"^K[0-9]*: ")
-    table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
+    try:
+        levels = int(max(table[table.Level != 'Function'].Level))
+        for i in range(1,levels+1):
+            filter = table['Level']==str(i)
+            table[filter][['Name','Count']].to_csv(f"{filePrefix}_level-{i}.tsv", index = False, header=True, sep='\t')
+        regex = re.compile(r"^K[0-9]*: ")
+        table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
+    except:
+        return
     table[table['Level']=='Function'][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-ko.tsv", index = False, header=True, sep='\t')
+    return
 
 
 ########## Write HTML Files ##########
