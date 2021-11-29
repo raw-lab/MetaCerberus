@@ -14,10 +14,6 @@ import dominate
 from dominate.tags import *
 
 
-### GLOBAL Variables ###
-
-WHITE = 'rgba(0, 0, 0, 0)'
-
 # standard html header to include plotly script
 htmlHeader = [
     '<html>',
@@ -151,14 +147,12 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             fig = px.bar(df, x='Sample', y='value',
                 color='count', barmode='group',
                 labels=dict(count="", value="Count"))
-            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'ORF Calling Results ({prefix[:-1]})'] = fig
         except: pass
         # Average Protein Length
         try:
             fig = px.bar(dfPre, x='Sample', y='Average Protein Length',
                 labels={'Average Protein Length':"Peptide Length"})
-            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'Average Protein Length ({prefix[:-1]})'] = fig
         except: pass
         # Annotations
@@ -168,7 +162,6 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
             fig = px.bar(df, x='Sample', y='value', color='group', barmode='group',
                 labels={'value': 'count', 'group':''})
-            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'Annotations ({prefix[:-1]})'] = fig
         except: pass
         # GC %
@@ -177,7 +170,6 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             fig = px.bar(df, x='Sample', y='GC %',
                 labels={'GC %':'GC Percent (%)'}
             )
-            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'GC (%) ({prefix[:-1]})'] = fig
         except: pass
         # Metaome Stats
@@ -188,7 +180,6 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
                 color='group', barmode='group',
                 labels=dict(group="", value="Sequence Length")
             )
-            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'Assembly Stats ({prefix[:-1]})'] = fig
         except: pass
         # Contig Min Max
@@ -200,10 +191,16 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
                 labels=dict(group="", value="Sequence Length")
             )
             fig.update_traces(textposition='outside')
-            fig.update_layout(dict(plot_bgcolor=WHITE, paper_bgcolor=WHITE))
             figPlots[f'Min-Max FASTA Length ({prefix[:-1]})'] = fig
         except: pass
-    
+
+    # Update Graph Colors    
+    for key in figPlots.keys():
+        figPlots[key].update_layout(dict(plot_bgcolor='White', paper_bgcolor='White'))
+        figPlots[key].update_xaxes(showline=True, linewidth=2, linecolor='black')
+        figPlots[key].update_yaxes( showline=True, linewidth=2, linecolor='black',
+                                    showgrid=True, gridwidth=1, gridcolor='LightGray')
+
     # Create HTML with Figures
     with dominate.document(title='Stats Report') as doc:
         with doc.head:

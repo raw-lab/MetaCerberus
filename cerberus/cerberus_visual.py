@@ -113,8 +113,31 @@ def graphPCA(table_list):
         if len(labels) > 2:
             fig3d = px.scatter_3d(
                 X_pca, x=0, y=1, z=2, color=X.index,
-                #title=data_type,
                 labels=labels)
+            fig3d.update_layout(scene = dict(
+                    xaxis = dict(
+                        backgroundcolor="White",
+                        gridcolor="LightGray",
+                        showbackground=False,
+                        zerolinecolor="LightGray"
+                        ),
+                    yaxis = dict(
+                        backgroundcolor="White",
+                        gridcolor="LightGray",
+                        showbackground=False,
+                        zerolinecolor="LightGray"
+                        ),
+                    zaxis = dict(
+                        backgroundcolor="White",
+                        gridcolor="LightGray",
+                        showbackground=False,
+                        zerolinecolor="LightGray"
+                        ),
+                    #width=700,
+                    #margin=dict(
+                    #r=10, l=10,
+                    #b=10, t=10
+                  ))
         else:
             print("WARNING: Insufficient data in", name, "results for 3D PCA Plot")
             fig3d = None
@@ -195,5 +218,9 @@ def createBarFigs(tree, level=1, name=""):
             )
         if max(data.values()) < 20: # to remove decimals from graph with low counts, let plotly decide tick marks otherwise
             fig.update_yaxes(dtick=1)
+        fig.update_layout(dict(plot_bgcolor='White', paper_bgcolor='White'))
+        fig.update_xaxes(showline=True, linewidth=2, linecolor='black')
+        fig.update_yaxes( showline=True, linewidth=2, linecolor='black',
+                                    showgrid=True, gridwidth=1, gridcolor='LightGray')
         chart[title] = fig
     return chart
