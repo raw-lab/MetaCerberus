@@ -428,7 +428,7 @@ Example:
         with open(hmmFile, 'w') as writer:
             for item in sorted(value): # TODO: Remove repeated headers
                 writer.write(open(item).read())
-                os.remove(item)
+                #os.remove(item) #TODO: Remove Chunked files???
         hmmFoam[key] = hmmFile
     del dictChunks
     # Clean HMM File

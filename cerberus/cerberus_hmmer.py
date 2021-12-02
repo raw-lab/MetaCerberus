@@ -27,7 +27,7 @@ def searchHMM(aminoAcid, config, subdir):
     
     # HMMER
     try:
-        command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {config['CPUS']} --domtblout {hmmOut} {hmmDB} {aminoAcid}"
+        command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu 4 --domtblout {hmmOut} {hmmDB} {aminoAcid}"
         with open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=ferr)
             #TODO: Add option to redirect output to file

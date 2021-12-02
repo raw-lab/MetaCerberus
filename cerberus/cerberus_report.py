@@ -194,12 +194,14 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             figPlots[f'Min-Max FASTA Length ({prefix[:-1]})'] = fig
         except: pass
 
-    # Update Graph Colors    
+    # Update Graph Colors & Export
+    os.makedirs(os.path.join(outpath, "combined", "img"),exist_ok=True)
     for key in figPlots.keys():
         figPlots[key].update_layout(dict(plot_bgcolor='White', paper_bgcolor='White'))
         figPlots[key].update_xaxes(showline=True, linewidth=2, linecolor='black')
         figPlots[key].update_yaxes( showline=True, linewidth=2, linecolor='black',
                                     showgrid=True, gridwidth=1, gridcolor='LightGray')
+        figPlots[key].write_image(os.path.join(outpath, "combined", "img", key+'.svg'))
 
     # Create HTML with Figures
     with dominate.document(title='Stats Report') as doc:
@@ -261,6 +263,7 @@ def write_PCA(outpath, pcaFigures):
                     #htmlOut.write(f"<h2 style='text-align:center'>{graph.replace('_', ' ')}</h2>")
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     htmlOut.write(htmlFig + '\n')
+                    fig.write_image(os.path.join(outpath, "img", f"{database}_{graph}.svg"))
             htmlOut.write('\n</body>\n</html>\n')
     return None
 
@@ -300,7 +303,7 @@ def write_HTML_files(outfile, figure, sample, name):
                 icon = base64.b64encode(icon).decode()
                 img(src=f"data:image/png;base64,{icon}", height="40")
                 a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
-                raw(f" - Cerberus {name} Bar Graphs for '{sample}'")
+                raw(f" - {name} Bar Graphs for '{sample}'")
             # Side Panel
             with div(cls="contents topic", id="contents"):
                 with ul(cls="simple"):

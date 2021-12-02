@@ -5,13 +5,12 @@ import pandas as pd
 from pandas.core.frame import DataFrame
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from functools import reduce
 import plotly.express as px
 import plotly.graph_objects as go
 
 # global vars
-BAR_LIMIT = 20
-SUN_LIMIT = 50
+BAR_LIMIT = 10
+SUN_LIMIT = 15
 
 
 ########## Create Sunburst Figures ##########
