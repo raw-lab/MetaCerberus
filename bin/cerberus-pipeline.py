@@ -218,10 +218,10 @@ Example:
         ray.init()
     # Get CPU Count
     if 'CPUS' not in config:
-        config['CPUS'] = int(ray.available_resources()['CPU'])
+        import psutil
+        config['CPUS'] = psutil.cpu_count()#int(ray.available_resources()['CPU'])
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
-
 
     startTime = time.time()
     # Step 1 - Load Input Files
@@ -403,15 +403,47 @@ Example:
     print("\nSTEP 8: HMMER Search")
 
     jobHMM = []
-    for key,value in amino.items():
+    limit = int(config["CPUS"]/4)
+    print("Jobs per node:", config["CPUS"], limit)
+    iter_amino = iter(amino)
+    for key in iter_amino:
         # Split files into chunks
         if config['CHUNKER'] > 0:
-            chunker = Chunker.Chunker(value, os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+            chunker = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
             for chunk in chunker.files:
                 jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, chunk, config, f"{STEP[8]}/{key}"))
         # Run without Chunker
         else:
-            jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
+            #keys = []
+            #values = []
+            aminoAcids = {}
+            for i in range(0, limit):
+                #keys.append(key)
+                #values.append(amino[key])
+                aminoAcids[key] = amino[key]
+                try:
+                    key = next(iter_amino)
+                except:
+                    break
+            jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
+    print("Waiting for HMMER")
+    while(jobHMM):
+        #print("Size:", sys.getsizeof(jobHMM))
+        readyHMM, jobHMM = ray.wait(jobHMM)
+        keys,values = ray.get(readyHMM[0])
+        #print(keys)
+        #print(values)
+
+    return #TODO: Testing Multi-HMM
+#    for key,value in amino.items():
+#        # Split files into chunks
+#        if config['CHUNKER'] > 0:
+#            chunker = Chunker.Chunker(value, os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+#            for chunk in chunker.files:
+#                jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, chunk, config, f"{STEP[8]}/{key}"))
+#        # Run without Chunker
+#        else:
+#            jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
 
     print("Waiting for HMMER")
     hmmFoam = {}
