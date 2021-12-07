@@ -51,6 +51,7 @@ setuptools.setup(
             'ray[default]',
             'metaomestats',
             'configargparse',
+            'kaleido',
             'scikit-learn',
             'pandas',
             'numpy',
