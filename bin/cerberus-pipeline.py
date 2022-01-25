@@ -404,22 +404,22 @@ Example:
 
     jobHMM = []
     limit = int(config["CPUS"]/4)
-    print("Jobs per node:", config["CPUS"], limit)
     iter_amino = iter(amino)
     for key in iter_amino:
         # Split files into chunks
         if config['CHUNKER'] > 0:
             chunker = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
-            for chunk in chunker.files:
-                jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, chunk, config, f"{STEP[8]}/{key}"))
-        # Run without Chunker
+            c = 0
+            for i in range(0, len(chunker.files), limit):
+                files = chunker.files[i:i+limit]
+                aminoAcids = {}
+                for chunk in files:
+                    aminoAcids[f'chunk_{c}'] = chunk
+                    c += 1
+                jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, aminoAcids, config, f"{STEP[8]}/{key}"))
         else:
-            #keys = []
-            #values = []
             aminoAcids = {}
             for i in range(0, limit):
-                #keys.append(key)
-                #values.append(amino[key])
                 aminoAcids[key] = amino[key]
                 try:
                     key = next(iter_amino)
@@ -427,35 +427,29 @@ Example:
                     break
             jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
     print("Waiting for HMMER")
-    while(jobHMM):
-        #print("Size:", sys.getsizeof(jobHMM))
-        readyHMM, jobHMM = ray.wait(jobHMM)
-        keys,values = ray.get(readyHMM[0])
-        #print(keys)
-        #print(values)
-
-    return #TODO: Testing Multi-HMM
-#    for key,value in amino.items():
-#        # Split files into chunks
-#        if config['CHUNKER'] > 0:
-#            chunker = Chunker.Chunker(value, os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
-#            for chunk in chunker.files:
-#                jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, chunk, config, f"{STEP[8]}/{key}"))
-#        # Run without Chunker
-#        else:
-#            jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, value, config, f"{STEP[8]}/{key}"))
-
-    print("Waiting for HMMER")
-    hmmFoam = {}
     dictChunks = dict()
     while(jobHMM):
         readyHMM, jobHMM = ray.wait(jobHMM)
-        key,value = ray.get(readyHMM[0])
-        if key not in dictChunks:
-            dictChunks[key] = []
-        dictChunks[key].append(value)
+        keys,values = ray.get(readyHMM[0])
+        if type(keys) is str:
+            # files in list belongs to same key
+            for value in values:
+                if keys not in dictChunks:
+                    dictChunks[keys] = []
+                dictChunks[keys].append(value)
+        else:
+            # files in list belongs to different keys
+            for i in range(0,len(keys)):
+                key = keys[i]
+                value = values[i]
+                if key not in dictChunks:
+                    dictChunks[key] = []
+                dictChunks[key].append(value)
+
     # Merge chunked files
+    hmmFoam = {}
     for key,value in dictChunks.items():
+        print(key, len(value), value)
         hmmFile = f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm"
         with open(hmmFile, 'w') as writer:
             for item in sorted(value): # TODO: Remove repeated headers
@@ -466,6 +460,7 @@ Example:
     # Clean HMM File
     for value in hmmFoam.values():
         subprocess.run(["sed", "-i", '4,$ {/^#/d}', value])
+
 
     # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")

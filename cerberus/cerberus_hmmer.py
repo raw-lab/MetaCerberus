@@ -11,7 +11,7 @@ import time
 
 
 ## HMMER Search
-def searchHMM(aminoAcids, config, subdir):
+def searchHMM(aminoAcids:dict, config:dict, subdir:str):
     hmmOut = []
     jobs = []
     for key,amino in aminoAcids.items():
@@ -33,12 +33,13 @@ def searchHMM(aminoAcids, config, subdir):
         try:
             command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu 4 --domtblout {hmmOut[-1]} {hmmDB} {amino}"
             with open(f"{path}/stderr.txt", 'w') as ferr:
-                #subprocess.run(command, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=ferr)
                 jobs.append(subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=ferr))
                 #TODO: Add option to redirect output to file
         except Exception as e:
             print(e)
             print("Error: failed to run: " + command)
+
+    # Wait for jobs
     done = False
     while not done:
         done = True
