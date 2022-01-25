@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""cerberusHMMER.py Script to find proteins using HMMER
+"""cerberus_hmm.py Script to find proteins using HMMER
 
 $ hmmsearch --cpu 4 --domtblout fastaFile.FOAM.out databaseFile aminoAcids.faa
 """

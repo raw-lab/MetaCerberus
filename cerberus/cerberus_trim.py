@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""rheaTrim.py: Module for trimming .fastq files
+"""cerberus_trim.py: Module for trimming .fastq files
 Uses fastp [https://github.com/OpenGene/fastp#quality-filter]
 
 $ fastp -i in.fq.gz -o trim.fq.gz

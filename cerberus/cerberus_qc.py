@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""rheaQC.py: Module for checking quality of .fastq files
+"""cerberus_qc.py: Module for checking quality of .fastq files
 Uses FastQC [https://www.bioinformatics.babraham.ac.uk/projects/fastqc/]
 $ fastqc file.fastq
 $ fastqc file_R1.fastq fastqc file_R2.fastq

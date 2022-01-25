@@ -23,10 +23,10 @@ import socket
 import ray #multiprocessing
 
 
-# our package import.
+# our package import
 from cerberus import (
     cerberus_qc, cerberus_merge, cerberus_trim, cerberus_decon, cerberus_formatFasta, cerberus_metastats,
-    cerberus_genecall, cerberus_hmmer, cerberus_parser,
+    cerberus_genecall, cerberus_hmm, cerberus_parser,
     cerberus_prostats, cerberus_visual, cerberus_report, Chunker
 )
 
@@ -416,7 +416,7 @@ Example:
                 for chunk in files:
                     aminoAcids[f'chunk_{c}'] = chunk
                     c += 1
-                jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, key, aminoAcids, config, f"{STEP[8]}/{key}"))
+                jobHMM.append(rayWorker.remote(cerberus_hmm.searchHMM, key, aminoAcids, config, f"{STEP[8]}/{key}"))
         else:
             aminoAcids = {}
             for i in range(0, limit):
@@ -425,7 +425,7 @@ Example:
                     key = next(iter_amino)
                 except:
                     break
-            jobHMM.append(rayWorker.remote(cerberus_hmmer.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
+            jobHMM.append(rayWorker.remote(cerberus_hmm.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
     print("Waiting for HMMER")
     dictChunks = dict()
     while(jobHMM):

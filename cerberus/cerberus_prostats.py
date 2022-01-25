@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-"""prot_stats.py Calculate protein stats from HMMER and Amino Acid sequences
+"""cerberus_prostats.py Calculate protein stats from HMMER and Amino Acid sequences
 
 """
 
