@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
-
 """cerberus_parser.py Parses HMMER output and identifies KOs with FOAM and KEGG DB info
 1) Get best hits
 2) Save rollup file
 3) Convert rollup file to table
 """
 
-from collections import OrderedDict
-from io import FileIO
 import os
-import csv
 import pandas as pd
 
 

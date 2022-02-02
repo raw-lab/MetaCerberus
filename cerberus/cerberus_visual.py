@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""cerberus_visual.py: Module for creating the plotly figures
+"""
 
 import numpy as np
 import pandas as pd

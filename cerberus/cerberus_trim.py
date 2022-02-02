@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 """cerberus_trim.py: Module for trimming .fastq files
 Uses fastp [https://github.com/OpenGene/fastp#quality-filter]
-
-$ fastp -i in.fq.gz -o trim.fq.gz
-$ fastp -i in.R1.fq.gz -I in.R2.fq.gz -o trim.R1.fq.gz -O trim.R2.fq.gz
+Uses porechop
 """
 
 import os

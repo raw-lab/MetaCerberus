@@ -1,4 +1,8 @@
 # -*- coding: utf-8 -*-
+"""cerberus_genecall.py: Module for finding Open Reading Frames (ORF) in FASTA nucleotide files
+Uses prodigal
+Uses FGS+
+"""
 
 import os
 import subprocess

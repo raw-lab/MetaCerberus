@@ -1,10 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """cerberus_metastats.py: Module for checking quality of .fastq files
-Uses checkm [https://www.bioinformatics.babraham.ac.uk/projects/fastqc/]
 Uses countfasta.py
-
-$ countfasta.py -f FASTA -i INTERVAL > assembly-stats.txt
 """
 
 #TODO Only run this when using contigs, not RAW Reads, or filtered reads

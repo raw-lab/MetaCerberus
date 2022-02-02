@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""cerberus.py: Versatile Functional Ontology Assignments for Metagenomes
+"""cerberus-pipeline.py: Versatile Functional Ontology Assignments for Metagenomes
 
 Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data.
 """
 
 
-__version__ = "0.1"
-__author__ = "Jose Figueroa"
+__version__     = "0.1"
+__author__      = "Jose L. Figueroa III, Richard A. White III"
+__copyright__   = "Copyright 2022"
 
 
 import sys

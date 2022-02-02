@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """cerberus_merge.py: Module to merge paired end .fastq files
 Uses flash [https://github.com/dstreett/FLASH2]
-
-$ flash2 r1_file r2_file -m min_overlap -M max_overlap -x mismatch_ratio -d out_path -o output_prefix
 """
 
 import os

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-"""cerberus_hmm.py Script to find proteins using HMMER
-
-$ hmmsearch --cpu 4 --domtblout fastaFile.FOAM.out databaseFile aminoAcids.faa
+"""cerberus_hmm.py Module to find FOAM annotations using Hidden Markov Models
+Uses HMMER hmmsearch
 """
 
 import os

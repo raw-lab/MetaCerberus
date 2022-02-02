@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""cerberus_report.py: Module to create the final HTML reports and tsv files
+"""
 
 from collections import OrderedDict
 import os

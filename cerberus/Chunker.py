@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+"""Chunker.py: Class for splitting fasta and fastq files into smaller chunks.
+Takes into account headers begining with select delimeters (i.e. > or @)
+"""
+
 import os
 import argparse
 import glob
