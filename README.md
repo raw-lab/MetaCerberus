@@ -1,10 +1,10 @@
-# Welcome to Cerberus
+# Welcome to MetaCerberus
 
 Python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data
 
 ![GitHub Logo](cerberus_logo.jpg)
 
-## Installing Cerberus
+## Installing MetaCerberus
 
 ### Prerequisites and dependencies
 
