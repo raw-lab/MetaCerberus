@@ -56,8 +56,8 @@ conda create -n metacerberus -c conda-forge -c bioconda fastqc flash2 fastp pore
     ```
 
 - --instal option copies the script files to a custom folder and downloads database files
-- --pip option uses pip to install Cerberus from the local folder
-- --conda option creates a conda environment named "cerberus" and installs cerberus with all dependencies in it
+- --pip option uses pip to install MetaCerberus from the local folder
+- --conda option creates a conda environment named "MetaCerberus" and installs MetaCerberus with all dependencies in it
 - --help gives more information about the options
 
 ### 2) Install with pip from github
@@ -97,9 +97,9 @@ cerberus_setup.py -f -d
 - The database files are located at <https://osf.io/5ba2v/>
 - NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
 
-## Running Cerberus
+## Running MetaCerberus
 
-- If needed, activate the Cerberus environment in Anaconda
+- If needed, activate the MetaCerberus environment in Anaconda
 
 ```bash
 conda activate cerberus
@@ -122,7 +122,7 @@ usage: metacerberus-pipeline.py [-c CONFIG] [--mic MIC] [--euk EUK] [--super SUP
 - example:
 
 ```bash
-python cerberus-pipeline.py --euk <input file path> 
+python metacerberus-pipeline.py --euk <input file path> 
 ```
 
 ### Multiprocessing / Multi-Computing
