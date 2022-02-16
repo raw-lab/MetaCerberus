@@ -35,25 +35,21 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict):
     # sum up proteins in HMMER file
     with open(fileHmmer, "r") as reader:
         for i,line in enumerate(reader,1):
-            line = line.strip()
-            if line.startswith("#"):        # Skip commented lines
-                continue
-            line = line.split()
+            "target", "score", "e-value" "query"
+            line = line.split('\t')
             try:
-                query = line[0]             # Column 0 is our query
-                tlen = line[2]              # Column 2 is length of protein
-                score = float(line[13])     # Column 14 is the score, convert to float
+                target = line[0]
+                score = float(line[1])
             except:
                 continue
 
-            if query not in proteins:
+            if target not in proteins:
                 print("WARNING: Possible bug on line", i, "of HMMER file:", fileHmmer)
-                print(line, '\n')
-                exit()
+                return None
             else:
-                proteins[query]['count'] += 1
+                proteins[target]['count'] += 1
                 if score >= minscore:
-                    proteins[query]['found'] += 1
+                    proteins[target]['found'] += 1
     
     # calculate stats
     lengths = [ item['length'] for item in proteins.values() ]

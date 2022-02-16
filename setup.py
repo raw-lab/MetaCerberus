@@ -23,15 +23,15 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/raw-lab/cerberus",
-    scripts=['bin/cerberus-meta.py', 'bin/cerberus_setup.sh', 'bin/cerberus_slurm.sh'], # scripts to copy to 'bin' path
-    packages=['cerberus', 'cerberus_data'], # list of packages, installed to site-packages folder
-    package_dir=dict(cerberus='cerberus', cerberus_data='cerberus_data'), # dict with 'package'='relative dir'
-    package_data=dict(cerberus_data=package_files('cerberus_data')), # add non-python data to package, relative paths
-    license="BSD License", # metadata
+    scripts=['bin/meta-cerberus.py', 'bin/cerberus_setup.sh', 'bin/cerberus_slurm.sh'], # scripts to copy to 'bin' path
+    packages=['meta_cerberus'],                                             # list of packages, installed to site-packages folder
+    package_dir=dict(cerberus_meta='meta_cerberus'),                        # dict with 'package'='relative dir'
+    package_data=dict(cerberus_data=package_files('meta_cerberus/data')),   # add non-python data to package, relative paths
+    license="MIT License", # metadata
     platforms=['Unix'], # metadata
     classifiers=[ # This is the new updated way for metadata, but old way seems to still be used in some of the output
         "Programming Language :: Python :: 3.7",
-        "License :: OSI Approved :: BSD License",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: Unix",
     ],
     python_requires='==3.7.*',

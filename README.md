@@ -8,9 +8,10 @@ Python code for versatile Functional Ontology Assignments for Metagenomes via Hi
 
 ### Prerequisites and dependencies
 
-python=3.7
+python >= 3.7
 
-Cerberus currently runs best with Python version 3.7 due to compatibility with dependencies, namely "Ray".
+Cerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies, namely "Ray".  
+Python 3.10 is not currently supported.
 
 #### Available from Bioconda
 
@@ -24,23 +25,23 @@ Cerberus currently runs best with Python version 3.7 due to compatibility with d
 These can be installed manually and the paths added to a config file, or installed in an Anaconda environment with this command:
 
 ```bash
-conda create -n cerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn dominate configargparse python=3.7 -y
+conda create -n cerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer python=3.7 -y
 ```
 
-#### Available from PyPi (pip)
+#### Other dependencies
 
-- ray - <https://github.com/ray-project/ray>
-- metaomestats - <https://github.com/raw-lab/metaome_stats>
+- Cerberus depends on a database available at osf.io
+- FGS+ needs to be cloned and compiled to run properly
 
-- configargparse
-- scikit-learn
-- pandas
-- numpy
-- plotly
-- psutil
-- dominate
+Both of these can be installed after installing cerberus by running:
 
-### 1) Clone latest build from github
+```bash
+cerberus_setup.sh -d -f
+```
+
+*When using the included install script these are installed automatically.
+
+### Option 1) Manual Install
 
 1. Clone github Repo
 
@@ -52,30 +53,14 @@ conda create -n cerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop
 
     ```bash
     cd cerberus
-    python3 install_cerberus.py
+    python3 install_cerberus.py --conda
+    conda activate cerberus
     ```
 
-- --instal option copies the script files to a custom folder and downloads database files
-- --pip option uses pip to install Cerberus from the local folder
-- --conda option creates a conda environment named "cerberus" and installs cerberus with all dependencies in it
+- This installs all required dependencies into a new conda environment called "cerberus"
 - --help gives more information about the options
 
-### 2) Install with pip from github
-
-```bash
-pip install git+https://github.com/raw-lab/cerberus/
-```
-
-- This installs the latest build (may be unstable) using pip
-- Next run the setup script to download the Database and install FGS+
-
-```bash
-cerberus_setup.py -f -d
-```
-
-- *Dependencies should be installed manually and specified in the config file or path
-
-### 3) Anaconda and pip installs (COMING SOON, stable versions)
+### Option 2) Anaconda and pip installs (**COMING SOON, stable versions)
 
 1. Anaconda install from bioconda with all dependencies:
 
@@ -109,20 +94,71 @@ conda activate cerberus
 - Run cerberus-pipeline.py with the options required for your project.
 
 ```bash
-usage: cerberus-pipeline.py [-c CONFIG] [--mic MIC] [--euk EUK] [--super SUPER]
-                   [--prot PROT] [--nanopore | --illumina | --pacbio]
-                   [--dir_out DIR_OUT] [--scaf] [--minscore MINSCORE]
-                   [--cpus CPUS] [--replace] [--version] [-h]
-                   [--adapters ADAPTERS] [----control_seq SEQUENCE]
-```
+usage: meta-cerberus.py [-c CONFIG] [--prodigal PRODIGAL]
+                        [--fraggenescan FRAGGENESCAN] [--meta META]
+                        [--super SUPER] [--protein PROTEIN]
+                        [--illumina | --nanopore | --pacbio]
+                        [--dir_out DIR_OUT] [--scaffolds]
+                        [--minscore MINSCORE] [--cpus CPUS]
+                        [--chunker CHUNKER] [--replace] [--hmm HMM]
+                        [--version] [-h] [--adapters ADAPTERS]
+                        [--control_seq CONTROL_SEQ]
 
-- One of --mic, --euk, --super, or --prot is required.
-- --help option will show more details about each option.
+optional arguments:
+  --illumina            Specifies that the given FASTQ files are from Illumina
+  --nanopore            Specifies that the given FASTQ files are from Nanopore
+  --pacbio              Specifies that the given FASTQ files are from PacBio
+
+Required arguments
+At least one sequence is required.
+<accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
+Example:
+> cerberus.py --prodigal file1.fasta
+> cerberus.py --config file.config
+*Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.:
+  -c CONFIG, --config CONFIG
+                        Path to config file, command line takes priority
+  --prodigal PRODIGAL   Prokaryote nucleotide sequence (includes microbes,
+                        bacteriophage)
+  --fraggenescan FRAGGENESCAN
+                        Eukaryote nucleotide sequence (includes other viruses,
+                        works all around for everything)
+  --meta META           Metagenomic nucleotide sequences (Uses prodigal)
+  --super SUPER         Run sequence in both --prodigal and --fraggenescan
+                        modes
+  --protein PROTEIN, --amino PROTEIN
+                        Protein Amino Acid sequence
+
+optional arguments:
+  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder.
+                        Defaults to current directory.
+  --scaffolds           Sequences are treated as scaffolds
+  --minscore MINSCORE   Filter for parsing HMMER results
+  --cpus CPUS           Number of CPUs to use per task. System will try to
+                        detect available CPUs if not specified
+  --chunker CHUNKER     Split files into smaller chunks, in Megabytes
+  --replace             Flag to replace existing files. False by default
+  --hmm HMM             Specify a custom HMM file for HMMER. Default uses
+                        downloaded FOAM HMM Database
+  --version, -v         show the version number and exit
+  -h, --help            show this help message and exit
+
+  --adapters ADAPTERS   FASTA File containing adapter sequences for trimming
+  --control_seq CONTROL_SEQ
+                        FASTA File containing control sequences for
+                        decontamination
+
+Args that start with '--' (eg. --prodigal) can also be set in a config file
+(specified via -c). Config file syntax allows: key=value, flag=true,
+stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
+specified in more than one place, then commandline values override config file
+values which override defaults.
+```
 
 - example:
 
 ```bash
-python cerberus-pipeline.py --euk <input file path> 
+python cerberus-pipeline.py --protein <input file path> 
 ```
 
 ### Multiprocessing / Multi-Computing
@@ -130,7 +166,7 @@ python cerberus-pipeline.py --euk <input file path>
 Cerberus uses Ray for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
 Cerberus has been tested on a cluster using Slurm <https://github.com/SchedMD/slurm>.  
   
-A script has been included to facilitate running Cerberus on Slurm. To use Cerberus on a Slurm cluster setup your slurm script run it using sbatch.  
+A script has been included to facilitate running Cerberus on Slurm. To use Cerberus on a Slurm cluster, setup your slurm script and run it using sbatch.  
 
 ```bash
 sbatch example_script.sh
@@ -164,7 +200,7 @@ conda activate cerberus
 # source the slurm script to initialize the Ray worker nodes
 source cerberus_slurm.sh
 # run Cerberus
-cerberus-pipeline.py --prod [input_folder] --illumina --dir_out [out_folder]
+cerberus-pipeline.py --prodigal [input_folder] --illumina --dir_out [out_folder]
 
 echo ""
 echo "======================================================"

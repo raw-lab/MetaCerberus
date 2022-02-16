@@ -9,7 +9,7 @@ import os
 import pandas as pd
 
 
-def parseHmmer(fileHmmer, config, subdir):
+def parseHmmer(hmm_tsv, config, subdir):
     path = os.path.join(config['DIR_OUT'], subdir)
     os.makedirs(path, exist_ok=True)
 
@@ -22,18 +22,16 @@ def parseHmmer(fileHmmer, config, subdir):
     # Calculate Best Hit
     BH_dict = {}
     BH_top5 = {}
-    with open(fileHmmer, "r") as reader:
+    with open(hmm_tsv, "r") as reader:
         for line in reader:
-            if line.startswith("#"):        # Skip commented lines
-                continue
-            line = line.split()
+            line = line.split('\t')
             try:
-                query = line[0]             # Column 0 is our query
-                line[13] = float(line[13])  # Column 14 is the score, convert to float
+                query = line[3]
+                score = float(line[1])
             except:
                 continue
-            score = line[13]
             if score < minscore:            # Skip scores less than minscore
+                print("DEBUG: MINSCORE DETECTED")
                 continue
 
             # store top 5 per query
@@ -42,32 +40,31 @@ def parseHmmer(fileHmmer, config, subdir):
             elif len(BH_top5[query]) < 5:
                 BH_top5[query].append(line)
             else:
-                BH_top5[query].sort(key = lambda x: x[13], reverse=True)
-                if score > BH_top5[query][0][13]:
+                BH_top5[query].sort(key = lambda x: x[1], reverse=True)
+                if score > float(BH_top5[query][0][1]):
                     BH_top5[query][0] = line
 
             # Check for Best Score per query
             if query not in BH_dict:
                 BH_dict[query] = line
-            elif score > BH_dict[query][13]:
+            elif score > float(BH_dict[query][1]):
                 BH_dict[query] = line
 
     # Save Top 5 hits tsv rollup
-    if config['REPLACE'] or not os.path.exists(top5File):
-        with open(top5File, 'w') as writer:
-            print("Target Name", "KO ID", "EC value", "E-Value (sequence)", "Score (domain)", file=writer, sep='\t')
-            for query in sorted(BH_top5.keys()):
-                BH_top5[query].sort(key = lambda x: x[13], reverse=True)
-                for line in BH_top5[query]:
-                    ko = []
-                    ec = []
-                    for id in line[3].split(','):
-                        if "KO:" in id:
-                            id = id.split(':')[1].split('_')
-                            ko += [id[0]]
-                            if len(id)>1:
-                                ec += [id[1]]
-                    print(line[0], ','.join(ko), ','.join(ec), line[6], line[13], file=writer, sep='\t')
+    with open(top5File, 'w') as writer:
+        print("Target Name", "KO ID", "EC value", "E-Value (sequence)", "Score (domain)", file=writer, sep='\t')
+        for query in sorted(BH_top5.keys()):
+            BH_top5[query].sort(key = lambda x: x[1], reverse=True)
+            for line in BH_top5[query]:
+                ko = []
+                ec = []
+                for id in line[3].split(','):
+                    if "KO:" in id:
+                        id = id.split(':')[1].split('_')
+                        ko += [id[0]]
+                        if len(id)>1:
+                            ec += [id[1]]
+                print(line[0], ','.join(ko), ','.join(ec), line[2], line[1], file=writer, sep='\t')
 
     # Create dictionary with found KO IDs and counts
     KO_ID_counts = {}

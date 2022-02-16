@@ -29,8 +29,10 @@ htmlHeader = [
 # Can I use both???
 PLOTLY_SOURCE = 'cdn'
 
-# style.css
-STYLESHEET = pkg.resource_stream('cerberus_data', 'style.css').read().decode()
+# Data resources
+STYLESHEET = pkg.resource_stream('meta_cerberus', 'data/style.css').read().decode()
+ICON = base64.b64encode(pkg.resource_stream('meta_cerberus', 'data/cerberus_logo.png').read()).decode()
+PLOTLY = pkg.resource_filename('meta_cerberus', 'data/plotly-2.0.0.min.js')
 
 
 ######### Create Report ##########
@@ -38,8 +40,7 @@ def createReport(figSunburst, figCharts, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
-    plotly = pkg.resource_filename('cerberus_data', 'plotly-2.0.0.min.js')
-    shutil.copy(plotly, path)
+    shutil.copy(PLOTLY, path)
     
     # Sunburst HTML files
     for sample,figures in figSunburst.items():
@@ -214,9 +215,7 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
                 raw('\n'+STYLESHEET)
         with div(cls="document", id="cerberus-summary"):
             with h1(cls="title"):
-                icon = pkg.resource_stream('cerberus_data', 'cerberus_logo.png').read()
-                icon = base64.b64encode(icon).decode()
-                img(src=f"data:image/png;base64,{icon}", height="40")
+                img(src=f"data:image/png;base64,{ICON}", height="40")
                 a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
                 raw(" - Statistical Summary")
             with div(cls="contents topic", id="contents"):
@@ -301,9 +300,7 @@ def write_HTML_files(outfile, figure, sample, name):
         with div(cls="document", id="cerberus-report"):
             # Header
             with h1(cls="title"):
-                icon = pkg.resource_stream('cerberus_data', 'cerberus_logo.png').read()
-                icon = base64.b64encode(icon).decode()
-                img(src=f"data:image/png;base64,{icon}", height="40")
+                img(src=f"data:image/png;base64,{ICON}", height="40")
                 a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
                 raw(f" - {name} Bar Graphs for '{sample}'")
             # Side Panel
@@ -318,7 +315,7 @@ def write_HTML_files(outfile, figure, sample, name):
                 for title, figure in figure.items():
                     htmlFig = figure.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     try:
-                        id = re.search('<div id="([a-​z0-9-]*)"', htmlFig).group(1)
+                        id = re.search('<div id="([a-z0-9-]*)"', htmlFig).group(1)
                     except:
                         continue
                     levels[id] = title

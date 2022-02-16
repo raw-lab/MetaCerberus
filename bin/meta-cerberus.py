@@ -25,7 +25,7 @@ import ray #multiprocessing
 
 
 # our package import
-from cerberus import (
+from meta_cerberus import (
     cerberus_qc, cerberus_merge, cerberus_trim, cerberus_decon, cerberus_formatFasta, cerberus_metastats,
     cerberus_genecall, cerberus_hmm, cerberus_parser,
     cerberus_prostats, cerberus_visual, cerberus_report, Chunker
@@ -41,10 +41,10 @@ FILES_AMINO = [".faa"]
 
 # refseq default locations (for decontamination)
 REFSEQ = {
-    "adapters": pkg.resource_filename("cerberus_data", "adapters.fna"),
-    "illumina": pkg.resource_filename("cerberus_data", "phix174_ill.ref.fna"),
-    "lambda": pkg.resource_filename("cerberus_data", "lambda-phage.fna"),
-    "pacbio": pkg.resource_filename("cerberus_data", "PacBio_quality-control.fna")
+    "adapters": pkg.resource_filename("meta_cerberus", "data/adapters.fna"),
+    "illumina": pkg.resource_filename("meta_cerberus", "data/phix174_ill.ref.fna"),
+    "lambda": pkg.resource_filename("meta_cerberus", "data/lambda-phage.fna"),
+    "pacbio": pkg.resource_filename("meta_cerberus", "data/PacBio_quality-control.fna")
 }
 
 # external dependencies
@@ -112,7 +112,7 @@ Example:
     required.add_argument('--prodigal', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
     required.add_argument('--fraggenescan', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
     required.add_argument('--meta', action="append", default=[], help="Metagenomic nucleotide sequences (Uses prodigal)")
-    required.add_argument('--super', action='append', default=[], help='Run sequence in both --prodigal and --graggenescan modes')
+    required.add_argument('--super', action='append', default=[], help='Run sequence in both --prodigal and --fraggenescan modes')
     required.add_argument('--protein', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
     readtype = parser.add_mutually_exclusive_group(required=False)
@@ -404,7 +404,9 @@ Example:
     print("\nSTEP 8: HMMER Search")
 
     jobHMM = []
-    limit = int(config["CPUS"]/4)
+    limit = int(config["CPUS"])#1#int(config["CPUS"]/4)
+    print("limit:", limit)
+    print("Aminos:", amino.keys())
     iter_amino = iter(amino)
     for key in iter_amino:
         # Split files into chunks
@@ -420,12 +422,14 @@ Example:
                 jobHMM.append(rayWorker.remote(cerberus_hmm.searchHMM, key, aminoAcids, config, f"{STEP[8]}/{key}"))
         else:
             aminoAcids = {}
-            for i in range(0, limit):
-                aminoAcids[key] = amino[key]
+            aminoAcids[key] = amino[key]
+            for i in range(0, limit-1):
                 try:
                     key = next(iter_amino)
                 except:
                     break
+                aminoAcids[key] = amino[key]
+            print("Amino Acids:", aminoAcids.keys())
             jobHMM.append(rayWorker.remote(cerberus_hmm.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
     print("Waiting for HMMER")
     dictChunks = dict()
@@ -448,25 +452,22 @@ Example:
                 dictChunks[key].append(value)
 
     # Merge chunked files
-    hmmFoam = {}
+    hmm_tsv = {}
     for key,value in dictChunks.items():
-        print(key, len(value), value)
-        hmmFile = f"{config['DIR_OUT']}/{STEP[8]}/{key}/{key}.hmm"
-        with open(hmmFile, 'w') as writer:
-            for item in sorted(value): # TODO: Remove repeated headers
+        tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
+        with open(tsv_file, 'w') as writer:
+            print("target", "score", "e-value" "query", sep='\t', file=writer)
+            for item in sorted(value):
                 writer.write(open(item).read())
-                #os.remove(item) #TODO: Remove Chunked files???
-        hmmFoam[key] = hmmFile
+                os.remove(item)
+        hmm_tsv[key] = tsv_file
     del dictChunks
-    # Clean HMM File
-    for value in hmmFoam.values():
-        subprocess.run(["sed", "-i", '4,$ {/^#/d}', value])
 
 
     # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")
     jobParse = []
-    for key,value in hmmFoam.items():
+    for key,value in hmm_tsv.items():
         jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
 
     hmmRollup = {}
@@ -479,7 +480,7 @@ Example:
         key,value = ray.get(ready[0])
         hmmRollup[key] = value
         hmmCounts[key] = cerberus_parser.createCountTables(hmmRollup[key])
-        protStats[key] = cerberus_prostats.getStats(amino[key], hmmFoam[key], hmmCounts[key], config)
+        protStats[key] = cerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config)
         figSunburst[key] = cerberus_visual.graphSunburst(hmmCounts[key])
         figCharts[key] = cerberus_visual.graphBarcharts(hmmRollup[key], hmmCounts[key])
 
