@@ -1,16 +1,16 @@
-# Welcome to Cerberus
+# Welcome to MetaCerberus
 
 Python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data
 
 ![GitHub Logo](cerberus_logo.jpg)
 
-## Installing Cerberus
+## Installing MetaCerberus
 
 ### Prerequisites and dependencies
 
 python >= 3.7
 
-Cerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies, namely "Ray".  
+MetaCerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies, namely "Ray".  
 Python 3.10 is not currently supported.
 
 #### Available from Bioconda
@@ -25,7 +25,7 @@ Python 3.10 is not currently supported.
 These can be installed manually and the paths added to a config file, or installed in an Anaconda environment with this command:
 
 ```bash
-conda create -n cerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer python=3.7 -y
+conda create -n metacerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn dominate configargparse python=3.7 -y
 ```
 
 #### Other dependencies
@@ -46,52 +46,67 @@ cerberus_setup.sh -d -f
 1. Clone github Repo
 
     ```bash
-    git clone https://github.com/raw-lab/cerberus.git
+    git clone https://github.com/raw-lab/metacerberus.git
     ```
 
 2. Run Setup File
 
     ```bash
-    cd cerberus
-    python3 install_cerberus.py --conda
-    conda activate cerberus
+    cd metacerberus
+    python3 install_metacerberus.py --conda
+    conda activate metacerberus
     ```
 
-- This installs all required dependencies into a new conda environment called "cerberus"
+- --conda option creates a conda environment named "MetaCerberus" and installs MetaCerberus with all dependencies in it
 - --help gives more information about the options
 
-### Option 2) Anaconda and pip installs (**COMING SOON, stable versions)
+### Option 2) Install with pip from github
+
+```bash
+pip install git+https://github.com/raw-lab/metacerberus/
+```
+
+- This installs the latest build (may be unstable) using pip
+- Next run the setup script to download the Database and install FGS+
+
+```bash
+cerberus_setup.py -f -d
+```
+
+- *Dependencies should be installed manually and specified in the config file or path
+
+### 3) Anaconda and pip installs (**COMING SOON, stable versions)
 
 1. Anaconda install from bioconda with all dependencies:
 
     ```bash
-    conda install -c bioconda cerberus
+    conda install -c bioconda metacerberus
     ```
 
 2. PIP install:
 
     ```bash
-    pip install cerberus
+    pip install metacerberus
     ```
 
 - The pip installer will not install all dependencies (since they are not available from pip)
-- Many dependencies will need to be installed manually. Running cerberus will let you know what is missing from your environment.
+- Many dependencies will need to be installed manually. Running MetaCerberus will let you know what is missing from your environment.
 
 ## Database
 
 - The database files are located at <https://osf.io/5ba2v/>
 - NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
 
-## Running Cerberus
+## Running MetaCerberus
 
-- If needed, activate the Cerberus environment in Anaconda
+- If needed, activate the MetaCerberus environment in Anaconda
 
 ```bash
-conda activate cerberus
+conda activate metacerberus
 ```
 
-- If the Cerberus environment is not used, make sure the dependencies are in PATH or specified in the config file.
-- Run cerberus-pipeline.py with the options required for your project.
+- If the metacerberus environment is not used, make sure the dependencies are in PATH or specified in the config file.
+- Run meta-cerberus.py with the options required for your project.
 
 ```bash
 usage: meta-cerberus.py [-c CONFIG] [--prodigal PRODIGAL]
@@ -113,8 +128,8 @@ Required arguments
 At least one sequence is required.
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-> cerberus.py --prodigal file1.fasta
-> cerberus.py --config file.config
+> meta-cerberus.py --prodigal file1.fasta
+> meta-cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.:
   -c CONFIG, --config CONFIG
                         Path to config file, command line takes priority
@@ -158,15 +173,15 @@ values which override defaults.
 - example:
 
 ```bash
-python cerberus-pipeline.py --protein <input file path> 
+python meta-cerberus.py --euk <input file path> 
 ```
 
 ### Multiprocessing / Multi-Computing
 
-Cerberus uses Ray for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
-Cerberus has been tested on a cluster using Slurm <https://github.com/SchedMD/slurm>.  
+MetaCerberus uses Ray for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
+MetaCerberus has been tested on a cluster using Slurm <https://github.com/SchedMD/slurm>.  
   
-A script has been included to facilitate running Cerberus on Slurm. To use Cerberus on a Slurm cluster, setup your slurm script and run it using sbatch.  
+A script has been included to facilitate running MetaCerberus on Slurm. To use MetaCerberus on a Slurm cluster, setup your slurm script and run it using sbatch.  
 
 ```bash
 sbatch example_script.sh
@@ -196,11 +211,11 @@ echo "======================================================"
 echo ""
 
 # Load any modules or resources here
-conda activate cerberus
+conda activate metacerberus
 # source the slurm script to initialize the Ray worker nodes
 source cerberus_slurm.sh
-# run Cerberus
-cerberus-pipeline.py --prodigal [input_folder] --illumina --dir_out [out_folder]
+# run MetaCerberus
+meta-cerberus.py --prodigal [input_folder] --illumina --dir_out [out_folder]
 
 echo ""
 echo "======================================================"
@@ -227,9 +242,9 @@ echo ""
 - Once the program is executed the html reports with the visuals will be saved to the last step of the pipeline.
 - The HTML files require plotly.js to be present. One has been provided in the package and is saved to the report folder.
 
-## Citing Cerberus
+## Citing MetaCerberus
 
-Cerberus: python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints.
+MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints.
 
 ## CONTACT
 
@@ -237,4 +252,4 @@ The informatics point-of-contact for this project is [Dr. Richard Allen White II
 If you have any questions or feedback, please feel free to get in touch by email.  
 Dr. Richard Allen White III - rwhit101@uncc.edu or raw937@gmail.com.  
 Jose Figueroa - jlfiguer@uncc.edu  
-Or [open an issue](https://github.com/raw-lab/cerberus/issues).  
+Or [open an issue](https://github.com/raw-lab/metacerberus/issues).  

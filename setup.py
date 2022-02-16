@@ -15,14 +15,14 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="cerberus-meta",
+    name="metacerberus",
     version="0.1",
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
     description="Versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/raw-lab/cerberus",
+    url="https://github.com/raw-lab/metacerberus",
     scripts=['bin/meta-cerberus.py', 'bin/cerberus_setup.sh', 'bin/cerberus_slurm.sh'], # scripts to copy to 'bin' path
     packages=['meta_cerberus'],                                             # list of packages, installed to site-packages folder
     package_dir=dict(cerberus_meta='meta_cerberus'),                        # dict with 'package'='relative dir'
