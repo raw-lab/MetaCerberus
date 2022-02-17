@@ -35,7 +35,13 @@ function clean {
   rm -rf "$ABSPATH/$pathDB"
   return
 }
+
 ### Begin Main Script ###
+
+$ARG_DOWN=false
+$ARG_FGS=false
+$ARG_CLEAN=false
+$ARG_HELP=false
 
 # Parse Arguments
 while (( "$#" )); do
@@ -63,9 +69,7 @@ while (( "$#" )); do
   esac
 done
 
-[ ! $ARG_DOWN $ARG_FGS $ARG_CLEAN $ARG_HELP ] && echo "
-No options given.
-" && ARG_HELP=true
+[ ! $ARG_DOWN $ARG_FGS $ARG_CLEAN $ARG_HELP ] && echo "No options given." && ARG_HELP=true
 
 [ $ARG_HELP ] && echo "
 usage: [--path PATH] [--download] [--dependencies] [--help]

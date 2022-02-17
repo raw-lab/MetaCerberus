@@ -15,7 +15,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="metacerberus",
+    name="MetaCerberus",
     version="0.1",
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
@@ -23,10 +23,10 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/raw-lab/metacerberus",
-    scripts=['bin/meta-cerberus.py', 'bin/cerberus_setup.sh', 'bin/cerberus_slurm.sh'], # scripts to copy to 'bin' path
+    scripts=['bin/metacerberus.py', 'bin/setup-metacerberus.sh', 'bin/slurm-metacerberus.sh'], # scripts to copy to 'bin' path
     packages=['meta_cerberus'],                                             # list of packages, installed to site-packages folder
-    package_dir=dict(meta_cerberus='meta_cerberus'),                        # dict with 'package'='relative dir'
-    package_data=dict(meta_cerberus=package_files('meta_cerberus/data')),   # add non-python data to package, relative paths
+    package_dir=dict(meta_cerberus='lib'),                        # dict with 'package'='relative dir'
+    package_data=dict(meta_cerberus=package_files('lib/data')),   # add non-python data to package, relative paths
     license="BSD License", # metadata
     platforms=['Unix'], # metadata
     classifiers=[ # This is the new updated way for metadata, but old way seems to still be used in some of the output
@@ -41,7 +41,7 @@ setuptools.setup(
     python_requires='<3.10',
     install_requires=[
             'setuptools',
-            'ray[default]',
+            'ray',
             'metaomestats',
             'configargparse',
             'kaleido',

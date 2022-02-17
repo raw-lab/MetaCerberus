@@ -6,42 +6,36 @@ Python code for versatile Functional Ontology Assignments for Metagenomes via Hi
 
 ## Installing MetaCerberus
 
-### Prerequisites and dependencies
+### Option 1) Anaconda
 
-python >= 3.7
+- Anaconda install from bioconda with all dependencies:
 
-MetaCerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies, namely "Ray".  
-Python 3.10 is not currently supported.
+    ```bash
+    conda create -n -c condaforge -c bioconda metacerberus
+    conda activate metacerberus
+    setup-metacerberus -d
+    setup-metacerberus -f
+    ```
 
-#### Available from Bioconda
-
-- fastqc - <https://github.com/s-andrews/FastQC>
-- fastp - <https://github.com/OpenGene/fastp>
-- porechop - <https://github.com/rrwick/Porechop>
-- bbmap - <https://sourceforge.net/projects/bbmap/> or <https://github.com/BioInfoTools/BBMap>
-- prodigal - <https://github.com/hyattpd/Prodigal>
-- hmmer - <https://github.com/EddyRivasLab/hmmer>
-
-These can be installed manually and the paths added to a config file, or installed in an Anaconda environment with this command:
+### Option 2) pip
 
 ```bash
-conda create -n metacerberus -c conda-forge -c bioconda fastqc flash2 fastp porechop bbmap prodigal hmmer pandas numpy plotly scikit-learn dominate configargparse python=3.7 -y
+pip install metacerberus
 ```
 
-#### Other dependencies
-
-- Cerberus depends on a database available at osf.io
-- FGS+ needs to be cloned and compiled to run properly
-
-Both of these can be installed after installing cerberus by running:
+- This installs the latest build (may be unstable) using pip
+- Next run the setup script to download the Database and install FGS+
 
 ```bash
-cerberus_setup.sh -d -f
+setup-metacerberus.py -f
+setup-metacerberus.py -d
 ```
 
-*When using the included install script these are installed automatically.
+- *Dependencies should be installed manually and specified in the config file or path
 
-### Option 1) Manual Install
+### Option 3) Manual Install
+
+*Latest code might be unstable
 
 1. Clone github Repo
 
@@ -53,48 +47,41 @@ cerberus_setup.sh -d -f
 
     ```bash
     cd metacerberus
-    python3 install_metacerberus.py --conda
+    python3 install_metacerberus.py
     conda activate metacerberus
     ```
 
-- --conda option creates a conda environment named "MetaCerberus" and installs MetaCerberus with all dependencies in it
-- --help gives more information about the options
+This creates an anaconda environment called "metacerberus" with all dependencies installed.
 
-### Option 2) Install with pip from github
+## Prerequisites and dependencies
+
+python >= 3.7
+
+MetaCerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies, namely "Ray".  
+Python 3.10 is not currently supported.
+
+### Available from Bioconda
+
+- fastqc - <https://github.com/s-andrews/FastQC>
+- fastp - <https://github.com/OpenGene/fastp>
+- porechop - <https://github.com/rrwick/Porechop>
+- bbmap - <https://sourceforge.net/projects/bbmap/> or <https://github.com/BioInfoTools/BBMap>
+- prodigal - <https://github.com/hyattpd/Prodigal>
+- hmmer - <https://github.com/EddyRivasLab/hmmer>
+
+### Other dependencies
+
+- Cerberus depends on a database available at osf.io
+- FGS+ needs to be cloned and compiled to run properly
+Both of these can be installed after installing cerberus by running:
 
 ```bash
-pip install git+https://github.com/raw-lab/metacerberus/
+cerberus_setup.sh -d
+cerberus_setup.sh -f
 ```
 
-- This installs the latest build (may be unstable) using pip
-- Next run the setup script to download the Database and install FGS+
+*When using the included install script these are installed automatically.
 
-```bash
-cerberus_setup.py -f -d
-```
-
-- *Dependencies should be installed manually and specified in the config file or path
-
-### 3) Anaconda and pip installs (**COMING SOON, stable versions)
-
-1. Anaconda install from bioconda with all dependencies:
-
-    ```bash
-    conda install -c bioconda metacerberus
-    ```
-
-2. PIP install:
-
-    ```bash
-    pip install metacerberus
-    ```
-
-- The pip installer will not install all dependencies (since they are not available from pip)
-- Many dependencies will need to be installed manually. Running MetaCerberus will let you know what is missing from your environment.
-
-## Database
-
-- The database files are located at <https://osf.io/5ba2v/>
 - NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
 
 ## Running MetaCerberus
@@ -106,18 +93,15 @@ conda activate metacerberus
 ```
 
 - If the metacerberus environment is not used, make sure the dependencies are in PATH or specified in the config file.
-- Run meta-cerberus.py with the options required for your project.
+- Run metacerberus.py with the options required for your project.
 
 ```bash
-usage: meta-cerberus.py [-c CONFIG] [--prodigal PRODIGAL]
-                        [--fraggenescan FRAGGENESCAN] [--meta META]
-                        [--super SUPER] [--protein PROTEIN]
-                        [--illumina | --nanopore | --pacbio]
-                        [--dir_out DIR_OUT] [--scaffolds]
-                        [--minscore MINSCORE] [--cpus CPUS]
-                        [--chunker CHUNKER] [--replace] [--hmm HMM]
-                        [--version] [-h] [--adapters ADAPTERS]
-                        [--control_seq CONTROL_SEQ]
+usage: metacerberus.py [-c CONFIG] [--prodigal PRODIGAL] [--fraggenescan FRAGGENESCAN]
+                       [--meta META] [--super SUPER] [--protein PROTEIN]
+                       [--illumina | --nanopore | --pacbio] [--dir_out DIR_OUT]
+                       [--scaffolds] [--minscore MINSCORE] [--cpus CPUS]
+                       [--chunker CHUNKER] [--replace] [--keep] [--hmm HMM] [--version]
+                       [-h] [--adapters ADAPTERS] [--control_seq CONTROL_SEQ]
 
 optional arguments:
   --illumina            Specifies that the given FASTQ files are from Illumina
@@ -128,52 +112,49 @@ Required arguments
 At least one sequence is required.
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-> meta-cerberus.py --prodigal file1.fasta
-> meta-cerberus.py --config file.config
+> cerberus.py --prodigal file1.fasta
+> cerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.:
   -c CONFIG, --config CONFIG
                         Path to config file, command line takes priority
-  --prodigal PRODIGAL   Prokaryote nucleotide sequence (includes microbes,
-                        bacteriophage)
+  --prodigal PRODIGAL   Prokaryote nucleotide sequence (includes microbes, bacteriophage)
   --fraggenescan FRAGGENESCAN
-                        Eukaryote nucleotide sequence (includes other viruses,
-                        works all around for everything)
+                        Eukaryote nucleotide sequence (includes other viruses, works all
+                        around for everything)
   --meta META           Metagenomic nucleotide sequences (Uses prodigal)
-  --super SUPER         Run sequence in both --prodigal and --fraggenescan
-                        modes
+  --super SUPER         Run sequence in both --prodigal and --fraggenescan modes
   --protein PROTEIN, --amino PROTEIN
                         Protein Amino Acid sequence
 
 optional arguments:
-  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder.
-                        Defaults to current directory.
+  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to
+                        current directory.
   --scaffolds           Sequences are treated as scaffolds
   --minscore MINSCORE   Filter for parsing HMMER results
-  --cpus CPUS           Number of CPUs to use per task. System will try to
-                        detect available CPUs if not specified
+  --cpus CPUS           Number of CPUs to use per task. System will try to detect
+                        available CPUs if not specified
   --chunker CHUNKER     Split files into smaller chunks, in Megabytes
   --replace             Flag to replace existing files. False by default
-  --hmm HMM             Specify a custom HMM file for HMMER. Default uses
-                        downloaded FOAM HMM Database
+  --keep                Flag to keep temporary files. False by default
+  --hmm HMM             Specify a custom HMM file for HMMER. Default uses downloaded FOAM
+                        HMM Database
   --version, -v         show the version number and exit
   -h, --help            show this help message and exit
 
   --adapters ADAPTERS   FASTA File containing adapter sequences for trimming
   --control_seq CONTROL_SEQ
-                        FASTA File containing control sequences for
-                        decontamination
+                        FASTA File containing control sequences for decontamination
 
-Args that start with '--' (eg. --prodigal) can also be set in a config file
-(specified via -c). Config file syntax allows: key=value, flag=true,
-stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
-specified in more than one place, then commandline values override config file
-values which override defaults.
+Args that start with '--' (eg. --prodigal) can also be set in a config file (specified via
+-c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for details, see
+syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then
+commandline values override config file values which override defaults.
 ```
 
 - example:
 
 ```bash
-python meta-cerberus.py --euk <input file path> 
+python metacerberus.py --protein <input file path> 
 ```
 
 ### Multiprocessing / Multi-Computing
@@ -213,9 +194,9 @@ echo ""
 # Load any modules or resources here
 conda activate metacerberus
 # source the slurm script to initialize the Ray worker nodes
-source cerberus_slurm.sh
+source slurm-metacerberus.sh
 # run MetaCerberus
-meta-cerberus.py --prodigal [input_folder] --illumina --dir_out [out_folder]
+metacerberus.py --prodigal [input_folder] --illumina --dir_out [out_folder]
 
 echo ""
 echo "======================================================"
