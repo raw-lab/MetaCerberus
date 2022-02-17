@@ -11,7 +11,7 @@ Python code for versatile Functional Ontology Assignments for Metagenomes via Hi
 - Anaconda install from bioconda with all dependencies:
 
     ```bash
-    conda create -n -c condaforge -c bioconda metacerberus
+    conda create -n metacerberus -c condaforge -c bioconda metacerberus
     conda activate metacerberus
     setup-metacerberus -d
     setup-metacerberus -f
