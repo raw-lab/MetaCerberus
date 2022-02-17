@@ -1,8 +1,10 @@
 # to run this file:
 # cerberus-pipeline.py -c test.config
 
-dir_out: temp-results_new
+dir_out: temp-results
 #chunker: 1
+
+#keep: True
 
 # nanopore and illumina tests are exclusive
 

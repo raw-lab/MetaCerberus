@@ -1,13 +1,13 @@
 #!/bin/bash
 
-#SBATCH --partition=Andromeda
+#SBATCH --partition=Orion
 #SBATCH --job-name=cerberus_tests
 #SBATCH --exclusive
-#SBATCH --nodes=2
+#SBATCH --nodes=1
 #SBATCH --tasks-per-node=1
-#SBATCH --cpus-per-task=64
-#SBATCH --mem=256GB
-#SBATCH --time=30-0
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=128GB
+#SBATCH --time=1-0
 #SBATCH -e slurm-%x-%j.err
 #SBATCH -o slurm-%x-%j.out
 #SBATCH --mail-type=END,FAIL,REQUEUE
@@ -22,14 +22,15 @@ echo "======================================================"
 echo ""
 
 module load anaconda3
-conda activate cerberus
+eval "$(conda shell.bash hook)"
+conda activate metacerberus
 
 if [ "$SLURM_NNODES" -gt 1 ]; then
   echo "Initializing Ray on $SLURM_NNODES Nodes"
   source cerberus_slurm.sh
 fi
 
-command time cerberus-pipeline.py -c config.yaml
+command time meta-cerberus.py -c config.yaml
 
 echo ""
 echo "======================================================"

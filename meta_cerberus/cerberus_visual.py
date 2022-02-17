@@ -64,7 +64,7 @@ def graphPCA(table_list):
             row = pd.Series(row, name=sample)
             if name not in dfTables:
                 dfTables[name] = pd.DataFrame()
-            dfTables[name] = dfTables[name].append(row)
+            dfTables[name] = pd.concat([dfTables[name], pd.DataFrame(row).T])
 
     # Run PCA and add to Plots
     figs = {}

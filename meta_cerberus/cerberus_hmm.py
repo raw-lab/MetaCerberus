@@ -69,6 +69,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
                 except:
                     continue
         outlist.append(outfile)
-        os.remove(domtbl_out)
+        if not config['KEEP']:
+            os.remove(domtbl_out)
 
     return outlist

@@ -12,8 +12,15 @@ __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022"
 
 
+def warn(*args, **kwargs):
+    #print("args", str(args))
+    pass
+import warnings
+warnings.warn = warn
+
 import sys
 import os
+import psutil
 import shutil
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
@@ -127,6 +134,7 @@ Example:
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
+    optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. False by default")
     optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
@@ -219,7 +227,6 @@ Example:
         ray.init()
     # Get CPU Count
     if 'CPUS' not in config:
-        import psutil
         config['CPUS'] = psutil.cpu_count()#int(ray.available_resources()['CPU'])
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
@@ -404,17 +411,16 @@ Example:
     print("\nSTEP 8: HMMER Search")
 
     jobHMM = []
-    limit = int(config["CPUS"])#1#int(config["CPUS"]/4)
-    print("limit:", limit)
-    print("Aminos:", amino.keys())
+    chunker = {}
+    limit = int(config["CPUS"]/4)
     iter_amino = iter(amino)
     for key in iter_amino:
         # Split files into chunks
         if config['CHUNKER'] > 0:
-            chunker = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+            chunker[key] = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
             c = 0
-            for i in range(0, len(chunker.files), limit):
-                files = chunker.files[i:i+limit]
+            for i in range(0, len(chunker[key].files), limit):
+                files = chunker[key].files[i:i+limit]
                 aminoAcids = {}
                 for chunk in files:
                     aminoAcids[f'chunk_{c}'] = chunk
@@ -429,7 +435,6 @@ Example:
                 except:
                     break
                 aminoAcids[key] = amino[key]
-            print("Amino Acids:", aminoAcids.keys())
             jobHMM.append(rayWorker.remote(cerberus_hmm.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
     print("Waiting for HMMER")
     dictChunks = dict()
@@ -451,7 +456,7 @@ Example:
                     dictChunks[key] = []
                 dictChunks[key].append(value)
 
-    # Merge chunked files
+    # Merge chunked results
     hmm_tsv = {}
     for key,value in dictChunks.items():
         tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
@@ -462,7 +467,10 @@ Example:
                 os.remove(item)
         hmm_tsv[key] = tsv_file
     del dictChunks
-
+    # Delete chunked files
+    for key,value in chunker.items():
+        for item in value.files:
+            os.remove(item)
 
     # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")

@@ -86,11 +86,11 @@ def parseHmmer(hmm_tsv, config, subdir):
 
     for name,df in dfRollup.items():
         outfile = os.path.join( path, "HMMER_BH_"+name+"_rollup.tsv" )
-        if config['REPLACE'] or not os.path.exists(outfile):
-            df.to_csv(outfile, index=False, header=True, sep='\t')
-        else:
-            dfRollup[name] = pd.read_csv(outfile, sep='\t', dtype=dict(Count=int))
-            dfRollup[name] = dfRollup[name].fillna('')
+        #if config['REPLACE'] or not os.path.exists(outfile):
+        df.to_csv(outfile, index=False, header=True, sep='\t')
+        #else:
+        #    dfRollup[name] = pd.read_csv(outfile, sep='\t', dtype=dict(Count=int))
+        #    dfRollup[name] = dfRollup[name].fillna('')
 
     return dfRollup
 
@@ -112,7 +112,8 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
                 print("WARNING:'", KO_ID, "'Does not have a 'Function' in the Lookup File", file=errlog)
                 continue
             rows['Count'] = count
-            dfRollup = dfRollup.append(rows, ignore_index=True)
+            dfRollup = pd.concat([dfRollup,rows])
+    dfRollup.reset_index(inplace=True)
 
     return dfRollup
 
