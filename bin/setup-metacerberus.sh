@@ -38,10 +38,10 @@ function clean {
 
 ### Begin Main Script ###
 
-$ARG_DOWN=false
-$ARG_FGS=false
-$ARG_CLEAN=false
-$ARG_HELP=false
+ARG_DOWN=false
+ARG_FGS=false
+ARG_CLEAN=false
+ARG_HELP=false
 
 # Parse Arguments
 while (( "$#" )); do
