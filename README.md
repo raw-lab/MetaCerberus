@@ -110,7 +110,7 @@ optional arguments:
 
 Required arguments
 At least one sequence is required.
-<accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
+<accepted formats {.fastq .fasta .faa .fna .ffn}>
 Example:
 > metacerberus.py --prodigal file1.fasta
 > metacerberus.py --config file.config
