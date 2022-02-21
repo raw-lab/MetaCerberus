@@ -112,8 +112,8 @@ Required arguments
 At least one sequence is required.
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-> cerberus.py --prodigal file1.fasta
-> cerberus.py --config file.config
+> metacerberus.py --prodigal file1.fasta
+> metacerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.:
   -c CONFIG, --config CONFIG
                         Path to config file, command line takes priority
