@@ -13,8 +13,8 @@ Python code for versatile Functional Ontology Assignments for Metagenomes via Hi
     ```bash
     conda create -n metacerberus -c condaforge -c bioconda metacerberus
     conda activate metacerberus
-    setup-metacerberus -d
-    setup-metacerberus -f
+    setup-metacerberus.sh -d
+    setup-metacerberus.sh -f
     ```
 
 ### Option 2) pip
@@ -27,8 +27,8 @@ pip install metacerberus
 - Next run the setup script to download the Database and install FGS+
 
 ```bash
-setup-metacerberus.py -f
-setup-metacerberus.py -d
+setup-metacerberus.sh -f
+setup-metacerberus.sh -d
 ```
 
 - *Dependencies should be installed manually and specified in the config file or path
