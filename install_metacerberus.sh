@@ -24,13 +24,16 @@ function install_conda {
     eval "$(conda shell.bash hook)"
 
     # create the metacerberus environment in conda
-    conda create -n metacerberus -c conda-forge -c bioconda gcc make fastqc flash2 fastp porechop bbmap prodigal hmmer ray-core ray-dashboard pandas numpy plotly scikit-learn dominate python-kaleido configargparse metaomestats -y
+    conda create -n metacerberus -c conda-forge -c bioconda gcc make fastqc flash2 fastp porechop bbmap prodigal hmmer ray-core ray-dashboard pandas numpy plotly scikit-learn dominate python-kaleido configargparse metaomestats psutil
 
     status=$?
     [ $status -eq 0 ] && echo "Conda environment successfully created" || exit 1
 
     # install additional pip requirements
     conda activate metacerberus
+    status=$?
+    [ $status -eq 0 ] && echo "" || exit 1
+
     pip install setuptools build
 
     install_pip
