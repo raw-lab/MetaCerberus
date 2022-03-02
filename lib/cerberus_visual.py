@@ -51,20 +51,7 @@ def graphSunburst(tables):
 
 
 ######### Create PCA Graph ##########
-def graphPCA(table_list):
-    if len(table_list) < 3:
-        print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
-        return {}
-
-    dfTables = {}    
-    for sample,tables in table_list.items():
-        for name,table in tables.items():
-            X = table[table.Level == 'Function'] #.drop(table[table['Level']<4].index, inplace=False).copy()
-            row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-            row = pd.Series(row, name=sample)
-            if name not in dfTables:
-                dfTables[name] = pd.DataFrame()
-            dfTables[name] = pd.concat([dfTables[name], pd.DataFrame(row).T])
+def graphPCA(dfTables:dict):
 
     # Run PCA and add to Plots
     figs = {}
@@ -156,10 +143,10 @@ def graphPCA(table_list):
             figs[name]["Scree_Plot"] = figScree
         figs[name]["Loadings"] = dfLoadings
         figs[name]["Loading_Matrix"] = loadings_matrix
-        figs[name]["PCA_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
+        figs[name]["Counts_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
         continue
 
-    return figs#figPCA
+    return figs
 
 
 ########## Create Bar Chart Figures ##########

@@ -2,7 +2,7 @@
 
 pathDB="cerberusDB"
 
-function install_pip {
+function install_pip() {
     rm -r dist/
     echo "Building MetaCerberus distribution..."
     python -m build > /dev/null #2>&1
@@ -19,12 +19,12 @@ function install_pip {
     return
 }
 
-function install_conda {
+function install_conda() {
     # initialize conda environment in bash script
     eval "$(conda shell.bash hook)"
 
     # create the metacerberus environment in conda
-    conda create -n metacerberus -c conda-forge -c bioconda gcc make fastqc flash2 fastp porechop bbmap prodigal hmmer ray-core ray-dashboard pandas numpy plotly scikit-learn dominate python-kaleido configargparse metaomestats psutil
+    conda create -n metacerberus -y -c conda-forge -c bioconda gcc make grpcio=1.43 fastqc flash2 fastp porechop bbmap prodigal hmmer ray-core ray-dashboard pandas plotly scikit-learn dominate python-kaleido configargparse psutil metaomestats
 
     status=$?
     [ $status -eq 0 ] && echo "Conda environment successfully created" || exit 1

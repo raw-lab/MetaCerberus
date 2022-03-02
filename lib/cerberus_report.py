@@ -260,8 +260,6 @@ def write_PCA(outpath, pcaFigures):
                 if type(fig) is pd.DataFrame:
                     fig.to_csv(f"{prefix}_{graph}.tsv", index=False, header=True, sep='\t')
                 else:
-                    # type= plotly.graph_objs._figure.Figure
-                    #htmlOut.write(f"<h2 style='text-align:center'>{graph.replace('_', ' ')}</h2>")
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     htmlOut.write(htmlFig + '\n')
                     fig.write_image(os.path.join(outpath, "img", f"{database}_{graph}.svg"))

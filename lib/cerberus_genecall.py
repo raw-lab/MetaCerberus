@@ -28,6 +28,7 @@ def findORF_fgs(contig, config, subdir):
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except Exception as e:
         print(e)
+        return None
 
     return faaOut
 

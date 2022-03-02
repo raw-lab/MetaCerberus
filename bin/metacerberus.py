@@ -7,7 +7,7 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "0.1"
+__version__     = "0.2"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022"
 
@@ -29,6 +29,7 @@ import time
 import datetime
 import socket
 import ray #multiprocessing
+import pandas as pd
 
 
 # our package import
@@ -404,7 +405,8 @@ Example:
     # Waiting for GeneCall
     for job in jobGenecall:
         key,value = ray.get(job)
-        amino[key] = value
+        if value:
+            amino[key] = value
 
 
     # step 8 (HMMER)
@@ -476,7 +478,7 @@ Example:
     print("\nSTEP 9: Parse HMMER results")
     jobParse = []
     for key,value in hmm_tsv.items():
-        jobParse.append(rayWorker.remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
+        jobParse.append(rayWorker.options(num_cpus=1).remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
 
     hmmRollup = {}
     hmmCounts = {}
@@ -524,10 +526,19 @@ Example:
 
     # HTML of PCA
     pcaFigures = None
-    if len(hmmCounts) < 3:
-        print("NOTE: PCA Tables and Combined report created only when there are at least three samples.\n")
+    if len(hmmCounts) < 4:
+        print("NOTE: PCA Tables and Combined report created only when there are at least four samples.\n")
     else:
-        pcaFigures = cerberus_visual.graphPCA(hmmCounts)
+        dfCounts = {}
+        for sample,tables in hmmCounts.items():
+            for name,table in tables.items():
+                X = table[table.Level == 'Function']
+                row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
+                row = pd.Series(row, name=sample)
+                if name not in dfCounts:
+                    dfCounts[name] = pd.DataFrame()
+                dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
+        pcaFigures = cerberus_visual.graphPCA(dfCounts)
         os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
         cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
     

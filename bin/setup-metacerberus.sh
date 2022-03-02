@@ -1,84 +1,86 @@
 #!/usr/bin/env bash
 
+set -eu
+IFS=$'\n'
+umask 0022
+
 ABSPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-access_rights=0o755
 pathDB="cerberusDB"
 pathFGS="FGS+"
 
-function install_FGS+ {
-  fgspath="$ABSPATH/$pathFGS"
+install_fgs() {
+  local fgspath="$ABSPATH/$pathFGS"
   echo
   echo "Cloning FGS+ to $fgspath"
   echo
-  git clone https://github.com/hallamlab/FragGeneScanPlus $fgspath
+  git clone https://github.com/hallamlab/FragGeneScanPlus "$fgspath"
   rm -rf "$fgspath/.git*"
-  make CFLAG="-fcommon -w" -C $fgspath
+  make CFLAG="-fcommon -w" -C "$fgspath"
   return
 }
 
-function download_db {
-  dbdir="$ABSPATH/$pathDB"
+download_db() {
+  local dbdir="$ABSPATH/$pathDB"
   echo
   echo "Downloading database to $dbdir"
   echo
-  mkdir -p $dbdir
+  install -m 0755 -d "$dbdir"
 
-  wget https://osf.io/72p6g/download -v -O "$dbdir/FOAM_readme.txt" -c
-  wget https://osf.io/muan4/download -v -O "$dbdir/FOAM-onto_rel1.tsv" -c
-  wget https://osf.io/2hp7t/download -v -O "$dbdir/KEGG-onto_rel1.tsv" -c
-  wget https://osf.io/bdpv5/download -v -O "$dbdir/FOAM-hmm_rel1a.hmm.gz" -c
+  curl -L https://osf.io/72p6g/download -o "$dbdir/FOAM_readme.txt"
+  curl -L https://osf.io/muan4/download -o "$dbdir/FOAM-onto_rel1.tsv"
+  curl -L https://osf.io/2hp7t/download -o "$dbdir/KEGG-onto_rel1.tsv"
+  curl -L https://osf.io/bdpv5/download -o "$dbdir/FOAM-hmm_rel1a.hmm.gz"
   return
 }
 
-function clean {
+clean() {
   rm -rf "$ABSPATH/$pathFGS"
   rm -rf "$ABSPATH/$pathDB"
   return
 }
 
-### Begin Main Script ###
+usage() {
+  cat <<EOF
+usage: $0 [--path PATH] [--download] [--fgs] [--help]
 
-ARG_DOWN=false
-ARG_FGS=false
-ARG_CLEAN=false
-ARG_HELP=false
+  -d, --download      Download the database files to "$ABSPATH/$pathDB"
+  -f, --fgs           Install FGS+ from git repository
+  -c, --clean         Removes database files and FGS+
 
-# Parse Arguments
-while (( "$#" )); do
+EOF
+}
+
+
+options="$(getopt -o 'cdfh' -l 'clean,download,fgs,help' -n "$(basename "$0")" -- "$@")"
+
+if  [[ $# -eq 0 ]]; then
+  printf "error: no arguments specified\n\n"
+  usage
+  exit 1
+fi
+
+while [[ $# -gt 0 ]]; do
   case "$1" in
     -d|--download)
-      ARG_DOWN=true
+      download_db
       shift
       ;;
     -f|--fgs)
-      ARG_FGS=true
+      install_fgs
       shift
       ;;
     -c|--clean)
-      ARG_CLEAN=true
+      clean
       shift
       ;;
     -h|--help)
-      ARG_HELP=true
-      shift
+      usage
+      exit 0
       ;;
-    -*|--*=) # unsupported flags
-      echo "Error: Unsupported flag $1" >&2
+    *)
+      printf "error: unknown argument: '%s'\n\n" "$1"
+      usage
       exit 1
       ;;
   esac
 done
-
-[ ! $ARG_DOWN $ARG_FGS $ARG_CLEAN $ARG_HELP ] && echo "No options given." && ARG_HELP=true
-
-[ $ARG_HELP ] && echo "
-usage: [--path PATH] [--download] [--dependencies] [--help]
-
-  -d, --download      Download the database files to <cerberus path>/cerberusDB
-  -f, --fgs           Install FGS+ from git repository
-  -c, --clean         Removes database files and FGS+
-" && exit 0
-
-[ $ARG_DOWN ] && download_db
-[ $ARG_FGS ] && install_FGS+
-[ $ARG_CLEAN ] && clean

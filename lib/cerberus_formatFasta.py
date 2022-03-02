@@ -45,7 +45,7 @@ def split_sequenceN(name, sequence):
 
 
 # Remove N's
-def removeN(fasta, config, subdir):
+def removeN(fasta:str, config:dict, subdir:os.PathLike):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)    
 
