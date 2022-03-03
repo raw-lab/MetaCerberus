@@ -27,7 +27,7 @@ conda activate metacerberus
 
 if [ "$SLURM_NNODES" -gt 1 ]; then
   echo "Initializing Ray on $SLURM_NNODES Nodes"
-  source cerberus_slurm.sh
+  source slurm-metacerberus.sh
 fi
 
 command time meta-cerberus.py -c config.yaml
