@@ -154,7 +154,7 @@ commandline values override config file values which override defaults.
 - example:
 
 ```bash
-python metacerberus.py --protein <input file path> 
+metacerberus.py --protein <input file path> 
 ```
 
 ### Multiprocessing / Multi-Computing
@@ -177,7 +177,7 @@ example script:
 #SBATCH --nodes=3
 #SBATCH --tasks-per-node=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=256MB
+#SBATCH --mem=128MB
 #SBATCH -e slurm-%j.err
 #SBATCH -o slurm-%j.out
 #SBATCH --mail-type=END,FAIL,REQUEUE
