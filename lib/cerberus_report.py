@@ -250,7 +250,7 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
 def write_PCA(outpath, pcaFigures):
     # PCA Files
     os.makedirs(os.path.join(outpath), exist_ok=True)
-
+    cntpathlist = []
     for database,figures in pcaFigures.items():
         prefix = f"{outpath}/{database}"
         with open(prefix+"_PCA.htm", 'w') as htmlOut:
@@ -259,12 +259,14 @@ def write_PCA(outpath, pcaFigures):
             for graph,fig in figures.items():
                 if type(fig) is pd.DataFrame:
                     fig.to_csv(f"{prefix}_{graph}.tsv", index=False, header=True, sep='\t')
+                    if "Counts" in graph:
+                        cntpathlist.append(f"{prefix}_{graph}.tsv")
                 else:
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     htmlOut.write(htmlFig + '\n')
                     fig.write_image(os.path.join(outpath, "img", f"{database}_{graph}.svg"))
             htmlOut.write('\n</body>\n</html>\n')
-    return None
+    return cntpathlist
 
 
 ########## Write Tables ##########
