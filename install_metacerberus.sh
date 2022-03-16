@@ -16,6 +16,7 @@ function install_pip() {
     python -m pip install $latest
     setup-metacerberus.sh -f
     setup-metacerberus.sh -d
+    Rscript bin/install_pathview.2.R
     return
 }
 
