@@ -137,6 +137,8 @@ Example:
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. False by default")
     optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
+    optional.add_argument('--pheno',type=str, default='./', help='path to pheno file which has class information')
+
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
                         help='show the version number and exit')
@@ -191,6 +193,7 @@ Example:
     # Create output directory
     config['DIR_OUT'] = os.path.abspath(os.path.expanduser(os.path.join(args.dir_out, "pipeline")))
     os.makedirs(config['DIR_OUT'], exist_ok=True)
+    config['pheno'] = args.pheno
 
     # Sequence File extensions
     config['EXT_FASTA'] = FILES_FASTA
@@ -540,8 +543,12 @@ Example:
                 dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
         pcaFigures = cerberus_visual.graphPCA(dfCounts)
         os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
-        cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
+        cntlist=cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
     
+    # run post processing analysis in R
+    for filepath in cntlist:
+        subprocess.call([pkg.resource_filename("meta_cerberus","data/post_analysis.R"), filepath, config['pheno']])
+        
     # HTML of Figures
     cerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
 
