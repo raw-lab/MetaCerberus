@@ -16,7 +16,8 @@ print("the treatment and reference are ")
 samp_indx
 reference_indx
 library(pathview.2)
-data(kegg.gs)
+kegg.ortho.path <-  kegg.gsets(species = "ko", id.type = "kegg", check.new = FALSE)
+kegg.gs <- kegg.ortho.path$kg.sets[kegg.ortho.path$sigmet.idx]
 gene.data <- as.matrix(na.omit(gene.data))
 
 outname <-  paste0( dirname(args[1]),"/","img", "/", str_split(basename(args[1]), pattern = "_")[[1]][1] , "_" )
