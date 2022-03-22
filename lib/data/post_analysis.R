@@ -29,5 +29,5 @@ gene.data <- gene.data[, rownames(coldata)]
 all(rownames(coldata) == colnames(gene.data))
 
 #runing pathview
-pathview.2(run = "complete"  , both.dirs = list(gene = T, cpd = T), diff.tool = "deseq2", gene.data= gene.data, ref = reference_indx, samp=samp_indx, pathway.id = NULL, gsets = kegg.gs, plot.gene.data = T, outname = outname )
-pathview.2(run = "complete"  , both.dirs = list(gene = T, cpd = T), diff.tool = "edgeR", gene.data= gene.data, ref = reference_indx, samp=samp_indx, pathway.id = NULL, gsets = kegg.gs, plot.gene.data = T, outname = outname )
+pathview.2(run = "complete"  , both.dirs = list(gene = T, cpd = T), diff.tool = "deseq2", gene.data= gene.data, ref = reference_indx, samp=samp_indx, pathway.id = NULL, gsets = kegg.gs, plot.gene.data = T, outname = outname, compare = "unpaired" )
+pathview.2(run = "complete"  , both.dirs = list(gene = T, cpd = T), diff.tool = "edgeR", gene.data= gene.data, ref = reference_indx, samp=samp_indx, pathway.id = NULL, gsets = kegg.gs, plot.gene.data = T, outname = outname, compare = "unpaired" )
