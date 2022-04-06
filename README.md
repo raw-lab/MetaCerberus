@@ -37,11 +37,54 @@ conda activate metacerberus
 
 This creates an anaconda environment called "metacerberus" with all dependencies installed.
 
+## Input formats
+
+- From any NextGen sequencing technology (from Illumina, PacBio, Oxford Nanopore)
+- type 1 raw reads (.fastq format)
+- type 2 nucleotide fasta (.fasta, .fa, .fna, .ffn format), assembled raw reads into contigs
+- type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence
+
+## Output Files
+
+- If an output directory is given, a 'pipeline' subfolder will be created there.
+- If no output directory is specified, the 'pipeline' subfolder will be created in the current directory.
+- Gage/Pathview R analysis provided as separate scripts within R. 
+
+## Visualization of Outputs
+
+- We use Plotly to visualize the data
+- Once the program is executed the html reports with the visuals will be saved to the last step of the pipeline.
+- The HTML files require plotly.js to be present. One has been provided in the package and is saved to the report folder.
+
+## Quick start examples
+
+### Illumina data (microbial/phage)
+```
+conda activate metacerberus
+metacerberus.py --prodigal [input_folder] --illumina --meta --dir_out [out_folder] 
+```
+
+### Nanopore data (microbial/phage)
+```
+conda activate metacerberus
+metacerberus.py --prodigal [input_folder]  --nanopore --meta --dir_out [out_folder]
+```
+
+### PacBio data (microbial/phage)
+```
+conda activate metacerberus
+metacerberus.py --prodigal [input_folder]  --pacbio --meta --dir_out [out_folder]
+```
+
+--SUPER for both FGS+ and prodigal, and --fraggenescan (FGS+) is recommended for communities with high eukaryotes. 
+
+
 ## Prerequisites and dependencies
 
-python >= 3.7
+- python >= 3.7
 
-MetaCerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies, namely "Ray".  
+- MetaCerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies.
+- MetaCerberus currently doesn't support Python 3.10 due to the "Ray" dependency. 
 Python 3.10 is not currently supported.
 
 ### Available from Bioconda
@@ -53,28 +96,9 @@ Python 3.10 is not currently supported.
 - prodigal - <https://github.com/hyattpd/Prodigal>
 - hmmer - <https://github.com/EddyRivasLab/hmmer>
 
-### Other dependencies
-
-- Cerberus depends on a database available at osf.io
-- FGS+ needs to be cloned and compiled to run properly
-Both of these can be installed after installing cerberus by running:
-
-```bash
-cerberus_setup.sh -d
-cerberus_setup.sh -f
-```
-
-*When using the included install script these are installed automatically.
-
 - NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
 
-## Running MetaCerberus
-
-- If needed, activate the MetaCerberus environment in Anaconda
-
-```
-conda activate metacerberus
-```
+## MetaCerberus Options
 
 - If the metacerberus environment is not used, make sure the dependencies are in PATH or specified in the config file.
 - Run metacerberus.py with the options required for your project.
@@ -141,7 +165,7 @@ commandline values override config file values which override defaults.
 metacerberus.py --protein <input file path> 
 ```
 
-### Multiprocessing / Multi-Computing
+### Multiprocessing / Multi-Computing with RAY
 
 MetaCerberus uses Ray for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
 MetaCerberus has been tested on a cluster using Slurm <https://github.com/SchedMD/slurm>.  
@@ -188,24 +212,6 @@ echo "End Time   : $(date)"
 echo "======================================================"
 echo ""
 ```
-
-## Input formats
-
-- From any NextGen sequencing technology (from Illumina, PacBio, Oxford Nanopore)
-- type 1 raw reads (.fastq format)
-- type 2 nucleotide fasta (.fasta, .fa, .fna, .ffn format), assembled raw reads into contigs
-- type 3 protein fasta (.faa format), assembled contigs which genes are converted to amino acid sequence
-
-## Output Files
-
-- If an output directory is given, a 'pipeline' subfolder will be created there.
-- If no output directory is specified, the 'pipeline' subfolder will be created in the current directory.
-
-## Visualization of outputs
-
-- We use Plotly to visualize the data
-- Once the program is executed the html reports with the visuals will be saved to the last step of the pipeline.
-- The HTML files require plotly.js to be present. One has been provided in the package and is saved to the report folder.
 
 ## Citing MetaCerberus
 
