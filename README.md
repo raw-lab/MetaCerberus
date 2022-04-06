@@ -159,12 +159,6 @@ syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place,
 commandline values override config file values which override defaults.
 ```
 
-- example:
-
-```bash
-metacerberus.py --protein <input file path> 
-```
-
 ### Multiprocessing / Multi-Computing with RAY
 
 MetaCerberus uses Ray for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
