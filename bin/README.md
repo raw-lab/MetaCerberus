@@ -1,3 +1,3 @@
-# RoadMap
+# Main scripts for MetaCerberus 
 
-- cerberus-pipeline.py --> It is the main script that incorporates the package into a pipeline.
+- metacerberus-pipeline.py --> It is the main script that incorporates the package into a pipeline.
