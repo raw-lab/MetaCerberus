@@ -1,6 +1,7 @@
 # Welcome to MetaCerberus
 
-Python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data
+## About 
+MetaCerberus translate raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM) database and KEGG via Hidden Markov Model (HMM) for whole ecosystem metabolomic analysis.
 
 ![GitHub Logo](metacerberus_logo.jpg)
 
@@ -10,46 +11,29 @@ Python code for versatile Functional Ontology Assignments for Metagenomes via Hi
 
 - Anaconda install from bioconda with all dependencies:
 
-    ```bash
-    conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
-    conda activate metacerberus
-    setup-metacerberus.sh -d
-    setup-metacerberus.sh -f
-    ```
-
-### Option 2) pip
-
-```bash
-pip install metacerberus
 ```
-
-- This installs the latest build (may be unstable) using pip
-- Next run the setup script to download the Database and install FGS+
-
-```bash
-setup-metacerberus.sh -f
+conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
+conda activate metacerberus
 setup-metacerberus.sh -d
+setup-metacerberus.sh -f
 ```
+*Dependencies should be installed manually and specified in the config file or path
 
-- *Dependencies should be installed manually and specified in the config file or path
-
-### Option 3) Manual Install
-
-*Latest code might be unstable
+### Option 2) Manual Install
 
 1. Clone github Repo
 
-    ```bash
-    git clone https://github.com/raw-lab/metacerberus.git
-    ```
+```
+git clone https://github.com/raw-lab/metacerberus.git
+```
 
 2. Run Setup File
 
-    ```bash
-    cd metacerberus
-    python3 install_metacerberus.py
-    conda activate metacerberus
-    ```
+```
+cd metacerberus
+python3 install_metacerberus.py
+conda activate metacerberus
+```
 
 This creates an anaconda environment called "metacerberus" with all dependencies installed.
 
@@ -88,7 +72,7 @@ cerberus_setup.sh -f
 
 - If needed, activate the MetaCerberus environment in Anaconda
 
-```bash
+```
 conda activate metacerberus
 ```
 
@@ -225,7 +209,7 @@ echo ""
 
 ## Citing MetaCerberus
 
-MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints.
+MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes (FOAM) database via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints.
 
 ## CONTACT
 
