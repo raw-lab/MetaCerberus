@@ -103,7 +103,7 @@ Python 3.10 is not currently supported.
 - If the metacerberus environment is not used, make sure the dependencies are in PATH or specified in the config file.
 - Run metacerberus.py with the options required for your project.
 
-```bash
+```
 usage: metacerberus.py [-c CONFIG] [--prodigal PRODIGAL] [--fraggenescan FRAGGENESCAN]
                        [--meta META] [--super SUPER] [--protein PROTEIN]
                        [--illumina | --nanopore | --pacbio] [--dir_out DIR_OUT]
