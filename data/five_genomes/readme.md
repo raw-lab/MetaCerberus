@@ -1,6 +1,6 @@
-# Example five genomes for rapid testing
+## Example five genomes for rapid testing
 
-## Genomes include
+### Genomes include
 - RW2
 - RW1
 - GIC31
