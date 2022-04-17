@@ -15,7 +15,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
     if config['HMM']:
         hmmDB = config['HMM']
     else:
-        hmmDB = f'{config["PATH"]}/cerberusDB/FOAM-hmm_rel1a.hmm.gz'
+        hmmDB = os.path.join(config['PATHDB'], 'FOAM-hmm_rel1a.hmm.gz')
 
 
     hmmOut = dict()

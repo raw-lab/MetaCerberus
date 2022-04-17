@@ -78,10 +78,10 @@ def parseHmmer(hmm_tsv, config, subdir):
     # Write rollup files to disk
     dfRollup = dict()
 
-    dbPath = os.path.join(config["PATH"], "cerberusDB", "FOAM-onto_rel1.tsv")
+    dbPath = os.path.join(config['PATHDB'], "FOAM-onto_rel1.tsv")
     dfRollup['FOAM'] = rollup(KO_ID_counts, dbPath, path)
 
-    dbPath = os.path.join(config["PATH"], "cerberusDB", "KEGG-onto_rel1.tsv")
+    dbPath = os.path.join(config['PATHDB'], "KEGG-onto_rel1.tsv")
     dfRollup['KEGG'] = rollup(KO_ID_counts, dbPath, path)
 
     for name,df in dfRollup.items():

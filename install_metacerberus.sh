@@ -14,8 +14,7 @@ function install_pip() {
     echo "Installing $latest"
     echo
     python -m pip install $latest
-    setup-metacerberus.sh -f
-    setup-metacerberus.sh -d
+    metacerberus.py --setup
     Rscript bin/install_pathview.2.R
     return
 }
@@ -25,7 +24,7 @@ function install_conda() {
     eval "$(conda shell.bash hook)"
 
     # create the metacerberus environment in conda
-    conda create -n metacerberus -y -c conda-forge -c bioconda gcc make grpcio=1.43 fastqc flash2 fastp porechop bbmap prodigal hmmer ray-core ray-dashboard pandas plotly scikit-learn dominate python-kaleido configargparse psutil metaomestats
+    conda create -n metacerberus -y -c conda-forge -c bioconda gcc make grpcio=1.43 fastqc flash2 fastp porechop bbmap prodigal hmmer ray-core ray-dashboard gitpython pandas plotly scikit-learn dominate python-kaleido configargparse psutil metaomestats
 
     status=$?
     [ $status -eq 0 ] && echo "Conda environment successfully created" || exit 1

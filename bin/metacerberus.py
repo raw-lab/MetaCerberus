@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""cerberus-pipeline.py: Versatile Functional Ontology Assignments for Metagenomes
+"""metacerberus.py: Versatile Functional Ontology Assignments for Metagenomes
 
 Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data.
 """
 
 
-__version__     = "0.2"
+__version__     = "0.3"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022"
 
@@ -34,9 +34,10 @@ import pandas as pd
 
 # our package import
 from meta_cerberus import (
-    cerberus_qc, cerberus_merge, cerberus_trim, cerberus_decon, cerberus_formatFasta, cerberus_metastats,
-    cerberus_genecall, cerberus_hmm, cerberus_parser,
-    cerberus_prostats, cerberus_visual, cerberus_report, Chunker
+    metacerberus_setup,
+    metacerberus_qc, metacerberus_merge, metacerberus_trim, metacerberus_decon, metacerberus_formatFasta, metacerberus_metastats,
+    metacerberus_genecall, metacerberus_hmm, metacerberus_parser,
+    metacerberus_prostats, metacerberus_visual, metacerberus_report, Chunker
 )
 
 
@@ -47,12 +48,16 @@ FILES_FASTQ = ['.fastq', '.fastq.gz']
 FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
 FILES_AMINO = [".faa"]
 
+# External file downloads
+pathDB = pkg.resource_filename("meta_cerberus", "cerberusDB")
+pathFGS = pkg.resource_filename("meta_cerberus", "FGS+")
+
 # refseq default locations (for decontamination)
 REFSEQ = {
-    "adapters": pkg.resource_filename("meta_cerberus", "data/adapters.fna"),
-    "illumina": pkg.resource_filename("meta_cerberus", "data/phix174_ill.ref.fna"),
-    "lambda": pkg.resource_filename("meta_cerberus", "data/lambda-phage.fna"),
-    "pacbio": pkg.resource_filename("meta_cerberus", "data/PacBio_quality-control.fna")
+    "adapters": pkg.resource_filename("meta_cerberus", "dependency_files/adapters.fna"),
+    "illumina": pkg.resource_filename("meta_cerberus", "dependency_files/phix174_ill.ref.fna"),
+    "lambda": pkg.resource_filename("meta_cerberus", "dependency_files/lambda-phage.fna"),
+    "pacbio": pkg.resource_filename("meta_cerberus", "dependency_files/PacBio_quality-control.fna")
 }
 
 # external dependencies
@@ -129,15 +134,17 @@ Example:
     readtype.add_argument('--pacbio', action="store_true", help="Specifies that the given FASTQ files are from PacBio")
     # optional flags
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument('--dir_out', type=str, default='./', help='path to output directory, creates "pipeline" folder. Defaults to current directory.')
-    optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds")
-    optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results")
-    optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified")
-    optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes")
-    optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. False by default")
-    optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. False by default")
+    optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
+    optional.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
+    optional.add_argument('--dir_out', type=str, default='./', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [Current Dir]')
+    optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
+    optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results [25]")
+    optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
+    optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
+    optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
+    optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
     optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
-    optional.add_argument('--pheno',type=str, default='./', help='path to pheno file which has class information')
+    optional.add_argument('--pheno', type=str, default='', help='path to pheno file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
 
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
@@ -151,6 +158,16 @@ Example:
     dependencies.add_argument('--control_seq', type=str, default="default", help="FASTA File containing control sequences for decontamination")
 
     args = parser.parse_args()
+
+    if args.uninstall:
+        metacerberus_setup.Remove(pathDB, pathFGS)
+
+    if args.setup:
+        metacerberus_setup.Download(pathDB)
+        metacerberus_setup.FGS(pathFGS)
+
+    if args.setup or args.uninstall:
+        return 0
 
     print("\nStarting Cerberus Pipeline\n")
 
@@ -177,10 +194,13 @@ Example:
 
     # Initialize Config Dictionary
     config = {}
-    config['PATH'] = os.path.dirname(os.path.abspath(__file__))
-    config['EXE_FGS+'] = os.path.join(config['PATH'], 'FGS+', 'FGS+')#pkg.resource_filename("cerberus_data", "FGS+")
+    #config['PATH'] = os.path.dirname(os.path.abspath(__file__))
     config['STEP'] = STEP
-    
+    config['PATHDB'] = pathDB
+
+    # Get FGS+ Folder from Library Path
+    config['EXE_FGS+'] = os.path.join(pathFGS, 'FGS+')
+
     # load all args into config
     for arg,value in args.__dict__.items():
         if value is not None:
@@ -189,11 +209,11 @@ Example:
             if type(value) is str and os.path.isfile(value):
                 value = os.path.abspath(os.path.expanduser(value))
             config[arg] = value
+    
 
     # Create output directory
     config['DIR_OUT'] = os.path.abspath(os.path.expanduser(os.path.join(args.dir_out, "pipeline")))
     os.makedirs(config['DIR_OUT'], exist_ok=True)
-    config['pheno'] = args.pheno
 
     # Sequence File extensions
     config['EXT_FASTA'] = FILES_FASTA
@@ -320,7 +340,7 @@ Example:
     if fastq:
         print("\nSTEP 2: Checking quality of fastq files")
         for key,value in fastq.items():
-            jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
+            jobsQC.append(rayWorker.remote(metacerberus_qc.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
 
 
     # Step 3 (trim fastq files)
@@ -331,18 +351,18 @@ Example:
         fastqPaired = {k:v for k,v in fastq.items() if "R1.fastq" in v and v.replace("R1.fastq", "R2.fastq") in fastq.values() }
         for key,value in fastqPaired.items():
             reverse = fastq.pop(key.replace("R1", "R2"))
-            fastq[key] = cerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
+            fastq[key] = metacerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
         del fastqPaired # memory cleanup
         # Trim
         for key,value in fastq.items():
-            jobTrim.append(rayWorker.remote(cerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
+            jobTrim.append(rayWorker.remote(metacerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
 
     # Wait for Trimmed Reads
     while jobTrim:
         ready,jobTrim = ray.wait(jobTrim)
         key,value = ray.get(ready[0])
         fastq[key] = value
-        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key+'_trim', value, config, f"{STEP[3]}/{key}/quality"))
+        jobsQC.append(rayWorker.remote(metacerberus_qc.checkQuality, key+'_trim', value, config, f"{STEP[3]}/{key}/quality"))
 
 
     # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
@@ -350,14 +370,14 @@ Example:
     if fastq and config['ILLUMINA']:
         print("\nSTEP 4: Decontaminating trimmed files")
         for key,value in fastq.items():
-            jobDecon.append(rayWorker.remote(cerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
+            jobDecon.append(rayWorker.remote(metacerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
 
     # Wait for Decontaminating Reads
     while jobDecon:
         ready,jobDecon = ray.wait(jobDecon)
         key,value = ray.get(ready[0])
         fastq[key] = value
-        jobsQC.append(rayWorker.remote(cerberus_qc.checkQuality, key+'_decon', value, config, f"{STEP[4]}/{key}/quality"))
+        jobsQC.append(rayWorker.remote(metacerberus_qc.checkQuality, key+'_decon', value, config, f"{STEP[4]}/{key}/quality"))
 
 
     # step 5a for cleaning contigs
@@ -366,7 +386,7 @@ Example:
     if fasta:# and "scaffold" in config:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
-            jobContigs.append(rayWorker.remote(cerberus_formatFasta.removeN, key, value, config, f"{STEP[5]}/{key}"))
+            jobContigs.append(rayWorker.remote(metacerberus_formatFasta.removeN, key, value, config, f"{STEP[5]}/{key}"))
 
     NStats = {}
     for job in jobContigs:
@@ -380,7 +400,7 @@ Example:
     if fastq:
         print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
         for key,value in fastq.items():
-            jobFormat.append(rayWorker.remote(cerberus_formatFasta.reformat, key, value, config, f"{STEP[5]}/{key}"))
+            jobFormat.append(rayWorker.remote(metacerberus_formatFasta.reformat, key, value, config, f"{STEP[5]}/{key}"))
 
     for job in jobFormat:
         key, value = ray.get(job)
@@ -391,7 +411,7 @@ Example:
     if fasta:
         print("\nSTEP 6: Metaome Stats\n")
         for key,value in fasta.items():
-                readStats[key] = cerberus_metastats.getReadStats(value, config, os.path.join(STEP[6], key))
+                readStats[key] = metacerberus_metastats.getReadStats(value, config, os.path.join(STEP[6], key))
 
     # step 7 (ORF Finder)
     jobGenecall = []
@@ -399,11 +419,11 @@ Example:
         print("\nSTEP 7: ORF Finder")
         for key,value in fasta.items():
             if key.startswith("FragGeneScan_"):
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_fgs, key, value, config, f"{STEP[7]}/{key}"))
+                jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_fgs, key, value, config, f"{STEP[7]}/{key}"))
             elif key.startswith("meta_"):
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
+                jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
             else:
-                jobGenecall.append(rayWorker.remote(cerberus_genecall.findORF_prod, key, value, config, f"{STEP[7]}/{key}"))
+                jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_prod, key, value, config, f"{STEP[7]}/{key}"))
 
     # Waiting for GeneCall
     for job in jobGenecall:
@@ -430,7 +450,7 @@ Example:
                 for chunk in files:
                     aminoAcids[f'chunk_{c}'] = chunk
                     c += 1
-                jobHMM.append(rayWorker.remote(cerberus_hmm.searchHMM, key, aminoAcids, config, f"{STEP[8]}/{key}"))
+                jobHMM.append(rayWorker.remote(metacerberus_hmm.searchHMM, key, aminoAcids, config, f"{STEP[8]}/{key}"))
         else:
             aminoAcids = {}
             aminoAcids[key] = amino[key]
@@ -440,7 +460,7 @@ Example:
                 except:
                     break
                 aminoAcids[key] = amino[key]
-            jobHMM.append(rayWorker.remote(cerberus_hmm.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
+            jobHMM.append(rayWorker.remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
     print("Waiting for HMMER")
     dictChunks = dict()
     while(jobHMM):
@@ -481,7 +501,7 @@ Example:
     print("\nSTEP 9: Parse HMMER results")
     jobParse = []
     for key,value in hmm_tsv.items():
-        jobParse.append(rayWorker.options(num_cpus=1).remote(cerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
+        jobParse.append(rayWorker.options(num_cpus=1).remote(metacerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
 
     hmmRollup = {}
     hmmCounts = {}
@@ -492,10 +512,10 @@ Example:
         ready, jobParse = ray.wait(jobParse)
         key,value = ray.get(ready[0])
         hmmRollup[key] = value
-        hmmCounts[key] = cerberus_parser.createCountTables(hmmRollup[key])
-        protStats[key] = cerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config)
-        figSunburst[key] = cerberus_visual.graphSunburst(hmmCounts[key])
-        figCharts[key] = cerberus_visual.graphBarcharts(hmmRollup[key], hmmCounts[key])
+        hmmCounts[key] = metacerberus_parser.createCountTables(hmmRollup[key])
+        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config)
+        figSunburst[key] = metacerberus_visual.graphSunburst(hmmCounts[key])
+        figCharts[key] = metacerberus_visual.graphBarcharts(hmmRollup[key], hmmCounts[key])
 
 
     # step 10 (Report)
@@ -515,13 +535,13 @@ Example:
         shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(outpath, key) )
 
     # Write Stats
-    cerberus_report.write_Stats(outpath, readStats, protStats, NStats, config)
+    metacerberus_report.write_Stats(outpath, readStats, protStats, NStats, config)
 
     # write roll-up tables
     for sample,tables in hmmCounts.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            cerberus_report.writeTables(table, f"{outpath}/{sample}/{name}")
+            metacerberus_report.writeTables(table, f"{outpath}/{sample}/{name}")
     for sample,tables in hmmRollup.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
@@ -530,7 +550,7 @@ Example:
     # HTML of PCA
     pcaFigures = None
     if len(hmmCounts) < 4:
-        print("NOTE: PCA Tables and Combined report created only when there are at least four samples.\n")
+        print("NOTE: PCA Tables and Pathview created only when there are at least four samples.\n")
     else:
         dfCounts = {}
         for sample,tables in hmmCounts.items():
@@ -541,16 +561,23 @@ Example:
                 if name not in dfCounts:
                     dfCounts[name] = pd.DataFrame()
                 dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
-        pcaFigures = cerberus_visual.graphPCA(dfCounts)
+        pcaFigures = metacerberus_visual.graphPCA(dfCounts)
         os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
-        cntlist=cerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
+        cntlist=metacerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
+
+        # run post processing analysis in R
+        print("Post Analysis with PathView/GAGE")
+        if config['PHENO']:
+            for i,filepath in enumerate(cntlist):
+                outpathview = os.path.join(outpath, "combined", f'pathview{i}')
+                os.makedirs(outpathview, exist_ok=True)
+                subprocess.run(['pathview-metacerberus.R', filepath, config['PHENO']],
+                                cwd=outpathview,
+                                stdout=open(f'{outpathview}/stdout.txt', 'w'),
+                                stderr=open(f'{outpathview}/stderr.txt', 'w'))
     
-    # run post processing analysis in R
-    for filepath in cntlist:
-        subprocess.call([pkg.resource_filename("meta_cerberus","data/post_analysis.R"), filepath, config['pheno']])
-        
     # HTML of Figures
-    cerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
+    metacerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
 
 
     # Wait for misc jobs

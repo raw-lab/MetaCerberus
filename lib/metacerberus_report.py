@@ -30,9 +30,9 @@ htmlHeader = [
 PLOTLY_SOURCE = 'cdn'
 
 # Data resources
-STYLESHEET = pkg.resource_stream('meta_cerberus', 'data/style.css').read().decode()
-ICON = base64.b64encode(pkg.resource_stream('meta_cerberus', 'data/cerberus_logo.png').read()).decode()
-PLOTLY = pkg.resource_filename('meta_cerberus', 'data/plotly-2.0.0.min.js')
+STYLESHEET = pkg.resource_stream('meta_cerberus', 'style.css').read().decode()
+ICON = base64.b64encode(pkg.resource_stream('meta_cerberus', 'metacerberus_logo.jpg').read()).decode()
+PLOTLY = pkg.resource_filename('meta_cerberus', 'plotly-2.0.0.min.js')
 
 
 ######### Create Report ##########
@@ -250,7 +250,7 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
 def write_PCA(outpath, pcaFigures):
     # PCA Files
     os.makedirs(os.path.join(outpath), exist_ok=True)
-    cntpathlist = []
+    countpathlist = []
     for database,figures in pcaFigures.items():
         prefix = f"{outpath}/{database}"
         with open(prefix+"_PCA.htm", 'w') as htmlOut:
@@ -260,13 +260,13 @@ def write_PCA(outpath, pcaFigures):
                 if type(fig) is pd.DataFrame:
                     fig.to_csv(f"{prefix}_{graph}.tsv", index=False, header=True, sep='\t')
                     if "Counts" in graph:
-                        cntpathlist.append(f"{prefix}_{graph}.tsv")
+                        countpathlist.append(f"{prefix}_{graph}.tsv")
                 else:
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     htmlOut.write(htmlFig + '\n')
                     fig.write_image(os.path.join(outpath, "img", f"{database}_{graph}.svg"))
             htmlOut.write('\n</body>\n</html>\n')
-    return cntpathlist
+    return countpathlist
 
 
 ########## Write Tables ##########
