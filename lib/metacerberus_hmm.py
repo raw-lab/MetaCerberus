@@ -28,16 +28,24 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
         hmmOut[os.path.join(path, name_dom)] = amino
 
     jobs = dict()
+    outlist = list()
     for domtbl_out,amino in hmmOut.items():
-        if not config['REPLACE'] and os.path.exists(domtbl_out):
-            jobs[domtbl_out] = subprocess.Popen("ls", stdout=subprocess.DEVNULL)
-            continue
         pathname = os.path.dirname(domtbl_out)
+        basename = os.path.basename(domtbl_out)
+        outname = os.path.splitext(basename)[0] + ".tsv"
+        outfile = os.path.join(pathname, outname)
+        if not config['REPLACE'] and os.path.exists(outfile):
+            outlist.append(outfile)
+            continue
         # HMMER
         try:
-            command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout {domtbl_out} {hmmDB} {amino}"
+            #TODO: Add --keep option to save the HMMER output file
+            print("target", "query", "e-value", "score", sep='\t', file=open(outfile, 'w'))
+            reduce_grep = f" grep -Ev '^#' | tr -s ' ' | cut -d ' ' -f1,4,7,14 | tr ' ' '\t' >> {outfile}"
+            command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_grep}"
             with open(f"{path}/stderr.txt", 'w') as ferr:
-                jobs[domtbl_out] = subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=ferr)
+                jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=ferr)
+            outlist.append(outfile)
         except Exception as e:
             print(e)
             print("Error: failed to run: " + command)
@@ -53,23 +61,23 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
         time.sleep(1)
 
     # Convet outfile to TSV to reduce size
-    outlist = list()
-    for domtbl_out in hmmOut.keys():
-        pathname = os.path.dirname(domtbl_out)
-        basename = os.path.basename(domtbl_out)
-        outname = os.path.splitext(basename)[0] + ".tsv"
-        outfile = os.path.join(pathname, outname)
-        with open(domtbl_out) as reader, open(outfile, 'w') as writer:
-            for line in reader:
-                if line.startswith("#"):        # Skip commented lines
-                    continue
-                line = line.split()
-                try:
-                    print(line[0], line[13], line[6], line[3], sep='\t', file=writer)
-                except:
-                    continue
-        outlist.append(outfile)
-        if not config['KEEP']:
-            os.remove(domtbl_out)
+#    outlist = list()
+#    for domtbl_out in hmmOut.keys():
+#        pathname = os.path.dirname(domtbl_out)
+#        basename = os.path.basename(domtbl_out)
+#        outname = os.path.splitext(basename)[0] + ".tsv"
+#        outfile = os.path.join(pathname, outname)
+#        with open(domtbl_out) as reader, open(outfile, 'w') as writer:
+#            for line in reader:
+#                if line.startswith("#"):        # Skip commented lines
+#                    continue
+#                line = line.split()
+#                try:
+#                    print(line[0], line[13], line[6], line[3], sep='\t', file=writer)
+#                except:
+#                    continue
+#        outlist.append(outfile)
+#        if not config['KEEP']:
+#            os.remove(domtbl_out)
 
     return outlist

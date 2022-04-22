@@ -22,12 +22,13 @@ def parseHmmer(hmm_tsv, config, subdir):
     # Calculate Best Hit
     BH_dict = {}
     BH_top5 = {}
+    #"target", "query", "e-value", "score"
     with open(hmm_tsv, "r") as reader:
         for line in reader:
             line = line.split('\t')
             try:
-                query = line[3]
-                score = float(line[1])
+                query = line[1]
+                score = float(line[3])
             except:
                 continue
             if score < minscore:            # Skip scores less than minscore
@@ -41,13 +42,13 @@ def parseHmmer(hmm_tsv, config, subdir):
                 BH_top5[query].append(line)
             else:
                 BH_top5[query].sort(key = lambda x: x[1], reverse=True)
-                if score > float(BH_top5[query][0][1]):
+                if score > float(BH_top5[query][0][3]):
                     BH_top5[query][0] = line
 
             # Check for Best Score per query
             if query not in BH_dict:
                 BH_dict[query] = line
-            elif score > float(BH_dict[query][1]):
+            elif score > float(BH_dict[query][3]):
                 BH_dict[query] = line
 
     # Save Top 5 hits tsv rollup
@@ -58,18 +59,18 @@ def parseHmmer(hmm_tsv, config, subdir):
             for line in BH_top5[query]:
                 ko = []
                 ec = []
-                for id in line[3].split(','):
+                for id in line[1].split(','):
                     if "KO:" in id:
                         id = id.split(':')[1].split('_')
                         ko += [id[0]]
                         if len(id)>1:
                             ec += [id[1]]
-                print(line[0], ','.join(ko), ','.join(ec), line[2], line[1], file=writer, sep='\t')
+                print(line[0], ','.join(ko), ','.join(ec), line[2], line[3], file=writer, sep='\t')
 
     # Create dictionary with found KO IDs and counts
     KO_ID_counts = {}
     for line in BH_dict.values():
-        KO_IDs = [KO_ID.split(":")[1].split("_")[0] for KO_ID in line[3].split(",") if "KO:" in KO_ID]
+        KO_IDs = [KO_ID.split(":")[1].split("_")[0] for KO_ID in line[1].split(",") if "KO:" in KO_ID]
         for KO_ID in KO_IDs:
             if KO_ID not in KO_ID_counts:
                 KO_ID_counts[KO_ID] = 0

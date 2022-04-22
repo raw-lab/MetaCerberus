@@ -55,7 +55,8 @@ def graphPCA(dfTables:dict):
 
     # Run PCA and add to Plots
     figs = {}
-    for name,df in dfTables.items():
+    for name,file in dfTables.items():
+        df = pd.read_csv(file, sep='\t').set_index('KO', drop=True).T
         if df.empty:
             continue
         df = df.fillna(0).astype(int)
@@ -76,9 +77,9 @@ def graphPCA(dfTables:dict):
             columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
         loadings.reset_index(inplace=True) # Move index to column and re-index
         dfLoadings = pd.DataFrame()
-        dfLoadings[['KO-ID','Name']] = loadings['index'].str.split(':', n=1, expand=True)
-        dfLoadings = pd.merge(dfLoadings, loadings, left_index=True, right_index=True)
-        dfLoadings.drop(labels=['index'], axis=1, inplace=True)
+#        dfLoadings[['KO-ID','Name']] = loadings['KO'].str.split(':', n=1, expand=True)
+#        dfLoadings = pd.merge(dfLoadings, loadings, left_index=True, right_index=True)
+#        dfLoadings.drop(labels=['KO'], axis=1, inplace=True)
         
         # Loading Matrix
         loadings_matrix = pd.DataFrame(
@@ -86,9 +87,9 @@ def graphPCA(dfTables:dict):
             columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
         loadings_matrix.reset_index(inplace=True) # Move index to column and re-index
         dfLoadings_matrix = pd.DataFrame()
-        dfLoadings_matrix[['KO-ID','Name']] = loadings_matrix['index'].str.split(':', n=1, expand=True)
-        dfLoadings_matrix = pd.merge(dfLoadings_matrix, loadings_matrix, left_index=True, right_index=True)
-        dfLoadings_matrix.drop(labels=['index'], axis=1, inplace=True)
+#        dfLoadings_matrix[['KO-ID','Name']] = loadings_matrix['KO'].str.split(':', n=1, expand=True)
+#        dfLoadings_matrix = pd.merge(dfLoadings_matrix, loadings_matrix, left_index=True, right_index=True)
+#        dfLoadings_matrix.drop(labels=['KO'], axis=1, inplace=True)
 
         # Create Scree Plot
         figScree = px.bar(
@@ -143,7 +144,7 @@ def graphPCA(dfTables:dict):
             figs[name]["Scree_Plot"] = figScree
         figs[name]["Loadings"] = dfLoadings
         figs[name]["Loading_Matrix"] = loadings_matrix
-        figs[name]["Counts_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
+#        figs[name]["Counts_Table"] = df.T.reset_index().rename(columns={'index':'KO'})
         continue
 
     return figs

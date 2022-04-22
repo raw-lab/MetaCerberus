@@ -136,7 +136,7 @@ Example:
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
     optional.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
-    optional.add_argument('--dir_out', type=str, default='./', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [Current Dir]')
+    optional.add_argument('--dir_out', type=str, default='./meta_cerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./meta_cerberus]')
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results [25]")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
@@ -144,7 +144,7 @@ Example:
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
     optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
-    optional.add_argument('--pheno', type=str, default='', help='path to pheno file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
+    optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
 
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
@@ -212,7 +212,7 @@ Example:
     
 
     # Create output directory
-    config['DIR_OUT'] = os.path.abspath(os.path.expanduser(os.path.join(args.dir_out, "pipeline")))
+    config['DIR_OUT'] = os.path.abspath(os.path.expanduser(args.dir_out))
     os.makedirs(config['DIR_OUT'], exist_ok=True)
 
     # Sequence File extensions
@@ -437,9 +437,14 @@ Example:
 
     jobHMM = []
     chunker = {}
+    hmm_tsv = {}
     limit = int(config["CPUS"]/4)
     iter_amino = iter(amino)
     for key in iter_amino:
+        tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
+        if not config['REPLACE'] and os.path.exists(tsv_file):
+            hmm_tsv[key] = tsv_file
+            continue
         # Split files into chunks
         if config['CHUNKER'] > 0:
             chunker[key] = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
@@ -482,11 +487,10 @@ Example:
                 dictChunks[key].append(value)
 
     # Merge chunked results
-    hmm_tsv = {}
     for key,value in dictChunks.items():
         tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
         with open(tsv_file, 'w') as writer:
-            print("target", "score", "e-value" "query", sep='\t', file=writer)
+            #print("target", "score", "e-value", "query", sep='\t', file=writer)
             for item in sorted(value):
                 writer.write(open(item).read())
                 os.remove(item)
@@ -547,34 +551,45 @@ Example:
         for name,table in tables.items():
             table.to_csv(f"{outpath}/{sample}/{name}_rollup.tsv", index=False, header=True, sep='\t')
 
+
+    # KO Counts Tables
+    dfCounts = {}
+    for sample,tables in hmmCounts.items():
+        for name,table in tables.items():
+            X = table[table.Level == 'Function']
+            row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
+            row = pd.Series(row, name=sample)
+            if name not in dfCounts:
+                dfCounts[name] = pd.DataFrame()
+            dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
+    table: pd.DataFrame
+    for name,table in dfCounts.items():
+        outfile = os.path.join(outpath, "combined", f"KO_Counts_{name}.tsv")
+        table = table.T.reset_index().rename(columns={'index':'KO'})
+        table.KO = table.KO.apply(lambda x : x[0:6])
+        table.to_csv(outfile, index=False, header=True, sep='\t')
+        dfCounts[name] = outfile
+
     # HTML of PCA
     pcaFigures = None
     if len(hmmCounts) < 4:
         print("NOTE: PCA Tables and Pathview created only when there are at least four samples.\n")
     else:
-        dfCounts = {}
-        for sample,tables in hmmCounts.items():
-            for name,table in tables.items():
-                X = table[table.Level == 'Function']
-                row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-                row = pd.Series(row, name=sample)
-                if name not in dfCounts:
-                    dfCounts[name] = pd.DataFrame()
-                dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
         pcaFigures = metacerberus_visual.graphPCA(dfCounts)
         os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
-        cntlist=metacerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
+        metacerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
 
         # run post processing analysis in R
-        print("Post Analysis with PathView/GAGE")
-        if config['PHENO']:
-            for i,filepath in enumerate(cntlist):
-                outpathview = os.path.join(outpath, "combined", f'pathview{i}')
+        if config['CLASS']:
+            print("STEP 11: Post Analysis with PathView/GAGE")
+            for name,filepath in dfCounts.items():
+                outpathview = os.path.join(outpath, "combined", f'pathview_{name}')
                 os.makedirs(outpathview, exist_ok=True)
-                subprocess.run(['pathview-metacerberus.R', filepath, config['PHENO']],
+                subprocess.run(['pathview-metacerberus.R', filepath, config['CLASS']],
                                 cwd=outpathview,
                                 stdout=open(f'{outpathview}/stdout.txt', 'w'),
-                                stderr=open(f'{outpathview}/stderr.txt', 'w'))
+                                stderr=open(f'{outpathview}/stderr.txt', 'w')
+                            )
     
     # HTML of Figures
     metacerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
