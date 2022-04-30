@@ -112,13 +112,13 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
                 print(c("Processing", paste0('k', pid)))
                 tryCatch(
                     expr = {
-                        pv.out <- pathview::pathview(
-                                        gene.data = logfoldchange,
-                                        pathway.id = pid,
-                                        species = species,
-                                        out.suffix = diff.tool,
-                                        plot.gene.data = T
-                                        #kegg.native = T,
+                        pathview::pathview(
+                            gene.data = logfoldchange,
+                            pathway.id = pid,
+                            species = species,
+                            out.suffix = diff.tool,
+                            plot.gene.data = T
+                            #kegg.native = T,
                                     )
                     },
                     error = function(e) {
@@ -126,8 +126,6 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
                     }
                 )
             }
-            #pv.out.list <- sapply(na.omit(path.ids.2[1:6]), function(pid) pathview::pathview(gene.data = logfoldchange,
-            #                        pathway.id = pid, out.suffix = diff.tool, species = species, plot.gene.data = T))
             print("Finished Pathview")
         }
         else {
@@ -150,24 +148,37 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
         }
     }
 
+    suppressMessages(library(plotly, quietly = TRUE))
+
     print("Plotting Pathview Data")
     if (plot.gene.data == T) { #& is.null(pathway.id))  ) {
         gs <- unique(unlist(gsets[rownames(fc.kegg.p$greater)[1:3]]))
         essData <- gage::essGene(gs, gene.data, ref = ref, samp = samp, compare = compare)
         for (gs in rownames(fc.kegg.p$greater)[1:3]) {
-            outname <- gsub(" |:|/", "_", substr(gs, 10, 100))
+            outname <- paste(gsub(" |:|/", "_", substr(gs, 9, 100)), "greater", sep="_")
             gage::geneData(genes = gsets[[gs]], exprs = essData, ref = ref,
                 samp = samp, outname = outname, txt = T, heatmap = T,
-                Colv = F, Rowv = F, dendrogram = "none", limit = 3, scatterplot = T)
+                Colv = F, Rowv = F, dendrogram = "none", limit = 3, scatterplot = T, pdf.size = c(7, 7))
         }
+        for (file_tsv in list.files(pattern = "\\.csv$", ignore.case = TRUE)) {
+            file_name = basename(file_tsv)
+            file_tsv <- read.csv(file_tsv, sep = '\t', stringsAsFactors = TRUE)
+            p <- ggplot(file_tsv, aes(x = engperc, y = frenperc)) + geom_bin2d() +
+                    labs(title = paste(file_name, "Heatmap"),
+                        x = "Samples",
+                        y = "KO IDs",
+                        fill = "KO Pathway\nRegulation")
+            plotly::ggplotly(p)
+        }
+
         if (length(fc.kegg.p) > 2) {
             gs <- unique(unlist(gsets[rownames(fc.kegg.p$lesser)[1:3]]))
-            essData <- gage::essGene(gs,gene.data, ref = ref, samp = samp, compare = compare)
+            essData <- gage::essGene(gs, gene.data, ref = ref, samp = samp, compare = compare)
             for (gs in rownames(fc.kegg.p$lesser)[1:3]) {
-                outname <- gsub(" |:|/", "_", substr(gs, 10, 100))
+                outname <- paste(gsub(" |:|/", "_", substr(gs, 10, 100)), "lesser", sep="_")
                 gage::geneData(genes = gsets[[gs]], exprs = essData, ref = ref,
                     samp = samp, outname = outname, txt = T, heatmap = T,
-                    Colv = F, Rowv = F, dendrogram = "none", limit = 3, scatterplot = T)
+                    Colv = F, Rowv = F, dendrogram = "none", limit = 3, scatterplot = T, pdf.size = c(7, 7))
             }
         }
     }
@@ -251,6 +262,9 @@ gene.data <- gene.data[, rownames(coldata)]
 all(rownames(coldata) == colnames(gene.data))
 
 print("Running pathview")
+
+dir.create("deseq2", showWarnings = FALSE)
+setwd("deseq2")
 pathview.2(run = "complete",
     both.dirs = list(gene = T, cpd = T),
     diff.tool = "deseq2",
@@ -263,7 +277,10 @@ pathview.2(run = "complete",
     outname = outname,
     compare = "unpaired",
     species = "ko")
+setwd("..")
 
+dir.create("edgeR", showWarnings = FALSE)
+setwd("edgeR")
 pathview.2(run = "complete",
     both.dirs = list(gene = T, cpd = T),
     diff.tool = "edgeR",
@@ -276,3 +293,4 @@ pathview.2(run = "complete",
     outname = outname,
     compare = "unpaired",
     species = "ko")
+setwd("..")

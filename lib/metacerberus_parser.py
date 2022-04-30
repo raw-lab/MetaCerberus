@@ -29,6 +29,7 @@ def parseHmmer(hmm_tsv, config, subdir):
             try:
                 query = line[1]
                 score = float(line[3])
+                line[3] = score
             except:
                 continue
             if score < minscore:            # Skip scores less than minscore
@@ -41,7 +42,7 @@ def parseHmmer(hmm_tsv, config, subdir):
             elif len(BH_top5[query]) < 5:
                 BH_top5[query].append(line)
             else:
-                BH_top5[query].sort(key = lambda x: x[1], reverse=True)
+                BH_top5[query].sort(key = lambda x: x[3], reverse=True)
                 if score > float(BH_top5[query][0][3]):
                     BH_top5[query][0] = line
 
@@ -55,7 +56,7 @@ def parseHmmer(hmm_tsv, config, subdir):
     with open(top5File, 'w') as writer:
         print("Target Name", "KO ID", "EC value", "E-Value (sequence)", "Score (domain)", file=writer, sep='\t')
         for query in sorted(BH_top5.keys()):
-            BH_top5[query].sort(key = lambda x: x[1], reverse=True)
+            BH_top5[query].sort(key = lambda x: x[3], reverse=True)
             for line in BH_top5[query]:
                 ko = []
                 ec = []
@@ -86,7 +87,7 @@ def parseHmmer(hmm_tsv, config, subdir):
     dfRollup['KEGG'] = rollup(KO_ID_counts, dbPath, path)
 
     for name,df in dfRollup.items():
-        outfile = os.path.join( path, "HMMER_BH_"+name+"_rollup.tsv" )
+        outfile = os.path.join( path, "HMMER_BH_"+name+"_rollup.tsv")
         #if config['REPLACE'] or not os.path.exists(outfile):
         df.to_csv(outfile, index=False, header=True, sep='\t')
         #else:

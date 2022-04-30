@@ -581,7 +581,7 @@ Example:
 
         # run post processing analysis in R
         if config['CLASS']:
-            print("STEP 11: Post Analysis with PathView/GAGE")
+            print("\nSTEP 11: Post Analysis with PathView/GAGE")
             for name,filepath in dfCounts.items():
                 outpathview = os.path.join(outpath, "combined", f'pathview_{name}')
                 os.makedirs(outpathview, exist_ok=True)
@@ -590,6 +590,7 @@ Example:
                                 stdout=open(f'{outpathview}/stdout.txt', 'w'),
                                 stderr=open(f'{outpathview}/stderr.txt', 'w')
                             )
+                
     
     # HTML of Figures
     metacerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
