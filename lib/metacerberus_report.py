@@ -2,6 +2,12 @@
 """metacerberus_report.py: Module to create the final HTML reports and tsv files
 """
 
+def warn(*args, **kwargs):
+    #print("args", str(args))
+    pass
+import warnings
+warnings.warn = warn
+
 from collections import OrderedDict
 import os
 import time

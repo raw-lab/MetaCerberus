@@ -97,7 +97,7 @@ def logTime(dirout, host, funcName, path, time):
         print(host, funcName, time, path, file=outTime, sep='\t')
     return
 
-## RAY WORKER THREAD ##
+## RAY WORKER THREADS ##
 @ray.remote
 def rayWorker(func, key, value, config, path):
     #logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, time.strftime("%H:%M:%S", time.localtime()))
@@ -106,6 +106,14 @@ def rayWorker(func, key, value, config, path):
     end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
     logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)
     return key, ret
+
+@ray.remote
+def getStats(key, hmmRollup, amino, hmm_tsv, config):
+    counts = metacerberus_parser.createCountTables(hmmRollup)
+    stats = metacerberus_prostats.getStats(amino, hmm_tsv, counts, config)
+    sunburst = metacerberus_visual.graphSunburst(counts)
+    charts = metacerberus_visual.graphBarcharts(hmmRollup, counts)
+    return key, counts, stats, sunburst, charts
 
 
 ## MAIN
@@ -512,15 +520,21 @@ Example:
     protStats = {}
     figSunburst = {}
     figCharts = {}
-    while(jobParse):
-        ready, jobParse = ray.wait(jobParse)
-        key,value = ray.get(ready[0])
-        hmmRollup[key] = value
-        hmmCounts[key] = metacerberus_parser.createCountTables(hmmRollup[key])
-        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config)
-        figSunburst[key] = metacerberus_visual.graphSunburst(hmmCounts[key])
-        figCharts[key] = metacerberus_visual.graphBarcharts(hmmRollup[key], hmmCounts[key])
-
+    jobStats = []
+    while(jobParse + jobStats):
+        print(f"Parse Jobs: {len(jobParse)} | Stats Jobs: {len(jobStats)}")
+        ready, jobParse = ray.wait(jobParse, timeout=1)
+        if ready:
+            key,value = ray.get(ready[0])
+            hmmRollup[key] = value
+            jobStats.append(getStats.options(num_cpus=1).remote(key, hmmRollup[key], amino[key], hmm_tsv[key], config))
+        ready, jobStats = ray.wait(jobStats, timeout=1)
+        if ready:
+            key, counts, stats, sunburst, charts = ray.get(ready[0])
+            hmmCounts[key] = counts
+            protStats[key] = stats
+            figSunburst[key] = sunburst
+            figCharts[key] = charts
 
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")

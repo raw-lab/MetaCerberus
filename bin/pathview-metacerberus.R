@@ -160,15 +160,19 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
                 samp = samp, outname = outname, txt = T, heatmap = T,
                 Colv = F, Rowv = F, dendrogram = "none", limit = 3, scatterplot = T, pdf.size = c(7, 7))
         }
-        for (file_tsv in list.files(pattern = "\\.csv$", ignore.case = TRUE)) {
+        print("PLOTTING HEATMAPS PLOTLY")
+        print(getwd())
+        for (file_tsv in list.files(pattern = "\\.txt$", ignore.case = TRUE)) {
             file_name = basename(file_tsv)
             file_tsv <- read.csv(file_tsv, sep = '\t', stringsAsFactors = TRUE)
-            p <- ggplot(file_tsv, aes(x = engperc, y = frenperc)) + geom_bin2d() +
-                    labs(title = paste(file_name, "Heatmap"),
+            p <- ggplot(file_tsv,
                         x = "Samples",
                         y = "KO IDs",
                         fill = "KO Pathway\nRegulation")
-            plotly::ggplotly(p)
+            pltHeatmap <- plotly::ggplotly(p)
+
+            print(paste0("SAVING: ", file_name, ".html"))
+            htmlwidgets::saveWidget(pltHeatmap, paste0(file_name, ".html"))
         }
 
         if (length(fc.kegg.p) > 2) {

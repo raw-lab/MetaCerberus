@@ -2,6 +2,12 @@
 """metacerberus_visual.py: Module for creating the plotly figures
 """
 
+def warn(*args, **kwargs):
+    #print("args", str(args))
+    pass
+import warnings
+warnings.warn = warn
+
 import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
