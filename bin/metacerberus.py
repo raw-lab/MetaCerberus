@@ -97,24 +97,55 @@ def logTime(dirout, host, funcName, path, time):
         print(host, funcName, time, path, file=outTime, sep='\t')
     return
 
+# Setup SLURM
+def slurm(SLURM_JOB_NODELIST):
+    """Sets up RAY on a SLURM cluster
+    Not Yet Fully Implemented"""
+
+    proc = subprocess.run(['scontrol', 'show', 'hostnames', SLURM_JOB_NODELIST],
+        stdout=subprocess.PIPE, text=True)
+    if proc.returncode == 0:
+        nodes = proc.stdout.split()
+    else:
+        print(f"ERROR executing 'scontrol show hostnames {SLURM_JOB_NODELIST}'")
+        return None
+    print("NODES:", nodes)
+
+    head_node = nodes[0]
+    proc = subprocess.run(['srun', '--nodes=1', '--ntasks=1', '-w', head_node, 'hostname', '--ip-address'],
+        stdout=subprocess.PIPE, text=True)
+    if proc.returncode == 0:
+        head_node_ip = proc.stdout.strip()
+    else:
+        print(f"ERROR getting head node IP")
+        return None
+
+    port = 6379
+    ip_head = f"{head_node_ip}:{port}"
+    print("IP Head:", ip_head)
+
+    print("Starting HEAD at", head_node)
+    cmd = ["srun", "--nodes=1", "--ntasks=1", "-w", head_node, "ray", "start", "--head", f"--node-ip-address={head_node_ip}", f"--port={port}", "--num-cpus", "1", "--block"]
+    subprocess.Popen(cmd)
+    time.sleep(5)
+
+    # Start Worker Nodes
+    for i in range(1, len(nodes)):
+        print(f"Starting WORKER {i} at {nodes[i]}")
+        cmd = ["srun", "--nodes=1", "--ntasks=1", "-w", nodes[i], "ray", "start", "--address", ip_head, "--num-cpus", "1", "--block"]
+        subprocess.Popen(cmd)
+        time.sleep(5)
+    return
+
+
 ## RAY WORKER THREADS ##
 @ray.remote
 def rayWorker(func, key, value, config, path):
-    #logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, time.strftime("%H:%M:%S", time.localtime()))
     start = time.time()
     ret = func(value, config, path)
-    end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
+    end = str(datetime.timedelta(seconds=time.time()-start))
     logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)
     return key, ret
-
-@ray.remote
-def getStats(key, hmmRollup, amino, hmm_tsv, config):
-    counts = metacerberus_parser.createCountTables(hmmRollup)
-    stats = metacerberus_prostats.getStats(amino, hmm_tsv, counts, config)
-    sunburst = metacerberus_visual.graphSunburst(counts)
-    charts = metacerberus_visual.graphBarcharts(hmmRollup, counts)
-    return key, counts, stats, sunburst, charts
-
 
 ## MAIN
 def main():
@@ -153,7 +184,7 @@ Example:
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
     optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
-
+    optional.add_argument('--slurm_nodes', type=str, default="", help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST')
     optional.add_argument('--version', '-v', action='version',
                         version=f'Cerberus: \n version: {__version__} June 24th 2021',
                         help='show the version number and exit')
@@ -243,25 +274,33 @@ Example:
                 print(f"{value:20} {path}")
                 config[key] = path
             else:
-                print(f"{value:20} NOT FOUND, must be defined in config file as {key}:(path)")
+                print(f"{value:20} NOT FOUND, must be defined in config file as {key}:<path>")
         except:
             print(f"ERROR executing 'which {value}'")
 
-    # Sanity Check of config file
+    # Check for dependencies
     for key,value in config.items():
         if key.startswith("EXE_") and not os.path.isfile(value):
             parser.error(f"Unable to find file: {value}")
 
+
     # Initialize RAY for Multithreading
-    try:
-        ray.init(address='auto') # First try if ray is setup for a cluster
-    except:
-        ray.init()
+    print("Initializing RAY")
+    tmpdir = "/scratch/jlfiguer/ray_tmp"# os.path.join(config['DIR_OUT'], 'tmp')
+    os.environ['RAY_TMPDIR'] = tmpdir
+    os.makedirs(tmpdir, exist_ok=True)
+    # First try if ray is setup for a cluster
+    if config['SLURM_NODES']:
+        slurm(config['SLURM_NODES'])
+        ray.init(address='auto', log_to_driver=False)
+    else:
+        ray.init(log_to_driver=False)
     # Get CPU Count
     if 'CPUS' not in config:
-        config['CPUS'] = psutil.cpu_count()#int(ray.available_resources()['CPU'])
+        config['CPUS'] = psutil.cpu_count()
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
+
 
     startTime = time.time()
     # Step 1 - Load Input Files
@@ -495,6 +534,7 @@ Example:
                 dictChunks[key].append(value)
 
     # Merge chunked results
+    print("Merging HMMER Results")
     for key,value in dictChunks.items():
         tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
         with open(tsv_file, 'w') as writer:
@@ -517,30 +557,25 @@ Example:
 
     hmmRollup = {}
     hmmCounts = {}
-    protStats = {}
-    figSunburst = {}
-    figCharts = {}
-    jobStats = []
-    while(jobParse + jobStats):
-        print(f"Parse Jobs: {len(jobParse)} | Stats Jobs: {len(jobStats)}")
-        ready, jobParse = ray.wait(jobParse, timeout=1)
+    jobCounts = []
+    while(jobParse + jobCounts):
+        ready,jobParse = ray.wait(jobParse, timeout=0)
         if ready:
             key,value = ray.get(ready[0])
             hmmRollup[key] = value
-            jobStats.append(getStats.options(num_cpus=1).remote(key, hmmRollup[key], amino[key], hmm_tsv[key], config))
-        ready, jobStats = ray.wait(jobStats, timeout=1)
+            jobCounts.append( rayWorker.options(num_cpus=1).remote(metacerberus_parser.createCountTables, key, value, config, f"{STEP[9]}/{key}") )
+
+        ready,jobCounts = ray.wait(jobCounts, timeout=0)
         if ready:
-            key, counts, stats, sunburst, charts = ray.get(ready[0])
-            hmmCounts[key] = counts
-            protStats[key] = stats
-            figSunburst[key] = sunburst
-            figCharts[key] = charts
+            key,value = ray.get(ready[0])
+            hmmCounts[key] = value
 
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
     outpath = os.path.join(config['DIR_OUT'], STEP[10])
 
     # Copy report files from QC, Parser
+    print("Copying QC reports")
     while(jobsQC):
         ready, jobsQC = ray.wait(jobsQC)
         key,value = ray.get(ready[0])
@@ -548,14 +583,21 @@ Example:
         key = key.rstrip('_decon').rstrip('_trim')
         os.makedirs(os.path.join(outpath, key), exist_ok=True)
         shutil.copy(value, os.path.join(outpath, key, f"qc_{name}.html"))
-    for key,value in hmmRollup.items():
+    for key in hmmRollup.keys():
         os.makedirs(os.path.join(outpath, key), exist_ok=True)
         shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(outpath, key) )
 
     # Write Stats
+    print("Saving Statistics")
+    protStats = {}
+    for key,value in hmm_tsv.items():
+        protStats[key] = metacerberus_prostats.getStats(amino[key], value, hmmCounts[key], config)
     metacerberus_report.write_Stats(outpath, readStats, protStats, NStats, config)
+    del protStats
+
 
     # write roll-up tables
+    print("Creating rollup tables")
     for sample,tables in hmmCounts.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
@@ -563,13 +605,15 @@ Example:
     for sample,tables in hmmRollup.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            table.to_csv(f"{outpath}/{sample}/{name}_rollup.tsv", index=False, header=True, sep='\t')
+            shutil.copy(table, f"{outpath}/{sample}/{name}_rollup.tsv")
 
 
     # KO Counts Tables
+    print("Creating Count tables")
     dfCounts = {}
     for sample,tables in hmmCounts.items():
-        for name,table in tables.items():
+        for name,table_path in tables.items():
+            table = pd.read_csv(table_path, sep='\t')
             X = table[table.Level == 'Function']
             row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
             row = pd.Series(row, name=sample)
@@ -589,6 +633,7 @@ Example:
     if len(hmmCounts) < 4:
         print("NOTE: PCA Tables and Pathview created only when there are at least four samples.\n")
     else:
+        print("PCA Analysis")
         pcaFigures = metacerberus_visual.graphPCA(dfCounts)
         os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
         metacerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
@@ -604,9 +649,28 @@ Example:
                                 stdout=open(f'{outpathview}/stdout.txt', 'w'),
                                 stderr=open(f'{outpathview}/stderr.txt', 'w')
                             )
-                
-    
+
     # HTML of Figures
+    print("Creating combined HTML Sunburst and Bar Graphs")
+    figSunburst = {}
+    for key,value in hmmCounts.items():
+        figSunburst[key] = metacerberus_visual.graphSunburst(value)
+    
+    @ray.remote
+    def graphCharts(key, rollup, counts):
+        return key, metacerberus_visual.graphBarcharts(rollup, counts)
+
+    jobCharts = []
+    for key,value in hmmRollup.items():
+        jobCharts.append( graphCharts.options(num_cpus=1).remote(key, value, hmmCounts[key]) )
+    
+    figCharts = {}
+    while(jobCharts):
+        ready,jobCharts = ray.wait(jobCharts)
+        if ready:
+            key,value = ray.get(ready[0])
+            figCharts[key] = value
+
     metacerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
 
 

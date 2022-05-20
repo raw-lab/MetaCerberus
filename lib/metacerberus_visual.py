@@ -25,7 +25,7 @@ SUN_LIMIT = 15
 def graphSunburst(tables):
     figs = {}
     for dbName,table in tables.items():
-        df: pd.DataFrame = table.copy()
+        df: pd.DataFrame = pd.read_csv(table, sep='\t')
 
         # Filter top MAX_DEPTH
         try:
@@ -157,11 +157,12 @@ def graphPCA(dfTables:dict):
 
 
 ########## Create Bar Chart Figures ##########
-def graphBarcharts(dfRollup, dfCounts):
+def graphBarcharts(rollup_files:dict, dfCounts):
     dfCounts = dfCounts.copy()
 
     # Set index for our dataframes
-    for dbName,df in dfCounts.items():
+    for dbName,table in dfCounts.items():
+        df = pd.read_csv(table, sep='\t')
         dfCounts[dbName] = df.set_index('Name', inplace=False)
     
     # Recursively add branches to tree    
@@ -178,7 +179,8 @@ def graphBarcharts(dfRollup, dfCounts):
 
     # Add rows to tree
     dbTrees = dict()
-    for dbName,df in dfRollup.items():
+    for dbName,filepath in rollup_files.items():
+        df = pd.read_csv(filepath, sep='\t')
         tree = [dict(), 0]
         for _,row in df.iterrows():
             cols = list()

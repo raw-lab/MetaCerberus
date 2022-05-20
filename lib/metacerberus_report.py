@@ -276,8 +276,8 @@ def write_PCA(outpath, pcaFigures):
 
 
 ########## Write Tables ##########
-def writeTables(table: pd.DataFrame, filePrefix: os.PathLike):
-    table = table.copy()
+def writeTables(table_path: os.PathLike, filePrefix: os.PathLike):
+    table = pd.read_csv(table_path, sep='\t')
 
     regex = re.compile(r"^lvl[0-9]: ")
     table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))

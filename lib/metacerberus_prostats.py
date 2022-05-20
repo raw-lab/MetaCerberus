@@ -4,6 +4,7 @@
 
 """
 
+import pandas as pd
 import statistics as stat
 
 
@@ -61,7 +62,8 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict):
         "% Proteins > Min Score": round(100.0*len(found)/len(proteins), 2),
         "Average Protein Length": round(stat.mean(lengths), 2)
     }
-    for dbName,df in dfCount.items():
+    for dbName,filepath in dfCount.items():
+        df = pd.read_csv(filepath, sep='\t')
         stats[dbName+' KO Count'] = df[df['Level']=='Function']['Count'].sum()
 
     return stats

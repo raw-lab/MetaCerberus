@@ -88,11 +88,8 @@ def parseHmmer(hmm_tsv, config, subdir):
 
     for name,df in dfRollup.items():
         outfile = os.path.join( path, "HMMER_BH_"+name+"_rollup.tsv")
-        #if config['REPLACE'] or not os.path.exists(outfile):
         df.to_csv(outfile, index=False, header=True, sep='\t')
-        #else:
-        #    dfRollup[name] = pd.read_csv(outfile, sep='\t', dtype=dict(Count=int))
-        #    dfRollup[name] = dfRollup[name].fillna('')
+        dfRollup[name] = outfile
 
     return dfRollup
 
@@ -115,15 +112,16 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
                 continue
             rows['Count'] = count
             dfRollup = pd.concat([dfRollup,rows])
-    dfRollup.reset_index(inplace=True)
+    #dfRollup.reset_index(inplace=True)
 
     return dfRollup
 
 
 ########## Counts Table #########
-def createCountTables(dfRollup):
+def createCountTables(rollup_files:dict, config:dict, subdir: str):
     dfCounts = dict()
-    for dbName,df in dfRollup.items():
+    for dbName,filepath in rollup_files.items():
+        df = pd.read_csv(filepath, sep='\t')
         dictCount = {}
         for i,row in df.iterrows():
             for colName,colData in row.iteritems():
@@ -148,6 +146,9 @@ def createCountTables(dfRollup):
         'Name':list(dictCount.keys()),
         'Level':[x[0] for x in dictCount.values()],
         'Count':[x[1] for x in dictCount.values()]}
-        dfCounts[dbName] = pd.DataFrame(data=data)
+
+        outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}_counts.tsv")
+        pd.DataFrame(data=data).to_csv(outpath, index=False, header=True, sep='\t')
+        dfCounts[dbName] = outpath
 
     return dfCounts

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-pathDB="cerberusDB"
+set -e
 
 function install_pip() {
-    rm -r dist/
+    rm -rf dist/
     echo "Building MetaCerberus distribution..."
-    python -m build > /dev/null #2>&1
-    rm -r metacerberus.egg-info/
+    python -m build > /dev/null 2>&1
+    rm -rf metacerberus.egg-info/
     # install latest build version
     latest=$(ls dist/*.gz | sort -V | tail -n 1)
     python -m pip uninstall metacerberus -y
@@ -15,7 +15,7 @@ function install_pip() {
     echo
     python -m pip install $latest
     metacerberus.py --setup
-    Rscript bin/install_pathview.2.R
+    #Rscript bin/install_pathview.2.R
     return
 }
 

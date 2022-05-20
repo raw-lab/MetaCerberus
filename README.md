@@ -1,7 +1,7 @@
 # Welcome to MetaCerberus
 
 ## About 
-MetaCerberus translate raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM) database and KEGG via Hidden Markov Model (HMM) for whole ecosystem metabolomic analysis.
+MetaCerberus translates raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM) database and KEGG via Hidden Markov Model (HMM) for whole ecosystem metabolomic analysis.
 
 ![GitHub Logo](metacerberus_logo.jpg)
 
