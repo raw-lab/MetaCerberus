@@ -58,34 +58,60 @@ This creates an anaconda environment called "metacerberus" with all dependencies
 
 ## Quick start examples
 
-### Illumina data (microbial/phage)
+### Illumina data 
+
+#### Microbial, Archaea and Bacteriophage
 ```
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder] --illumina --meta --dir_out [out_folder] 
 ```
 
-### Nanopore data (microbial/phage)
+#### Eukaryotes and Viruses
+```
+conda activate metacerberus
+metacerberus.py --fraggenescan [input_folder] --illumina --meta --dir_out [out_folder] 
+```
+
+### Nanopore data 
+
+#### Microbial, Archaea and Bacteriophage
 ```
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder]  --nanopore --meta --dir_out [out_folder]
 ```
 
-### PacBio data (microbial/phage)
+#### Eukaryotes and Viruses
+```
+conda activate metacerberus
+metacerberus.py --fraggenescan [input_folder] --nanopore --meta --dir_out [out_folder] 
+```
+
+### PacBio data
+
+#### Microbial, Archaea and Bacteriophage
 ```
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder]  --pacbio --meta --dir_out [out_folder]
 ```
 
---SUPER for both FGS+ and prodigal, and --fraggenescan (FGS+) is recommended for communities with high eukaryotes. 
+#### Eukaryotes and Viruses
+```
+conda activate metacerberus
+metacerberus.py --fraggenescan [input_folder]  --pacbio --meta --dir_out [out_folder]
+```
 
+### SUPER (both methods)
+```
+conda activate metacerberus
+metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --dir_out [out_folder]
+```
 
 ## Prerequisites and dependencies
 
 - python >= 3.7
-
 - MetaCerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies.
 - MetaCerberus currently doesn't support Python 3.10 due to the "Ray" dependency. 
-Python 3.10 is not currently supported.
+- Python 3.10 is not currently supported.
 
 ### Available from Bioconda
 
