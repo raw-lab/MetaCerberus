@@ -7,7 +7,7 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "0.3"
+__version__     = "1.0"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022"
 
@@ -28,7 +28,7 @@ import pkg_resources as pkg #to import package data files
 import time
 import datetime
 import socket
-import ray #multiprocessing
+import ray #parallel-processing
 import pandas as pd
 
 
@@ -157,8 +157,8 @@ def main():
 At least one sequence is required.
 <accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-> cerberus.py --prodigal file1.fasta
-> cerberus.py --config file.config
+> metaerberus.py --prodigal file1.fasta
+> metacerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--prodigal', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
@@ -185,8 +185,9 @@ Example:
     optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
     optional.add_argument('--slurm_nodes', type=str, default="", help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST')
+    optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY [system tmp dir]')
     optional.add_argument('--version', '-v', action='version',
-                        version=f'Cerberus: \n version: {__version__} June 24th 2021',
+                        version=f'MetaCerberus: \n version: {__version__} June 24th 2021',
                         help='show the version number and exit')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
     # Hidden from help, expected to load from config file
@@ -208,7 +209,7 @@ Example:
     if args.setup or args.uninstall:
         return 0
 
-    print("\nStarting Cerberus Pipeline\n")
+    print("\nStarting MetaCerberus Pipeline\n")
 
     # Merge related arguments
     if args.super:
@@ -286,14 +287,17 @@ Example:
 
     # Initialize RAY for Multithreading
     print("Initializing RAY")
-    tmpdir = "/scratch/jlfiguer/ray_tmp"# os.path.join(config['DIR_OUT'], 'tmp')
-    os.environ['RAY_TMPDIR'] = tmpdir
-    os.makedirs(tmpdir, exist_ok=True)
+    if config['TMPDIR']:
+        tmpdir = os.path.abspath(os.path.expanduser(config['TMPDIR']))
+        os.environ['RAY_TMPDIR'] = tmpdir
+        os.makedirs(tmpdir, exist_ok=True)
     # First try if ray is setup for a cluster
     if config['SLURM_NODES']:
         slurm(config['SLURM_NODES'])
+    
+    try:
         ray.init(address='auto', log_to_driver=False)
-    else:
+    except:
         ray.init(log_to_driver=False)
     # Get CPU Count
     if 'CPUS' not in config:
@@ -640,15 +644,27 @@ Example:
 
         # run post processing analysis in R
         if config['CLASS']:
-            print("\nSTEP 11: Post Analysis with PathView/GAGE")
+            print("\nSTEP 11: Post Analysis with GAGE and PathView")
+            outpathview = os.path.join(outpath, 'combined', 'pathview')
+            os.makedirs(os.path.join(outpathview), exist_ok=True)
+            rscript = os.path.join(outpathview, 'run_pathview.sh')
+            with open(rscript, 'w') as writer:
+                writer.write(f"#!/bin/bash\n\n")
+                for name,filepath in dfCounts.items():
+                    shutil.copy(filepath, os.path.join(outpathview, f"{name}_counts.tsv"))
+                    shutil.copy(config['CLASS'], os.path.join(outpathview, f"{name}_class.tsv"))
+                    writer.write(f"mkdir -p {name}\n")
+                    writer.write(f"cd {name}\n")
+                    writer.write(f"pathview-metacerberus.R ../{name}_counts.tsv ../{name}_class.tsv\n")
+                    writer.write(f"cd ..\n")
             for name,filepath in dfCounts.items():
-                outpathview = os.path.join(outpath, "combined", f'pathview_{name}')
-                os.makedirs(outpathview, exist_ok=True)
+                os.makedirs(os.path.join(outpathview, name), exist_ok=True)
                 subprocess.run(['pathview-metacerberus.R', filepath, config['CLASS']],
-                                cwd=outpathview,
+                                cwd=os.path.join(outpathview, name),
                                 stdout=open(f'{outpathview}/stdout.txt', 'w'),
                                 stderr=open(f'{outpathview}/stderr.txt', 'w')
                             )
+            print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
 
     # HTML of Figures
     print("Creating combined HTML Sunburst and Bar Graphs")

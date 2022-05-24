@@ -14,10 +14,8 @@ MetaCerberus translates raw shotgun metaomics sequencing (i.e. metagenomics/meta
 ```
 conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
-setup-metacerberus.sh -d
-setup-metacerberus.sh -f
+metacerberus.py --setup
 ```
-*Dependencies should be installed manually and specified in the config file or path
 
 ### Option 2) Manual Install
 
@@ -33,6 +31,7 @@ git clone https://github.com/raw-lab/metacerberus.git
 cd metacerberus
 python3 install_metacerberus.py
 conda activate metacerberus
+metacerberus.py --setup
 ```
 
 This creates an anaconda environment called "metacerberus" with all dependencies installed.
@@ -46,7 +45,7 @@ This creates an anaconda environment called "metacerberus" with all dependencies
 
 ## Output Files
 
-- If an output directory is given, a 'pipeline' subfolder will be created there.
+- If an output directory is given, that folder will be created where all files are stored.
 - If no output directory is specified, the 'pipeline' subfolder will be created in the current directory.
 - Gage/Pathview R analysis provided as separate scripts within R. 
 
@@ -104,12 +103,10 @@ Python 3.10 is not currently supported.
 - Run metacerberus.py with the options required for your project.
 
 ```
-usage: metacerberus.py [-c CONFIG] [--prodigal PRODIGAL] [--fraggenescan FRAGGENESCAN]
-                       [--meta META] [--super SUPER] [--protein PROTEIN]
-                       [--illumina | --nanopore | --pacbio] [--dir_out DIR_OUT]
-                       [--scaffolds] [--minscore MINSCORE] [--cpus CPUS]
-                       [--chunker CHUNKER] [--replace] [--keep] [--hmm HMM] [--version]
-                       [-h] [--adapters ADAPTERS] [--control_seq CONTROL_SEQ]
+usage: metacerberus.py [-c CONFIG] [--prodigal PRODIGAL] [--fraggenescan FRAGGENESCAN] [--meta META] [--super SUPER] [--protein PROTEIN]
+                       [--illumina | --nanopore | --pacbio] [--setup] [--uninstall] [--dir_out DIR_OUT] [--scaffolds] [--minscore MINSCORE] [--cpus CPUS]
+                       [--chunker CHUNKER] [--replace] [--keep] [--hmm HMM] [--class CLASS] [--slurm_nodes SLURM_NODES] [--tmpdir TMPDIR] [--version] [-h]
+                       [--adapters ADAPTERS] [--control_seq CONTROL_SEQ]
 
 optional arguments:
   --illumina            Specifies that the given FASTQ files are from Illumina
@@ -118,34 +115,36 @@ optional arguments:
 
 Required arguments
 At least one sequence is required.
-<accepted formats {.fastq .fasta .faa .fna .ffn}>
+<accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
 Example:
-> metacerberus.py --prodigal file1.fasta
+> metaerberus.py --prodigal file1.fasta
 > metacerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.:
   -c CONFIG, --config CONFIG
                         Path to config file, command line takes priority
   --prodigal PRODIGAL   Prokaryote nucleotide sequence (includes microbes, bacteriophage)
   --fraggenescan FRAGGENESCAN
-                        Eukaryote nucleotide sequence (includes other viruses, works all
-                        around for everything)
+                        Eukaryote nucleotide sequence (includes other viruses, works all around for everything)
   --meta META           Metagenomic nucleotide sequences (Uses prodigal)
   --super SUPER         Run sequence in both --prodigal and --fraggenescan modes
   --protein PROTEIN, --amino PROTEIN
                         Protein Amino Acid sequence
 
 optional arguments:
-  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to
-                        current directory.
-  --scaffolds           Sequences are treated as scaffolds
-  --minscore MINSCORE   Filter for parsing HMMER results
-  --cpus CPUS           Number of CPUs to use per task. System will try to detect
-                        available CPUs if not specified
-  --chunker CHUNKER     Split files into smaller chunks, in Megabytes
-  --replace             Flag to replace existing files. False by default
-  --keep                Flag to keep temporary files. False by default
-  --hmm HMM             Specify a custom HMM file for HMMER. Default uses downloaded FOAM
-                        HMM Database
+  --setup               Set this flag to ensure dependencies are setup [False]
+  --uninstall           Set this flag to remove downloaded databases and FragGeneScan+ [False]
+  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to current directory. [./meta_cerberus]
+  --scaffolds           Sequences are treated as scaffolds [False]
+  --minscore MINSCORE   Filter for parsing HMMER results [25]
+  --cpus CPUS           Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]
+  --chunker CHUNKER     Split files into smaller chunks, in Megabytes [Disabled by default]
+  --replace             Flag to replace existing files. [False]
+  --keep                Flag to keep temporary files. [False]
+  --hmm HMM             Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database
+  --class CLASS         path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R
+  --slurm_nodes SLURM_NODES
+                        list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST
+  --tmpdir TMPDIR       temp directory for RAY [system tmp dir]
   --version, -v         show the version number and exit
   -h, --help            show this help message and exit
 
@@ -153,11 +152,16 @@ optional arguments:
   --control_seq CONTROL_SEQ
                         FASTA File containing control sequences for decontamination
 
-Args that start with '--' (eg. --prodigal) can also be set in a config file (specified via
--c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for details, see
-syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then
-commandline values override config file values which override defaults.
+Args that start with '--' (eg. --prodigal) can also be set in a config file (specified via -c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for
+details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override config file values which override defaults.
 ```
+
+### GAGE / PathView
+
+After processing the HMM files MetaCerberus calculates a KO Counts table for processing through GAGE and PathView.
+GAGE and PathView are used to visualize the metabolic pathways of the metagenomic samples. A "class" file is required through the --class option to run this analysis. The output is saved under the step_10-visualizeData/combined/pathview folder. Also, at least 4 samples need to be used for this type of analysis.  
+  
+GAGE and PathView also require internet access to be able to download information from a database. MetaCerberus will save a bash script 'run_pathview.sh' in the step_10-visualizeData/combined/pathview directory along with the KO Counts tsv files and the class file for running manualy in case MetaCerberus was run on a cluster without access to the internet.
 
 ### Multiprocessing / Multi-Computing with RAY
 
@@ -196,7 +200,7 @@ echo ""
 # Load any modules or resources here
 conda activate metacerberus
 # source the slurm script to initialize the Ray worker nodes
-source slurm-metacerberus.sh
+source ray-slurm-metacerberus.sh
 # run MetaCerberus
 metacerberus.py --prodigal [input_folder] --illumina --dir_out [out_folder]
 
@@ -216,5 +220,5 @@ MetaCerberus: python code for versatile Functional Ontology Assignments for Meta
 The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw-lab).  
 If you have any questions or feedback, please feel free to get in touch by email.  
 Dr. Richard Allen White III - rwhit101@uncc.edu or raw937@gmail.com.  
-Jose Figueroa - jlfiguer@uncc.edu  
+Jose L. Figueroa III - jlfiguer@uncc.edu  
 Or [open an issue](https://github.com/raw-lab/metacerberus/issues).  

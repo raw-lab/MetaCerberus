@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --partition=Orion
+#SBATCH --partition=Draco
 #SBATCH --job-name=MetaCerberus-Update
 #SBATCH --nodes=3
 #SBATCH --tasks-per-node=1
@@ -19,18 +19,24 @@ echo "Num Tasks   : $SLURM_NTASKS total [$SLURM_NNODES nodes @ $SLURM_CPUS_ON_NO
 echo "======================================================"
 echo ""
 
+SECONDS=0
 
 module load anaconda3
 eval "$(conda shell.bash hook)"
 conda activate metacerberus
 
+if [ "$SLURM_NNODES" -gt 1 ]; then
+    echo "Initializing Ray on $SLURM_NNODES Nodes"
+    source ray-slurm-metacerberus.sh
+fi
 
 # run MetaCerberus
-command time metacerberus.py -c config.yaml --cpus $SLURM_CPUS_ON_NODE --slurm_nodes $SLURM_JOB_NODELIST
+command time metacerberus.py -c config.yaml --cpus $SLURM_CPUS_ON_NODE
 
 
 echo ""
 echo "======================================================"
 echo "End Time   : $(date)"
+echo "Job ran in : $SECONDS seconds"
 echo "======================================================"
 echo ""

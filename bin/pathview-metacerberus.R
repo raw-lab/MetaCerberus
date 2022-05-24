@@ -1,5 +1,36 @@
 #!/usr/bin/env Rscript
 
+# Load libraries
+is_quiet <- TRUE
+
+if (!require("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager", quiet = TRUE)
+    library(BiocManager)
+}
+
+if (!require("DESeq2", quietly = TRUE))
+    BiocManager::install("DESeq2", quiet = is_quiet)
+
+if (!require("edgeR", quietly = TRUE))
+    BiocManager::install("edgeR", quiet = is_quiet)
+
+if (!require("limma", quietly = TRUE))
+    BiocManager::install("limma", quiet = is_quiet)
+
+if (!require("EnhancedVolcano", quietly = TRUE))
+    BiocManager::install("EnhancedVolcano", quiet = is_quiet)
+
+if (!require("gage", quietly = TRUE))
+    BiocManager::install("gage", quiet = is_quiet)
+
+if (!require("gageData", quietly=TRUE))
+    BiocManager::install("gageData", quiet = is_quiet)
+
+if (!require("pathview", quietly = TRUE))
+    BiocManager::install("pathview", quiet = is_quiet)
+
+
+
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) < 2) {
@@ -160,20 +191,19 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
                 samp = samp, outname = outname, txt = T, heatmap = T,
                 Colv = F, Rowv = F, dendrogram = "none", limit = 3, scatterplot = T, pdf.size = c(7, 7))
         }
-        print("PLOTTING HEATMAPS PLOTLY")
-        print(getwd())
-        for (file_tsv in list.files(pattern = "\\.txt$", ignore.case = TRUE)) {
-            file_name = basename(file_tsv)
-            file_tsv <- read.csv(file_tsv, sep = '\t', stringsAsFactors = TRUE)
-            p <- ggplot(file_tsv,
-                        x = "Samples",
-                        y = "KO IDs",
-                        fill = "KO Pathway\nRegulation")
-            pltHeatmap <- plotly::ggplotly(p)
-
-            print(paste0("SAVING: ", file_name, ".html"))
-            htmlwidgets::saveWidget(pltHeatmap, paste0(file_name, ".html"))
-        }
+        #print("PLOTTING HEATMAPS PLOTLY")
+        #print(getwd())
+        #for (file_tsv in list.files(pattern = "\\.txt$", ignore.case = TRUE)) {
+        #    file_name = basename(file_tsv)
+        #    file_tsv <- read.csv(file_tsv, sep = '\t', stringsAsFactors = TRUE)
+        #    p <- ggplot(file_tsv,
+        #                x = "Samples",
+        #                y = "KO IDs",
+        #                fill = "KO Pathway\nRegulation")
+        #    pltHeatmap <- plotly::ggplotly(p)
+        #    print(paste0("SAVING: ", file_name, ".html"))
+        #    htmlwidgets::saveWidget(pltHeatmap, paste0(file_name, ".html"))
+        #}
 
         if (length(fc.kegg.p) > 2) {
             gs <- unique(unlist(gsets[rownames(fc.kegg.p$lesser)[1:3]]))
@@ -188,44 +218,6 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
     }
 }
 
-# Load libraries
-is_quiet <- TRUE
-
-#'if (!require("BiocManager", quietly = TRUE)) {
-#'    install.packages("BiocManager", quiet = TRUE)
-#'    library(BiocManager)
-#'}
-
-#'if (!require("pathview.2", quietly = TRUE)) {
-#'    # pathview.2 dependencies
-#'    if (!require("DESeq2", quietly = TRUE))
-#'        BiocManager::install("DESeq2", quiet = is_quiet)
-#'
-#'    if (!require("edgeR", quietly = TRUE))
-#'        BiocManager::install("edgeR", quiet = is_quiet)
-#'
-#'    if (!require("limma", quietly = TRUE))
-#'        BiocManager::install("limma", quiet = is_quiet)
-#'
-#'    if (!require("EnhancedVolcano", quietly = TRUE))
-#'        BiocManager::install("EnhancedVolcano", quiet = is_quiet)
-#'
-#'    if (!require("gage", quietly = TRUE))
-#'        BiocManager::install("gage", quiet = is_quiet)
-#'
-#'    if (!require("gageData", quietly=TRUE))
-#'        BiocManager::install("gageData", quiet = is_quiet)
-#'
-#'    if (!require("pathview", quietly = TRUE))
-#'        BiocManager::install("pathview", quiet = is_quiet)
-#'
-#'    #Install pathview from github
-#'    if (!require("devtools", quietly = TRUE)) {
-#'        install.packages("devtools", quiet = is_quiet)
-#'        library(devtools)
-#'    }
-#'    devtools::install_github("Elizaddh/pathview", quiet = is_quiet)
-#'}
 
 library(stringr, quietly = TRUE)
 library(gage, quietly = TRUE)

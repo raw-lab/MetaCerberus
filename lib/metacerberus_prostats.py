@@ -36,16 +36,16 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict):
     # sum up proteins in HMMER file
     with open(fileHmmer, "r") as reader:
         for i,line in enumerate(reader,1):
-            "target", "score", "e-value" "query"
+            #"target", "query", "e-value", "score"
             line = line.split('\t')
             try:
                 target = line[0]
-                score = float(line[1])
+                score = float(line[3])
             except:
                 continue
 
             if target not in proteins:
-                print("WARNING: Possible bug on line", i, "of HMMER file:", fileHmmer)
+                print("ERROR: Target on line", i, "of HMMER file not in protein fasta:", fileHmmer)
                 return None
             else:
                 proteins[target]['count'] += 1

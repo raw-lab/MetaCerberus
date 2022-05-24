@@ -5,6 +5,12 @@
 3) Convert rollup file to table
 """
 
+def warn(*args, **kwargs):
+    #print("args", str(args))
+    pass
+import warnings
+warnings.warn = warn
+
 import os
 import pandas as pd
 
@@ -28,8 +34,8 @@ def parseHmmer(hmm_tsv, config, subdir):
             line = line.split('\t')
             try:
                 query = line[1]
-                score = float(line[3])
-                line[3] = score
+                line[3] = float(line[3])
+                score = line[3]
             except:
                 continue
             if score < minscore:            # Skip scores less than minscore
@@ -42,7 +48,7 @@ def parseHmmer(hmm_tsv, config, subdir):
             elif len(BH_top5[query]) < 5:
                 BH_top5[query].append(line)
             else:
-                BH_top5[query].sort(key = lambda x: x[3], reverse=True)
+                BH_top5[query].sort(key = lambda x: x[3], reverse=False)
                 if score > float(BH_top5[query][0][3]):
                     BH_top5[query][0] = line
 
@@ -87,7 +93,7 @@ def parseHmmer(hmm_tsv, config, subdir):
     dfRollup['KEGG'] = rollup(KO_ID_counts, dbPath, path)
 
     for name,df in dfRollup.items():
-        outfile = os.path.join( path, "HMMER_BH_"+name+"_rollup.tsv")
+        outfile = os.path.join(path, "HMMER_BH_"+name+"_rollup.tsv")
         df.to_csv(outfile, index=False, header=True, sep='\t')
         dfRollup[name] = outfile
 
@@ -121,6 +127,7 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
 def createCountTables(rollup_files:dict, config:dict, subdir: str):
     dfCounts = dict()
     for dbName,filepath in rollup_files.items():
+        print("Loading Count Tables:", dbName, filepath)
         df = pd.read_csv(filepath, sep='\t')
         dictCount = {}
         for i,row in df.iterrows():
@@ -148,7 +155,9 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
         'Count':[x[1] for x in dictCount.values()]}
 
         outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}_counts.tsv")
-        pd.DataFrame(data=data).to_csv(outpath, index=False, header=True, sep='\t')
+        df = pd.DataFrame(data=data)
+        df.fillna(0, inplace=True)
+        df.to_csv(outpath, index=False, header=True, sep='\t')
         dfCounts[dbName] = outpath
 
     return dfCounts
