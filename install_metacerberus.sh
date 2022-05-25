@@ -2,22 +2,6 @@
 
 set -e
 
-function install_pip() {
-    rm -rf dist/
-    echo "Building MetaCerberus distribution..."
-    python -m build > /dev/null 2>&1
-    rm -rf metacerberus.egg-info/
-    # install latest build version
-    latest=$(ls dist/*.gz | sort -V | tail -n 1)
-    python -m pip uninstall metacerberus -y
-    echo
-    echo "Installing $latest"
-    echo
-    python -m pip install $latest
-    metacerberus.py --setup
-    return
-}
-
 function install_conda() {
     # initialize conda environment in bash script
     eval "$(conda shell.bash hook)"
