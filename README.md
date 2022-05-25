@@ -242,7 +242,7 @@ echo ""
 
 ## Citing MetaCerberus
 
-MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes (FOAM) database searching via Hidden Markov Model (HMM) with environmental focus of shotgun metaomics data. Preprints.
+MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes (FOAM) database searching via Hidden Markov Models (HMM) with environmental focus of shotgun metaomics data. Preprints.
 
 ## CONTACT
 
