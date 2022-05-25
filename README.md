@@ -1,7 +1,7 @@
 # Welcome to MetaCerberus
 
 ## About 
-MetaCerberus translates raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM) database and KEGG via Hidden Markov Model (HMM) for whole ecosystem metabolomic analysis.
+MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM) database and KEGG via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis.
 
 ![GitHub Logo](metacerberus_logo.jpg)
 
@@ -59,7 +59,7 @@ This creates an anaconda environment called "metacerberus" with all dependencies
 
 ### Illumina data 
 
-#### Microbial, Archaea and Bacteriophage
+#### Bacterial, Archaea and Bacteriophage 
 ```
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder] --illumina --meta --dir_out [out_folder] 
@@ -73,7 +73,7 @@ metacerberus.py --fraggenescan [input_folder] --illumina --meta --dir_out [out_f
 
 ### Nanopore data 
 
-#### Microbial, Archaea and Bacteriophage
+#### Bacterial, Archaea and Bacteriophage
 ```
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder]  --nanopore --meta --dir_out [out_folder]
@@ -104,6 +104,9 @@ metacerberus.py --fraggenescan [input_folder]  --pacbio --meta --dir_out [out_fo
 conda activate metacerberus
 metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --dir_out [out_folder]
 ```
+
+- Note: Fraggenescan will work for prokaryotes and viruses/bacteriophage but prodigal will not work for eukaryotes. 
+
 
 ## Prerequisites and dependencies
 
@@ -184,8 +187,8 @@ details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more th
 
 ### GAGE / PathView
 
-After processing the HMM files MetaCerberus calculates a KO Counts table for processing through GAGE and PathView.
-GAGE and PathView are used to visualize the metabolic pathways of the metagenomic samples. A "class" file is required through the --class option to run this analysis. The output is saved under the step_10-visualizeData/combined/pathview folder. Also, at least 4 samples need to be used for this type of analysis.  
+After processing the HMM files MetaCerberus calculates a KO (KEGG Orthology) counts table from KEGG/FOAM for processing through GAGE and PathView.
+GAGE is recommended for pathway enrichment followed by PathView for visualize the metabolic pathways. A "class" file is required through the --class option to run this analysis. The output is saved under the step_10-visualizeData/combined/pathview folder. Also, at least 4 samples need to be used for this type of analysis.  
   
 GAGE and PathView also require internet access to be able to download information from a database. MetaCerberus will save a bash script 'run_pathview.sh' in the step_10-visualizeData/combined/pathview directory along with the KO Counts tsv files and the class file for running manualy in case MetaCerberus was run on a cluster without access to the internet.
 
@@ -239,7 +242,7 @@ echo ""
 
 ## Citing MetaCerberus
 
-MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes (FOAM) database via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data. Preprints.
+MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes (FOAM) database via Hidden Markov Model (HMM) searching with environmental focus of shotgun metaomics data. Preprints.
 
 ## CONTACT
 
