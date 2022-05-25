@@ -29,7 +29,7 @@ git clone https://github.com/raw-lab/metacerberus.git
 
 ```
 cd metacerberus
-python3 install_metacerberus.py
+bash install_metacerberus.sh
 conda activate metacerberus
 metacerberus.py --setup
 ```
