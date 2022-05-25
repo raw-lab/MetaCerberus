@@ -163,7 +163,6 @@ Example:
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--prodigal', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
     required.add_argument('--fraggenescan', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
-    required.add_argument('--meta', action="append", default=[], help="Metagenomic nucleotide sequences (Uses prodigal)")
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --prodigal and --fraggenescan modes')
     required.add_argument('--protein', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
     # Raw-read identification
@@ -176,6 +175,7 @@ Example:
     optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
     optional.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
     optional.add_argument('--dir_out', type=str, default='./meta_cerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./meta_cerberus]')
+    optional.add_argument('--meta', action="store_true", help="Metagenomic nucleotide sequences (for prodigal) [False]")
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results [25]")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
@@ -217,10 +217,10 @@ Example:
         args.fraggenescan += args.super
 
     # Check if required flags are set
-    if not any([args.prodigal, args.fraggenescan, args.meta, args.protein]):
+    if not any([args.prodigal, args.fraggenescan, args.protein]):
         parser.error('At least one sequence must be declared either in the command line or through the config file')
     # Check sequence type
-    for file in args.prodigal + args.fraggenescan + args.meta:
+    for file in args.prodigal + args.fraggenescan:
         if '.fastq' in file:
             if not any([args.illumina, args.nanopore, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
@@ -362,25 +362,6 @@ Example:
                     args.fraggenescan.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
-    # Load metagenomic input
-    for item in args.meta:
-        item = os.path.abspath(os.path.expanduser(item))
-        if os.path.isfile(item):
-            name, ext = os.path.splitext(os.path.basename(item))
-            if ext in FILES_FASTQ:
-                fastq['meta_'+name] = item
-            elif ext in FILES_FASTA:
-                fasta['meta_'+name] = item
-            elif ext in FILES_AMINO:
-                print(f"WARNING: {item} is a protein sequence, please use --prot option for these.")
-                amino[name] = item
-        elif os.path.isdir(item):
-            for file in os.listdir(item):
-                ext = os.path.splitext(file)[1]
-                if ext in FILES_FASTQ + FILES_FASTA:
-                    args.meta.append(os.path.join(item, file))
-        else:
-            print(f'{item} is not a valid sequence')
     
     print(f"Processing {len(fastq)} fastq sequences")
     print(f"Processing {len(fasta)} fasta sequences")
@@ -471,10 +452,11 @@ Example:
         for key,value in fasta.items():
             if key.startswith("FragGeneScan_"):
                 jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_fgs, key, value, config, f"{STEP[7]}/{key}"))
-            elif key.startswith("meta_"):
-                jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
             else:
-                jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_prod, key, value, config, f"{STEP[7]}/{key}"))
+                if config['META']:
+                    jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
+                else:
+                    jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_prod, key, value, config, f"{STEP[7]}/{key}"))
 
     # Waiting for GeneCall
     for job in jobGenecall:

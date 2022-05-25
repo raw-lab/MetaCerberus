@@ -6,6 +6,7 @@ Uses FGS+
 
 import os
 import subprocess
+import pkg_resources as pkg
 
 
 # Eukaryotic option
@@ -13,7 +14,7 @@ def findORF_fgs(contig, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
 
-    FGStrain = f"{os.path.dirname(config['EXE_FGS+'])}/train"
+    FGStrain = pkg.resource_filename("meta_cerberus", "fraggenescanplus_dependences")
 
     baseOut = f"{path}/proteins"
     faaOut = f"{baseOut}.faa"
