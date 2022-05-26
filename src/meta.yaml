@@ -1,5 +1,5 @@
 {% set name = "MetaCerberus" %}
-{% set version = "0.1" %}
+{% set version = "1.0" %}
 
 package:
   name: "{{ name|lower }}"
@@ -7,7 +7,7 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: d52441e295b9de94a1125912e8c52f7b7417f778e0e96770ad0e17fb9816a977
+  sha256: dba98a71d0d13e63b66bcadc28408f5b3f6f76e87e6b9c90e03516ccc0c4cf2b
 
 build:
   number: 0
@@ -22,6 +22,7 @@ requirements:
   run:
     - gcc
     - make
+    - git
     - python
     - fastqc
     - flash2
@@ -30,19 +31,21 @@ requirements:
     - bbmap
     - prodigal
     - hmmer
+    - ray-default
+    - ray-core
+    - ray-dashboard
+    - pandas
+    - numpy
+    - plotly
+    - scikit-learn
     - dominate
     - python-kaleido
     - configargparse
-    - dominate
-    - kaleido
     - metaomestats
-    - numpy
-    - pandas
-    - plotly
     - psutil
-    - ray-core
-    - ray-dashboard
-    - scikit-learn
+    - grpcio
+    - gitpython
+
 
 test:
   imports:
@@ -61,6 +64,9 @@ about:
   dev_url: 
 
 extra:
+  skip-lints:
+    - compilers_must_be_in_build
+    - should_use_compilers
   recipe-maintainers:
     - decrevi
     - raw-lab
