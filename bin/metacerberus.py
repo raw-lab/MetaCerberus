@@ -174,7 +174,7 @@ Example:
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
     optional.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
-    optional.add_argument('--dir_out', type=str, default='./meta_cerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./meta_cerberus]')
+    optional.add_argument('--dir_out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
     optional.add_argument('--meta', action="store_true", help="Metagenomic nucleotide sequences (for prodigal) [False]")
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
     optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results [25]")

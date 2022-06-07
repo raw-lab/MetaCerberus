@@ -22,8 +22,6 @@ def parseHmmer(hmm_tsv, config, subdir):
     minscore = config["MINSCORE"]
 
     top5File = os.path.join(path, "HMMER_top_5.tsv")
-    rollupFileFOAM = os.path.join(path, "HMMER_BH_FOAM.rollup")
-    rollupFileKEGG = os.path.join(path, "HMMER_BH_KO.rollup")
 
     # Calculate Best Hit
     BH_dict = {}
@@ -92,12 +90,13 @@ def parseHmmer(hmm_tsv, config, subdir):
     dbPath = os.path.join(config['PATHDB'], "KEGG-onto_rel1.tsv")
     dfRollup['KEGG'] = rollup(KO_ID_counts, dbPath, path)
 
+    rollup_file = dict()
     for name,df in dfRollup.items():
         outfile = os.path.join(path, "HMMER_BH_"+name+"_rollup.tsv")
         df.to_csv(outfile, index=False, header=True, sep='\t')
-        dfRollup[name] = outfile
+        rollup_file[name] = outfile
 
-    return dfRollup
+    return rollup_file
 
 
 ######### Roll-Up #########
@@ -118,7 +117,6 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
                 continue
             rows['Count'] = count
             dfRollup = pd.concat([dfRollup,rows])
-    #dfRollup.reset_index(inplace=True)
 
     return dfRollup
 

@@ -34,9 +34,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
         basename = os.path.basename(domtbl_out)
         outname = os.path.splitext(basename)[0] + ".tsv"
         outfile = os.path.join(pathname, outname)
-        if not config['REPLACE'] and os.path.exists(outfile):
-            outlist.append(outfile)
-            continue
+
         # HMMER
         try:
             #TODO: Add --keep option to save the HMMER output file
@@ -59,25 +57,5 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
             if jobs[domtbl_out].poll() is None: # no return code yet, still running
                 done = False # At least one job still running
         time.sleep(1)
-
-    # Convet outfile to TSV to reduce size
-#    outlist = list()
-#    for domtbl_out in hmmOut.keys():
-#        pathname = os.path.dirname(domtbl_out)
-#        basename = os.path.basename(domtbl_out)
-#        outname = os.path.splitext(basename)[0] + ".tsv"
-#        outfile = os.path.join(pathname, outname)
-#        with open(domtbl_out) as reader, open(outfile, 'w') as writer:
-#            for line in reader:
-#                if line.startswith("#"):        # Skip commented lines
-#                    continue
-#                line = line.split()
-#                try:
-#                    print(line[0], line[13], line[6], line[3], sep='\t', file=writer)
-#                except:
-#                    continue
-#        outlist.append(outfile)
-#        if not config['KEEP']:
-#            os.remove(domtbl_out)
 
     return outlist
