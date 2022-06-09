@@ -42,7 +42,7 @@ if (length(args) < 2) {
 #'
 run_path_analysis <- function(lf.c, gsets, ref = ref, samp = samp, compare) {
     suppressMessages(library(gage, quietly = TRUE))
-    fc.kegg.p <- gage::gage(exprs = lf.c, gsets = gsets, ref = NULL, samp = NULL, compare = compare, same.dir = FALSE)
+    fc.kegg.p <- gage::gage(exprs = lf.c, gsets = gsets, ref = NULL, samp = NULL, compare = compare, same.dir = FALSE, use.fold = FALSE)
     write.table(fc.kegg.p$greater, file = "gage_greater.txt", sep = "\t")
     write.table(fc.kegg.p$stats, file = "gage_stats.txt", sep = "\t")
     return(fc.kegg.p)
