@@ -8,6 +8,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
+import re
 import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -70,6 +71,16 @@ def graphPCA(dfTables:dict):
 
         # Do PCA
         X = df.copy()
+
+        # Sort and rename index (if appropriate)
+        types = set()
+        for x in X.index:
+            types.add(re.match(r'([A-Za-z]+_)', x).groups(1))
+        if len(types) == 1:
+            X.index = df.index.map(lambda x: re.sub(r'([A-Za-z]+_)', '', x))
+
+        X.sort_index(inplace=True)
+
         scaler = StandardScaler()
         scaler.fit(X)
         X_scaled = scaler.transform(X)

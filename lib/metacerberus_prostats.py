@@ -59,8 +59,8 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict):
     stats = {
         "Protein Count (Total)": len(proteins),
         f"Protein Count (>Min Score)": len(found),
-        "% Proteins > Min Score": round(100.0*len(found)/len(proteins), 2),
-        "Average Protein Length": round(stat.mean(lengths), 2)
+        "% Proteins > Min Score": 0 if not len(proteins) else round(100.0*len(found)/len(proteins), 2),
+        "Average Protein Length": 0 if not len(lengths) else round(stat.mean(lengths), 2)
     }
     for dbName,filepath in dfCount.items():
         df = pd.read_csv(filepath, sep='\t')

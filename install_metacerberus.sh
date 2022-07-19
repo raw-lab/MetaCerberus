@@ -1,22 +1,16 @@
 #!/usr/bin/env bash
 
-set -e
+set -eu
 
-function install_conda() {
-    # initialize conda environment in bash script
-    eval "$(conda shell.bash hook)"
+ENV_NAME=metacerberus
 
-    # create the metacerberus environment in conda
-    conda create -n metacerberus -y -c conda-forge -c bioconda gcc make grpcio fastqc flash2 fastp porechop bbmap prodigal hmmer ray-default ray-core ray-dashboard gitpython pandas plotly scikit-learn dominate python-kaleido configargparse psutil metaomestats
+# initialize conda environment in bash script
+eval "$(conda shell.bash hook)"
 
-    conda activate metacerberus
+# create the metacerberus environment in conda
+conda create -n $ENV_NAME -y -c conda-forge -c bioconda git python grpcio fastqc flash2 fastp porechop bbmap prodigal hmmer ray-default ray-core ray-dashboard gitpython pandas plotly scikit-learn dominate python-kaleido configargparse psutil metaomestats
 
-    pip install --use-feature=in-tree-build .
-    metacerberus.py --setup
+conda activate $ENV_NAME
 
-    return
-}
-
-### Begin Main Script ###
-
-install_conda
+pip install .
+metacerberus.py --setup

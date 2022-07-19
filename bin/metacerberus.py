@@ -7,10 +7,10 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.0"
+__version__     = "1.1"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022"
-
+__date__        = "July 2022"
 
 def warn(*args, **kwargs):
     #print("args", str(args))
@@ -50,7 +50,7 @@ FILES_AMINO = [".faa"]
 
 # External file downloads
 pathDB = pkg.resource_filename("meta_cerberus", "cerberusDB")
-pathFGS = pkg.resource_filename("meta_cerberus", "FGS+")
+pathFGS = pkg.resource_filename("meta_cerberus", "FGS")
 
 # refseq default locations (for decontamination)
 REFSEQ = {
@@ -67,7 +67,7 @@ DEPENDENCIES = {
     'EXE_FASTP': 'fastp',
     'EXE_PORECHOP': 'porechop',
     'EXE_BBDUK': 'bbduk.sh',
-    'EXE_FGS+': 'FGS+',
+    'EXE_FGS': 'FragGeneScanRs',
     'EXE_PRODIGAL': 'prodigal',
     'EXE_HMMSEARCH': 'hmmsearch',
     'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
@@ -95,46 +95,6 @@ def eprint(*args, **kwargs):
 def logTime(dirout, host, funcName, path, time):
     with open(f'{dirout}/time.tsv', 'a+') as outTime:
         print(host, funcName, time, path, file=outTime, sep='\t')
-    return
-
-# Setup SLURM
-def slurm(SLURM_JOB_NODELIST):
-    """Sets up RAY on a SLURM cluster
-    Not Yet Fully Implemented"""
-
-    proc = subprocess.run(['scontrol', 'show', 'hostnames', SLURM_JOB_NODELIST],
-        stdout=subprocess.PIPE, text=True)
-    if proc.returncode == 0:
-        nodes = proc.stdout.split()
-    else:
-        print(f"ERROR executing 'scontrol show hostnames {SLURM_JOB_NODELIST}'")
-        return None
-    print("NODES:", nodes)
-
-    head_node = nodes[0]
-    proc = subprocess.run(['srun', '--nodes=1', '--ntasks=1', '-w', head_node, 'hostname', '--ip-address'],
-        stdout=subprocess.PIPE, text=True)
-    if proc.returncode == 0:
-        head_node_ip = proc.stdout.strip()
-    else:
-        print(f"ERROR getting head node IP")
-        return None
-
-    port = 6379
-    ip_head = f"{head_node_ip}:{port}"
-    print("IP Head:", ip_head)
-
-    print("Starting HEAD at", head_node)
-    cmd = ["srun", "--nodes=1", "--ntasks=1", "-w", head_node, "ray", "start", "--head", f"--node-ip-address={head_node_ip}", f"--port={port}", "--num-cpus", "1", "--block"]
-    subprocess.Popen(cmd)
-    time.sleep(5)
-
-    # Start Worker Nodes
-    for i in range(1, len(nodes)):
-        print(f"Starting WORKER {i} at {nodes[i]}")
-        cmd = ["srun", "--nodes=1", "--ntasks=1", "-w", nodes[i], "ray", "start", "--address", ip_head, "--num-cpus", "1", "--block"]
-        subprocess.Popen(cmd)
-        time.sleep(5)
     return
 
 
@@ -184,10 +144,10 @@ Example:
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
     optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
-    optional.add_argument('--slurm_nodes', type=str, default="", help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST')
+    optional.add_argument('--slurm_nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
     optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY [system tmp dir]')
     optional.add_argument('--version', '-v', action='version',
-                        version=f'MetaCerberus: \n version: {__version__} June 24th 2021',
+                        version=f'MetaCerberus: \n version: {__version__} {__date__}',
                         help='show the version number and exit')
     optional.add_argument("-h", "--help", action="help", help="show this help message and exit")
     # Hidden from help, expected to load from config file
@@ -203,8 +163,8 @@ Example:
         metacerberus_setup.Remove(pathDB, pathFGS)
 
     if args.setup:
-        metacerberus_setup.Download(pathDB)
         metacerberus_setup.FGS(pathFGS)
+        metacerberus_setup.Download(pathDB)
 
     if args.setup or args.uninstall:
         return 0
@@ -239,7 +199,7 @@ Example:
     config['PATHDB'] = pathDB
 
     # Get FGS+ Folder from Library Path
-    config['EXE_FGS+'] = os.path.join(pathFGS, 'FGS+')
+    config['EXE_FGS'] = os.path.join(pathFGS, DEPENDENCIES["EXE_FGS"])
 
     # load all args into config
     for arg,value in args.__dict__.items():
@@ -293,7 +253,7 @@ Example:
         os.makedirs(tmpdir, exist_ok=True)
     # First try if ray is setup for a cluster
     if config['SLURM_NODES']:
-        slurm(config['SLURM_NODES'])
+        metacerberus_setup.slurm(config['SLURM_NODES'])
     
     try:
         ray.init(address='auto', log_to_driver=False)
@@ -576,8 +536,8 @@ Example:
     # Write Stats
     print("Saving Statistics")
     protStats = {}
-    for key,value in hmm_tsv.items():
-        protStats[key] = metacerberus_prostats.getStats(amino[key], value, hmmCounts[key], config)
+    for key in hmm_tsv.keys():
+        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config)
     metacerberus_report.write_Stats(outpath, readStats, protStats, NStats, config)
     del protStats
 

@@ -126,7 +126,10 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
     dfCounts = dict()
     for dbName,filepath in rollup_files.items():
         print("Loading Count Tables:", dbName, filepath)
-        df = pd.read_csv(filepath, sep='\t')
+        try:
+            df = pd.read_csv(filepath, sep='\t')
+        except:
+            continue
         dictCount = {}
         for i,row in df.iterrows():
             for colName,colData in row.iteritems():

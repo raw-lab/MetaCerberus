@@ -17,16 +17,16 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="MetaCerberus",
-    version="1.0",
+    version="1.1",
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
     description="Versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/raw-lab/metacerberus",
-    scripts=['bin/metacerberus.py',
+    scripts=['bin/metacerberus.py',                                     # scripts to copy to 'bin' path
              'bin/ray-slurm-metacerberus.sh',
-             'bin/pathview-metacerberus.R'],                            # scripts to copy to 'bin' path
+             'bin/pathview-metacerberus.R'],
     packages=['meta_cerberus'],                                         # list of packages, installed to site-packages folder
     package_dir=dict(meta_cerberus='lib'),                              # dict with 'package'='relative dir'
     package_data=dict(meta_cerberus=package_files('lib/')),             # add non-python data to package, relative paths

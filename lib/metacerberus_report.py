@@ -84,21 +84,27 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
     reTrim = re.compile(r"Filtering result:[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)")
     reDecon = re.compile(r"([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)")
     for key,value in readStats.items():
-        # GC Count
-        gcCount = reGC.search(value, re.MULTILINE)
-        if gcCount: dictStats[key]['GC count'] = gcCount.group(1)
-        if gcCount: dictStats[key]['GC %'] = gcCount.group(2)
-        # N25-N90
-        Nstats = reNstats.search(value, re.MULTILINE)
-        if Nstats:
-            for i,label in enumerate(nstatLabels, 1):
-                dictStats[key][label] = Nstats.group(i)
-        # Min-Max fasta
-        min_max = reMinMax.search(value, re.MULTILINE)
-        if min_max: dictStats[key]['Contig Min Length'] = min_max.group(2)
-        if min_max: dictStats[key]['Contig Max Length'] = min_max.group(1)
-        # Trimmed stats
         try:
+            # GC Count
+            gcCount = reGC.search(value, re.MULTILINE)
+            if gcCount: dictStats[key]['GC count'] = gcCount.group(1)
+            if gcCount: dictStats[key]['GC %'] = gcCount.group(2)
+        except: pass
+        try:
+            # N25-N90
+            Nstats = reNstats.search(value, re.MULTILINE)
+            if Nstats:
+                for i,label in enumerate(nstatLabels, 1):
+                    dictStats[key][label] = Nstats.group(i)
+        except: pass
+        try:
+            # Min-Max fasta
+            min_max = reMinMax.search(value, re.MULTILINE)
+            if min_max: dictStats[key]['Contig Min Length'] = min_max.group(2)
+            if min_max: dictStats[key]['Contig Max Length'] = min_max.group(1)
+        except: pass
+        try:
+            # Trimmed stats
             infile = os.path.join(config['DIR_OUT'], config['STEP'][3], key, "stderr.txt")
             trimStats = '\n'.join(open(infile).readlines())
             trim = reTrim.search(trimStats, re.MULTILINE)
