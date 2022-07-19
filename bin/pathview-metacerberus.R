@@ -42,7 +42,9 @@ if (length(args) < 2) {
 #'
 run_path_analysis <- function(lf.c, gsets, ref = ref, samp = samp, compare) {
     suppressMessages(library(gage, quietly = TRUE))
-    fc.kegg.p <- gage::gage(exprs = lf.c, gsets = gsets, ref = NULL, samp = NULL, compare = compare)
+    fc.kegg.p <- gage::gage(exprs = lf.c, gsets = gsets, ref = NULL, samp = NULL, compare = compare, same.dir = FALSE, use.fold = FALSE)
+    write.table(fc.kegg.p$greater, file = "gage_greater.txt", sep = "\t")
+    write.table(fc.kegg.p$stats, file = "gage_stats.txt", sep = "\t")
     return(fc.kegg.p)
 }
 
@@ -114,10 +116,10 @@ rundifftool <- function(diff.tool, gene.data, ref, samp, outname) {
 #' this is a function to run pathview.2 function
 #'
 pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, compare,
-                        both.dirs = list(gene = T, cpd = T), pathway.id = NULL, species, plot.gene.data = T) {
+                        both.dirs = list(gene = F, cpd = F), pathway.id = NULL, species, plot.gene.data = T) {
 
     if (is.null(pathway.id) == FALSE) {
-        pathview::pathview(gene.data = gene.data, pathway.id = pathway.id, out.suffix = outname, plot.gene.data)
+        pathview::pathview(gene.data = gene.data, both.dirs = list(gene = F, cpd = F), pathway.id = pathway.id, out.suffix = outname, plot.gene.data)
     }
     else {
         if (run == "complete") {
@@ -131,13 +133,13 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
             path.ids.2 <- rownames(fc.kegg.p$greater)[fc.kegg.p$greater[, "q.val"] < 0.1 &
                                     + !is.na(fc.kegg.p$greater[, "q.val"])]
 
-            if (length(fc.kegg.p) > 2) {
-                print(length(fc.kegg.p))
-                path.ids.l <- rownames(fc.kegg.p$less)[
-                                            fc.kegg.p$less[, "q.val"] < 0.1 & + !is.na(fc.kegg.p$less[, "q.val"])]
-                path.ids.2 <- c(path.ids.2[1:3], path.ids.l[1:3])
+           # if (length(fc.kegg.p) > 2) {
+           #     print(length(fc.kegg.p))
+           #     path.ids.l <- rownames(fc.kegg.p$less)[
+           #                                 fc.kegg.p$less[, "q.val"] < 0.1 & + !is.na(fc.kegg.p$less[, "q.val"])]
+           #     path.ids.2 <- c(path.ids.2[1:3], path.ids.l[1:3])
                 path.ids.2 <- gsub("[^0-9.-]", "", sapply(stringr::str_split(path.ids.2, " ", 2), "[[", 1))
-            }
+            #}
             print(c("Visualize Pathway", na.omit(path.ids.2[1:6])))
             for (pid in na.omit(path.ids.2[1:6])) {
                 print(c("Processing", paste0('k', pid)))
@@ -147,6 +149,7 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
                             gene.data = logfoldchange,
                             pathway.id = pid,
                             species = species,
+                            both.dirs = list(gene = F, cpd = F),
                             out.suffix = diff.tool,
                             plot.gene.data = T
                             #kegg.native = T,
@@ -174,7 +177,7 @@ pathview.2 <- function(run, diff.tool, gene.data, ref, samp, outname, gsets, com
 
                 #visualize pathway
                 pv.out.list <- sapply(na.omit(path.ids.2[1:6]), function(pid) pathview::pathview(gene.data =  gene.data,
-                                        pathway.id = pid, out.suffix = diff.tool, species, plot.gene.data = T))
+                                        pathway.id = pid, out.suffix = diff.tool, species, plot.gene.data = T, both.dirs = list(gene = F, cpd = F)))
             }
         }
     }
@@ -262,7 +265,7 @@ print("Running pathview")
 dir.create("deseq2", showWarnings = FALSE)
 setwd("deseq2")
 pathview.2(run = "complete",
-    both.dirs = list(gene = T, cpd = T),
+    both.dirs = list(gene = F, cpd = F),
     diff.tool = "deseq2",
     gene.data = gene.data,
     ref = reference_indx,
@@ -278,7 +281,7 @@ setwd("..")
 dir.create("edgeR", showWarnings = FALSE)
 setwd("edgeR")
 pathview.2(run = "complete",
-    both.dirs = list(gene = T, cpd = T),
+    both.dirs = list(gene = F, cpd = F),
     diff.tool = "edgeR",
     gene.data= gene.data,
     ref = reference_indx,
