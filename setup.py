@@ -33,6 +33,7 @@ setuptools.setup(
     license="BSD License",  # metadata
     platforms=['Unix'],     # metadata
     classifiers=[           # This is the new updated way for metadata, but old way seems to still be used in some of the output
+        "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

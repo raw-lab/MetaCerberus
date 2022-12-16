@@ -8,7 +8,6 @@ import shutil
 import subprocess
 import platform
 import urllib.request as url
-from git import Repo
 
 
 # Download Database
@@ -25,26 +24,13 @@ def Download(pathDB):
 
 # Download Frag Gene Scan Plus
 def FGS(pathFGS:os.PathLike):
-    #command = "wget -qO- https://github.com/unipept/FragGeneScanRs/releases/download/v1.1.0/FragGeneScanRs-v1.1.0-x86_64-unknown-linux-musl.tar.gz | tar -xz"
-    #os.makedirs(pathFGS, exist_ok=True)
-    #url.urlretrieve("https://github.com/unipept/FragGeneScanRs/releases/download/v1.1.0/FragGeneScanRs-v1.1.0-x86_64-unknown-linux-musl.tar.gz",
-    #                os.path.join(pathFGS, "FragGeneScanRS.tar.gz"))
-    #subprocess.run(['tar', '-xzf', 'FragGeneScanRS.tar.gz'], cwd=pathFGS)
-    
     system = platform.system()
+
     if system == "Windows":
         print("Windows is not supported")
         return None
     subprocess.run(['tar', '-xzf', f'FragGeneScanRS-{system}.tar.gz'], cwd=pathFGS)
 
-    #os.makedirs(pathFGS, exist_ok=True)
-    #print(f"Cloning FGS+ to {pathFGS}")
-    #try:
-    #    Repo.clone_from("https://github.com/hallamlab/FragGeneScanPlus", pathFGS)
-    #except:
-    #    print("Cloning repo failed, possibly already exists")
-    ##rm -rf "$fgspath/.git*"
-    #subprocess.run(f'make CFLAG="-fcommon -w" -C "{pathFGS}"', shell=True)
     return os.path.join(pathFGS, 'FragGeneScanRS')
 
 
