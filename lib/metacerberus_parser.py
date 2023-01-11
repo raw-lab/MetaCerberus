@@ -124,6 +124,7 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
 ########## Counts Table #########
 def createCountTables(rollup_files:dict, config:dict, subdir: str):
     dfCounts = dict()
+    print("createCountTables:", subdir)
     for dbName,filepath in rollup_files.items():
         print("Loading Count Tables:", dbName, filepath)
         try:

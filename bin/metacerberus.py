@@ -255,13 +255,13 @@ Example:
     if config['SLURM_NODES']:
         metacerberus_setup.slurm(config['SLURM_NODES'])
     
-    try:
-        ray.init(address='auto', log_to_driver=False)
-    except:
-        ray.init(log_to_driver=False)
     # Get CPU Count
     if 'CPUS' not in config:
         config['CPUS'] = psutil.cpu_count()
+    try:
+        ray.init(num_cpus=config['CPUS'], address='auto')#, log_to_driver=False)
+    except:
+        ray.init(num_cpus=config['CPUS'])#log_to_driver=False)
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
 
@@ -557,6 +557,7 @@ Example:
     # KO Counts Tables
     print("Creating Count tables")
     dfCounts = {}
+    #TODO: Use improved algorythm for merging count tables
     for sample,tables in hmmCounts.items():
         for name,table_path in tables.items():
             table = pd.read_csv(table_path, sep='\t')

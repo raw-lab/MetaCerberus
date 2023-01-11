@@ -42,7 +42,7 @@ setuptools.setup(
         "License :: OSI Approved :: BSD License",
         "Operating System :: Unix",
     ],
-    python_requires='<3.10',
+    python_requires='>=3.9',
     install_requires=[
             'setuptools',
             'ray',

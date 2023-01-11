@@ -19,6 +19,10 @@ def Download(pathDB):
     url.urlretrieve("https://osf.io/muan4/download", os.path.join(pathDB, "FOAM-onto_rel1.tsv"))
     url.urlretrieve("https://osf.io/2hp7t/download", os.path.join(pathDB, "KEGG-onto_rel1.tsv"))
     url.urlretrieve("https://osf.io/bdpv5/download", os.path.join(pathDB, "FOAM-hmm_rel1a.hmm.gz"))
+
+    url.urlretrieve("https://osf.io/f6q9u/download", os.path.join(pathDB, "KOFam.hmm.gz"))
+    url.urlretrieve("https://osf.io/km8fu/download", os.path.join(pathDB, "KOFam-eukaryote.hmm.gz"))
+    url.urlretrieve("https://osf.io/pgdua/download", os.path.join(pathDB, "KOFam-prokaryote.hmm.gz"))
     return
 
 
