@@ -107,6 +107,16 @@ def rayWorker(func, key, value, config, path):
     logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)
     return key, ret
 
+## Ray Worker Threads ##
+@ray.remote
+def rayWorkerNew(func, key, dir_log, params:list):
+    start = time.time()
+    ret = func(*params)
+    end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
+    logTime(dir_log, socket.gethostname(), func.__name__, key, end)
+    return (key, ret)#, func.__name__)
+
+
 ## MAIN
 def main():
     ## Parse the command line
@@ -142,7 +152,7 @@ Example:
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
-    optional.add_argument('--hmm', type=str, default='', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
+    optional.add_argument('--hmm', type=str, default='KOFam_all', help="Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
     optional.add_argument('--slurm_nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
     optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY [system tmp dir]')
@@ -168,6 +178,28 @@ Example:
 
     if args.setup or args.uninstall:
         return 0
+
+    DB_HMM = dict(
+        KOFam_all=f'{pathDB}/KOFam-all.hmm.gz',
+        KOFam_prokaryote=f'{pathDB}/KOFam-prokaryote.hmm.gz',
+        KOFam_eukaryote=f'{pathDB}/KOFam-eukaryote.hmm.gz',
+        )
+
+    dbHMM = dict()
+    for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')],1):
+        print(f"HMM: '{hmm}'")
+        if hmm in DB_HMM:
+            if os.path.exists(DB_HMM[hmm]):
+                dbHMM[hmm] = DB_HMM[hmm]
+            else:
+                print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --setup")
+        else:
+            if os.path.exists(hmm):
+                dbHMM[f'DB{i}'] = hmm
+            else:
+                print(f"ERROR: Cannot find '{hmm}'")
+    for k,v in dbHMM.items():
+        print(k, v)
 
     print("\nStarting MetaCerberus Pipeline\n")
 
@@ -247,10 +279,10 @@ Example:
 
     # Initialize RAY for Multithreading
     print("Initializing RAY")
-    if config['TMPDIR']:
-        tmpdir = os.path.abspath(os.path.expanduser(config['TMPDIR']))
-        os.environ['RAY_TMPDIR'] = tmpdir
-        os.makedirs(tmpdir, exist_ok=True)
+    #if config['TMPDIR']:
+    #    tmpdir = os.path.abspath(os.path.expanduser(config['TMPDIR']))
+    #    os.environ['RAY_TMPDIR'] = tmpdir
+    #    os.makedirs(tmpdir, exist_ok=True)
     # First try if ray is setup for a cluster
     if config['SLURM_NODES']:
         metacerberus_setup.slurm(config['SLURM_NODES'])
@@ -260,8 +292,10 @@ Example:
         config['CPUS'] = psutil.cpu_count()
     try:
         ray.init(num_cpus=config['CPUS'], address='auto')#, log_to_driver=False)
+        print("Started RAY on cluster")
     except:
         ray.init(num_cpus=config['CPUS'])#log_to_driver=False)
+        print("Started RAY single node")
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
 
@@ -448,7 +482,8 @@ Example:
                 for chunk in files:
                     aminoAcids[f'chunk_{c}'] = chunk
                     c += 1
-                jobHMM.append(rayWorker.remote(metacerberus_hmm.searchHMM, key, aminoAcids, config, f"{STEP[8]}/{key}"))
+                for hmm in dbHMM.items():
+                    jobHMM.append(rayWorkerNew.remote(metacerberus_hmm.searchHMM, key, config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}/{key}", hmm]))
         else:
             aminoAcids = {}
             aminoAcids[key] = amino[key]
@@ -458,7 +493,8 @@ Example:
                 except:
                     break
                 aminoAcids[key] = amino[key]
-            jobHMM.append(rayWorker.remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), aminoAcids, config, f"{STEP[8]}"))
+            for hmm in dbHMM.items():
+                jobHMM.append(rayWorkerNew.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
     print("Waiting for HMMER")
     dictChunks = dict()
     while(jobHMM):

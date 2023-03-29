@@ -1,5 +1,15 @@
 # MetaCerberus config file
 
+
+#### TESTING ####
+#hmm: KOFam_all, KOFam_prokaryote, KOFam_eukaryote
+hmm: KOFam_prokaryote
+fraggenescan: [../data/five_genomes/RW1.fna]
+illumina: True
+dir_out: testing
+
+
+
 #protein: [../data/example_data/KO_validated_proteins.faa]
 #dir_out: KO_validated_proteins
 
@@ -10,10 +20,10 @@
 #dir_out: Illumina_Microbial_Archaea_Bacteriophage
 
 #### Illumina Eukaryotes and Viruses
-fraggenescan: [../data/five_genomes]
-illumina: True
-meta: True
-dir_out: Illumina_Eukaryotes_Viruses
+#fraggenescan: [../data/five_genomes]
+#illumina: True
+#meta: True
+#dir_out: Illumina_Eukaryotes_Viruses
 
 #### Nanopore Microbial, Archaea and Bacteriophage
 #prodigal: [../../data/five_genomes]

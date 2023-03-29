@@ -4,25 +4,94 @@
 """
 
 import os
+import re
+import time
 import shutil
 import subprocess
 import platform
 import urllib.request as url
 
-
 # Download Database
 def Download(pathDB):
+    start = 0
+    downloaded = 0
+    def progress(block, read, size):
+        nonlocal start
+        nonlocal downloaded
+        if block == 1:
+            start = 0
+            downloaded = 0
+        downloaded += block*read
+        if time.time() - start > 10:
+            start = time.time()
+
+            print("Progress:", downloaded)
+
+            sz = round(block*read, 2)
+
+            if sz < 2^10:
+                sz = f"{sz} Bytes"
+            elif sz < 2^20:
+                sz = f"{round((sz)/2^10, 2)} Kb"
+            else:
+                sz = f"{round((sz)/2^20, 2)} Mb"
+
+            if size < 2^10:
+                size = f"{sz} Bytes"
+            elif size < 2^20:
+                size = f"{round((size)/2^10, 2)} Kb"
+            else:
+                size = f"{round((size)/2^20, 2)} Mb"
+
+            if size > 0:
+                print("Downloaded", sz, "out of:", size)
+            else:
+                print("Downloaded", sz)
+        return
+
+    pathDB = os.path.abspath(pathDB)
     os.makedirs(pathDB, exist_ok=True)
     print(f"Downloading Database files to {pathDB}")
     print("This will take a few minutes...")
-    url.urlretrieve("https://osf.io/72p6g/download", os.path.join(pathDB, "FOAM_readme.txt"))
-    url.urlretrieve("https://osf.io/muan4/download", os.path.join(pathDB, "FOAM-onto_rel1.tsv"))
-    url.urlretrieve("https://osf.io/2hp7t/download", os.path.join(pathDB, "KEGG-onto_rel1.tsv"))
-    url.urlretrieve("https://osf.io/bdpv5/download", os.path.join(pathDB, "FOAM-hmm_rel1a.hmm.gz"))
+    url.urlretrieve("https://osf.io/72p6g/download", os.path.join(pathDB, "FOAM_readme.txt"), reporthook=progress)
+    url.urlretrieve("https://osf.io/muan4/download", os.path.join(pathDB, "FOAM-onto_rel1.tsv"), reporthook=progress)
+    url.urlretrieve("https://osf.io/2hp7t/download", os.path.join(pathDB, "KEGG-onto_rel1.tsv"), reporthook=progress)
+    #url.urlretrieve("https://osf.io/bdpv5/download", os.path.join(pathDB, "FOAM-hmm_rel1a.hmm.gz"))
 
-    url.urlretrieve("https://osf.io/f6q9u/download", os.path.join(pathDB, "KOFam.hmm.gz"))
-    url.urlretrieve("https://osf.io/km8fu/download", os.path.join(pathDB, "KOFam-eukaryote.hmm.gz"))
-    url.urlretrieve("https://osf.io/pgdua/download", os.path.join(pathDB, "KOFam-prokaryote.hmm.gz"))
+
+    print("Downloading KOFam")
+    url.urlretrieve("https://www.genome.jp/ftp/db/kofam/profiles.tar.gz", os.path.join(pathDB, "profiles.tar.gz"), reporthook=progress)
+    print("Extracting KOFam")
+    subprocess.run(['tar', '-xzf', "profiles.tar.gz"], cwd=pathDB)
+    os.remove(os.path.join(pathDB, "profiles.tar.gz"))
+    
+    pathProfiles = os.path.join(pathDB, 'profiles')
+    reKO = re.compile(r'NAME  K', re.MULTILINE)
+    for db in ['prokaryote', 'eukaryote']:
+        print(f"Building KOFam-{db}")
+        dbList = os.path.join(pathProfiles, f'{db}.hal')
+        dbOut = os.path.join(pathDB, f'KOFam_{db}.hmm')
+        with open(dbList) as reader, open(dbOut, 'w') as writer:
+            for line in reader:
+                nextKO = os.path.join(pathProfiles, line.strip())
+                writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
+        os.remove(dbList)
+        subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
+
+    print("Building KOFam-all")
+    dbOut = os.path.join(pathDB, 'KOFam_all.hmm')
+    with open(dbOut, 'w') as writer:
+        for filename in os.listdir(pathProfiles):
+            nextKO = os.path.join(pathProfiles, filename)
+            if filename.endswith('.hmm'):
+                writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
+            os.remove(nextKO)
+    os.removedirs(pathProfiles)
+    subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
+
+    #url.urlretrieve("https://osf.io/f6q9u/download", os.path.join(pathDB, "KOFam-all.hmm.gz"))
+    #url.urlretrieve("https://osf.io/km8fu/download", os.path.join(pathDB, "KOFam-eukaryote.hmm.gz"))
+    #url.urlretrieve("https://osf.io/pgdua/download", os.path.join(pathDB, "KOFam-prokaryote.hmm.gz"))
     return
 
 

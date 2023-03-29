@@ -10,14 +10,10 @@ import time
 
 
 ## HMMER Search
-def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
+def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4):
     minscore = config['MINSCORE']
-    if config['HMM']:
-        hmmDB = config['HMM']
-    else:
-#        hmmDB = os.path.join(config['PATHDB'], 'FOAM-hmm_rel1a.hmm.gz')
-        hmmDB = os.path.join(config['PATHDB'], 'KOFam-prokaryote.hmm.gz')
 
+    hmmKey,hmmDB = hmmDB
 
     hmmOut = dict()
     for key,amino in aminoAcids.items():
@@ -34,15 +30,14 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, CPUs:int=4):
         pathname = os.path.dirname(domtbl_out)
         basename = os.path.basename(domtbl_out)
         outname = os.path.splitext(basename)[0] + ".tsv"
-        outfile = os.path.join(pathname, outname)
+        outfile = os.path.join(pathname, f"{hmmKey}_{outname}")
 
         # HMMER
         try:
             #TODO: Add --keep option to save the HMMER output file
             print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=open(outfile, 'w'))
-#            reduce_grep = f" grep -Ev '^#' | tr -s ' ' | cut -d ' ' -f1,4,7,14,3,18,19 | tr ' ' '\t' >> {outfile}"
             reduce_grep = """grep -Ev '^#' | awk '{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }'""" + f" >> {outfile}"
-            command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | tee hmm.out | {reduce_grep}"
+            command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_grep}"
             with open(f"{path}/stderr.txt", 'w') as ferr:
                 jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=ferr)
             outlist.append(outfile)
