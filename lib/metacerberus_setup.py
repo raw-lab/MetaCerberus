@@ -53,14 +53,14 @@ def Download(pathDB):
     os.makedirs(pathDB, exist_ok=True)
     print(f"Downloading Database files to {pathDB}")
     print("This will take a few minutes...")
-    url.urlretrieve("https://osf.io/72p6g/download", os.path.join(pathDB, "FOAM_readme.txt"), reporthook=progress)
-    url.urlretrieve("https://osf.io/muan4/download", os.path.join(pathDB, "FOAM-onto_rel1.tsv"), reporthook=progress)
-    url.urlretrieve("https://osf.io/2hp7t/download", os.path.join(pathDB, "KEGG-onto_rel1.tsv"), reporthook=progress)
+    url.urlretrieve("https://osf.io/72p6g/download", os.path.join(pathDB, "FOAM_readme.txt"))#, reporthook=progress)
+    url.urlretrieve("https://osf.io/muan4/download", os.path.join(pathDB, "FOAM-onto_rel1.tsv"))#, reporthook=progress)
+    url.urlretrieve("https://osf.io/2hp7t/download", os.path.join(pathDB, "KEGG-onto_rel1.tsv"))#, reporthook=progress)
     #url.urlretrieve("https://osf.io/bdpv5/download", os.path.join(pathDB, "FOAM-hmm_rel1a.hmm.gz"))
 
 
     print("Downloading KOFam")
-    url.urlretrieve("https://www.genome.jp/ftp/db/kofam/profiles.tar.gz", os.path.join(pathDB, "profiles.tar.gz"), reporthook=progress)
+    url.urlretrieve("https://www.genome.jp/ftp/db/kofam/profiles.tar.gz", os.path.join(pathDB, "profiles.tar.gz"))#, reporthook=progress)
     print("Extracting KOFam")
     subprocess.run(['tar', '-xzf', "profiles.tar.gz"], cwd=pathDB)
     os.remove(os.path.join(pathDB, "profiles.tar.gz"))
@@ -68,7 +68,7 @@ def Download(pathDB):
     pathProfiles = os.path.join(pathDB, 'profiles')
     reKO = re.compile(r'NAME  K', re.MULTILINE)
     for db in ['prokaryote', 'eukaryote']:
-        print(f"Building KOFam-{db}")
+        print(f"Building KOFam_{db}")
         dbList = os.path.join(pathProfiles, f'{db}.hal')
         dbOut = os.path.join(pathDB, f'KOFam_{db}.hmm')
         with open(dbList) as reader, open(dbOut, 'w') as writer:
@@ -78,7 +78,7 @@ def Download(pathDB):
         os.remove(dbList)
         subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
 
-    print("Building KOFam-all")
+    print("Building KOFam_all")
     dbOut = os.path.join(pathDB, 'KOFam_all.hmm')
     with open(dbOut, 'w') as writer:
         for filename in os.listdir(pathProfiles):

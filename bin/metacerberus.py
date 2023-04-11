@@ -114,7 +114,7 @@ def rayWorkerNew(func, key, dir_log, params:list):
     ret = func(*params)
     end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
     logTime(dir_log, socket.gethostname(), func.__name__, key, end)
-    return (key, ret)#, func.__name__)
+    return key, ret #, func.__name__
 
 
 ## MAIN
@@ -180,13 +180,13 @@ Example:
         return 0
 
     DB_HMM = dict(
-        KOFam_all=f'{pathDB}/KOFam-all.hmm.gz',
-        KOFam_prokaryote=f'{pathDB}/KOFam-prokaryote.hmm.gz',
-        KOFam_eukaryote=f'{pathDB}/KOFam-eukaryote.hmm.gz',
+        KOFam_all=f'{pathDB}/KOFam_all.hmm.gz',
+        KOFam_prokaryote=f'{pathDB}/KOFam_prokaryote.hmm.gz',
+        KOFam_eukaryote=f'{pathDB}/KOFam_eukaryote.hmm.gz',
         )
 
     dbHMM = dict()
-    for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')],1):
+    for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')], 1):
         print(f"HMM: '{hmm}'")
         if hmm in DB_HMM:
             if os.path.exists(DB_HMM[hmm]):
@@ -198,6 +198,9 @@ Example:
                 dbHMM[f'DB{i}'] = hmm
             else:
                 print(f"ERROR: Cannot find '{hmm}'")
+    if not len(dbHMM):
+        print("ERROR: No HMM DB Loaded")
+        return 0
     for k,v in dbHMM.items():
         print(k, v)
 

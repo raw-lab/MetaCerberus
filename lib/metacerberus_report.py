@@ -149,7 +149,7 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
     tsv_stats = base64.b64encode(dfStats.to_csv(sep='\t').encode('utf-8')).decode('utf-8')
     dfStats = dfStats.apply(pd.to_numeric).T.rename_axis('Sample').reset_index()
     regex = re.compile(r"^([a-zA-Z]*_)")
-    prefixes = {regex.search(x).group(1):i for i,x in dfStats['Sample'].iteritems()}.keys()
+    prefixes = {regex.search(x).group(1):i for i,x in dfStats['Sample'].items()}.keys()
 
     figPlots = OrderedDict()
     for prefix in prefixes:

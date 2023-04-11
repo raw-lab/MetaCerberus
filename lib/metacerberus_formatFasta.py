@@ -4,6 +4,7 @@ Also removes N's from scaffolds
 """
 
 import os
+from pathlib import Path
 import re
 import subprocess
 import textwrap
@@ -46,16 +47,21 @@ def split_sequenceN(name, sequence):
 
 # Remove N's
 def removeN(fasta:str, config:dict, subdir:os.PathLike):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)    
+    path = Path(config['DIR_OUT']) / subdir
 
     outFasta, ext = os.path.splitext(fasta)
     outFasta = os.path.basename(outFasta) + "_clean"+ ext
     outFasta = os.path.join(path, outFasta)
 
+    done = Path(config['DIR_OUT']) / subdir / "complete"
+    if not config['REPLACE'] and done.exists():
+        return outFasta, None
+    path.mkdir(exist_ok=True, parents=True)
+
     proc = subprocess.run(['grep', '-cE', '^[^>].*N', fasta], stdout=subprocess.PIPE, text=True)
     res = int(proc.stdout.strip())
     if res == 0:
+        done.touch()
         return fasta, None
 
     with open(fasta) as reader, open(outFasta, 'w') as writer:
@@ -83,4 +89,5 @@ def removeN(fasta:str, config:dict, subdir:os.PathLike):
                 continue #already got next line, next item in loop
             line = reader.readline()
 
+    done.touch()
     return outFasta, NStats

@@ -195,7 +195,7 @@ def graphBarcharts(rollup_files:dict, dfCounts):
         tree = [dict(), 0]
         for _,row in df.iterrows():
             cols = list()
-            for colName,colData in row.iteritems():
+            for colName,colData in row.items():
                 if colName.startswith('L'):
                     level = colName[1]
                     if colData:

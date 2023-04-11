@@ -12,6 +12,7 @@ import warnings
 warnings.warn = warn
 
 import os
+from pathlib import Path
 import pandas as pd
 
 
@@ -123,9 +124,15 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
 
 ########## Counts Table #########
 def createCountTables(rollup_files:dict, config:dict, subdir: str):
+    done = Path(config['DIR_OUT']) / subdir / "complete"
     dfCounts = dict()
     print("createCountTables:", subdir)
     for dbName,filepath in rollup_files.items():
+        outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}_counts.tsv")
+        if not config['REPLACE'] and done.exists():
+            dfCounts[dbName] = outpath
+            continue
+
         print("Loading Count Tables:", dbName, filepath)
         try:
             df = pd.read_csv(filepath, sep='\t')
@@ -133,7 +140,7 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
             continue
         dictCount = {}
         for i,row in df.iterrows():
-            for colName,colData in row.iteritems():
+            for colName,colData in row.items():
                 if not colName.startswith('L'):
                     continue
                 level = colName[1]
@@ -156,10 +163,10 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
         'Level':[x[0] for x in dictCount.values()],
         'Count':[x[1] for x in dictCount.values()]}
 
-        outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}_counts.tsv")
         df = pd.DataFrame(data=data)
         df.fillna(0, inplace=True)
         df.to_csv(outpath, index=False, header=True, sep='\t')
         dfCounts[dbName] = outpath
 
+    done.touch()
     return dfCounts
