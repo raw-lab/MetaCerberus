@@ -15,7 +15,7 @@ def getReadStats(contig, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
     
-    # countAssembly.py
+    # Metaome_stats
     try:
         command = [ config['EXE_COUNT_ASSEMBLY'], '-f', contig, '-i 100' ]
         with open(f"{path}/stderr.txt", 'w') as ferr, open(f"{path}/read-stats.txt", 'w') as writer:
