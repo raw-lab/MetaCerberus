@@ -10,6 +10,7 @@ warnings.warn = warn
 
 from collections import OrderedDict
 import os
+from pathlib import Path
 import time
 import shutil
 import base64
@@ -283,6 +284,8 @@ def write_PCA(outpath, pcaFigures):
 
 ########## Write Tables ##########
 def writeTables(table_path: os.PathLike, filePrefix: os.PathLike):
+    if not Path(table_path).exists():
+        return
     table = pd.read_csv(table_path, sep='\t')
 
     regex = re.compile(r"^lvl[0-9]: ")

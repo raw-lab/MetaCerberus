@@ -5,6 +5,7 @@ Uses HMMER hmmsearch
 """
 
 import os
+from pathlib import Path
 import subprocess
 import time
 
@@ -17,7 +18,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
 
     hmmOut = dict()
     for key,amino in aminoAcids.items():
-        path = f"{config['DIR_OUT']}/{subdir}/{key}"
+        path = Path(config['DIR_OUT'], subdir, key)
         os.makedirs(path, exist_ok=True)
 
         name = os.path.basename(amino)
@@ -35,7 +36,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
         # HMMER
         try:
             #TODO: Add --keep option to save the HMMER output file
-            print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=open(outfile, 'w'))
+            #print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=open(outfile, 'w'))
             reduce_grep = """grep -Ev '^#' | awk '{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }'""" + f" >> {outfile}"
             command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_grep}"
             with open(f"{path}/stderr.txt", 'w') as ferr:

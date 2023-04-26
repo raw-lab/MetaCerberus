@@ -5,43 +5,49 @@ Uses FGS+
 """
 
 import os
+from pathlib import Path
 import subprocess
 import pkg_resources as pkg
 
 
 # Eukaryotic option
 def findORF_fgs(contig, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)
+    path = Path(config['DIR_OUT'], subdir)
+    done = path / "complete"
 
-    baseOut = f"{path}/proteins"
-    faaOut = f"{baseOut}.faa"
+    baseOut = path / "proteins"
+    faaOut  = path / "proteins.faa"
 
-    if not config['REPLACE'] and os.path.exists(faaOut):
+    if not config['REPLACE'] and done.exists() and faaOut.exists():
         return faaOut
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     command = f"{config['EXE_FGS']} -p {config['CPUS']} -s {contig} -o {baseOut} -w 1 -t complete"
     try:
-        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+        with Path(path,"stdout.txt").open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except Exception as e:
         print(e)
         return None
 
+    done.touch()
     return faaOut
 
 
 # Microbial option
 def findORF_prod(contig, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)
+    path = Path(config['DIR_OUT'], subdir)
+    done = path / "complete"
     fout = open(f"{path}/stdout.txt", 'w')
     ferr = open(f"{path}/stderr.txt", 'w')
 
-    faaOut = f"{path}/proteins.faa"
+    faaOut = path / "proteins.faa"
 
-    if not config['REPLACE'] and os.path.exists(faaOut):
+    if not config['REPLACE'] and done.exists() and faaOut.exists():
         return faaOut
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff"
     try:
@@ -49,21 +55,24 @@ def findORF_prod(contig, config, subdir):
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except Exception as e:
         print(e)
-    
+
+    done.touch()    
     return faaOut
 
 
 # Metagenome option
 def findORF_meta(contig, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)
+    path = Path(config['DIR_OUT'], subdir)
+    done = path / "complete"
     fout = open(f"{path}/stdout.txt", 'w')
     ferr = open(f"{path}/stderr.txt", 'w')
 
     faaOut = f"{path}/proteins.faa"
 
-    if not config['REPLACE'] and os.path.exists(faaOut):
+    if not config['REPLACE'] and done.exists() and faaOut.exists():
         return faaOut
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff -p meta"
     try:
@@ -72,4 +81,5 @@ def findORF_meta(contig, config, subdir):
     except Exception as e:
         print(e)
 
+    done.touch()
     return faaOut

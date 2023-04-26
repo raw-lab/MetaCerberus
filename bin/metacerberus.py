@@ -20,6 +20,7 @@ warnings.warn = warn
 
 import sys
 import os
+from pathlib import Path
 import psutil
 import shutil
 import subprocess
@@ -183,6 +184,7 @@ Example:
         KOFam_all=f'{pathDB}/KOFam_all.hmm.gz',
         KOFam_prokaryote=f'{pathDB}/KOFam_prokaryote.hmm.gz',
         KOFam_eukaryote=f'{pathDB}/KOFam_eukaryote.hmm.gz',
+        COG=f'{pathDB}/COG-noIter.hmm.gz',
         )
 
     dbHMM = dict()
@@ -244,6 +246,7 @@ Example:
             if type(value) is str and os.path.isfile(value):
                 value = os.path.abspath(os.path.expanduser(value))
             config[arg] = value
+    config['HMM'] = dbHMM
     
 
     # Create output directory
@@ -504,7 +507,7 @@ Example:
         readyHMM, jobHMM = ray.wait(jobHMM)
         keys,values = ray.get(readyHMM[0])
         if type(keys) is str:
-            # files in list belongs to same key
+            # files in list belongs to same key (chunks)
             for value in values:
                 if keys not in dictChunks:
                     dictChunks[keys] = []
@@ -521,9 +524,9 @@ Example:
     # Merge chunked results
     print("Merging HMMER Results")
     for key,value in dictChunks.items():
-        tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
-        with open(tsv_file, 'w') as writer:
-            #print("target", "score", "e-value", "query", sep='\t', file=writer)
+        tsv_file = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
+        with tsv_file.open('w') as writer:
+            print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
             for item in sorted(value):
                 writer.write(open(item).read())
                 os.remove(item)
@@ -599,6 +602,8 @@ Example:
     #TODO: Use improved algorythm for merging count tables
     for sample,tables in hmmCounts.items():
         for name,table_path in tables.items():
+            if not Path(table_path).exists():
+                continue
             table = pd.read_csv(table_path, sep='\t')
             X = table[table.Level == 'Function']
             row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))

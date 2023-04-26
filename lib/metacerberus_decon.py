@@ -4,6 +4,7 @@ Uses bbduk [https://sourceforge.net/projects/bbmap/]
 """
 
 import os
+from pathlib import Path
 import subprocess
 
 
@@ -11,15 +12,21 @@ import subprocess
 #
 def deconSingleReads(key_value, config, subdir):
     # TODO: Find good long read mapper
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)
+    path = Path(config['DIR_OUT'], subdir)
 
     key = key_value[0]
     value = key_value[1]
 
-    deconReads = os.path.join(path, f"decon-{key}.fastq")
-    matched = os.path.join(path, "matched_"+key)
-    stats = os.path.join(path, "stats.txt")
+    deconReads = path / f"decon-{key}.fastq"
+    matched = path / f"matched_{key}"
+    stats = path / "stats.txt"
+
+    done = path / "complete"
+    if not config['REPLACE'] and done.exists() and deconReads.exists():
+        return deconReads
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
+
 
     refseq = "ref="+config['REFSEQ'] if config['REFSEQ'] else ""
 
@@ -31,4 +38,5 @@ def deconSingleReads(key_value, config, subdir):
         print(e)
         print("ERROR: Failed to execute:\n", command)
 
+    done.touch()
     return deconReads

@@ -12,6 +12,7 @@ import warnings
 warnings.warn = warn
 
 import os
+import re
 from pathlib import Path
 import pandas as pd
 
@@ -59,7 +60,7 @@ def parseHmmer(hmm_tsv, config, subdir):
 
     # Save Top 5 hits tsv rollup
     with open(top5File, 'w') as writer:
-        print("Target Name", "KO ID", "EC value", "E-Value (sequence)", "Score (domain)", file=writer, sep='\t')
+        print("Target Name", "ID", "EC value", "E-Value (sequence)", "Score (domain)", file=writer, sep='\t')
         for query in sorted(BH_top5.keys()):
             BH_top5[query].sort(key = lambda x: x[3], reverse=True)
             for line in BH_top5[query]:
@@ -71,34 +72,62 @@ def parseHmmer(hmm_tsv, config, subdir):
                         ko += [id[0]]
                         if len(id)>1:
                             ec += [id[1]]
+                    else:
+                        ko += [id]
                 print(line[0], ','.join(ko), ','.join(ec), line[2], line[3], file=writer, sep='\t')
 
     # Create dictionary with found KO IDs and counts
     KO_ID_counts = {}
+    #for line in BH_dict.values():
+    #    KO_IDs = [KO_ID.split(":")[1].split("_")[0] for KO_ID in line[1].split(",") if "KO:" in KO_ID]
+    #    for KO_ID in KO_IDs:
+    #        if KO_ID not in KO_ID_counts:
+    #            KO_ID_counts[KO_ID] = 0
+    #        KO_ID_counts[KO_ID] += 1
     for line in BH_dict.values():
-        KO_IDs = [KO_ID.split(":")[1].split("_")[0] for KO_ID in line[1].split(",") if "KO:" in KO_ID]
+        KO_IDs = [ID for ID in line[1].split(",")]
         for KO_ID in KO_IDs:
             if KO_ID not in KO_ID_counts:
                 KO_ID_counts[KO_ID] = 0
             KO_ID_counts[KO_ID] += 1
 
     # Write rollup files to disk
-    dfRollup = dict()
-
-    dbPath = os.path.join(config['PATHDB'], "FOAM-onto_rel1.tsv")
-    dfRollup['FOAM'] = rollup(KO_ID_counts, dbPath, path)
-
-    dbPath = os.path.join(config['PATHDB'], "KEGG-onto_rel1.tsv")
-    dfRollup['KEGG'] = rollup(KO_ID_counts, dbPath, path)
 
     rollup_file = dict()
-    for name,df in dfRollup.items():
-        outfile = os.path.join(path, "HMMER_BH_"+name+"_rollup.tsv")
+    for name in ['FOAM', 'KEGG', 'COG']:
+        dbPath = Path(config['PATHDB'], f"{name}-onto_rel1.tsv")
+        outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
+        #df = rollupKegg(KO_ID_counts, dbPath, path, outfile)
+        df = rollup(KO_ID_counts, dbPath, path)
         df.to_csv(outfile, index=False, header=True, sep='\t')
         rollup_file[name] = outfile
 
     return rollup_file
 
+######## Roll-Up KEGG #########
+def rollupKegg(KO_COUNTS: dict, lookupFile: Path, outpath: str, outfile: Path):
+    dfLookup = dict()
+    with Path(lookupFile).open() as reader:
+        for line in reader:
+            line = line.strip('\n').split('\t')
+            dfLookup[line[4]] = line[0:4] + line[5:]
+
+    errfile = Path(outpath, Path(lookupFile).name+".err")
+    with errfile.open('w') as errlog, Path(outfile).open('w') as writer:
+        #L1 | L2 | L3 | KO | Function | EC
+        print("L1", "L2", "L3", "KO", "Function", "EC", "Count", sep='\t', file=writer)
+        for KO_ID,count in KO_COUNTS.items():
+            if KO_ID in dfLookup:
+                L1, L2, L3, Func, EC, _ = dfLookup[KO_ID]
+                print(L1, L2, L3, KO_ID, Func, EC, count, sep='\t')
+                if Func:
+                    print(L1, L2, L3, KO_ID, Func, EC, count, sep='\t', file=writer)
+                else:
+                    print("WARNING:'", KO_ID, "'Does not have a 'Function' in the Lookup File", file=errlog)
+            else:
+                print("WARNING:'", KO_ID, "'not found in the Lookup File", file=errlog)
+
+    return outfile
 
 ######### Roll-Up #########
 def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
@@ -132,6 +161,7 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
         if not config['REPLACE'] and done.exists():
             dfCounts[dbName] = outpath
             continue
+        done.unlink(missing_ok=True)
 
         print("Loading Count Tables:", dbName, filepath)
         try:

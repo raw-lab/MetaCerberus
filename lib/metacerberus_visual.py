@@ -9,6 +9,7 @@ import warnings
 warnings.warn = warn
 
 import re
+from pathlib import Path
 import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
@@ -26,6 +27,8 @@ SUN_LIMIT = 15
 def graphSunburst(tables):
     figs = {}
     for dbName,table in tables.items():
+        if not Path(table).exists():
+            continue
         df: pd.DataFrame = pd.read_csv(table, sep='\t')
 
         # Filter top MAX_DEPTH
@@ -173,6 +176,8 @@ def graphBarcharts(rollup_files:dict, dfCounts):
 
     # Set index for our dataframes
     for dbName,table in dfCounts.items():
+        if not Path(table).exists():
+            continue
         df = pd.read_csv(table, sep='\t')
         dfCounts[dbName] = df.set_index('Name', inplace=False)
     
@@ -191,19 +196,21 @@ def graphBarcharts(rollup_files:dict, dfCounts):
     # Add rows to tree
     dbTrees = dict()
     for dbName,filepath in rollup_files.items():
-        df = pd.read_csv(filepath, sep='\t')
-        tree = [dict(), 0]
-        for _,row in df.iterrows():
-            cols = list()
-            for colName,colData in row.items():
-                if colName.startswith('L'):
-                    level = colName[1]
-                    if colData:
-                        cols.append(f"lvl{level}: {colData}")
-            if row.Function:
-                cols.append(f"{row.KO}: {row.Function}")
-                buildTree(tree, cols, dbName)
-        dbTrees[dbName] = tree[0]
+        try:
+            df = pd.read_csv(filepath, sep='\t')
+            tree = [dict(), 0]
+            for _,row in df.iterrows():
+                cols = list()
+                for colName,colData in row.items():
+                    if colName.startswith('L'):
+                        level = colName[1]
+                        if colData:
+                            cols.append(f"lvl{level}: {colData}")
+                if row.Function:
+                    cols.append(f"{row.KO}: {row.Function}")
+                    buildTree(tree, cols, dbName)
+            dbTrees[dbName] = tree[0]
+        except: pass
 
     # Create Figures
     figs = dict()

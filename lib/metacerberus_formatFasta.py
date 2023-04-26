@@ -12,18 +12,27 @@ import textwrap
 
 ## format_fastq
 def reformat(fastq, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)    
+    path = Path(config['DIR_OUT'], subdir)
 
-    fasta, ext = os.path.splitext(fastq)
-    fasta = os.path.basename(fasta) + ".fna"
-    fasta = os.path.join(path, fasta)
+    #fasta, ext = os.path.splitext(fastq)
+    #fasta = os.path.basename(fasta) + ".fna"
+    #fasta = Path(path, fasta)
+
+    fasta = path / Path(fastq).with_suffix(".fna")
+
+    done = Path(path, 'complete')
+    if not config['REPLACE'] and done.exists() and fasta.exists():
+        return fasta
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     if not config['REPLACE'] and os.path.exists(fasta):
         return fasta
 
     command = "sed -n '1~4s/^@/>/p;2~4p' " +fastq+ " > " +fasta
     subprocess.call(command, shell=True)
+
+    done.touch()
     return fasta
 
 
@@ -47,15 +56,16 @@ def split_sequenceN(name, sequence):
 
 # Remove N's
 def removeN(fasta:str, config:dict, subdir:os.PathLike):
-    path = Path(config['DIR_OUT']) / subdir
+    path = Path(config['DIR_OUT'], subdir)
 
     outFasta, ext = os.path.splitext(fasta)
     outFasta = os.path.basename(outFasta) + "_clean"+ ext
-    outFasta = os.path.join(path, outFasta)
+    outFasta = Path(path, outFasta)
 
-    done = Path(config['DIR_OUT']) / subdir / "complete"
-    if not config['REPLACE'] and done.exists():
+    done = Path(path, 'complete')
+    if not config['REPLACE'] and done.exists() and outFasta.exists():
         return outFasta, None
+    done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
     proc = subprocess.run(['grep', '-cE', '^[^>].*N', fasta], stdout=subprocess.PIPE, text=True)
@@ -64,7 +74,7 @@ def removeN(fasta:str, config:dict, subdir:os.PathLike):
         done.touch()
         return fasta, None
 
-    with open(fasta) as reader, open(outFasta, 'w') as writer:
+    with open(fasta) as reader, outFasta.open('w') as writer:
         NStats = dict()
         line = reader.readline()
         while line:

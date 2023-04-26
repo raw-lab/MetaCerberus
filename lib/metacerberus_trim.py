@@ -5,19 +5,25 @@ Uses porechop
 """
 
 import os
+from pathlib import Path
 import subprocess
 
 
 ## trimSingleRead
 #
 def trimSingleRead(key_value, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)
+    path = Path(config['DIR_OUT'], subdir)
 
     key = key_value[0]
     value = key_value[1]
 
-    trimmedRead = f'{path}/trimmed_{key}.fastq'
+    trimmedRead = path / f'trimmed_{key}.fastq'
+
+    done = path / "complete"
+    if not config['REPLACE'] and done.exists() and trimmedRead.exists():
+        return trimmedRead
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     adapters = "" if not config['ADAPTERS'] else f"--adapter_fasta {config['ADAPTERS']}"
 
@@ -32,21 +38,27 @@ def trimSingleRead(key_value, config, subdir):
         print(e)
         print("Error: Failed to execute trimSingleRead: " + command)
 
+    done.touch()
     return trimmedRead
 
 
 ## trimPairedRead
 #
 def trimPairedRead(key_value, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)
+    path = Path(config['DIR_OUT'], subdir)
 
     key = key_value[0]
     value = key_value[1]
     outR1 = f"trimmed_{os.path.basename(value[0])}"
     outR2 = f"trimmed_{os.path.basename(value[1])}"
 
-    trimmedReads = (os.path.join(path, outR1), os.path.join(path, outR2))
+    trimmedReads = (Path(path, outR1), Path(path, outR2))
+
+    done = path / "complete"
+    if not config['REPLACE'] and done.exists() and trimmedReads.exists():
+        return trimmedReads
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     adapters = "" if not config['ADAPTERS'] else f"--adapter_fasta {config['ADAPTERS']}"
 
@@ -58,6 +70,7 @@ def trimPairedRead(key_value, config, subdir):
         print(e)
         print("Error: Failed to execute trimPairedRead: " + key_value)
 
+    done.touch()
     return trimmedReads
 
 

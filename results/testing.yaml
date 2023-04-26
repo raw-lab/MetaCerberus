@@ -2,9 +2,10 @@
 
 
 #### TESTING ####
-#hmm: KOFam_all, KOFam_prokaryote, KOFam_eukaryote
-hmm: KOFam_prokaryote
-fraggenescan: [../data/five_genomes/RW1.fna]
+#hmm: KOFam_all, KOFam_prokaryote, KOFam_eukaryote, COG
+hmm: COG, KOFam_prokaryote
+#fraggenescan: [../data/five_genomes/RW1.fna]
+protein: [../data/example_data/KO_validated_proteins.faa]
 illumina: True
 dir_out: testing
 
