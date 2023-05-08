@@ -74,7 +74,8 @@ def Download(pathDB):
         with open(dbList) as reader, open(dbOut, 'w') as writer:
             for line in reader:
                 nextKO = os.path.join(pathProfiles, line.strip())
-                writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
+                #writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
+                writer.write(open(nextKO).read())
         os.remove(dbList)
         subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
 

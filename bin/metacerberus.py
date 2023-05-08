@@ -503,7 +503,7 @@ Example:
                 jobHMM.append(rayWorkerNew.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
     print("Waiting for HMMER")
     dictChunks = dict()
-    while(jobHMM):
+    while jobHMM:
         readyHMM, jobHMM = ray.wait(jobHMM)
         keys,values = ray.get(readyHMM[0])
         if type(keys) is str:
@@ -530,7 +530,11 @@ Example:
             for item in sorted(value):
                 writer.write(open(item).read())
                 os.remove(item)
-        hmm_tsv[key] = tsv_file
+        tsv_filtered = metacerberus_hmm.filterHMM(tsv_file, Path(config['DIR_OUT'], STEP[8], key))
+        if not config['KEEP']:
+            Path(tsv_file).unlink(True)
+        hmm_tsv[key] = tsv_filtered
+
     del dictChunks
     # Delete chunked files
     for key,value in chunker.items():
@@ -601,6 +605,45 @@ Example:
     dfCounts = {}
     #TODO: Use improved algorythm for merging count tables
     for sample,tables in hmmCounts.items():
+        outmerged = Path(f'merged_counts-{sample}.tsv')
+        print("MERGING:", outmerged)
+        metacerberus_parser.merge_tsv(tables, outmerged)
+
+        names = sorted(list(tsv_list.keys()))
+        file_list = dict()
+        for name in names:
+            file_list[name] = open(tsv_list[name])
+            file_list[name].readline() # skip header
+        with open(out_file, 'w') as writer:
+            print("kmer", '\t'.join(names), sep='\t', file=writer)
+            lines = dict()
+            kmers = set()
+            for name in names:
+                lines[name] = file_list[name].readline().split()
+                kmers.add(lines[name][0])
+            kmer = sorted(kmers)[0]
+            while True:
+                line = [kmer]
+                kmers = set()
+                for name in names:
+                    if not lines[name]:
+                        line.append('0')
+                    elif lines[name][0] > kmer:
+                        line.append('0')
+                    else:
+                        line.append(lines[name][1])
+                        lines[name] = file_list[name].readline().split()
+                        if lines[name]:
+                            kmers.add(lines[name][0])
+                print('\t'.join(line), file=writer)
+                if not kmers:
+                    break
+                kmer = sorted(kmers)[0]
+        for name in names:
+            file_list[name].close()
+
+
+
         for name,table_path in tables.items():
             if not Path(table_path).exists():
                 continue

@@ -23,19 +23,27 @@ def parseHmmer(hmm_tsv, config, subdir):
 
     minscore = config["MINSCORE"]
 
-    top5File = os.path.join(path, "HMMER_top_5.tsv")
+    top5File = Path(path, "HMMER_top_5.tsv")
+    filteredFile = Path(path, "HMMER_filtered.tsv")
+
 
     # Calculate Best Hit
     BH_dict = {}
     BH_top5 = {}
-    #"target", "query", "e-value", "score"
+    BH_target = {}
+    #"target", "query", "e-value", "score", "length", "start", "end"
     with open(hmm_tsv, "r") as reader:
         for line in reader:
             line = line.split('\t')
             try:
+                target = line[0]
                 query = line[1]
+                e_value = line[2]
                 line[3] = float(line[3])
                 score = line[3]
+                length = int(line[4])
+                start = int(line[5])
+                end = int(line[6])
             except:
                 continue
             if score < minscore:            # Skip scores less than minscore
@@ -59,7 +67,7 @@ def parseHmmer(hmm_tsv, config, subdir):
                 BH_dict[query] = line
 
     # Save Top 5 hits tsv rollup
-    with open(top5File, 'w') as writer:
+    with top5File.open('w') as writer:
         print("Target Name", "ID", "EC value", "E-Value (sequence)", "Score (domain)", file=writer, sep='\t')
         for query in sorted(BH_top5.keys()):
             BH_top5[query].sort(key = lambda x: x[3], reverse=True)
@@ -68,6 +76,7 @@ def parseHmmer(hmm_tsv, config, subdir):
                 ec = []
                 for id in line[1].split(','):
                     if "KO:" in id:
+                        #TODO: Remove this path once custom databases properly identified and formated.
                         id = id.split(':')[1].split('_')
                         ko += [id[0]]
                         if len(id)>1:
@@ -200,3 +209,73 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
 
     done.touch()
     return dfCounts
+
+
+# Merge TSV Files
+def merge_tsv(tsv_list:dict, out_file:os.PathLike):
+    names = sorted(list(tsv_list.keys()))
+    file_list = dict()
+    for name in names:
+        file_list[name] = open(tsv_list[name])
+        file_list[name].readline() # skip header
+    with open(out_file, 'w') as writer:
+        print("kmer", '\t'.join(names), sep='\t', file=writer)
+        lines = dict()
+        kmers = set()
+        for name in names:
+            lines[name] = file_list[name].readline().split()
+            kmers.add(lines[name][0])
+        kmer = sorted(kmers)[0]
+        while True:
+            line = [kmer]
+            kmers = set()
+            for name in names:
+                if not lines[name]:
+                    line.append('0')
+                elif lines[name][0] > kmer:
+                    line.append('0')
+                else:
+                    line.append(lines[name][1])
+                    lines[name] = file_list[name].readline().split()
+                    if lines[name]:
+                        kmers.add(lines[name][0])
+            print('\t'.join(line), file=writer)
+            if not kmers:
+                break
+            kmer = sorted(kmers)[0]
+    for name in names:
+        file_list[name].close()
+    return
+
+
+# Merge TSV Files, Transposed
+def merge_tsv_T(tsv_list:dict, out_file:os.PathLike):
+    names = sorted(list(tsv_list.keys()))#, key=lambda x: x.lower())
+    header = set()
+    file_list = dict()
+    for name in names:
+        file_list[name] = open(tsv_list[name], 'r')
+        file_list[name].readline() # skip header
+        for line in file_list[name]:
+            kmer = line.split()[0]
+            header.add(kmer)
+    
+    header = list(header)
+    with open(out_file, 'w') as writer:
+        print('sample', '\t'.join(header), sep='\t', file=writer)
+        for name in names:
+            file_list[name].seek(0)
+            file_list[name].readline() # skip header
+            counts = dict()
+            for line in file_list[name]:
+                kmer,count = line.split()
+                counts[kmer] = count
+            file_list[name].close()
+            writer.write(name)
+            for kmer in header:
+                if kmer in counts:
+                    writer.write(f'\t{counts[kmer]}')
+                else:
+                    writer.write(f'\t0')
+            writer.write('\n')
+    return

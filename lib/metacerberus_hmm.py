@@ -57,3 +57,50 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
         time.sleep(1)
 
     return outlist
+
+def filterHMM(hmm_tsv:Path, outdir:Path):
+    filteredFile = Path(outdir, "filtered.out")
+
+    BH_target = dict()
+    with open(hmm_tsv, "r") as reader:
+        for line in reader:
+            line = line.split('\t')
+            try:
+                target = line[0]
+                query = line[1]
+                e_value = line[2]
+                line[3] = float(line[3])
+                score = line[3]
+                length = int(line[4])
+                start = int(line[5])
+                end = int(line[6])
+            except:
+                continue
+
+            # Count Proper Hits
+            # 1) Overlapping: Count best score
+            # 2) Unique: Count both
+            if target not in BH_target:
+                BH_target[target] = [(query, e_value, score, length, start, end)]
+            else: # More than one match/target
+                #keys = list(BH_target[target].keys())
+                item = (query, e_value, score, length, start, end)
+                overlap = False
+                for i,match in enumerate(BH_target[target]):
+                    # Check for overlap
+                    if start <= match[5] and end >= match[4]:
+                        #overlap = end - match[4]
+                        overlap = True
+                        if score > match[2]:
+                            BH_target[target][i] = item
+                if not overlap: # Did not overlap
+                    BH_target[target] += [item]
+
+    with filteredFile.open('w') as writer:
+        print("target", "query", "e-value", "score", "length", "start", "end", file=writer, sep='\t')
+        for target in BH_target:
+            for match in set(BH_target[target]):
+                query, e_value, score, length, start, end = match
+                print(target, query, e_value, score, length, start, end, sep='\t', file=writer)
+
+    return filteredFile
