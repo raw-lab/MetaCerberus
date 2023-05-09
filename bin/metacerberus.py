@@ -603,47 +603,10 @@ Example:
     # KO Counts Tables
     print("Creating Count tables")
     dfCounts = {}
-    #TODO: Use improved algorythm for merging count tables
     for sample,tables in hmmCounts.items():
         outmerged = Path(f'merged_counts-{sample}.tsv')
         print("MERGING:", outmerged)
         metacerberus_parser.merge_tsv(tables, outmerged)
-
-        names = sorted(list(tsv_list.keys()))
-        file_list = dict()
-        for name in names:
-            file_list[name] = open(tsv_list[name])
-            file_list[name].readline() # skip header
-        with open(out_file, 'w') as writer:
-            print("kmer", '\t'.join(names), sep='\t', file=writer)
-            lines = dict()
-            kmers = set()
-            for name in names:
-                lines[name] = file_list[name].readline().split()
-                kmers.add(lines[name][0])
-            kmer = sorted(kmers)[0]
-            while True:
-                line = [kmer]
-                kmers = set()
-                for name in names:
-                    if not lines[name]:
-                        line.append('0')
-                    elif lines[name][0] > kmer:
-                        line.append('0')
-                    else:
-                        line.append(lines[name][1])
-                        lines[name] = file_list[name].readline().split()
-                        if lines[name]:
-                            kmers.add(lines[name][0])
-                print('\t'.join(line), file=writer)
-                if not kmers:
-                    break
-                kmer = sorted(kmers)[0]
-        for name in names:
-            file_list[name].close()
-
-
-
         for name,table_path in tables.items():
             if not Path(table_path).exists():
                 continue
