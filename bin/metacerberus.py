@@ -530,7 +530,8 @@ Example:
             for item in sorted(value):
                 writer.write(open(item).read())
                 os.remove(item)
-        tsv_filtered = metacerberus_hmm.filterHMM(tsv_file, Path(config['DIR_OUT'], STEP[8], key))
+        # Filter overlaps
+        tsv_filtered = metacerberus_hmm.filterHMM(tsv_file, Path(config['DIR_OUT'], STEP[8], key), config['PATHDB'])
         if not config['KEEP']:
             Path(tsv_file).unlink(True)
         hmm_tsv[key] = tsv_filtered

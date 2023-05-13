@@ -24,13 +24,11 @@ def parseHmmer(hmm_tsv, config, subdir):
     minscore = config["MINSCORE"]
 
     top5File = Path(path, "HMMER_top_5.tsv")
-    filteredFile = Path(path, "HMMER_filtered.tsv")
 
 
     # Calculate Best Hit
-    BH_dict = {}
+    BH_query = {}
     BH_top5 = {}
-    BH_target = {}
     #"target", "query", "e-value", "score", "length", "start", "end"
     with open(hmm_tsv, "r") as reader:
         for line in reader:
@@ -61,10 +59,10 @@ def parseHmmer(hmm_tsv, config, subdir):
                     BH_top5[query][0] = line
 
             # Check for Best Score per query
-            if query not in BH_dict:
-                BH_dict[query] = line
-            elif score > float(BH_dict[query][3]):
-                BH_dict[query] = line
+            if query not in BH_query:
+                BH_query[query] = line
+            elif score > float(BH_query[query][3]):
+                BH_query[query] = line
 
     # Save Top 5 hits tsv rollup
     with top5File.open('w') as writer:
@@ -77,6 +75,7 @@ def parseHmmer(hmm_tsv, config, subdir):
                 for id in line[1].split(','):
                     if "KO:" in id:
                         #TODO: Remove this path once custom databases properly identified and formated.
+                        print("TODO: Fix DB And remove conditional path (Parser)")
                         id = id.split(':')[1].split('_')
                         ko += [id[0]]
                         if len(id)>1:
@@ -93,12 +92,15 @@ def parseHmmer(hmm_tsv, config, subdir):
     #        if KO_ID not in KO_ID_counts:
     #            KO_ID_counts[KO_ID] = 0
     #        KO_ID_counts[KO_ID] += 1
-    for line in BH_dict.values():
+    for line in BH_query.values():
         KO_IDs = [ID for ID in line[1].split(",")]
         for KO_ID in KO_IDs:
             if KO_ID not in KO_ID_counts:
                 KO_ID_counts[KO_ID] = 0
             KO_ID_counts[KO_ID] += 1
+
+    print(BH_query)
+    print(KO_ID_counts)
 
     # Write rollup files to disk
 
@@ -108,8 +110,9 @@ def parseHmmer(hmm_tsv, config, subdir):
         outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
         #df = rollupKegg(KO_ID_counts, dbPath, path, outfile)
         df = rollup(KO_ID_counts, dbPath, path)
-        df.to_csv(outfile, index=False, header=True, sep='\t')
-        rollup_file[name] = outfile
+        if len(df.index) > 1:
+            df.to_csv(outfile, index=False, header=True, sep='\t')
+            rollup_file[name] = outfile
 
     return rollup_file
 
@@ -166,7 +169,7 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
     dfCounts = dict()
     print("createCountTables:", subdir)
     for dbName,filepath in rollup_files.items():
-        outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}_counts.tsv")
+        outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}-rollup_counts.tsv")
         if not config['REPLACE'] and done.exists():
             dfCounts[dbName] = outpath
             continue
