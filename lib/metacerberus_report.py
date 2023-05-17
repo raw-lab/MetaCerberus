@@ -226,10 +226,10 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             script(type="text/javascript", src="plotly-2.0.0.min.js")
             with style(type="text/css"):
                 raw('\n'+STYLESHEET)
-        with div(cls="document", id="cerberus-summary"):
+        with div(cls="document", id="metacerberus-summary"):
             with h1(cls="title"):
                 img(src=f"data:image/png;base64,{ICON}", height="40")
-                a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
+                a("METACERBERUS", cls="reference external", href="https://github.com/raw-lab/metacerberus")
                 raw(" - Statistical Summary")
             with div(cls="contents topic", id="contents"):
                 with ul(cls="simple"):
@@ -306,17 +306,17 @@ def writeTables(table_path: os.PathLike, filePrefix: os.PathLike):
 ########## Write HTML Files ##########
 def write_HTML_files(outfile, figure, sample, name):
     sample = re.sub(r'^[a-zA-Z]*_', '', sample)
-    with dominate.document(title=f'Cerberus: {name} - {sample}') as doc:
+    with dominate.document(title=f'MetaCerberus: {name} - {sample}') as doc:
         with doc.head:
             meta(charset="utf-8")
             script(type="text/javascript", src="plotly-2.0.0.min.js")
             with style(type="text/css"):
                 raw('\n'+STYLESHEET)
-        with div(cls="document", id="cerberus-report"):
+        with div(cls="document", id="metacerberus-report"):
             # Header
             with h1(cls="title"):
                 img(src=f"data:image/png;base64,{ICON}", height="40")
-                a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
+                a("METACERBERUS", cls="reference external", href="https://github.com/raw-lab/metacerberus")
                 raw(f" - {name} Bar Graphs for '{sample}'")
             # Side Panel
             with div(cls="contents topic", id="contents"):

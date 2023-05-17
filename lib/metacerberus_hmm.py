@@ -40,8 +40,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
             #print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=open(outfile, 'w'))
             reduce_grep = """grep -Ev '^#' | awk '{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }'""" + f" >> {outfile}"
             command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_grep}"
-            with open(f"{path}/stderr.txt", 'w') as ferr:
-                jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=ferr)
+            jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=subprocess.DEVNULL)
             outlist.append(outfile)
         except Exception as e:
             print(e)
@@ -59,10 +58,8 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
 
     return outlist
 
-def filterHMM(hmm_tsv:Path, outdir:Path, dbpath:Path):
-    filteredFile = Path(outdir, "filtered.tsv")
-
-    with filteredFile.open('w') as writer:
+def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
+    with outfile.open('w') as writer:
         print("target", "query", "e-value", "score", "length", "start", "end", file=writer, sep='\t')
         for name in ['KEGG', 'COG']:
             dbLookup = Path(dbpath, f"{name}-onto_rel1.tsv").read_text()
@@ -81,6 +78,7 @@ def filterHMM(hmm_tsv:Path, outdir:Path, dbpath:Path):
                         end = int(line[6])
                     except:
                         continue
+                    # Check if Query is in the Database
                     if not re.search(query, dbLookup, re.MULTILINE):
                         continue
 
@@ -108,4 +106,4 @@ def filterHMM(hmm_tsv:Path, outdir:Path, dbpath:Path):
                     query, e_value, score, length, start, end = match
                     print(target, query, e_value, score, length, start, end, sep='\t', file=writer)
 
-    return filteredFile
+    return outfile

@@ -475,8 +475,9 @@ Example:
     iter_amino = iter(amino)
     for key in iter_amino:
         tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
-        if not config['REPLACE'] and os.path.exists(tsv_file):
-            hmm_tsv[key] = tsv_file
+        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+        if not config['REPLACE'] and os.path.exists(tsv_filtered):
+            hmm_tsv[key] = tsv_filtered
             continue
         # Split files into chunks
         if config['CHUNKER'] > 0:
@@ -531,10 +532,10 @@ Example:
                 writer.write(open(item).read())
                 os.remove(item)
         # Filter overlaps
-        tsv_filtered = metacerberus_hmm.filterHMM(tsv_file, Path(config['DIR_OUT'], STEP[8], key), config['PATHDB'])
+        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+        hmm_tsv[key] = metacerberus_hmm.filterHMM(tsv_file, tsv_filtered, config['PATHDB'])
         if not config['KEEP']:
             Path(tsv_file).unlink(True)
-        hmm_tsv[key] = tsv_filtered
 
     del dictChunks
     # Delete chunked files
@@ -598,38 +599,48 @@ Example:
     for sample,tables in hmmRollup.items():
         os.makedirs(f"{outpath}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            shutil.copy(table, f"{outpath}/{sample}/{name}_rollup.tsv")
+            shutil.copy(table, Path(outpath, sample, f'{name}_rollup.tsv'))
 
 
-    # KO Counts Tables
+    # KO Rollup Counts Tables
     print("Creating Count tables")
-    dfCounts = {}
-    for sample,tables in hmmCounts.items():
-        outmerged = Path(f'merged_counts-{sample}.tsv')
-        print("MERGING:", outmerged)
-        metacerberus_parser.merge_tsv(tables, outmerged)
-        for name,table_path in tables.items():
-            if not Path(table_path).exists():
-                continue
-            table = pd.read_csv(table_path, sep='\t')
-            X = table[table.Level == 'Function']
-            row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-            row = pd.Series(row, name=sample)
-            if name not in dfCounts:
-                dfCounts[name] = pd.DataFrame()
-            dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
-    table: pd.DataFrame
-    for name,table in dfCounts.items():
-        outfile = os.path.join(outpath, "combined", f"KO_Counts_{name}.tsv")
-        table = table.T.reset_index().rename(columns={'index':'KO'})
-        table.KO = table.KO.apply(lambda x : x[0:6])
-        table.to_csv(outfile, index=False, header=True, sep='\t')
-        dfCounts[name] = outfile
+    #dfCounts = {}
+    #for sample,tables in hmmCounts.items():
+    #    outmerged = Path(f'merged_counts-{sample}.tsv')
+    #    print("MERGING:", outmerged)
+    #    metacerberus_parser.merge_tsv(tables, outmerged)
+    #    for name,table_path in tables.items():
+    #        if not Path(table_path).exists():
+    #            continue
+    #        table = pd.read_csv(table_path, sep='\t')
+    #        X = table[table.Level == 'Function']
+    #        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
+    #        row = pd.Series(row, name=sample)
+    #        if name not in dfCounts:
+    #            dfCounts[name] = pd.DataFrame()
+    #        dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
+    #table: pd.DataFrame
+    #for name,table in dfCounts.items():
+    #    outfile = os.path.join(outpath, "combined", f"KO_Counts_{name}.tsv")
+    #    table = table.T.reset_index().rename(columns={'index':'KO'})
+    #    table.KO = table.KO.apply(lambda x : x[0:6])
+    #    table.to_csv(outfile, index=False, header=True, sep='\t')
+    #    dfCounts[name] = outfile
+
+    # Counts for PCA
+    dfCounts = dict()
+    for db in ['KEGG', 'FOAM', 'COG']:
+        tsv_list = dict()
+        for name in hmm_tsv.keys():
+            tsv_list[name] = Path(config['DIR_OUT'], STEP[9], name, f'counts_{db}.tsv')
+        dfCounts[db] = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{db}.tsv')
+        metacerberus_parser.merge_tsv(tsv_list, dfCounts[db])
+
 
     # HTML of PCA
     pcaFigures = None
     if len(hmmCounts) < 4:
-        print("NOTE: PCA Tables and Pathview created only when there are at least four samples.\n")
+        print("NOTE: PCA Tables and Pathview created only when there are at least four sequence files.\n")
     else:
         print("PCA Analysis")
         pcaFigures = metacerberus_visual.graphPCA(dfCounts)

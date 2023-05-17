@@ -66,7 +66,7 @@ def graphPCA(dfTables:dict):
     # Run PCA and add to Plots
     figs = {}
     for name,file in dfTables.items():
-        df = pd.read_csv(file, sep='\t').set_index('KO', drop=True).T
+        df = pd.read_csv(file, sep='\t').set_index('ID', drop=True).T
         if df.empty:
             continue
         df = df.fillna(0).astype(int)

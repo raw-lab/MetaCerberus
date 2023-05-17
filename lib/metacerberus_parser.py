@@ -99,22 +99,61 @@ def parseHmmer(hmm_tsv, config, subdir):
                 KO_ID_counts[KO_ID] = 0
             KO_ID_counts[KO_ID] += 1
 
-    print(BH_query)
-    print(KO_ID_counts)
-
     # Write rollup files to disk
 
-    rollup_file = dict()
-    for name in ['FOAM', 'KEGG', 'COG']:
-        dbPath = Path(config['PATHDB'], f"{name}-onto_rel1.tsv")
-        outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
-        #df = rollupKegg(KO_ID_counts, dbPath, path, outfile)
-        df = rollup(KO_ID_counts, dbPath, path)
-        if len(df.index) > 1:
-            df.to_csv(outfile, index=False, header=True, sep='\t')
-            rollup_file[name] = outfile
+    #rollup_file = dict()
+    #for name in ['FOAM', 'KEGG', 'COG']:
+    #    dbPath = Path(config['PATHDB'], f"{name}-onto_rel1.tsv")
+    #    outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
+    #    #df = rollupKegg(KO_ID_counts, dbPath, path, outfile)
+    #    df = rollup(KO_ID_counts, dbPath, path)
+    #    if len(df.index) > 1:
+    #        df.to_csv(outfile, index=False, header=True, sep='\t')
+    #        rollup_file[name] = outfile
 
-    return rollup_file
+    dbPath = Path(config['PATHDB'])
+    dfRollups = rollupAll(KO_ID_counts, dbPath, path)
+    rollup_files = dict()
+    for name,df in dfRollups.items():
+        if len(df.index) > 1:
+            outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
+            df.to_csv(outfile, index=False, header=True, sep='\t')
+            rollup_files[name] = outfile
+
+    return rollup_files
+
+######### Roll-Up All #########
+def rollupAll(KO_COUNTS: dict, lookupPath: str, outpath: str):
+    dfLookup = dict()
+    dfRollup = dict()
+    count_file = dict()
+    for name in ['FOAM', 'KEGG', 'COG']:
+        count_file[name] = Path(outpath, f'counts_{name}.tsv').open('w')
+        print('ID', 'count', sep='\t', file=count_file[name])
+        dbPath = Path(lookupPath, f"{name}-onto_rel1.tsv")
+        dfLookup[name] = pd.read_csv(dbPath, sep='\t').fillna('')
+        dfRollup[name] = pd.DataFrame()
+
+    errfile = os.path.join(outpath, 'lookup.err')
+    with open(errfile, 'w') as errlog:
+        for KO_ID,count in KO_COUNTS.items():
+            found = False
+            for name in ['FOAM', 'KEGG', 'COG']:
+                rows = pd.DataFrame(dfLookup[name][dfLookup[name].KO==KO_ID])
+                if not rows.empty:
+                    found = True
+                    rows.drop(rows[rows['Function']==''].index, inplace=True)
+                    if rows.empty:
+                        print("WARNING:'", KO_ID, "'Does not have a 'Function' in the Lookup File:", name, file=errlog)
+                        continue
+                    print(KO_ID, count, sep='\t', file=count_file[name])
+                    rows['Count'] = count
+                    dfRollup[name] = pd.concat([dfRollup[name],rows])
+            if not found:
+                print("WARNING:'", KO_ID, "'not found in any Lookup File", file=errlog)
+                continue
+    
+    return dfRollup
 
 ######## Roll-Up KEGG #########
 def rollupKegg(KO_COUNTS: dict, lookupFile: Path, outpath: str, outfile: Path):
@@ -222,21 +261,25 @@ def merge_tsv(tsv_list:dict, out_file:os.PathLike):
         file_list[name] = open(tsv_list[name])
         file_list[name].readline() # skip header
     with open(out_file, 'w') as writer:
-        print("kmer", '\t'.join(names), sep='\t', file=writer)
+        print("ID", '\t'.join(names), sep='\t', file=writer)
         lines = dict()
         kmers = set()
         for name in names:
             lines[name] = file_list[name].readline().split()
+            if not lines[name]:
+                continue
             kmers.add(lines[name][0])
+        if len(kmers) == 0:
+            return False
         kmer = sorted(kmers)[0]
         while True:
             line = [kmer]
             kmers = set()
             for name in names:
                 if not lines[name]:
-                    line.append('0')
+                    line.append('')
                 elif lines[name][0] > kmer:
-                    line.append('0')
+                    line.append('')
                 else:
                     line.append(lines[name][1])
                     lines[name] = file_list[name].readline().split()
@@ -248,7 +291,7 @@ def merge_tsv(tsv_list:dict, out_file:os.PathLike):
             kmer = sorted(kmers)[0]
     for name in names:
         file_list[name].close()
-    return
+    return True
 
 
 # Merge TSV Files, Transposed
