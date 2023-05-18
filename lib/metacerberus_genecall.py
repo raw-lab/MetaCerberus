@@ -39,8 +39,6 @@ def findORF_fgs(contig, config, subdir):
 def findORF_prod(contig, config, subdir):
     path = Path(config['DIR_OUT'], subdir)
     done = path / "complete"
-    fout = open(f"{path}/stdout.txt", 'w')
-    ferr = open(f"{path}/stderr.txt", 'w')
 
     faaOut = path / "proteins.faa"
 
@@ -51,7 +49,7 @@ def findORF_prod(contig, config, subdir):
 
     command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff"
     try:
-        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+        with Path(path, 'stdout.txt').open('w') as fout, Path(path, 'stderr.txt').open('w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except Exception as e:
         print(e)
@@ -64,10 +62,8 @@ def findORF_prod(contig, config, subdir):
 def findORF_meta(contig, config, subdir):
     path = Path(config['DIR_OUT'], subdir)
     done = path / "complete"
-    fout = open(f"{path}/stdout.txt", 'w')
-    ferr = open(f"{path}/stderr.txt", 'w')
 
-    faaOut = f"{path}/proteins.faa"
+    faaOut = path / "proteins.faa"
 
     if not config['REPLACE'] and done.exists() and faaOut.exists():
         return faaOut
@@ -76,7 +72,7 @@ def findORF_meta(contig, config, subdir):
 
     command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff -p meta"
     try:
-        with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
+        with Path(path, "stdout.txt").open('w') as fout, Path(path, "stderr.txt").open('w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
     except Exception as e:
         print(e)
