@@ -110,7 +110,7 @@ def rayWorker(func, key, value, config, path):
 
 ## Ray Worker Threads ##
 @ray.remote
-def rayWorkerNew(func, key, dir_log, params:list):
+def rayWorkerThread(func, key, dir_log, params:list):
     start = time.time()
     ret = func(*params)
     end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
@@ -297,7 +297,7 @@ Example:
     if 'CPUS' not in config:
         config['CPUS'] = psutil.cpu_count()
     try:
-        ray.init(num_cpus=config['CPUS'], address='auto')#, log_to_driver=False)
+        ray.init(address='auto')#, log_to_driver=False)
         print("Started RAY on cluster")
     except:
         ray.init(num_cpus=config['CPUS'])#log_to_driver=False)
@@ -490,7 +490,7 @@ Example:
                     aminoAcids[f'chunk_{c}'] = chunk
                     c += 1
                 for hmm in dbHMM.items():
-                    jobHMM.append(rayWorkerNew.remote(metacerberus_hmm.searchHMM, key, config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}/{key}", hmm]))
+                    jobHMM.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, key, config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}/{key}", hmm]))
         else:
             aminoAcids = {}
             aminoAcids[key] = amino[key]
@@ -501,7 +501,7 @@ Example:
                     break
                 aminoAcids[key] = amino[key]
             for hmm in dbHMM.items():
-                jobHMM.append(rayWorkerNew.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
+                jobHMM.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
     print("Waiting for HMMER")
     dictChunks = dict()
     while jobHMM:
@@ -566,7 +566,7 @@ Example:
 
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
-    outpath = os.path.join(config['DIR_OUT'], STEP[10])
+    report_path = os.path.join(config['DIR_OUT'], STEP[10])
 
     # Copy report files from QC, Parser
     print("Copying QC reports")
@@ -575,82 +575,60 @@ Example:
         key,value = ray.get(ready[0])
         name = key
         key = key.rstrip('_decon').rstrip('_trim')
-        os.makedirs(os.path.join(outpath, key), exist_ok=True)
-        shutil.copy(value, os.path.join(outpath, key, f"qc_{name}.html"))
+        os.makedirs(os.path.join(report_path, key), exist_ok=True)
+        shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
     for key in hmmRollup.keys():
-        os.makedirs(os.path.join(outpath, key), exist_ok=True)
-        shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(outpath, key) )
+        os.makedirs(os.path.join(report_path, key), exist_ok=True)
+        shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(report_path, key) )
 
     # Write Stats
     print("Saving Statistics")
     protStats = {}
     for key in hmm_tsv.keys():
         protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config)
-    metacerberus_report.write_Stats(outpath, readStats, protStats, NStats, config)
+    metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
 
 
     # write roll-up tables
     print("Creating rollup tables")
     for sample,tables in hmmCounts.items():
-        os.makedirs(f"{outpath}/{sample}", exist_ok=True)
+        os.makedirs(f"{report_path}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            metacerberus_report.writeTables(table, f"{outpath}/{sample}/{name}")
+            metacerberus_report.writeTables(table, f"{report_path}/{sample}/{name}")
     for sample,tables in hmmRollup.items():
-        os.makedirs(f"{outpath}/{sample}", exist_ok=True)
+        os.makedirs(f"{report_path}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            shutil.copy(table, Path(outpath, sample, f'{name}_rollup.tsv'))
+            shutil.copy(table, Path(report_path, sample, f'{name}_rollup.tsv'))
 
 
     # KO Rollup Counts Tables
     print("Creating Count tables")
-    #dfCounts = {}
-    #for sample,tables in hmmCounts.items():
-    #    outmerged = Path(f'merged_counts-{sample}.tsv')
-    #    print("MERGING:", outmerged)
-    #    metacerberus_parser.merge_tsv(tables, outmerged)
-    #    for name,table_path in tables.items():
-    #        if not Path(table_path).exists():
-    #            continue
-    #        table = pd.read_csv(table_path, sep='\t')
-    #        X = table[table.Level == 'Function']
-    #        row = dict(zip(X['Name'].tolist(), X['Count'].tolist()))
-    #        row = pd.Series(row, name=sample)
-    #        if name not in dfCounts:
-    #            dfCounts[name] = pd.DataFrame()
-    #        dfCounts[name] = pd.concat([dfCounts[name], pd.DataFrame(row).T])
-    #table: pd.DataFrame
-    #for name,table in dfCounts.items():
-    #    outfile = os.path.join(outpath, "combined", f"KO_Counts_{name}.tsv")
-    #    table = table.T.reset_index().rename(columns={'index':'KO'})
-    #    table.KO = table.KO.apply(lambda x : x[0:6])
-    #    table.to_csv(outfile, index=False, header=True, sep='\t')
-    #    dfCounts[name] = outfile
-
-    # Counts for PCA
     dfCounts = dict()
     for db in ['KEGG', 'FOAM', 'COG']:
         tsv_list = dict()
         for name in hmm_tsv.keys():
-            tsv_list[name] = Path(config['DIR_OUT'], STEP[9], name, f'counts_{db}.tsv')
+            table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{db}.tsv')
+            if table_path.exists():
+                tsv_list[name] = table_path
         dfCounts[db] = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{db}.tsv')
         metacerberus_parser.merge_tsv(tsv_list, dfCounts[db])
 
 
     # HTML of PCA
     pcaFigures = None
-    if len(hmmCounts) < 4:
+    if len(dfCounts) < 4:
         print("NOTE: PCA Tables and Pathview created only when there are at least four sequence files.\n")
     else:
         print("PCA Analysis")
         pcaFigures = metacerberus_visual.graphPCA(dfCounts)
-        os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
-        metacerberus_report.write_PCA(os.path.join(outpath, "combined"), pcaFigures)
+        Path(report_path, 'combined').mkdir(parents=True, exist_ok=True)
+        metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 
         # run post processing analysis in R
         if config['CLASS']:
             print("\nSTEP 11: Post Analysis with GAGE and PathView")
-            outpathview = os.path.join(outpath, 'combined', 'pathview')
+            outpathview = os.path.join(report_path, 'combined', 'pathview')
             os.makedirs(os.path.join(outpathview), exist_ok=True)
             rscript = os.path.join(outpathview, 'run_pathview.sh')
             with open(rscript, 'w') as writer:
