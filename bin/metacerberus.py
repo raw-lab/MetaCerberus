@@ -501,7 +501,7 @@ Example:
                     break
                 aminoAcids[key] = amino[key]
             for hmm in dbHMM.items():
-                jobHMM.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
+                jobHMM.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
     print("Waiting for HMMER")
     dictChunks = dict()
     while jobHMM:
@@ -524,6 +524,7 @@ Example:
 
     # Merge chunked results
     print("Merging HMMER Results")
+    pipeline = []
     for key,value in dictChunks.items():
         tsv_file = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
         with tsv_file.open('w') as writer:
@@ -547,7 +548,7 @@ Example:
     print("\nSTEP 9: Parse HMMER results")
     jobParse = []
     for key,value in hmm_tsv.items():
-        jobParse.append(rayWorker.options(num_cpus=1).remote(metacerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
+        jobParse.append(rayWorker.remote(metacerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
 
     hmmRollup = {}
     hmmCounts = {}
@@ -557,7 +558,7 @@ Example:
         if ready:
             key,value = ray.get(ready[0])
             hmmRollup[key] = value
-            jobCounts.append( rayWorker.options(num_cpus=1).remote(metacerberus_parser.createCountTables, key, value, config, f"{STEP[9]}/{key}") )
+            jobCounts.append(rayWorker.remote(metacerberus_parser.createCountTables, key, value, config, f"{STEP[9]}/{key}"))
 
         ready,jobCounts = ray.wait(jobCounts, timeout=0)
         if ready:
@@ -661,7 +662,7 @@ Example:
 
     jobCharts = []
     for key,value in hmmRollup.items():
-        jobCharts.append( graphCharts.options(num_cpus=1).remote(key, value, hmmCounts[key]) )
+        jobCharts.append( graphCharts.remote(key, value, hmmCounts[key]) )
     
     figCharts = {}
     while(jobCharts):
