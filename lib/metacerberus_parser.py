@@ -206,7 +206,7 @@ def rollup(KO_COUNTS: dict, lookupFile: str, outpath: str):
 def createCountTables(rollup_files:dict, config:dict, subdir: str):
     done = Path(config['DIR_OUT']) / subdir / "complete"
     dfCounts = dict()
-    print("createCountTables:", subdir)
+
     for dbName,filepath in rollup_files.items():
         outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}-rollup_counts.tsv")
         if not config['REPLACE'] and done.exists():
@@ -214,7 +214,6 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
             continue
         done.unlink(missing_ok=True)
 
-        print("Loading Count Tables:", dbName, filepath)
         try:
             df = pd.read_csv(filepath, sep='\t')
         except:

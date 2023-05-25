@@ -115,7 +115,7 @@ def rayWorkerThread(func, key, dir_log, params:list):
     ret = func(*params)
     end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
     logTime(dir_log, socket.gethostname(), func.__name__, key, end)
-    return key, ret #, func.__name__
+    return key, ret, func.__name__
 
 
 ## MAIN
@@ -367,17 +367,17 @@ Example:
     print(f"Processing {len(fasta)} fasta sequences")
     print(f"Processing {len(amino)} protein Sequences")
 
-    # Step 2 (check quality of fastq files)
+    # Main Pipeline
+    pipeline = list()
+
     jobsQC = []
+    
+    # Entry Point: Fastq
     if fastq:
+        # Step 2 (check quality of fastq files)
         print("\nSTEP 2: Checking quality of fastq files")
         for key,value in fastq.items():
-            jobsQC.append(rayWorker.remote(metacerberus_qc.checkQuality, key, value, config, f"{STEP[2]}/{key}"))
-
-
-    # Step 3 (trim fastq files)
-    jobTrim = []
-    if fastq:
+            pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key, config['DIR_OUT'], [value, config, f"{STEP[2]}/{key}"]))
         print("\nSTEP 3: Trimming fastq files")
         # Merge Paired End Reads
         fastqPaired = {k:v for k,v in fastq.items() if "R1.fastq" in v and v.replace("R1.fastq", "R2.fastq") in fastq.values() }
@@ -387,98 +387,107 @@ Example:
         del fastqPaired # memory cleanup
         # Trim
         for key,value in fastq.items():
-            jobTrim.append(rayWorker.remote(metacerberus_trim.trimSingleRead, key, [key, value], config, f"{STEP[3]}/{key}"))
+            pipeline.append(rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)]))
 
-    # Wait for Trimmed Reads
-    while jobTrim:
-        ready,jobTrim = ray.wait(jobTrim)
-        key,value = ray.get(ready[0])
-        fastq[key] = value
-        jobsQC.append(rayWorker.remote(metacerberus_qc.checkQuality, key+'_trim', value, config, f"{STEP[3]}/{key}/quality"))
-
-
-    # step 4 Decontaminate (adapter free read to clean quality read + removal of junk)
-    jobDecon = []
-    if fastq and config['ILLUMINA']:
-        print("\nSTEP 4: Decontaminating trimmed files")
-        for key,value in fastq.items():
-            jobDecon.append(rayWorker.remote(metacerberus_decon.deconSingleReads, key, [key, value], config, f"{STEP[4]}/{key}"))
-
-    # Wait for Decontaminating Reads
-    while jobDecon:
-        ready,jobDecon = ray.wait(jobDecon)
-        key,value = ray.get(ready[0])
-        fastq[key] = value
-        jobsQC.append(rayWorker.remote(metacerberus_qc.checkQuality, key+'_decon', value, config, f"{STEP[4]}/{key}/quality"))
-
-
-    # step 5a for cleaning contigs
-    jobContigs = [] #TODO: Add config flag for contigs/scaffolds/raw reads
+    # Step 5 Contig Entry Point
+    #TODO: Add config flag for contigs/scaffolds/raw reads
     # Only do this if a fasta file was given, not if fastq
     if fasta:# and "scaffold" in config:
         print("\nSTEP 5a: Removing N's from contig files")
         for key,value in fasta.items():
-            jobContigs.append(rayWorker.remote(metacerberus_formatFasta.removeN, key, value, config, f"{STEP[5]}/{key}"))
+            pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.removeN, key, config['DIR_OUT'], [value, config, Path(STEP[5], key)]))
 
+    step_curr = set()
     NStats = {}
-    for job in jobContigs:
-        key,value = ray.get(job)
-        fasta[key] = value[0]
-        if value[1]:
-            NStats[key] = value[1]
-
-    # step 5b Format (convert fq to fna. Remove quality scores and N's)
-    jobFormat = []
-    if fastq:
-        print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
-        for key,value in fastq.items():
-            jobFormat.append(rayWorker.remote(metacerberus_formatFasta.reformat, key, value, config, f"{STEP[5]}/{key}"))
-
-    for job in jobFormat:
-        key, value = ray.get(job)
-        fasta[key] = value
-
-    # step 6 Metaome Stats
     readStats = {}
-    if fasta:
-        print("\nSTEP 6: Metaome Stats\n")
-        for key,value in fasta.items():
-                readStats[key] = metacerberus_metastats.getReadStats(value, config, os.path.join(STEP[6], key))
+    report_path = os.path.join(config['DIR_OUT'], STEP[10])
+    while pipeline:
+        ready,pipeline = ray.wait(pipeline, timeout=0)
+        if not ready:
+            continue
+        key,value,func = ray.get(ready[0])
 
-    # step 7 (ORF Finder)
-    jobGenecall = []
-    if fasta:
-        print("\nSTEP 7: ORF Finder")
-        for key,value in fasta.items():
+        if func == "checkQuality":
+            name = key
+            key = key.rstrip('_decon').rstrip('_trim')
+            os.makedirs(os.path.join(report_path, key), exist_ok=True)
+            shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
+        if func == "trimSingleRead":
+            # Wait for Trimmed Reads
+            fastq[key] = value
+            pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_trim', config['DIR_OUT'], [value, config, f"{STEP[3]}/{key}/quality"]))
+            if fastq and config['ILLUMINA']:
+                if 4 not in step_curr:
+                    step_curr.add(4)
+                    print("\nSTEP 4: Decontaminating trimmed files")
+                pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, config['DIR_OUT'], key, [[key, value], config, f"{STEP[4]}/{key}"]))
+            else:
+                if 5.2 not in step_curr:
+                    step_curr.add(5.2)
+                    print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
+                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, config['DIR_OUT'], key, [value, config, f"{STEP[5]}/{key}"]))
+        if func == "deconSingleReads":
+            fastq[key] = value
+            pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_decon', config['DIR_OUT'], [value, config, f"{STEP[4]}/{key}/quality"]))
+        if func == "removeN":
+            fasta[key] = value[0]
+            if value[1]:
+                NStats[key] = value[1]
+            if 6 not in step_curr:
+                step_curr.add(6)
+                print("\nSTEP 6: Metaome Stats\n")
+            readStats[key] = metacerberus_metastats.getReadStats(value[0], config, os.path.join(STEP[6], key))
+            if 7 not in step_curr:
+                step_curr.add(7)
+                print("\nSTEP 7: ORF Finder")
             if key.startswith("FragGeneScan_"):
-                jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_fgs, key, value, config, f"{STEP[7]}/{key}"))
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
             else:
                 if config['META']:
-                    jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_meta, key, value, config, f"{STEP[7]}/{key}"))
+                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_meta, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
                 else:
-                    jobGenecall.append(rayWorker.remote(metacerberus_genecall.findORF_prod, key, value, config, f"{STEP[7]}/{key}"))
+                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
+        if func == "reformat":
+            fasta[key] = value
+            if 6 not in step_curr:
+                step_curr.add(6)
+                print("\nSTEP 6: Metaome Stats\n")
+            readStats[key] = metacerberus_metastats.getReadStats(value, config, os.path.join(STEP[6], key))
+            if 7 not in step_curr:
+                step_curr.add(7)
+                print("\nSTEP 7: ORF Finder")
+            if key.startswith("FragGeneScan_"):
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
+            else:
+                if config['META']:
+                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_meta, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
+                else:
+                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
+        if func.startswith("findORF_"):
+            if value:
+                amino[key] = value
 
-    # Waiting for GeneCall
-    for job in jobGenecall:
-        key,value = ray.get(job)
-        if value:
-            amino[key] = value
-
+    # End Phase 1
 
     # step 8 (HMMER)
     print("\nSTEP 8: HMMER Search")
 
-    jobHMM = []
-    chunker = {}
-    hmm_tsv = {}
+    jobHMM = list()
+    chunker = dict()
+    hmm_tsv = dict()
+    dictChunks = dict()
     limit = int(config["CPUS"]/4)
     iter_amino = iter(amino)
     for key in iter_amino:
-        tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
+        #tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
+        #if not config['REPLACE'] and os.path.exists(tsv_file):
+        #    dictChunks[key] = tsv_file
+        #    continue
         tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
         if not config['REPLACE'] and os.path.exists(tsv_filtered):
             hmm_tsv[key] = tsv_filtered
             continue
+
         # Split files into chunks
         if config['CHUNKER'] > 0:
             chunker[key] = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
@@ -502,11 +511,11 @@ Example:
                 aminoAcids[key] = amino[key]
             for hmm in dbHMM.items():
                 jobHMM.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
+
     print("Waiting for HMMER")
-    dictChunks = dict()
     while jobHMM:
-        readyHMM, jobHMM = ray.wait(jobHMM)
-        keys,values = ray.get(readyHMM[0])
+        readyHMM,jobHMM = ray.wait(jobHMM)
+        keys,values,func = ray.get(readyHMM[0])
         if type(keys) is str:
             # files in list belongs to same key (chunks)
             for value in values:
@@ -534,7 +543,7 @@ Example:
                 os.remove(item)
         # Filter overlaps
         tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-        hmm_tsv[key] = metacerberus_hmm.filterHMM(tsv_file, tsv_filtered, config['PATHDB'])
+        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_file, tsv_filtered, config['PATHDB']]))
         if not config['KEEP']:
             Path(tsv_file).unlink(True)
 
@@ -543,6 +552,13 @@ Example:
     for key,value in chunker.items():
         for item in value.files:
             os.remove(item)
+
+    print("Filtering HMMER Results")
+    while pipeline:
+        ready,pipeline = ray.wait(pipeline, timeout=0)
+        if ready:
+            key,value,func = ray.get(ready[0])
+            hmm_tsv[key] = value
 
     # step 9 (Parser)
     print("\nSTEP 9: Parse HMMER results")
@@ -567,17 +583,16 @@ Example:
 
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
-    report_path = os.path.join(config['DIR_OUT'], STEP[10])
 
     # Copy report files from QC, Parser
     print("Copying QC reports")
-    while(jobsQC):
-        ready, jobsQC = ray.wait(jobsQC)
-        key,value = ray.get(ready[0])
-        name = key
-        key = key.rstrip('_decon').rstrip('_trim')
-        os.makedirs(os.path.join(report_path, key), exist_ok=True)
-        shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
+    #while(jobsQC):
+    #    ready, jobsQC = ray.wait(jobsQC)
+    #    key,value = ray.get(ready[0])
+    #    name = key
+    #    key = key.rstrip('_decon').rstrip('_trim')
+    #    os.makedirs(os.path.join(report_path, key), exist_ok=True)
+    #    shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
     for key in hmmRollup.keys():
         os.makedirs(os.path.join(report_path, key), exist_ok=True)
         shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(report_path, key) )
@@ -618,7 +633,7 @@ Example:
 
     # HTML of PCA
     pcaFigures = None
-    if len(dfCounts) < 4:
+    if len(hmm_tsv) < 4:
         print("NOTE: PCA Tables and Pathview created only when there are at least four sequence files.\n")
     else:
         print("PCA Analysis")
@@ -675,12 +690,12 @@ Example:
 
 
     # Wait for misc jobs
-    jobs = jobsQC
-    ready, jobs = ray.wait(jobs, num_returns=len(jobs), timeout=1) # clear buffer
-    while(jobs):
-        print(f"Waiting for {len(jobs)} jobs:", end=' ')
-        ready, jobs = ray.wait(jobs)
-        print(ray.get(ready[0]))
+    #jobs = jobsQC
+    #ready, jobs = ray.wait(jobs, num_returns=len(jobs), timeout=1) # clear buffer
+    #while(jobs):
+    #    print(f"Waiting for {len(jobs)} jobs:", end=' ')
+    #    ready, jobs = ray.wait(jobs)
+    #    print(ray.get(ready[0]))
 
 
     # Finished!

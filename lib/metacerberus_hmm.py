@@ -40,7 +40,8 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
             #print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=open(outfile, 'w'))
             reduce_grep = """grep -Ev '^#' | awk '{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }'""" + f" >> {outfile}"
             command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_grep}"
-            jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=subprocess.DEVNULL)
+            if not Path(outfile).exists():
+                jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=subprocess.DEVNULL)
             outlist.append(outfile)
         except Exception as e:
             print(e)
