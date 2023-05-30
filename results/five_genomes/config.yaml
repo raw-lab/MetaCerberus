@@ -1,7 +1,10 @@
 # MetaCerberus config file
 
-dir_out: test_may
-prodigal: [../../data/five_genomes]
+dir_out: 2023-05-26
+hmm: KOFam_all, COG
+chunker: 1
+fraggenescan: [../../data/five_genomes]
+keep: True
 
 #### Illumina Microbial, Archaea and Bacteriophage
 #prodigal: [../../data/five_genomes]

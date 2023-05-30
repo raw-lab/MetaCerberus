@@ -19,7 +19,7 @@ def findORF_fgs(contig, config, subdir):
     faaOut  = path / "proteins.faa"
 
     if not config['REPLACE'] and done.exists() and faaOut.exists():
-        return faaOut
+            return faaOut
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 

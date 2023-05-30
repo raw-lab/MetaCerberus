@@ -93,6 +93,12 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
     return
 
+def set_add(to_set:set, item, msg:str):
+    if item not in to_set:
+        to_set.add(item)
+        print('\n', msg, '\n', sep='')
+    return to_set
+
 def logTime(dirout, host, funcName, path, time):
     with open(f'{dirout}/time.tsv', 'a+') as outTime:
         print(host, funcName, time, path, file=outTime, sep='\t')
@@ -398,11 +404,13 @@ Example:
             pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.removeN, key, config['DIR_OUT'], [value, config, Path(STEP[5], key)]))
 
     step_curr = set()
-    NStats = {}
-    readStats = {}
+    NStats = dict()
+    readStats = dict()
     report_path = os.path.join(config['DIR_OUT'], STEP[10])
+    amino_queue = dict()
+
     while pipeline:
-        ready,pipeline = ray.wait(pipeline, timeout=0)
+        ready,pipeline = ray.wait(pipeline, timeout=1)
         if not ready:
             continue
         key,value,func = ray.get(ready[0])
@@ -417,14 +425,16 @@ Example:
             fastq[key] = value
             pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_trim', config['DIR_OUT'], [value, config, f"{STEP[3]}/{key}/quality"]))
             if fastq and config['ILLUMINA']:
-                if 4 not in step_curr:
-                    step_curr.add(4)
-                    print("\nSTEP 4: Decontaminating trimmed files")
+                set_add(step_curr, 4, "STEP 4: Decontaminating trimmed files")
+                #if 4 not in step_curr:
+                #    step_curr.add(4)
+                #    print("\nSTEP 4: Decontaminating trimmed files")
                 pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, config['DIR_OUT'], key, [[key, value], config, f"{STEP[4]}/{key}"]))
             else:
-                if 5.2 not in step_curr:
-                    step_curr.add(5.2)
-                    print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
+                set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
+                #if 5.2 not in step_curr:
+                #    step_curr.add(5.2)
+                #    print("\nSTEP 5b: Reformating FASTQ files to FASTA format")
                 pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, config['DIR_OUT'], key, [value, config, f"{STEP[5]}/{key}"]))
         if func == "deconSingleReads":
             fastq[key] = value
@@ -433,9 +443,10 @@ Example:
             fasta[key] = value[0]
             if value[1]:
                 NStats[key] = value[1]
-            if 6 not in step_curr:
-                step_curr.add(6)
-                print("\nSTEP 6: Metaome Stats\n")
+            set_add(step_curr, 6, "STEP 6: Metaome Stats")
+            #if 6 not in step_curr:
+            #    step_curr.add(6)
+            #    print("\nSTEP 6: Metaome Stats\n")
             readStats[key] = metacerberus_metastats.getReadStats(value[0], config, os.path.join(STEP[6], key))
             if 7 not in step_curr:
                 step_curr.add(7)
@@ -464,14 +475,23 @@ Example:
                 else:
                     pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
         if func.startswith("findORF_"):
+            if 8 not in step_curr:
+                step_curr.add(8)
+                print("\nSTEP 8: HMMER Search")
             if value:
                 amino[key] = value
+                amino_queue[key] = value
+                if len(amino_queue) >= 4:
+                    #for hmm in dbHMM.items():
+                    #    pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, amino_queue.keys(), config['DIR_OUT'],
+                    #                                           [amino_queue.values(), config, Path(STEP[8], key), hmm]))
+                    amino_queue = dict()
 
     # End Phase 1
+    
 
     # step 8 (HMMER)
-    print("\nSTEP 8: HMMER Search")
-
+    set_add(step_curr, 8, "STEP 8: HMMER Search")
     jobHMM = list()
     chunker = dict()
     hmm_tsv = dict()
@@ -618,17 +638,25 @@ Example:
             shutil.copy(table, Path(report_path, sample, f'{name}_rollup.tsv'))
 
 
-    # KO Rollup Counts Tables
+    # Counts Tables
     print("Creating Count tables")
+    #TODO: Fix bug in merging count tables without Pandas
     dfCounts = dict()
     for db in ['KEGG', 'FOAM', 'COG']:
-        tsv_list = dict()
-        for name in hmm_tsv.keys():
-            table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{db}.tsv')
+        #tsv_list = dict()
+        df = pd.DataFrame()
+        for dbName in hmm_tsv.keys():
+            table_path = Path(config['DIR_OUT'], STEP[9], dbName, f'counts_{db}.tsv')
             if table_path.exists():
-                tsv_list[name] = table_path
-        dfCounts[db] = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{db}.tsv')
-        metacerberus_parser.merge_tsv(tsv_list, dfCounts[db])
+                #tsv_list[name] = table_path
+                df = pd.concat([df, pd.read_csv(table_path, sep='\t', index_col=0, names=[dbName], header=0)])
+        combined_path = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{db}.tsv')
+        df = df.groupby(axis=0, level=0).sum()
+        df.to_csv(combined_path, header=True, index=True, index_label='ID', sep='\t')
+        #metacerberus_parser.merge_tsv(tsv_list, combined_path)
+        if combined_path.exists():
+            dfCounts[db] = combined_path
+    del(combined_path)
 
 
     # HTML of PCA
@@ -687,16 +715,6 @@ Example:
             figCharts[key] = value
 
     metacerberus_report.createReport(figSunburst, figCharts, config, STEP[10])
-
-
-    # Wait for misc jobs
-    #jobs = jobsQC
-    #ready, jobs = ray.wait(jobs, num_returns=len(jobs), timeout=1) # clear buffer
-    #while(jobs):
-    #    print(f"Waiting for {len(jobs)} jobs:", end=' ')
-    #    ready, jobs = ray.wait(jobs)
-    #    print(ray.get(ready[0]))
-
 
     # Finished!
     print("\nFinished Pipeline")
