@@ -22,15 +22,14 @@ def parseHmmer(hmm_tsv, config, subdir):
     path.mkdir(exist_ok=True, parents=True)
 
     done = path / "complete"
-    if not config['REPLACE'] and not done.exists():
+    if not config['REPLACE'] and done.exists():
         rollup_files = dict()
         for name in ['FOAM', 'KEGG', 'COG']:
             outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
             if outfile.exists():
                 rollup_files[name] = outfile
-        print(rollup_files)
         return rollup_files
-    done.unlink()
+    done.unlink(missing_ok=True)
 
 
     minscore = config["MINSCORE"]
@@ -221,7 +220,6 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
 
 # Merge TSV Files
 def merge_tsv(tsv_list:dict, out_file:Path):
-    #TODO: Bug in this method, does not count properly when all tables have a value for an ID.
     names = sorted(list(tsv_list.keys()))
     file_list = dict()
     lines = dict()
@@ -236,10 +234,11 @@ def merge_tsv(tsv_list:dict, out_file:Path):
         return False
     with open(out_file, 'w') as writer:
         print("ID", '\t'.join(names), sep='\t', file=writer)
-        ID = sorted(IDS)[0]
-        while True:
+        while IDS:
+            ID = sorted(IDS)[0]
+            IDS.remove(ID)
             line = [ID]
-            IDS = set()
+            #IDS = set()
             for name in names:
                 if not lines[name]: # End of file
                     line.append('0')
@@ -251,9 +250,8 @@ def merge_tsv(tsv_list:dict, out_file:Path):
                     if lines[name]:
                         IDS.add(lines[name][0])
             print('\t'.join(line), file=writer)
-            if not IDS:
-                break
-            ID = sorted(IDS)[0]
+            #if not IDS:
+            #    break
     for name in names:
         file_list[name].close()
     return True

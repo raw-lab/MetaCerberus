@@ -20,6 +20,7 @@ warnings.warn = warn
 
 import sys
 import os
+import re
 from pathlib import Path
 import psutil
 import shutil
@@ -605,14 +606,6 @@ Example:
     print("\nSTEP 10: Creating Reports")
 
     # Copy report files from QC, Parser
-    print("Copying QC reports")
-    #while(jobsQC):
-    #    ready, jobsQC = ray.wait(jobsQC)
-    #    key,value = ray.get(ready[0])
-    #    name = key
-    #    key = key.rstrip('_decon').rstrip('_trim')
-    #    os.makedirs(os.path.join(report_path, key), exist_ok=True)
-    #    shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
     for key in hmmRollup.keys():
         os.makedirs(os.path.join(report_path, key), exist_ok=True)
         shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(report_path, key) )
@@ -640,39 +633,38 @@ Example:
 
     # Counts Tables
     print("Creating Count tables")
-    #TODO: Fix bug in merging count tables without Pandas
     dfCounts = dict()
-    for db in ['KEGG', 'FOAM', 'COG']:
-        #tsv_list = dict()
-        df = pd.DataFrame()
-        for dbName in hmm_tsv.keys():
-            table_path = Path(config['DIR_OUT'], STEP[9], dbName, f'counts_{db}.tsv')
+    for dbName in ['KEGG', 'FOAM', 'COG']:
+        tsv_list = dict()
+        for name in hmm_tsv.keys():
+            table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{dbName}.tsv')
             if table_path.exists():
-                #tsv_list[name] = table_path
-                df = pd.concat([df, pd.read_csv(table_path, sep='\t', index_col=0, names=[dbName], header=0)])
-        combined_path = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{db}.tsv')
-        df = df.groupby(axis=0, level=0).sum()
-        df.to_csv(combined_path, header=True, index=True, index_label='ID', sep='\t')
-        #metacerberus_parser.merge_tsv(tsv_list, combined_path)
+                name = re.sub(rf'^FragGeneScan_|prodigal_|Protein_', '', name)
+                tsv_list[name] = table_path
+        combined_path = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{dbName}.tsv')
+        metacerberus_parser.merge_tsv(tsv_list, Path(combined_path))
         if combined_path.exists():
-            dfCounts[db] = combined_path
-    del(combined_path)
+            dfCounts[dbName] = combined_path
+        del(combined_path)
 
 
     # HTML of PCA
     pcaFigures = None
     if len(hmm_tsv) < 4:
-        print("NOTE: PCA Tables and Pathview created only when there are at least four sequence files.\n")
+        print("NOTE: PCA Tables created only when there are at least four sequence files.\n")
     else:
         print("PCA Analysis")
         pcaFigures = metacerberus_visual.graphPCA(dfCounts)
         Path(report_path, 'combined').mkdir(parents=True, exist_ok=True)
         metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 
-        # run post processing analysis in R
+    # run post processing analysis in R
+    if len(hmm_tsv) < 4:
+        print("NOTE: Pathview created only when there are at least four sequence files.\n")
+    else:
         if config['CLASS']:
             print("\nSTEP 11: Post Analysis with GAGE and PathView")
-            outpathview = os.path.join(report_path, 'combined', 'pathview')
+            outpathview = os.path.join(report_path, 'pathview')
             os.makedirs(os.path.join(outpathview), exist_ok=True)
             rscript = os.path.join(outpathview, 'run_pathview.sh')
             with open(rscript, 'w') as writer:
@@ -688,8 +680,8 @@ Example:
                 os.makedirs(os.path.join(outpathview, name), exist_ok=True)
                 subprocess.run(['pathview-metacerberus.R', filepath, config['CLASS']],
                                 cwd=os.path.join(outpathview, name),
-                                stdout=open(f'{outpathview}/stdout.txt', 'w'),
-                                stderr=open(f'{outpathview}/stderr.txt', 'w')
+                                stdout=open(f'{outpathview}/{name}/stdout.txt', 'w'),
+                                stderr=open(f'{outpathview}/{name}/stderr.txt', 'w')
                             )
             print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
 

@@ -76,11 +76,12 @@ def graphPCA(dfTables:dict):
         X = df.copy()
 
         # Sort and rename index (if appropriate)
-        types = set()
-        for x in X.index:
-            types.add(re.match(r'([A-Za-z]+_)', x).groups(1))
-        if len(types) == 1:
-            X.index = df.index.map(lambda x: re.sub(r'([A-Za-z]+_)', '', x))
+        #TODO: Remove this, should be fixed before sending to this method
+        #types = set()
+        #for x in X.index:
+        #    types.add(re.match(r'([A-Za-z]+_)', x).groups(1))
+        #if len(types) == 1:
+        #    X.index = df.index.map(lambda x: re.sub(r'([A-Za-z]+_)', '', x))
 
         X.sort_index(inplace=True)
 
