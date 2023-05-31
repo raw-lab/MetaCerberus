@@ -24,7 +24,7 @@ def parseHmmer(hmm_tsv, config, subdir):
     done = path / "complete"
     if not config['REPLACE'] and done.exists():
         rollup_files = dict()
-        for name in ['FOAM', 'KEGG', 'COG']:
+        for name in ['FOAM', 'KEGG', 'COG', 'CAZy']:
             outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
             if outfile.exists():
                 rollup_files[name] = outfile
@@ -113,7 +113,7 @@ def parseHmmer(hmm_tsv, config, subdir):
     # Write rollup files to disk
 
     #rollup_file = dict()
-    #for name in ['FOAM', 'KEGG', 'COG']:
+    #for name in ['FOAM', 'KEGG', 'COG', 'CAZy']:
     #    dbPath = Path(config['PATHDB'], f"{name}-onto_rel1.tsv")
     #    outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
     #    #df = rollupKegg(KO_ID_counts, dbPath, path, outfile)
@@ -139,7 +139,7 @@ def rollupAll(KO_COUNTS: dict, lookupPath: str, outpath: str):
     dfLookup = dict()
     dfRollup = dict()
     count_file = dict()
-    for name in ['FOAM', 'KEGG', 'COG']:
+    for name in ['FOAM', 'KEGG', 'COG', 'CAZy']:
         count_file[name] = Path(outpath, f'counts_{name}.tsv').open('w')
         print('ID', 'count', sep='\t', file=count_file[name])
         dbPath = Path(lookupPath, f"{name}-onto_rel1.tsv")
@@ -150,7 +150,7 @@ def rollupAll(KO_COUNTS: dict, lookupPath: str, outpath: str):
     with open(errfile, 'w') as errlog:
         for KO_ID,count in sorted(KO_COUNTS.items()):
             found = False
-            for name in ['FOAM', 'KEGG', 'COG']:
+            for name in ['FOAM', 'KEGG', 'COG', 'CAZy']:
                 rows = pd.DataFrame(dfLookup[name][dfLookup[name].KO==KO_ID])
                 if not rows.empty:
                     found = True

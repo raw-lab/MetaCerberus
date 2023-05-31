@@ -62,7 +62,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
 def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
     with outfile.open('w') as writer:
         print("target", "query", "e-value", "score", "length", "start", "end", file=writer, sep='\t')
-        for name in ['KEGG', 'COG']:
+        for name in ['KEGG', 'COG', 'CAZy']:
             dbLookup = Path(dbpath, f"{name}-onto_rel1.tsv").read_text()
             BH_target = dict()
             with open(hmm_tsv, "r") as reader:

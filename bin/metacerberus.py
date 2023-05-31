@@ -29,6 +29,7 @@ import configargparse as argparse #replace argparse with: https://pypi.org/proje
 import pkg_resources as pkg #to import package data files
 import time
 import datetime
+from urllib import request
 import socket
 import ray #parallel-processing
 import pandas as pd
@@ -634,7 +635,7 @@ Example:
     # Counts Tables
     print("Creating Count tables")
     dfCounts = dict()
-    for dbName in ['KEGG', 'FOAM', 'COG']:
+    for dbName in ['FOAM', 'KEGG', 'COG', 'CAZy']:
         tsv_list = dict()
         for name in hmm_tsv.keys():
             table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{dbName}.tsv')
@@ -664,26 +665,38 @@ Example:
     else:
         if config['CLASS']:
             print("\nSTEP 11: Post Analysis with GAGE and PathView")
-            outpathview = os.path.join(report_path, 'pathview')
-            os.makedirs(os.path.join(outpathview), exist_ok=True)
-            rscript = os.path.join(outpathview, 'run_pathview.sh')
-            with open(rscript, 'w') as writer:
+            outpathview = Path(report_path, 'pathview')
+            outpathview.mkdir(exist_ok=True, parents=True)
+            rscript = Path(outpathview, 'run_pathview.sh')
+
+            # Check for internet
+            try:#attempt to open Google
+                request.urlopen('216.58.195.142', timeout=1)
+                is_internet = True
+            except request.URLError as err: 
+                is_internet = False
+            
+            with rscript.open('w') as writer:
                 writer.write(f"#!/bin/bash\n\n")
-                for name,filepath in dfCounts.items():
-                    shutil.copy(filepath, os.path.join(outpathview, f"{name}_counts.tsv"))
+                for name,countpath in dfCounts.items():
+                    if name not in ['FOAM', 'KEGG']:
+                        continue
+                    shutil.copy(countpath, os.path.join(outpathview, f"{name}_counts.tsv"))
                     shutil.copy(config['CLASS'], os.path.join(outpathview, f"{name}_class.tsv"))
                     writer.write(f"mkdir -p {name}\n")
                     writer.write(f"cd {name}\n")
                     writer.write(f"pathview-metacerberus.R ../{name}_counts.tsv ../{name}_class.tsv\n")
                     writer.write(f"cd ..\n")
-            for name,filepath in dfCounts.items():
-                os.makedirs(os.path.join(outpathview, name), exist_ok=True)
-                subprocess.run(['pathview-metacerberus.R', filepath, config['CLASS']],
-                                cwd=os.path.join(outpathview, name),
-                                stdout=open(f'{outpathview}/{name}/stdout.txt', 'w'),
-                                stderr=open(f'{outpathview}/{name}/stderr.txt', 'w')
-                            )
-            print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
+                    outcmd = Path(outpathview, name)
+                    outcmd.mkdir(parents=True, exist_ok=True)
+                    if is_internet:
+                        subprocess.run(['pathview-metacerberus.R', countpath, config['CLASS']],
+                                        cwd=outcmd,
+                                        stdout=Path(outcmd, 'stdout.txt').open('w'),
+                                        stderr=Path(outcmd, 'stderr.txt').open('w')
+                                    )
+            if not is_internet:
+                print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
 
     # HTML of Figures
     print("Creating combined HTML Sunburst and Bar Graphs")
