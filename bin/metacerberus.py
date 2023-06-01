@@ -76,6 +76,14 @@ DEPENDENCIES = {
     'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
     }
 
+# Databases
+DB_HMM = dict(
+    KOFam_all=Path(pathDB, 'KOFam_all.hmm.gz'),
+    KOFam_prokaryote=Path(pathDB, 'KOFam_prokaryote.hmm.gz'),
+    KOFam_eukaryote=Path(pathDB, 'KOFam_eukaryote.hmm.gz'),
+    COG=Path(pathDB, 'COG-noIter.hmm.gz'),
+    )
+
 # step names
 STEP = {
     1:"step_01-loadFiles",
@@ -88,6 +96,7 @@ STEP = {
     8:"step_08-hmmer",
     9:"step_09-parse",
     10:"step_10-visualizeData"}
+
 
 
 ## PRINT to stderr ##
@@ -188,31 +197,24 @@ Example:
     if args.setup or args.uninstall:
         return 0
 
-    DB_HMM = dict(
-        KOFam_all=f'{pathDB}/KOFam_all.hmm.gz',
-        KOFam_prokaryote=f'{pathDB}/KOFam_prokaryote.hmm.gz',
-        KOFam_eukaryote=f'{pathDB}/KOFam_eukaryote.hmm.gz',
-        COG=f'{pathDB}/COG-noIter.hmm.gz',
-        )
 
     dbHMM = dict()
     for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')], 1):
         print(f"HMM: '{hmm}'")
         if hmm in DB_HMM:
-            if os.path.exists(DB_HMM[hmm]):
+            if DB_HMM[hmm].exists():
                 dbHMM[hmm] = DB_HMM[hmm]
             else:
                 print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --setup")
         else:
-            if os.path.exists(hmm):
-                dbHMM[f'DB{i}'] = hmm
-            else:
-                print(f"ERROR: Cannot find '{hmm}'")
+            print(f"ERROR: Cannot use '{hmm}', custom databases not allowed yet. Please use one of:", *list(DB_HMM.keys()))
+            #if os.path.exists(hmm):
+            #    dbHMM[f'DB{i}'] = hmm
+            #else:
+            #    print(f"ERROR: Cannot find '{hmm}'")
     if not len(dbHMM):
         print("ERROR: No HMM DB Loaded")
-        return 0
-    for k,v in dbHMM.items():
-        print(k, v)
+        return 1
 
     print("\nStarting MetaCerberus Pipeline\n")
 
@@ -681,8 +683,8 @@ Example:
                 for name,countpath in dfCounts.items():
                     if name not in ['FOAM', 'KEGG']:
                         continue
-                    shutil.copy(countpath, os.path.join(outpathview, f"{name}_counts.tsv"))
-                    shutil.copy(config['CLASS'], os.path.join(outpathview, f"{name}_class.tsv"))
+                    shutil.copy(countpath, Path(outpathview, f"{name}_counts.tsv"))
+                    shutil.copy(config['CLASS'], Path(outpathview, f"{name}_class.tsv"))
                     writer.write(f"mkdir -p {name}\n")
                     writer.write(f"cd {name}\n")
                     writer.write(f"pathview-metacerberus.R ../{name}_counts.tsv ../{name}_class.tsv\n")
