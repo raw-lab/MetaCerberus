@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-cazy_onto = "CAZyDB.08062022.fam-activities.tsv"
+cazy_lookup = "CAZyDB.08062022.fam-activities-FIXED.tsv"
 fun_lookup = "CAZy.tsv"
 cazy_out = "CAZy-onto_rel1.tsv"
 
@@ -19,21 +19,23 @@ cazy_out = "CAZy-onto_rel1.tsv"
 #Auxiliary activities	lytic cellulose monooxygenase (C1-hydroxylating)	AA15	1.14.99.53
 
 
+print("Creating lookup table")
 fun = Path(fun_lookup).read_text()
-with open(cazy_onto) as cazy, open(cazy_out, 'w') as writer:
-    print('ID', 'FUN', 'EC', 'NAME', sep='\t', file=writer)
+with open(cazy_lookup) as cazy, open(cazy_out, 'w') as writer:
+    print('L1', 'KO', 'Function', 'EC', 'FUN_ID', sep='\t', file=writer)
+    cazy.readline() # Skip Header
     for line in cazy:
         if line.startswith('#'):
             continue
-        match = re.search(rf'(\w+)\t(.+?)\(EC ([0-9.-]+)\)', line)
+        ID,NAME,EC = line.strip('\n').split('\t')
+        
+        match = re.search(r'^([A-Z]+)', ID)
         if match:
-            ID,NAME,EC = match.groups()
-            NAME = NAME.strip()
+            CAT_ID = match.group(1)
+            CAT = re.search(rf'{CAT_ID}\t(.+)', fun).group(1)
+            print(CAT, ID, NAME, EC, CAT_ID, sep='\t', file=writer)
         else:
-            ID = re.search(rf'(\w+)\t', line).group(1)
-            NAME = ''
-            EC = ''
+            print('ERROR:', line)
 
-        FUN_ID = re.search(r'^([A-Z]+)', ID).group(1)
-        FUN = re.search(rf'{FUN_ID}\t(.+)', fun).group(1)
-        print(ID, FUN, EC, NAME, sep='\t', file=writer)
+print("Fixing HMM db")
+zcat dbCAN-HMMdb-V11.hmm.gz | sed "s/\.hmm//g" | gzip > CAZy.hmm.gz
