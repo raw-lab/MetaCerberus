@@ -82,6 +82,9 @@ DB_HMM = dict(
     KOFam_prokaryote=Path(pathDB, 'KOFam_prokaryote.hmm.gz'),
     KOFam_eukaryote=Path(pathDB, 'KOFam_eukaryote.hmm.gz'),
     COG=Path(pathDB, 'COG-noIter.hmm.gz'),
+    CAZy=Path(pathDB, 'CAZy.hmm.gz'),
+    PHROG=Path(pathDB, 'PHROG.hmm.gz'),
+    VOG=Path(pathDB, 'VOG.hmm.gz'),
     )
 
 # step names
@@ -207,11 +210,7 @@ Example:
             else:
                 print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --setup")
         else:
-            print(f"ERROR: Cannot use '{hmm}', custom databases not allowed yet. Please use one of:", *list(DB_HMM.keys()))
-            #if os.path.exists(hmm):
-            #    dbHMM[f'DB{i}'] = hmm
-            #else:
-            #    print(f"ERROR: Cannot find '{hmm}'")
+            print(f"ERROR: Cannot use '{hmm}', custom databases not supported yet. Please use one of:", *list(DB_HMM.keys()))
     if not len(dbHMM):
         print("ERROR: No HMM DB Loaded")
         return 1
@@ -637,7 +636,7 @@ Example:
     # Counts Tables
     print("Creating Count tables")
     dfCounts = dict()
-    for dbName in ['FOAM', 'KEGG', 'COG', 'CAZy']:
+    for dbName in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
         tsv_list = dict()
         for name in hmm_tsv.keys():
             table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{dbName}.tsv')
@@ -725,7 +724,7 @@ Example:
 
     # Finished!
     print("\nFinished Pipeline")
-    end = str(datetime.timedelta(seconds=time.time()-startTime)) #end = time.strftime("%H:%M:%S", time.gmtime(time.time()-startTime))
+    end = str(datetime.timedelta(seconds=time.time()-startTime))
     logTime(config["DIR_OUT"], socket.gethostname(), "Total_Time", config["DIR_OUT"], end)
 
     return 0
