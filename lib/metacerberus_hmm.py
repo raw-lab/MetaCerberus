@@ -35,17 +35,19 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
         outfile = os.path.join(pathname, f"{hmmKey}_{outname}")
 
         # HMMER
+        errfile=Path(outfile).with_suffix('.err').open('w')
         try:
             #TODO: Add --keep option to save the HMMER output file
             #print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=open(outfile, 'w'))
             reduce_grep = """grep -Ev '^#' | awk '{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }'""" + f" >> {outfile}"
             command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_grep}"
             if not Path(outfile).exists():
-                jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=subprocess.DEVNULL)
+                jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=errfile)
             outlist.append(outfile)
         except Exception as e:
-            print(e)
-            print("Error: failed to run: " + command)
+            print(e, file=errfile)
+            print("Error: failed to run: " + command, file=errfile)
+        errfile.close
     
     # Wait for jobs
     done = False
