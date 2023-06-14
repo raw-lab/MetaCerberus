@@ -483,11 +483,20 @@ Example:
             if value:
                 amino[key] = value
                 if not config['CLUSTER']:
-                    for hmm in dbHMM.items():
-#                        pipeline.append(rayWorkerThread.options(num_cpus=config['CPUS']).remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
-#                                                                [{key:value}, config, Path(STEP[8]), hmm, config['CPUS']]))
-                        pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
-                                                                [{key:value}, config, Path(STEP[8]), hmm, 4]))
+                    if config['CHUNKER'] > 0:
+                        chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+                        chunkCount = 1
+                        for chunk in chunks.files:
+                            key_chunk = f'chunk{chunkCount}-{len(chunks.files)}_{key}'
+                            chunkCount += 1
+                            val_chunk = chunk
+                            for hmm in dbHMM.items():
+                                pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
+                                                                                        [{key_chunk:val_chunk}, config, Path(STEP[8], key), hmm, 4]))
+                    else:
+                        for hmm in dbHMM.items():
+                            pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key], config['DIR_OUT'],
+                                                                    [{key:value}, config, Path(STEP[8]), hmm, 4]))
                     continue
                 if config['CHUNKER'] > 0:
                     chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
@@ -500,7 +509,7 @@ Example:
                         if len(amino_queue) >= jobs_per_node:
                             for hmm in dbHMM.items():
                                 pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
-                                                                    [amino_queue, config, Path(STEP[8], key), hmm]))
+                                                                    [amino_queue, config, Path(STEP[8]), hmm]))
                             amino_queue = dict()
                 else:
                     amino_queue[key] = value
@@ -514,7 +523,6 @@ Example:
         if func.startswith('searchHMM'):
             keys = key
             for key,tsv_file in zip(keys,value):
-                print(key,tsv_file)
                 match = re.search(r"^chunk(\d+)-(\d+)_(.+)", key)
                 if match: # Matches if the keys are part of chunks
                     i,l,key = match.groups()
@@ -522,7 +530,6 @@ Example:
                         dictChunks[key] = list()
                     dictChunks[key].append(tsv_file)
                     if len(dictChunks[key]) >= int(l):
-                        print("Merge:", key, dictChunks[key])
                         tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
                         tsv_out.parent.mkdir(parents=True, exist_ok=True)
                         with tsv_out.open('w') as writer:
@@ -552,119 +559,7 @@ Example:
         if func.startswith('createCountTables'):
             hmmCounts[key] = value
 
-    # End Phase 1
-
-
-#    # step 8 (HMMER)
-#    set_add(step_curr, 8, "STEP 8: HMMER Search")
-#    jobHMM = list()
-#    chunker = dict()
-#    hmm_tsv = dict()
-#    dictChunks = dict()
-#    limit = int(config["CPUS"]/4)
-#    iter_amino = iter(amino)
-#    for key in iter_amino:
-#        #tsv_file = os.path.join(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
-#        #if not config['REPLACE'] and os.path.exists(tsv_file):
-#        #    dictChunks[key] = tsv_file
-#        #    continue
-#        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-#        if not config['REPLACE'] and os.path.exists(tsv_filtered):
-#            hmm_tsv[key] = tsv_filtered
-#            continue
-#
-#        # Split files into chunks
-#        if config['CHUNKER'] > 0:
-#            chunker[key] = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
-#            c = 0
-#            for i in range(0, len(chunker[key].files), limit):
-#                files = chunker[key].files[i:i+limit]
-#                aminoAcids = {}
-#                for chunk in files:
-#                    aminoAcids[f'chunk_{c}'] = chunk
-#                    c += 1
-#                for hmm in dbHMM.items():
-#                    jobHMM.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, key, config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}/{key}", hmm]))
-#        else:
-#            aminoAcids = {}
-#            aminoAcids[key] = amino[key]
-#            for i in range(0, limit-1):
-#                try:
-#                    key = next(iter_amino)
-#                except:
-#                    break
-#                aminoAcids[key] = amino[key]
-#            for hmm in dbHMM.items():
-#                jobHMM.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(aminoAcids.keys()), config['DIR_OUT'], [aminoAcids, config, f"{STEP[8]}", hmm]))
-#
-#    print("Waiting for HMMER")
-#    while jobHMM:
-#        readyHMM,jobHMM = ray.wait(jobHMM)
-#        keys,values,func = ray.get(readyHMM[0])
-#        if type(keys) is str:
-#            # files in list belongs to same key (chunks)
-#            for value in values:
-#                if keys not in dictChunks:
-#                    dictChunks[keys] = []
-#                dictChunks[keys].append(value)
-#        else:
-#            # files in list belongs to different keys
-#            for i in range(0,len(keys)):
-#                key = keys[i]
-#                value = values[i]
-#                if key not in dictChunks:
-#                    dictChunks[key] = []
-#                dictChunks[key].append(value)
-#
-#    # Merge chunked results
-#    print("Merging HMMER Results")
-#    pipeline = []
-#    for key,value in dictChunks.items():
-#        tsv_file = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
-#        with tsv_file.open('w') as writer:
-#            print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
-#            for item in sorted(value):
-#                writer.write(open(item).read())
-#                os.remove(item)
-#        # Filter overlaps
-#        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-#        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_file, tsv_filtered, config['PATHDB']]))
-#        #if not config['KEEP']:
-#        #    Path(tsv_file).unlink(True)
-#
-#    del dictChunks
-#    # Delete chunked files
-#    for key,value in chunker.items():
-#        for item in value.files:
-#            os.remove(item)
-#
-#    print("Filtering HMMER Results")
-#    while pipeline:
-#        ready,pipeline = ray.wait(pipeline, timeout=0)
-#        if ready:
-#            key,value,func = ray.get(ready[0])
-#            hmm_tsv[key] = value
-#
-#    # step 9 (Parser)
-#    print("\nSTEP 9: Parse HMMER results")
-#    jobParse = []
-#    for key,value in hmm_tsv.items():
-#        jobParse.append(rayWorker.remote(metacerberus_parser.parseHmmer, key, value, config, f"{STEP[9]}/{key}"))
-#
-#    hmmRollup = {}
-#    hmmCounts = {}
-#    jobCounts = []
-#    while(jobParse + jobCounts):
-#        ready,jobParse = ray.wait(jobParse, timeout=0)
-#        if ready:
-#            key,value = ray.get(ready[0])
-#            hmmRollup[key] = value
-#            jobCounts.append(rayWorker.remote(metacerberus_parser.createCountTables, key, value, config, f"{STEP[9]}/{key}"))
-#
-#        ready,jobCounts = ray.wait(jobCounts, timeout=0)
-#        if ready:
-#            key,value = ray.get(ready[0])
-#            hmmCounts[key] = value
+    # End main pipeline
 
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
