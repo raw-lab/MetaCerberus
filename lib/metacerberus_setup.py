@@ -57,43 +57,30 @@ def Download(pathDB):
     print("This will take a few minutes...")
     url.urlretrieve("https://osf.io/muan4/download", Path(pathDB, "FOAM-onto_rel1.tsv"))#, reporthook=progress)
     url.urlretrieve("https://osf.io/2hp7t/download", Path(pathDB, "KEGG-onto_rel1.tsv"))#, reporthook=progress)
+
+    url.urlretrieve("https://osf.io/cuw94/download", Path(pathDB, "CAZy-onto_rel1.tsv"))#, reporthook=progress)
+    url.urlretrieve("https://osf.io/579bc/download", Path(pathDB, "COG-onto_rel1.tsv"))#, reporthook=progress)
+    url.urlretrieve("https://osf.io/dnc27/download", Path(pathDB, "PHROG-onto_rel1.tsv"))#, reporthook=progress)
+    url.urlretrieve("https://osf.io/pd29f/download", Path(pathDB, "VOG-onto_rel1.tsv"))#, reporthook=progress)
     #url.urlretrieve("https://osf.io/72p6g/download", Path(pathDB, "FOAM_readme.txt"))#, reporthook=progress)
     #url.urlretrieve("https://osf.io/bdpv5/download", Path(pathDB, "FOAM-hmm_rel1a.hmm.gz"))
 
-    print("Downloading KOFam")
-    url.urlretrieve("https://osf.io/8f2gm/download", os.path.join(pathDB, "KOFam-all.hmm.gz"))
-    url.urlretrieve("https://osf.io/3atd4/download", os.path.join(pathDB, "KOFam-eukaryote.hmm.gz"))
-    url.urlretrieve("https://osf.io/jnsw9/download", os.path.join(pathDB, "KOFam-prokaryote.hmm.gz"))
+    print("Downloading CAZy")
+    url.urlretrieve("https://osf.io/8bxyj/download", os.path.join(pathDB, "CAZy.hmm.gz"))
 
-    #url.urlretrieve("https://www.genome.jp/ftp/db/kofam/profiles.tar.gz", Path(pathDB, "profiles.tar.gz"))#, reporthook=progress)
-    #print("Extracting KOFam")
-    #subprocess.run(['tar', '-xzf', "profiles.tar.gz"], cwd=pathDB)
-    #Path(pathDB, "profiles.tar.gz").unlink()
-    #
-    #pathProfiles = Path(pathDB, 'profiles')
-    #reKO = re.compile(r'NAME  K', re.MULTILINE)
-    #for db in ['prokaryote', 'eukaryote']:
-    #    print(f"Building KOFam_{db}")
-    #    dbList = Path(pathProfiles, f'{db}.hal')
-    #    dbOut = Path(pathDB, f'KOFam_{db}.hmm')
-    #    with open(dbList) as reader, open(dbOut, 'w') as writer:
-    #        for line in reader:
-    #            nextKO = os.path.join(pathProfiles, line.strip())
-    #            #writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
-    #            writer.write(open(nextKO).read())
-    #    dbList.unlink()
-    #    subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
-    #
-    #print("Building KOFam_all")
-    #dbOut = os.path.join(pathDB, 'KOFam_all.hmm')
-    #with open(dbOut, 'w') as writer:
-    #    for filename in os.listdir(pathProfiles):
-    #        nextKO = os.path.join(pathProfiles, filename)
-    #        if filename.endswith('.hmm'):
-    #            writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
-    #        os.remove(nextKO)
-    #os.removedirs(pathProfiles)
-    #subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
+    print("Downloading COG")
+    url.urlretrieve("https://osf.io/ncsfx/download", os.path.join(pathDB, "COG-noIter.hmm.gz"))
+
+    print("Downloading PHROG")
+    url.urlretrieve("https://osf.io/5zdnv/download", os.path.join(pathDB, "PHROG.hmm.gz"))
+
+    print("Downloading VOG")
+    url.urlretrieve("https://osf.io/93mhp/download", os.path.join(pathDB, "VOG.hmm.gz"))
+
+    print("Downloading KOFam")
+    url.urlretrieve("https://osf.io/8dse5/download", os.path.join(pathDB, "KOFam-prokaryote.hmm.gz"))
+    url.urlretrieve("https://osf.io/gk7vx/download", os.path.join(pathDB, "KOFam-eukaryote.hmm.gz"))
+    url.urlretrieve("https://osf.io/yga2f/download", os.path.join(pathDB, "KOFam-all.hmm.gz"))
 
     return
 
