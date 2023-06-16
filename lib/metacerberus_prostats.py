@@ -35,6 +35,7 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict):
             line = reader.readline()
 
     # sum up proteins in HMMER file
+    hmmHits = dict()
     with open(fileHmmer, "r") as reader:
         for i,line in enumerate(reader,1):
             #"target", "query", "e-value", "score"
@@ -53,6 +54,10 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict):
                 if score >= minscore:
                     proteins[target]['found'] += 1
     
+    # Sumarize best target hit
+    #for target in proteins:
+        
+
     # calculate stats
     lengths = [ item['length'] for item in proteins.values() ]
     found = [ v['found'] for k,v in proteins.items() if v['found']>1 ]

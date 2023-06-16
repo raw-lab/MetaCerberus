@@ -8,10 +8,8 @@ from pathlib import Path
 import subprocess
 
 
-## mergePairedEnd
-#
+# Merge paired end reads
 def mergePairedEnd(pairedFastq, config, subdir):
-    # TODO: Find good long read mapper
     path = Path(config['DIR_OUT'], subdir)
 
     R1 = pairedFastq[0]
@@ -30,8 +28,6 @@ def mergePairedEnd(pairedFastq, config, subdir):
     with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
         subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
 
-    #if os.path.exists(merged):
-    #    os.remove(merged)
     command = f"cat {path}/*.fastq > {merged}"
     subprocess.run(command, shell=True, check=True)
 

@@ -9,8 +9,7 @@ from pathlib import Path
 import subprocess
 
 
-## trimSingleRead
-#
+# Trim single end reads
 def trimSingleRead(key_value, config, subdir):
     path = Path(config['DIR_OUT'], subdir)
 
@@ -42,8 +41,7 @@ def trimSingleRead(key_value, config, subdir):
     return trimmedRead
 
 
-## trimPairedRead
-#
+# Trim paired end reads
 def trimPairedRead(key_value, config, subdir):
     path = Path(config['DIR_OUT'], subdir)
 
@@ -72,6 +70,3 @@ def trimPairedRead(key_value, config, subdir):
 
     done.touch()
     return trimmedReads
-
-
-## End of script

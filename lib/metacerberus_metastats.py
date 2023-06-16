@@ -4,13 +4,11 @@
 Uses countfasta.py
 """
 
-#TODO Only run this when using contigs, not RAW Reads, or filtered reads
-
 import os
 import subprocess
 
 
-## checkContigs
+# Check contigs
 def getReadStats(contig, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)

@@ -4,7 +4,6 @@ Uses prodigal
 Uses FGS+
 """
 
-import os
 from pathlib import Path
 import subprocess
 import pkg_resources as pkg

@@ -7,10 +7,10 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.1"
+__version__     = "2.0"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
-__copyright__   = "Copyright 2022"
-__date__        = "July 2022"
+__copyright__   = "Copyright 2023"
+__date__        = "July 2023"
 
 def warn(*args, **kwargs):
     #print("args", str(args))
@@ -51,12 +51,12 @@ FILES_FASTQ = ['.fastq', '.fastq.gz']
 FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
 FILES_AMINO = [".faa"]
 
-# External file downloads
-pathDB = pkg.resource_filename("meta_cerberus", "cerberusDB")
+# External file paths
+pathDB = pkg.resource_filename("meta_cerberus", "cerberusDB") #TODO: Change cerberusDB to DB
 pathFGS = pkg.resource_filename("meta_cerberus", "FGS")
 
 # refseq default locations (for decontamination)
-REFSEQ = {
+REFSEQ = { #TODO: Change name to quality control QC_REF
     "adapters": pkg.resource_filename("meta_cerberus", "dependency_files/adapters.fna"),
     "illumina": pkg.resource_filename("meta_cerberus", "dependency_files/phix174_ill.ref.fna"),
     "lambda": pkg.resource_filename("meta_cerberus", "dependency_files/lambda-phage.fna"),
@@ -103,9 +103,9 @@ STEP = {
 
 
 ## PRINT to stderr ##
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-    return
+#def eprint(*args, **kwargs):
+#    print(*args, file=sys.stderr, **kwargs)
+#    return
 
 def set_add(to_set:set, item, msg:str):
     if item not in to_set:
@@ -119,14 +119,14 @@ def logTime(dirout, host, funcName, path, time):
     return
 
 
-## RAY WORKER THREADS ##
-@ray.remote
-def rayWorker(func, key, value, config, path):
-    start = time.time()
-    ret = func(value, config, path)
-    end = str(datetime.timedelta(seconds=time.time()-start))
-    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)
-    return key, ret
+### RAY WORKER THREADS ##
+#@ray.remote
+#def rayWorker(func, key, value, config, path):
+#    start = time.time()
+#    ret = func(value, config, path)
+#    end = str(datetime.timedelta(seconds=time.time()-start))
+#    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)
+#    return key, ret
 
 ## Ray Worker Threads ##
 @ray.remote
@@ -201,6 +201,7 @@ Example:
         return 0
 
 
+    # TODO: Add Custom HMM DB
     dbHMM = dict()
     for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')], 1):
         print(f"HMM: '{hmm}'")
@@ -240,7 +241,6 @@ Example:
 
     # Initialize Config Dictionary
     config = {}
-    #config['PATH'] = os.path.dirname(os.path.abspath(__file__))
     config['STEP'] = STEP
     config['PATHDB'] = pathDB
 
@@ -294,11 +294,9 @@ Example:
 
     # Initialize RAY for Multithreading
     print("Initializing RAY")
-    #if config['TMPDIR']:
-    #    tmpdir = os.path.abspath(os.path.expanduser(config['TMPDIR']))
-    #    os.environ['RAY_TMPDIR'] = tmpdir
-    #    os.makedirs(tmpdir, exist_ok=True)
+
     # First try if ray is setup for a cluster
+    #TODO: Fix this, does not set up slurm script
     if config['SLURM_NODES']:
         metacerberus_setup.slurm(config['SLURM_NODES'])
     
@@ -467,8 +465,6 @@ Example:
             jobsORF += 1
         if func == "reformat":
             fasta[key] = value
-            set_add(step_curr, 6, "STEP 6: Metaome Stats")
-            readStats[key] = metacerberus_metastats.getReadStats(value, config, os.path.join(STEP[6], key))
             set_add(step_curr, 7, "STEP 7: ORF Finder")
             if key.startswith("FragGeneScan_"):
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
@@ -490,7 +486,7 @@ Example:
                             key_chunk = f'chunk{chunkCount}-{len(chunks.files)}_{key}'
                             chunkCount += 1
                             val_chunk = chunk
-                            for hmm in dbHMM.items():
+                            for hmm in dbHMM.items(): #TODO: Fix long line syntax
                                 pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
                                                                                         [{key_chunk:val_chunk}, config, Path(STEP[8], key), hmm, 4]))
                     else:
@@ -561,6 +557,9 @@ Example:
 
     # End main pipeline
 
+    # Log time of main pipeline
+    logTime(config["DIR_OUT"], socket.gethostname(), "Pipeline_time", config["DIR_OUT"], end)
+
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
 
@@ -577,9 +576,8 @@ Example:
     metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
 
-
-    # write roll-up tables
-    print("Creating rollup tables")
+    # Write Roll-up Tables
+    print("Creating Rollup Tables")
     for sample,tables in hmmCounts.items():
         os.makedirs(f"{report_path}/{sample}", exist_ok=True)
         for name,table in tables.items():
@@ -589,9 +587,8 @@ Example:
         for name,table in tables.items():
             shutil.copy(table, Path(report_path, sample, f'{name}_rollup.tsv'))
 
-
     # Counts Tables
-    print("Creating Count tables")
+    print("Creating Count Tables")
     dfCounts = dict()
     for dbName in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
         tsv_list = dict()
@@ -606,8 +603,7 @@ Example:
             dfCounts[dbName] = combined_path
         del(combined_path)
 
-
-    # HTML of PCA
+    # PCA output (HTML)
     pcaFigures = None
     if len(hmm_tsv) < 4:
         print("NOTE: PCA Tables created only when there are at least four sequence files.\n")
@@ -617,12 +613,12 @@ Example:
         Path(report_path, 'combined').mkdir(parents=True, exist_ok=True)
         metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 
-    # run post processing analysis in R
+    # Run post processing analysis in R
     if len(hmm_tsv) < 4:
         print("NOTE: Pathview created only when there are at least four sequence files.\n")
     else:
         if config['CLASS']:
-            print("\nSTEP 11: Post Analysis with GAGE and PathView")
+            print("\nSTEP 11: Post Analysis with GAGE and Pathview")
             outpathview = Path(report_path, 'pathview')
             outpathview.mkdir(exist_ok=True, parents=True)
             rscript = Path(outpathview, 'run_pathview.sh')
@@ -656,8 +652,8 @@ Example:
             if not is_internet:
                 print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
 
-    # HTML of Figures
-    print("Creating combined HTML Sunburst and Bar Graphs")
+    # Figure outputs (HTML)
+    print("Creating combined sunburst and bargraphs")
     figSunburst = {}
     for key,value in hmmCounts.items():
         figSunburst[key] = metacerberus_visual.graphSunburst(value)

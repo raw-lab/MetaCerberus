@@ -62,8 +62,6 @@ def Download(pathDB):
     url.urlretrieve("https://osf.io/579bc/download", Path(pathDB, "COG-onto_rel1.tsv"))#, reporthook=progress)
     url.urlretrieve("https://osf.io/dnc27/download", Path(pathDB, "PHROG-onto_rel1.tsv"))#, reporthook=progress)
     url.urlretrieve("https://osf.io/pd29f/download", Path(pathDB, "VOG-onto_rel1.tsv"))#, reporthook=progress)
-    #url.urlretrieve("https://osf.io/72p6g/download", Path(pathDB, "FOAM_readme.txt"))#, reporthook=progress)
-    #url.urlretrieve("https://osf.io/bdpv5/download", Path(pathDB, "FOAM-hmm_rel1a.hmm.gz"))
 
     print("Downloading CAZy")
     url.urlretrieve("https://osf.io/8bxyj/download", os.path.join(pathDB, "CAZy.hmm.gz"))
@@ -85,7 +83,7 @@ def Download(pathDB):
     return
 
 
-# Download Frag Gene Scan Plus
+# Copy FragGeneScanRS
 def FGS(pathFGS:os.PathLike):
     system = platform.system()
 
@@ -97,7 +95,7 @@ def FGS(pathFGS:os.PathLike):
     return os.path.join(pathFGS, 'FragGeneScanRS')
 
 
-# Remove Database and FGS+
+# Remove Database and FGSRS
 def Remove(pathDB, pathFGS):
     shutil.rmtree(pathDB, ignore_errors=True)
     shutil.rmtree(os.path.join(pathFGS, "FragGeneScanRS"), ignore_errors=True)

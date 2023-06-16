@@ -3,7 +3,6 @@
 """
 
 def warn(*args, **kwargs):
-    #print("args", str(args))
     pass
 import warnings
 warnings.warn = warn
@@ -138,13 +137,13 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
         dictStats[key]["N-repeat Average "] = round(sum(repeats)/len(repeats), 2)
 
 
-    #Write Combined Stats to File
+    # Write Combined Stats to File
     outfile = os.path.join(outpath, "combined", "stats.tsv")
     os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
     dfStats = pd.DataFrame(dictStats)
     dfStats.to_csv(outfile, sep='\t')
 
-    # HTML Plots of Stats
+    # Statistical plotting (HTML)
     outfile = os.path.join(outpath, "combined", "stats.html")
 
     tsv_stats = base64.b64encode(dfStats.to_csv(sep='\t').encode('utf-8')).decode('utf-8')
@@ -172,7 +171,7 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             figPlots[f'Average Protein Length ({prefix[:-1]})'] = fig
         except: pass
         # Annotations
-        try:
+        try: #TODO: Add COG, CAZy...
             df = dfPre[['Sample', 'FOAM KO Count', 'KEGG KO Count']]
             df.rename(columns={'FOAM KO Count': 'FOAM KO', 'KEGG KO Count':'KEGG KO'}, inplace=True)
             df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
@@ -263,23 +262,20 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
 def write_PCA(outpath, pcaFigures):
     # PCA Files
     os.makedirs(os.path.join(outpath), exist_ok=True)
-#    countpathlist = []
     for database,figures in pcaFigures.items():
         prefix = f"{outpath}/{database}"
-        with open(prefix+"_PCA.htm", 'w') as htmlOut:
+        with open(prefix+"_PCA.html", 'w') as htmlOut:
             htmlOut.write("\n".join(htmlHeader))
             htmlOut.write(f"<h1>PCA Report for {database}<h1>\n")
             for graph,fig in figures.items():
                 if type(fig) is pd.DataFrame:
                     fig.to_csv(f"{prefix}_{graph}.tsv", index=False, header=True, sep='\t')
-#                    if "Counts" in graph:
-#                        countpathlist.append(f"{prefix}_{graph}.tsv")
                 else:
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     htmlOut.write(htmlFig + '\n')
                     fig.write_image(os.path.join(outpath, "img", f"{database}_{graph}.svg"))
             htmlOut.write('\n</body>\n</html>\n')
-    return# countpathlist
+    return
 
 
 ########## Write Tables ##########

@@ -8,10 +8,8 @@ from pathlib import Path
 import subprocess
 
 
-## deconSingleReads
-#
+# Decontaminate single end reads
 def deconSingleReads(key_value, config, subdir):
-    # TODO: Find good long read mapper
     path = Path(config['DIR_OUT'], subdir)
 
     key = key_value[0]
@@ -27,10 +25,9 @@ def deconSingleReads(key_value, config, subdir):
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
+    qc_seq = "ref="+config['QC_SEQ'] if config['QC_SEQ'] else ""
 
-    refseq = "ref="+config['REFSEQ'] if config['REFSEQ'] else ""
-
-    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=33 qtrim=r minlen=50 outm={matched} {refseq} k=31 stats={stats}"
+    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=30 qtrim=r minlen=50 outm={matched} {qc_seq} k=31 stats={stats}"
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)

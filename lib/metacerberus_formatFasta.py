@@ -10,13 +10,9 @@ import subprocess
 import textwrap
 
 
-## format_fastq
+# Remove quality from fastq
 def reformat(fastq, config, subdir):
     path = Path(config['DIR_OUT'], subdir)
-
-    #fasta, ext = os.path.splitext(fastq)
-    #fasta = os.path.basename(fasta) + ".fna"
-    #fasta = Path(path, fasta)
 
     fasta = path / Path(fastq).with_suffix(".fna")
 
@@ -36,6 +32,7 @@ def reformat(fastq, config, subdir):
     return fasta
 
 
+# Helper for removeN
 def split_sequenceN(name, sequence):
     N_lengths = []
     regex = re.compile(r"(N+)")

@@ -6,13 +6,11 @@
 """
 
 def warn(*args, **kwargs):
-    #print("args", str(args))
     pass
 import warnings
 warnings.warn = warn
 
 import os
-import re
 from pathlib import Path
 import pandas as pd
 
@@ -97,12 +95,6 @@ def parseHmmer(hmm_tsv, config, subdir):
 
     # Create dictionary with found KO IDs and counts
     KO_ID_counts = {}
-    #for line in BH_dict.values():
-    #    KO_IDs = [KO_ID.split(":")[1].split("_")[0] for KO_ID in line[1].split(",") if "KO:" in KO_ID]
-    #    for KO_ID in KO_IDs:
-    #        if KO_ID not in KO_ID_counts:
-    #            KO_ID_counts[KO_ID] = 0
-    #        KO_ID_counts[KO_ID] += 1
     for line in BH_query.values():
         KO_IDs = [ID for ID in line[1].split(",")]
         for KO_ID in KO_IDs:
@@ -111,16 +103,6 @@ def parseHmmer(hmm_tsv, config, subdir):
             KO_ID_counts[KO_ID] += 1
 
     # Write rollup files to disk
-
-    #rollup_file = dict()
-    #for name in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-    #    dbPath = Path(config['PATHDB'], f"{name}-onto_rel1.tsv")
-    #    outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
-    #    #df = rollupKegg(KO_ID_counts, dbPath, path, outfile)
-    #    df = rollup(KO_ID_counts, dbPath, path)
-    #    if len(df.index) > 1:
-    #        df.to_csv(outfile, index=False, header=True, sep='\t')
-    #        rollup_file[name] = outfile
 
     dbPath = Path(config['PATHDB'])
     dfRollups = rollupAll(KO_ID_counts, dbPath, path)
@@ -199,12 +181,12 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
             name = row.Function
             if not name:
                 continue
-            name = f"{row.KO}: {name}"
+            name = f"{row.KO}: {name}" #TODO: Remove KO
             if name not in dictCount:
                 dictCount[name] = ['Function', 0, row.KO]
             dictCount[name][1] += row['Count']
         data = {
-        'KO Id':[x[2] for x in dictCount.values()],
+        'KO Id':[x[2] for x in dictCount.values()], #TODO: Remove KO
         'Name':list(dictCount.keys()),
         'Level':[x[0] for x in dictCount.values()],
         'Count':[x[1] for x in dictCount.values()]}
@@ -238,7 +220,6 @@ def merge_tsv(tsv_list:dict, out_file:Path):
             ID = sorted(IDS)[0]
             IDS.remove(ID)
             line = [ID]
-            #IDS = set()
             for name in names:
                 if not lines[name]: # End of file
                     line.append('0')
@@ -250,8 +231,6 @@ def merge_tsv(tsv_list:dict, out_file:Path):
                     if lines[name]:
                         IDS.add(lines[name][0])
             print('\t'.join(line), file=writer)
-            #if not IDS:
-            #    break
     for name in names:
         file_list[name].close()
     return True

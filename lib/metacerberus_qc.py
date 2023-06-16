@@ -7,8 +7,7 @@ import os
 import subprocess
 
 
-## checkQuality
-#
+## Check quality
 def checkQuality(rawRead, config, subdir):
     if type(rawRead) is str:
         return checkSingleRead(rawRead, config, subdir)
@@ -16,8 +15,7 @@ def checkQuality(rawRead, config, subdir):
         return checkPairedRead(rawRead, config, subdir)
 
 
-## checkSingleQuality
-#
+# Check single end quality
 def checkSingleRead(singleRead, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
@@ -33,8 +31,7 @@ def checkSingleRead(singleRead, config, subdir):
     return None
 
 
-## checkPairedQuality
-#
+# Check paired end quality
 def checkPairedRead(pairedRead, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
