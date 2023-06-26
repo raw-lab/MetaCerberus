@@ -13,7 +13,6 @@ __copyright__   = "Copyright 2023"
 __date__        = "July 2023"
 
 def warn(*args, **kwargs):
-    #print("args", str(args))
     pass
 import warnings
 warnings.warn = warn
@@ -52,7 +51,7 @@ FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
 FILES_AMINO = [".faa"]
 
 # External file paths
-pathDB = pkg.resource_filename("meta_cerberus", "cerberusDB") #TODO: Change cerberusDB to DB
+pathDB = pkg.resource_filename("meta_cerberus", "DB")
 pathFGS = pkg.resource_filename("meta_cerberus", "FGS")
 
 # refseq default locations (for decontamination)
@@ -101,12 +100,6 @@ STEP = {
     10:"step_10-visualizeData"}
 
 
-
-## PRINT to stderr ##
-#def eprint(*args, **kwargs):
-#    print(*args, file=sys.stderr, **kwargs)
-#    return
-
 def set_add(to_set:set, item, msg:str):
     if item not in to_set:
         to_set.add(item)
@@ -119,21 +112,12 @@ def logTime(dirout, host, funcName, path, time):
     return
 
 
-### RAY WORKER THREADS ##
-#@ray.remote
-#def rayWorker(func, key, value, config, path):
-#    start = time.time()
-#    ret = func(value, config, path)
-#    end = str(datetime.timedelta(seconds=time.time()-start))
-#    logTime(config["DIR_OUT"], socket.gethostname(), func.__name__, path, end)
-#    return key, ret
-
 ## Ray Worker Threads ##
 @ray.remote
 def rayWorkerThread(func, key, dir_log, params:list):
     start = time.time()
     ret = func(*params)
-    end = str(datetime.timedelta(seconds=time.time()-start)) #time.strftime("%H:%M:%S", time.gmtime(time.time()-start))
+    end = str(datetime.timedelta(seconds=time.time()-start))
     logTime(dir_log, socket.gethostname(), func.__name__, key, end)
     return key, ret, func.__name__
 
@@ -168,7 +152,8 @@ Example:
     optional.add_argument('--dir_out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
     optional.add_argument('--meta', action="store_true", help="Metagenomic nucleotide sequences (for prodigal) [False]")
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
-    optional.add_argument('--minscore', type=float, default=25, help="Filter for parsing HMMER results [25]")
+    optional.add_argument('--minscore', type=float, default=25, help="Score cutoff for parsing HMMER results [25]")
+    optional.add_argument('--evalue', type=float, default=1e-09, help="E-value cutoff for parsing HMMER results [1e-09]")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
@@ -421,6 +406,7 @@ Example:
     amino_queue = dict()
     jobs_per_node = int(-(config["CPUS"] // -4))
     dictChunks = dict()
+    dictHMM = dict()
     hmm_tsv = dict()
     hmmRollup = {}
     hmmCounts = {}
@@ -528,23 +514,33 @@ Example:
                     if len(dictChunks[key]) >= int(l):
                         tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
                         tsv_out.parent.mkdir(parents=True, exist_ok=True)
-                        with tsv_out.open('w') as writer:
-                            print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
-                            for item in sorted(dictChunks[key]):
-                                writer.write(open(item).read())
-                                os.remove(item)
+                        if key not in dictHMM:
+                            dictHMM[key] = 1
+                            with tsv_out.open('w') as writer:
+                                print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
+                                for item in sorted(dictChunks[key]):
+                                    writer.write(open(item).read())
+                                    os.remove(item)
                         tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
                         set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                         pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
-                else:
+                else: # Not chunked file
                     tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
-                    with tsv_out.open('w') as writer:
-                        print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
-                        writer.write(open(tsv_file).read())
-                        os.remove(tsv_file)
-                    tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                    set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                    pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
+                    if key not in dictHMM:
+                        dictHMM[key] = 1
+                        with tsv_out.open('w') as writer:
+                            print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
+                            writer.write(open(tsv_file).read())
+                            os.remove(tsv_file)
+                    else:
+                        dictHMM[key] += 1
+                        with tsv_out.open('a') as writer:
+                            writer.write(open(tsv_file).read())
+                            os.remove(tsv_file)
+                    if dictHMM[key] == len(dbHMM):
+                        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+                        set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
+                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
         if func.startswith('filterHMM'):
             hmm_tsv[key] = value
             set_add(step_curr, 9, "STEP 9: Parse HMMER results")
@@ -558,7 +554,8 @@ Example:
     # End main pipeline
 
     # Log time of main pipeline
-    logTime(config["DIR_OUT"], socket.gethostname(), "Pipeline_time", config["DIR_OUT"], end)
+    time_pipeline = str(datetime.timedelta(seconds=time.time()-startTime))
+    logTime(config["DIR_OUT"], socket.gethostname(), "Pipeline_time", config["DIR_OUT"], time_pipeline)
 
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
@@ -572,7 +569,7 @@ Example:
     print("Saving Statistics")
     protStats = {}
     for key in hmm_tsv.keys():
-        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config)
+        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config, Path(report_path, key, 'annotation_summary.tsv'))
     metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
 
