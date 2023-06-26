@@ -14,6 +14,7 @@ import time
 ## HMMER Search
 def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4):
     minscore = config['MINSCORE']
+    evalue = config['EVALUE']
 
     hmmKey,hmmDB = hmmDB
 

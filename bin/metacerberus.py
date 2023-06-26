@@ -54,8 +54,8 @@ FILES_AMINO = [".faa"]
 pathDB = pkg.resource_filename("meta_cerberus", "DB")
 pathFGS = pkg.resource_filename("meta_cerberus", "FGS")
 
-# refseq default locations (for decontamination)
-REFSEQ = { #TODO: Change name to quality control QC_REF
+# qc sequence default locations (for decontamination)
+QC_SEQ = {
     "adapters": pkg.resource_filename("meta_cerberus", "dependency_files/adapters.fna"),
     "illumina": pkg.resource_filename("meta_cerberus", "dependency_files/phix174_ill.ref.fna"),
     "lambda": pkg.resource_filename("meta_cerberus", "dependency_files/lambda-phage.fna"),
@@ -170,8 +170,8 @@ Example:
     dependencies = parser.add_argument_group()
     for key in DEPENDENCIES:
         dependencies.add_argument(f"--{key}", help=argparse.SUPPRESS)
-    dependencies.add_argument('--adapters', type=str, default=REFSEQ['adapters'], help="FASTA File containing adapter sequences for trimming")
-    dependencies.add_argument('--control_seq', type=str, default="default", help="FASTA File containing control sequences for decontamination")
+    dependencies.add_argument('--adapters', type=str, default=QC_SEQ['adapters'], help="FASTA File containing adapter sequences for trimming")
+    dependencies.add_argument('--qc_seq', type=str, default="default", help="FASTA File containing control sequences for decontamination")
 
     args = parser.parse_args()
 
@@ -216,13 +216,13 @@ Example:
         if '.fastq' in file:
             if not any([args.illumina, args.nanopore, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
-            elif args.control_seq =="default":
+            elif args.qc_seq =="default":
                 if args.illumina:
-                    args.control_seq = REFSEQ["illumina"]
+                    args.qc_seq = QC_SEQ["illumina"]
                 if args.nanopore:
-                    args.control_seq = REFSEQ["lambda"]
+                    args.qc_seq = QC_SEQ["lambda"]
                 if args.pacbio:
-                    args.control_seq = REFSEQ["pacbio"]
+                    args.qc_seq = QC_SEQ["pacbio"]
 
     # Initialize Config Dictionary
     config = {}
@@ -235,7 +235,6 @@ Example:
     # load all args into config
     for arg,value in args.__dict__.items():
         if value is not None:
-            if arg == "control_seq": arg = "refseq"
             arg = arg.upper()
             if type(value) is str and os.path.isfile(value):
                 value = os.path.abspath(os.path.expanduser(value))
