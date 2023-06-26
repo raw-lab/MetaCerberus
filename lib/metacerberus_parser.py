@@ -156,8 +156,8 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
     dfCounts = dict()
 
     for dbName,filepath in rollup_files.items():
-        outpath = os.path.join(config['DIR_OUT'], subdir, f"{dbName}-rollup_counts.tsv")
-        if not config['REPLACE'] and done.exists():
+        outpath = Path(config['DIR_OUT'], subdir, f"{dbName}-rollup_counts.tsv")
+        if not config['REPLACE'] and done.exists() and outpath.exists():
             dfCounts[dbName] = outpath
             continue
         done.unlink(missing_ok=True)
