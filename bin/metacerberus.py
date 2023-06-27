@@ -511,6 +511,7 @@ Example:
                         dictChunks[key] = list()
                     dictChunks[key].append(tsv_file)
                     if len(dictChunks[key]) >= int(l):
+                        # All chunks of a file have returned
                         tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
                         tsv_out.parent.mkdir(parents=True, exist_ok=True)
                         if key not in dictHMM:
@@ -519,10 +520,19 @@ Example:
                                 print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
                                 for item in sorted(dictChunks[key]):
                                     writer.write(open(item).read())
+                                    dictChunks[key].remove(item)
                                     os.remove(item)
-                        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                        set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
+                        else:
+                            dictHMM[key] += 1
+                            with tsv_out.open('a') as writer:
+                                for item in sorted(dictChunks[key]):
+                                    writer.write(open(item).read())
+                                    dictChunks[key].remove(item)
+                                    os.remove(item)
+                        if dictHMM[key] == len(dbHMM):
+                            tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+                            set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
+                            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
                 else: # Not chunked file
                     tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
                     if key not in dictHMM:
