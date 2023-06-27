@@ -75,9 +75,9 @@ def Download(pathDB):
     url.urlretrieve("https://osf.io/93mhp/download", os.path.join(pathDB, "VOG.hmm.gz"))
 
     print("Downloading KOFam")
-    url.urlretrieve("https://osf.io/8dse5/download", os.path.join(pathDB, "KOFam-prokaryote.hmm.gz"))
-    url.urlretrieve("https://osf.io/gk7vx/download", os.path.join(pathDB, "KOFam-eukaryote.hmm.gz"))
-    url.urlretrieve("https://osf.io/yga2f/download", os.path.join(pathDB, "KOFam-all.hmm.gz"))
+    url.urlretrieve("https://osf.io/8dse5/download", os.path.join(pathDB, "KOFam_prokaryote.hmm.gz"))
+    url.urlretrieve("https://osf.io/gk7vx/download", os.path.join(pathDB, "KOFam_eukaryote.hmm.gz"))
+    url.urlretrieve("https://osf.io/yga2f/download", os.path.join(pathDB, "KOFam_all.hmm.gz"))
 
     return
 
