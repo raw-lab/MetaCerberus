@@ -2,6 +2,8 @@ import os
 import setuptools
 
 
+from bin.metacerberus import __version__
+
 # recursively load package files
 def package_files(directory):
     paths = []
@@ -17,7 +19,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="MetaCerberus",
-    version="1.1",
+    version=__version__,
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
     description="Versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
@@ -35,10 +37,9 @@ setuptools.setup(
     classifiers=[           # This is the new updated way for metadata, but old way seems to still be used in some of the output
         "Development Status :: 4 - Beta",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: BSD License",
         "Operating System :: Unix",
     ],

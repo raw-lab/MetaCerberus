@@ -73,7 +73,7 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict, summary_out:
                     for dbname in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
                         if dbname not in annotations:
                             annotations[dbname] = []
-                        rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].KO==q])
+                        rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].ID==q])
                         if not rows.empty:
                             name = f"{dbname}:{rows.iloc[0].Function}"
                             EC = rows.iloc[0].EC
@@ -83,7 +83,7 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict, summary_out:
                 name = ""
                 EC = ""
                 for dbname in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-                    rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].KO==query])
+                    rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].ID==query])
                     if not rows.empty:
                         name = rows.iloc[0].Function
                         EC = rows.iloc[0].EC
@@ -109,6 +109,6 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict, summary_out:
     for dbName,filepath in dfCount.items():
         if Path(filepath).exists():
             df = pd.read_csv(filepath, sep='\t')
-            stats[dbName+' KO Count'] = df[df['Level']=='Function']['Count'].sum()
+            stats[dbName+' ID Count'] = df[df['Level']=='Function']['Count'].sum()
 
     return stats

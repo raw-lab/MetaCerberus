@@ -172,8 +172,13 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
         except: pass
         # Annotations
         try: #TODO: Add COG, CAZy...
-            df = dfPre[['Sample', 'FOAM KO Count', 'KEGG KO Count']]
-            df.rename(columns={'FOAM KO Count': 'FOAM KO', 'KEGG KO Count':'KEGG KO'}, inplace=True)
+            columns = ['Sample']
+            for column in dfPre.columns:
+                if re.search(r'[A-Za-z] ID Count', column):
+                    columns.append(column)
+            df = dfPre[columns]
+            columns = {col:col.replace(" Count", "") for col in columns}
+            df.rename(columns=columns, inplace=True)
             df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
             fig = px.bar(df, x='Sample', y='value', color='group', barmode='group',
                 labels={'value': 'count', 'group':''})
@@ -212,6 +217,7 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
     # Update Graph Colors & Export
     os.makedirs(os.path.join(outpath, "combined", "img"),exist_ok=True)
     for key in figPlots.keys():
+        print(key)
         figPlots[key].update_layout(dict(plot_bgcolor='White', paper_bgcolor='White'))
         figPlots[key].update_xaxes(showline=True, linewidth=2, linecolor='black')
         figPlots[key].update_yaxes( showline=True, linewidth=2, linecolor='black',
@@ -295,7 +301,7 @@ def writeTables(table_path: os.PathLike, filePrefix: os.PathLike):
         table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
     except:
         return
-    table[table['Level']=='Function'][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-ko.tsv", index = False, header=True, sep='\t')
+    table[table['Level']=='Function'][['Id','Name','Count']].to_csv(f"{filePrefix}_level-id.tsv", index = False, header=True, sep='\t')
     return
 
 

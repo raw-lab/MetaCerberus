@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""metacerberus_parser.py Parses HMMER output and identifies KOs with FOAM and KEGG DB info
+"""metacerberus_parser.py Parses HMMER output
 1) Get best hits
 2) Save rollup file
 3) Convert rollup file to table
@@ -79,33 +79,23 @@ def parseHmmer(hmm_tsv, config, subdir):
         for query in sorted(BH_top5.keys()):
             BH_top5[query].sort(key = lambda x: x[3], reverse=True)
             for line in BH_top5[query]:
-                ko = []
+                id = [i for i in line[1].split(',')]
                 ec = []
-                for id in line[1].split(','):
-                    if "KO:" in id:
-                        #TODO: Remove this path once custom databases properly identified and formated.
-                        print("TODO: Fix DB And remove conditional path (Parser)")
-                        id = id.split(':')[1].split('_')
-                        ko += [id[0]]
-                        if len(id)>1:
-                            ec += [id[1]]
-                    else:
-                        ko += [id]
-                print(line[0], ','.join(ko), ','.join(ec), line[2], line[3], file=writer, sep='\t')
+                print(line[0], ','.join(id), ','.join(ec), line[2], line[3], file=writer, sep='\t')
 
-    # Create dictionary with found KO IDs and counts
-    KO_ID_counts = {}
+    # Create dictionary with found IDs and counts
+    ID_counts = {}
     for line in BH_query.values():
-        KO_IDs = [ID for ID in line[1].split(",")]
-        for KO_ID in KO_IDs:
-            if KO_ID not in KO_ID_counts:
-                KO_ID_counts[KO_ID] = 0
-            KO_ID_counts[KO_ID] += 1
+        IDs = [ID for ID in line[1].split(",")]
+        for ID in IDs:
+            if ID not in ID_counts:
+                ID_counts[ID] = 0
+            ID_counts[ID] += 1
 
     # Write rollup files to disk
 
     dbPath = Path(config['PATHDB'])
-    dfRollups = rollupAll(KO_ID_counts, dbPath, path)
+    dfRollups = rollupAll(ID_counts, dbPath, path)
     rollup_files = dict()
     for name,df in dfRollups.items():
         if len(df.index) > 1:
@@ -117,7 +107,7 @@ def parseHmmer(hmm_tsv, config, subdir):
     return rollup_files
 
 ######### Roll-Up All #########
-def rollupAll(KO_COUNTS: dict, lookupPath: str, outpath: str):
+def rollupAll(COUNTS: dict, lookupPath: str, outpath: str):
     dfLookup = dict()
     dfRollup = dict()
     count_file = dict()
@@ -130,21 +120,21 @@ def rollupAll(KO_COUNTS: dict, lookupPath: str, outpath: str):
 
     errfile = os.path.join(outpath, 'lookup.err')
     with open(errfile, 'w') as errlog:
-        for KO_ID,count in sorted(KO_COUNTS.items()):
+        for ID,count in sorted(COUNTS.items()):
             found = False
             for name in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-                rows = pd.DataFrame(dfLookup[name][dfLookup[name].KO==KO_ID])
+                rows = pd.DataFrame(dfLookup[name][dfLookup[name].ID==ID])
                 if not rows.empty:
                     found = True
                     rows.drop(rows[rows['Function']==''].index, inplace=True)
                     if rows.empty:
-                        print("WARNING:'", KO_ID, "'Does not have a 'Function' in the Lookup File:", name, file=errlog)
+                        print("WARNING:'", ID, "'Does not have a 'Function' in the Lookup File:", name, file=errlog)
                         continue
-                    print(KO_ID, count, sep='\t', file=count_file[name])
+                    print(ID, count, sep='\t', file=count_file[name])
                     rows['Count'] = count
                     dfRollup[name] = pd.concat([dfRollup[name],rows])
             if not found:
-                print("WARNING:'", KO_ID, "'not found in any Lookup File", file=errlog)
+                print("WARNING:'", ID, "'not found in any Lookup File", file=errlog)
                 continue
     
     return dfRollup
@@ -181,12 +171,12 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
             name = row.Function
             if not name:
                 continue
-            name = f"{row.KO}: {name}" #TODO: Remove KO
+            name = f"{row.ID}: {name}"
             if name not in dictCount:
-                dictCount[name] = ['Function', 0, row.KO]
+                dictCount[name] = ['Function', 0, row.ID]
             dictCount[name][1] += row['Count']
         data = {
-        'KO Id':[x[2] for x in dictCount.values()], #TODO: Remove KO
+        'Id':[x[2] for x in dictCount.values()],
         'Name':list(dictCount.keys()),
         'Level':[x[0] for x in dictCount.values()],
         'Count':[x[1] for x in dictCount.values()]}

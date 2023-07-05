@@ -7,7 +7,7 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "2.0"
+__version__     = "1.1"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2023"
 __date__        = "July 2023"
@@ -382,7 +382,6 @@ Example:
             pipeline.append(rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)]))
 
     # Step 5 Contig Entry Point
-    #TODO: Add config flag for contigs/scaffolds/raw reads
     # Only do this if a fasta file was given, not if fastq
     if fasta:# and "scaffold" in config:
         print("\nSTEP 5a: Removing N's from contig files")
