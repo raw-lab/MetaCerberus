@@ -1,0 +1,26 @@
+=====================================================
+Start Time  : Sat Jun 24 21:33:42 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3996848 / InterProScan
+Node List   : str-c97
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On CPR/.fna
+======================================================
+24/06/2023 21:33:43:475 Welcome to InterProScan-5.60-92.0
+24/06/2023 21:33:43:476 Running InterProScan v5 in STANDALONE mode... on Linux
+For the (-i) option you specified a location which doesn't exist or is not readable:
+/projects/raw_lab/jobs/metacerberus/CPR/.fna
+Command exited with non-zero status 2
+26.20user 1.03system 0:04.60elapsed 592%CPU (0avgtext+0avgdata 687292maxresident)k
+0inputs+144outputs (0major+160569minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 21:33:47 EDT 2023
+Run Time   : 5 seconds
+======================================================
+

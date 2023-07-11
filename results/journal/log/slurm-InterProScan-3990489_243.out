@@ -1,0 +1,32 @@
+=====================================================
+Start Time  : Sat Jun 24 20:45:30 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3995686 / InterProScan
+Node List   : str-c108
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On PHAGES/genomes/NC_008152.fna
+======================================================
+24/06/2023 20:45:31:109 Welcome to InterProScan-5.60-92.0
+24/06/2023 20:45:31:110 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 20:45:35:212 RunID: str-c108.uncc.edu_20230624_204535041_5xep
+24/06/2023 20:45:43:957 Loading file /projects/raw_lab/jobs/metacerberus/PHAGES/genomes/NC_008152.fna
+24/06/2023 20:45:44:439 Running the following analyses:
+[AntiFam-7.0,CDD-3.20,Coils-2.2.1,FunFam-4.3.0,Gene3D-4.3.0,Hamap-2021_04,MobiDBLite-2.0,PANTHER-17.0,Pfam-35.0,PIRSF-3.10,PIRSR-2021_05,PRINTS-42.0,ProSitePatterns-2022_01,ProSiteProfiles-2022_01,SFLD-4,SMART-7.1,SUPERFAMILY-1.75,TIGRFAM-15.0]
+Pre-calculated match lookup service DISABLED.  Please wait for match calculations to complete...
+2023-06-24 20:47:15,069 [amqEmbeddedWorkerJmsContainer-1] [uk.ac.ebi.interpro.scan.management.model.implementations.WriteOutputStep:344] WARN - At write output completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c108.uncc.edu_20230624_204535041_5xep
+24/06/2023 20:47:15:173 100% done:  InterProScan analyses completed 
+
+2023-06-24 20:47:15,676 [main] [uk.ac.ebi.interpro.scan.jms.master.AbstractMaster:259] WARN - Master process unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c108.uncc.edu_20230624_204535041_5xep
+253.23user 23.59system 1:45.29elapsed 262%CPU (0avgtext+0avgdata 3241880maxresident)k
+635440inputs+495608outputs (13major+1735765minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 20:47:15 EDT 2023
+Run Time   : 105 seconds
+======================================================
+

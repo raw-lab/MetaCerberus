@@ -1,0 +1,35 @@
+=====================================================
+Start Time  : Sat Jul  1 17:15:00 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4128896 / PROKKA
+Node List   : str-c107
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading prokka/1.14.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running PROKKA On VIRAL_ARCHAEA/GCA_021091095.1.fna
+======================================================
+Viruses
+[17:15:02] This is prokka 1.14.6
+[17:15:02] Written by Torsten Seemann <torsten.seemann@gmail.com>
+[17:15:02] Homepage is https://github.com/tseemann/prokka
+[17:15:02] Local time is Sat Jul  1 17:15:02 2023
+[17:15:02] You are jlfiguer
+[17:15:02] Operating system is linux
+[17:15:02] You have BioPerl 1.7.8
+Argument "1.7.8" isn't numeric in numeric lt (<) at /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka line 259.
+[17:15:02] System has 16 cores.
+[17:15:02] Will use maximum of 16 cores.
+[17:15:02] Annotating as >>> Viruses <<<
+[17:15:02] 'VIRAL_ARCHAEA/GCA_021091095.1.fna' is not a readable non-empty FASTA file
+Command exited with non-zero status 2
+0.09user 0.01system 0:00.12elapsed 86%CPU (0avgtext+0avgdata 22044maxresident)k
+0inputs+8outputs (0major+5355minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 17:15:02 EDT 2023
+Run Time   : 2 seconds
+======================================================
+

@@ -1,0 +1,76 @@
+=====================================================
+Start Time  : Sat Jul  1 18:39:14 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4129577 / Metacerberus
+Node List   : str-c92
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+======================================================
+Running Metacerberus On CPR/SAMN04315616.fna
+======================================================
+HMM: 'KOFam_all'
+HMM: 'COG'
+HMM: 'VOG'
+HMM: 'PHROG'
+HMM: 'CAZy'
+
+Starting MetaCerberus Pipeline
+
+Checking for external dependencies:
+fastqc               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastqc
+flash2               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/flash2
+fastp                /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastp
+porechop             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/porechop
+bbduk.sh             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/bbduk.sh
+FragGeneScanRs       /users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/meta_cerberus/FGS/FragGeneScanRs
+prodigal             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/prodigal
+hmmsearch            /users/jlfiguer/.conda/envs/metacerberus-dev/bin/hmmsearch
+countAssembly.py     /users/jlfiguer/.conda/envs/metacerberus-dev/bin/countAssembly.py
+Initializing RAY
+2023-07-01 18:39:19,185	INFO worker.py:1627 -- Started a local Ray instance. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+Started RAY single node
+Running RAY on 1 node(s)
+Using 16 CPUs per node
+
+STEP 1: Loading sequence files:
+Processing 0 fastq sequences
+Processing 1 fasta sequences
+Processing 0 protein Sequences
+
+STEP 5a: Removing N's from contig files
+
+STEP 6: Metaome Stats
+
+
+STEP 7: ORF Finder
+
+
+STEP 8: HMMER Search
+
+
+STEP 8: Filtering HMMER results
+
+
+STEP 9: Parse HMMER results
+
+
+STEP 10: Creating Reports
+Saving Statistics
+Creating Rollup Tables
+Creating Count Tables
+NOTE: PCA Tables created only when there are at least four sequence files.
+
+NOTE: Pathview created only when there are at least four sequence files.
+
+Creating combined sunburst and bargraphs
+
+Finished Pipeline
+30.16user 4.49system 6:25.42elapsed 8%CPU (0avgtext+0avgdata 364196maxresident)k
+536inputs+26320outputs (0major+283454minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 18:45:40 EDT 2023
+Run Time   : 386 seconds
+======================================================
+

@@ -1,0 +1,109 @@
+=====================================================
+Start Time  : Sat Jun 24 16:50:28 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3994601 / DRAM
+Node List   : str-c90
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading dram/1.4.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running DRAM On GTDB-100/genomes/bacteria/GCA_003510135.1.fna
+======================================================
+2023-06-24 16:50:33,789 - The log file is created at results/DRAM/GTDB-100/genomes/bacteria/GCA_003510135.1/annotate.log.
+2023-06-24 16:50:33,789 - 1 FASTAs found
+2023-06-24 16:50:33,800 - Starting the Annotation of Bins with database configuration: 
+ 
+
+KOfam db:
+    Citation: T. Aramaki, R. Blanc-Mathieu, H. Endo, K. Ohkubo, M. Kanehisa, S. Goto, and H. Ogata, "Kofamkoala: Kegg ortholog assignment based on profile hmm and adaptive score threshold," Bioinformatics, vol. 36, no. 7, pp. 2251–2252, 2020.
+    Download Time: 06/10/2023, 10:32:33
+    Origin: Downloaded by DRAM
+KOfam KO list:
+    Citation: T. Aramaki, R. Blanc-Mathieu, H. Endo, K. Ohkubo, M. Kanehisa, S. Goto, and H. Ogata, "Kofamkoala: Kegg ortholog assignment based on profile hmm and adaptive score threshold," Bioinformatics, vol. 36, no. 7, pp. 2251–2252, 2020.
+    Download Time: 06/10/2023, 10:32:36
+    Origin: Downloaded by DRAM
+Pfam db:
+    Citation: J. Mistry, S. Chuguransky, L. Williams, M. Qureshi, G. A. Salazar, E. L. Sonnhammer, S. C. Tosatto, L. Paladin, S. Raj, L. J. Richardson et al., "Pfam: The protein families database in 2021," Nucleic acids research, vol. 49, no. D1, pp. D412–D419, 2021.
+    Download Time: 06/10/2023, 18:44:32
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:42
+dbCAN db:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Download Time: 06/10/2023, 18:44:36
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:42
+MEROPS peptidase db:
+    Description_Db_Updated: 06/12/2023, 01:23:41
+    Citation: N. D. Rawlings, A. J. Barrett, P. D. Thomas, X. Huang, A. Bateman, and R. D. Finn, "The merops database of proteolytic enzymes, their substrates and inhibitors in 2017 and a comparison with peptidases in the panther database," Nucleic acids research, vol. 46, no. D1, pp. D624–D632, 2018.
+    Download Time: 06/10/2023, 18:45:19
+    Origin: Downloaded by DRAM
+
+Pfam hmm dat:
+    Description_Db_Updated: Unknown, or Never
+    Citation: J. Mistry, S. Chuguransky, L. Williams, M. Qureshi, G. A. Salazar, E. L. Sonnhammer, S. C. Tosatto, L. Paladin, S. Raj, L. J. Richardson et al., "Pfam: The protein families database in 2021," Nucleic acids research, vol. 49, no. D1, pp. D412–D419, 2021.
+    Download Time: 06/10/2023, 18:44:33
+    Origin: Downloaded by DRAM
+dbCAN family activities:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Upload_Date: 08062022
+    Download Time: 06/10/2023, 18:44:37
+    Origin: Downloaded by DRAM
+dbCAN subfamily EC numbers:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Upload_Date: 08062022
+    Download Time: 06/10/2023, 18:44:37
+    Origin: Downloaded by DRAM
+VOG annotations:
+    Description_Db_Updated: Unknown, or Never
+    Citation: J. Thannesberger, H.-J. Hellinger, I. Klymiuk, M.-T. Kastner, F. J. Rieder, M. Schneider, S. Fister, T. Lion, K. Kosulin, J. Laengle et al., "Viruses comprise an extensive pool of mobile genetic elements in eukaryote cell cultures and human clinical samples," The FASEB Journal, vol. 31, no. 5, pp. 1987–2000, 2017.
+    Version: latest
+    Download Time: 06/10/2023, 18:45:00
+    Origin: Downloaded by DRAM
+
+Genome summary form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+Module step form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+ETC module database:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:21
+    Origin: Downloaded by DRAM
+Function heatmap form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+AMG database:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+2023-06-24 16:50:33,802 - Retrieved database locations and descriptions
+2023-06-24 16:50:33,802 - Annotating GCA_003510135.1
+2023-06-24 16:50:55,388 - Turning genes from prodigal to mmseqs2 db
+2023-06-24 16:51:05,175 - Getting hits from kofam
+2023-06-24 17:01:55,900 - Getting forward best hits from peptidase
+2023-06-24 17:01:59,823 - Getting reverse best hits from peptidase
+2023-06-24 17:02:08,472 - Getting descriptions of hits from peptidase
+2023-06-24 17:02:08,688 - Getting hits from pfam
+2023-06-24 17:02:14,036 - Getting hits from dbCAN
+/apps/pkg/anaconda3/2022.10/envs/dram-1.4.6/lib/python3.10/site-packages/mag_annotator/database_handler.py:215: UserWarning: No descriptions were found for your id's. Does this GT2_Glycos_transf_2 look like an id from dbcan_description
+  warnings.warn(
+2023-06-24 17:02:21,981 - Merging ORF annotations
+2023-06-24 17:02:34,913 - Annotations complete, processing annotations
+2023-06-24 17:02:35,145 - Completed annotations
+1174.37user 66.90system 12:04.47elapsed 171%CPU (0avgtext+0avgdata 18232016maxresident)k
+1874776inputs+1948840outputs (87major+6779379minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 17:02:35 EDT 2023
+Run Time   : 727 seconds
+======================================================
+

@@ -1,0 +1,31 @@
+=====================================================
+Start Time  : Sat Jun 24 21:36:55 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3996863 / InterProScan
+Node List   : str-c105
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On VIRAL_ARCHAEA/MZ334502.fna
+======================================================
+24/06/2023 21:36:56:490 Welcome to InterProScan-5.60-92.0
+24/06/2023 21:36:56:490 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 21:37:00:480 RunID: str-c105.uncc.edu_20230624_213700295_9dyn
+24/06/2023 21:37:08:991 Loading file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/MZ334502.fna
+24/06/2023 21:37:09:471 Running the following analyses:
+[AntiFam-7.0,CDD-3.20,Coils-2.2.1,FunFam-4.3.0,Gene3D-4.3.0,Hamap-2021_04,MobiDBLite-2.0,PANTHER-17.0,Pfam-35.0,PIRSF-3.10,PIRSR-2021_05,PRINTS-42.0,ProSitePatterns-2022_01,ProSiteProfiles-2022_01,SFLD-4,SMART-7.1,SUPERFAMILY-1.75,TIGRFAM-15.0]
+Pre-calculated match lookup service DISABLED.  Please wait for match calculations to complete...
+24/06/2023 21:38:41:622 100% done:  InterProScan analyses completed 
+
+2023-06-24 21:38:42,128 [main] [uk.ac.ebi.interpro.scan.jms.master.AbstractMaster:259] WARN - Master process unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c105.uncc.edu_20230624_213700295_9dyn
+252.41user 23.69system 1:46.38elapsed 259%CPU (0avgtext+0avgdata 3279880maxresident)k
+488136inputs+493544outputs (13major+1790753minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 21:38:42 EDT 2023
+Run Time   : 107 seconds
+======================================================
+

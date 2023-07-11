@@ -1,0 +1,33 @@
+=====================================================
+Start Time  : Sat Jun 24 20:47:48 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3995747 / InterProScan
+Node List   : str-c105
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On PHAGES/genomes/NC_048100.fna
+======================================================
+24/06/2023 20:47:49:723 Welcome to InterProScan-5.60-92.0
+24/06/2023 20:47:49:723 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 20:47:53:864 RunID: str-c105.uncc.edu_20230624_204753686_kc5s
+24/06/2023 20:48:02:415 Loading file /projects/raw_lab/jobs/metacerberus/PHAGES/genomes/NC_048100.fna
+24/06/2023 20:48:02:902 Running the following analyses:
+[AntiFam-7.0,CDD-3.20,Coils-2.2.1,FunFam-4.3.0,Gene3D-4.3.0,Hamap-2021_04,MobiDBLite-2.0,PANTHER-17.0,Pfam-35.0,PIRSF-3.10,PIRSR-2021_05,PRINTS-42.0,ProSitePatterns-2022_01,ProSiteProfiles-2022_01,SFLD-4,SMART-7.1,SUPERFAMILY-1.75,TIGRFAM-15.0]
+Pre-calculated match lookup service DISABLED.  Please wait for match calculations to complete...
+2023-06-24 20:49:29,156 [amqEmbeddedWorkerJmsContainer-11] [uk.ac.ebi.interpro.scan.management.model.implementations.WriteOutputStep:344] WARN - At write output completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c105.uncc.edu_20230624_204753686_kc5s
+24/06/2023 20:49:29:204 100% done:  InterProScan analyses completed 
+
+2023-06-24 20:49:29,707 [main] [uk.ac.ebi.interpro.scan.jms.master.AbstractMaster:259] WARN - Master process unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c105.uncc.edu_20230624_204753686_kc5s
+2023-06-24 20:49:29,715 [main] [uk.ac.ebi.interpro.scan.jms.main.Run:1778] WARN - At Run completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c105.uncc.edu_20230624_204753686_kc5s
+231.09user 23.16system 1:40.65elapsed 252%CPU (0avgtext+0avgdata 3355308maxresident)k
+481744inputs+484504outputs (12major+1535734minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 20:49:29 EDT 2023
+Run Time   : 101 seconds
+======================================================
+

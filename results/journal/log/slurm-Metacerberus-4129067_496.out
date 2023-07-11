@@ -1,0 +1,70 @@
+=====================================================
+Start Time  : Sat Jul  1 18:52:49 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4129701 / Metacerberus
+Node List   : str-c92
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+======================================================
+Running Metacerberus On VIRAL/genomes/NC_061433.1.fna
+======================================================
+HMM: 'KOFam_all'
+HMM: 'COG'
+HMM: 'VOG'
+HMM: 'PHROG'
+HMM: 'CAZy'
+
+Starting MetaCerberus Pipeline
+
+Checking for external dependencies:
+fastqc               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastqc
+flash2               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/flash2
+fastp                /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastp
+porechop             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/porechop
+bbduk.sh             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/bbduk.sh
+FragGeneScanRs       /users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/meta_cerberus/FGS/FragGeneScanRs
+prodigal             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/prodigal
+hmmsearch            /users/jlfiguer/.conda/envs/metacerberus-dev/bin/hmmsearch
+countAssembly.py     /users/jlfiguer/.conda/envs/metacerberus-dev/bin/countAssembly.py
+Initializing RAY
+Traceback (most recent call last):
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/bin/metacerberus.py", line 291, in main
+    ray.init(address='auto')#, log_to_driver=False)
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/worker.py", line 1449, in init
+    bootstrap_address = services.canonicalize_bootstrap_address(address, _temp_dir)
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/services.py", line 526, in canonicalize_bootstrap_address
+    addr = get_ray_address_from_environment(addr, temp_dir)
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/services.py", line 419, in get_ray_address_from_environment
+    raise ConnectionError(
+ConnectionError: Could not find any running Ray instance. Please specify the one to connect to by setting `--address` flag or `RAY_ADDRESS` environment variable.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/bin/metacerberus.py", line 684, in <module>
+    sys.exit(main())
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/bin/metacerberus.py", line 295, in main
+    ray.init(num_cpus=config['CPUS'])#log_to_driver=False)
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/client_mode_hook.py", line 103, in wrapper
+    return func(*args, **kwargs)
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/worker.py", line 1534, in init
+    _global_node = ray._private.node.Node(
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/node.py", line 283, in __init__
+    self._ray_params.update_pre_selected_port()
+  File "/users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/ray/_private/parameter.py", line 331, in update_pre_selected_port
+    raise ValueError(
+ValueError: Ray component dashboard_agent_http is trying to use a port number 52365 that is used by other components.
+Port information: {'gcs': 'random', 'object_manager': 'random', 'node_manager': 'random', 'gcs_server': 61676, 'client_server': 'random', 'dashboard': 'random', 'dashboard_agent_grpc': 52365, 'dashboard_agent_http': 52365, 'dashboard_grpc': 'random', 'metrics_export': 45987, 'redis_shards': 'random', 'worker_ports': 'random'}
+If you allocate ports, please make sure the same port is not used by multiple components.
+Command exited with non-zero status 1
+1.67user 0.88system 0:01.66elapsed 154%CPU (0avgtext+0avgdata 193836maxresident)k
+560inputs+120outputs (0major+29529minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 18:52:51 EDT 2023
+Run Time   : 2 seconds
+======================================================
+

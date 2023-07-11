@@ -1,0 +1,176 @@
+=====================================================
+Start Time  : Sat Jul  1 17:14:40 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4128810 / PROKKA
+Node List   : str-c102
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading prokka/1.14.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running PROKKA On CPR/SAMN04315426.fna
+======================================================
+Viruses
+[17:14:42] This is prokka 1.14.6
+[17:14:42] Written by Torsten Seemann <torsten.seemann@gmail.com>
+[17:14:42] Homepage is https://github.com/tseemann/prokka
+[17:14:42] Local time is Sat Jul  1 17:14:42 2023
+[17:14:42] You are jlfiguer
+[17:14:42] Operating system is linux
+[17:14:42] You have BioPerl 1.7.8
+Argument "1.7.8" isn't numeric in numeric lt (<) at /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka line 259.
+[17:14:42] System has 16 cores.
+[17:14:42] Will use maximum of 16 cores.
+[17:14:42] Annotating as >>> Viruses <<<
+[17:14:42] Generating locus_tag from 'CPR/SAMN04315426.fna' contents.
+[17:14:42] Setting --locustag NLEFMFNC from MD5 75ef6f7cd3f01307160c75d2168e8c0e
+[17:14:42] Creating new output folder: results/PROKKA/CPR/SAMN04315426
+[17:14:42] Running: mkdir -p results\/PROKKA\/CPR\/SAMN04315426
+[17:14:42] Using filename prefix: SAMN04315426.XXX
+[17:14:42] Setting HMMER_NCPU=1
+[17:14:42] Writing log to: results/PROKKA/CPR/SAMN04315426/SAMN04315426.log
+[17:14:42] Command: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka --prefix SAMN04315426 --outdir results/PROKKA/CPR/SAMN04315426 --kingdom Viruses --cpus 16 CPR/SAMN04315426.fna
+[17:14:42] Appending to PATH: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin
+[17:14:42] Looking for 'aragorn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/aragorn
+[17:14:42] Determined aragorn version is 001002 from 'ARAGORN v1.2.41 Dean Laslett'
+[17:14:42] Looking for 'barrnap' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/barrnap
+[17:14:42] Determined barrnap version is 000009 from 'barrnap 0.9'
+[17:14:42] Looking for 'blastp' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/blastp
+[17:14:42] Determined blastp version is 002013 from 'blastp: 2.13.0+'
+[17:14:42] Looking for 'cmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmpress
+[17:14:42] Determined cmpress version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[17:14:42] Looking for 'cmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmscan
+[17:14:42] Determined cmscan version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[17:14:42] Looking for 'egrep' - found /usr/bin/egrep
+[17:14:42] Looking for 'find' - found /usr/bin/find
+[17:14:42] Looking for 'grep' - found /usr/bin/grep
+[17:14:42] Looking for 'hmmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmpress
+[17:14:42] Determined hmmpress version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[17:14:42] Looking for 'hmmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmscan
+[17:14:42] Determined hmmscan version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[17:14:42] Looking for 'java' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/java
+[17:14:42] Looking for 'makeblastdb' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/makeblastdb
+[17:14:42] Determined makeblastdb version is 002013 from 'makeblastdb: 2.13.0+'
+[17:14:42] Looking for 'minced' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/minced
+[17:14:42] Determined minced version is 004002 from 'minced 0.4.2'
+[17:14:42] Looking for 'parallel' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/parallel
+[17:14:42] Determined parallel version is 20230122 from 'GNU parallel 20230122'
+[17:14:42] Looking for 'prodigal' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prodigal
+[17:14:42] Determined prodigal version is 002006 from 'Prodigal V2.6.3: February, 2016'
+[17:14:42] Looking for 'prokka-genbank_to_fasta_db' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka-genbank_to_fasta_db
+[17:14:42] Looking for 'sed' - found /usr/bin/sed
+[17:14:42] Looking for 'tbl2asn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/tbl2asn
+[17:14:42] Determined tbl2asn version is 025007 from 'tbl2asn 25.7   arguments:'
+[17:14:42] Using genetic code table 1.
+[17:14:42] Loading and checking input file: CPR/SAMN04315426.fna
+[17:14:42] Wrote 46 contigs totalling 853445 bp.
+[17:14:42] Predicting tRNAs and tmRNAs
+[17:14:42] Running: aragorn -l -gc1  -w results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.fna
+[17:14:42] 1 tRNA-Gln c[5861,5933] 33 (ttg)
+[17:14:42] 1 tRNA-Glu c[2145,2220] 37 (ttc)
+[17:14:42] 2 tRNA-Val c[2281,2355] 33 (gac)
+[17:14:42] 3 tRNA-Leu [6234,6316] 35 (gag)
+[17:14:42] 4 tRNA-Val c[10162,10234] 33 (tac)
+[17:14:42] 5 tRNA-Phe c[10294,10366] 33 (gaa)
+[17:14:42] 6 tRNA-His [10994,11067] 33 (gtg)
+[17:14:42] 1 tRNA-Thr [2446,2519] 34 (tgt)
+[17:14:42] 1 tRNA-Asp c[74133,74209] 37 (gtc)
+[17:14:42] 2 tRNA-Met c[74877,74951] 35 (cat)
+[17:14:42] 1 tRNA-Arg [2972,3046] 34 (gcg)
+[17:14:42] 2 tRNA-Ile [15719,15791] 33 (tat)
+[17:14:42] 3 tRNA-Ala c[22873,22943] 33 (ggc)
+[17:14:42] 4 tRNA-Arg [26211,26283] 34 (cct)
+[17:14:42] 1 tRNA-Gln c[10150,10221] 33 (ctg)
+[17:14:42] 1 tRNA-Gly c[9238,9309] 33 (tcc)
+[17:14:42] 2 tRNA-Pro c[10811,10882] 33 (tgg)
+[17:14:42] 3 tRNA-Arg [54230,54302] 34 (tct)
+[17:14:42] 1 tRNA-Lys [10820,10893] 34 (ctt)
+[17:14:42] 2 tRNA-Ser [13590,13678] 36 (cga)
+[17:14:42] 1 tRNA-Leu c[7927,8011] 35 (cag)
+[17:14:42] 1 tRNA-Trp [3681,3752] 33 (cca)
+[17:14:42] 1 tRNA-Lys c[-1,74] 35 (ttt)
+[17:14:42] 1 tRNA-Met c[19383,19454] 33 (cat)
+[17:14:42] 2 tRNA-Gly c[36037,36110] 33 (ccc)
+[17:14:42] 3 tRNA-Thr c[42376,42449] 34 (cgt)
+[17:14:42] 1 tRNA-Ala [10795,10866] 33 (tgc)
+[17:14:42] 2 tRNA-Ile c[15665,15739] 33 (gat)
+[17:14:42] 1 tRNA-Ser c[1927,2012] 35 (gga)
+[17:14:42] 1 tRNA-Tyr [1073,1157] 35 (gta)
+[17:14:42] 1 tRNA-Leu [14350,14432] 35 (caa)
+[17:14:42] 1 tRNA-Ala c[609,679] 33 (cgc)
+[17:14:42] 2 tRNA-Pro c[10806,10879] 33 (cgg)
+[17:14:42] 3 tRNA-Arg c[13435,13509] 35 (tcg)
+[17:14:42] 1 tRNA-Asn [9658,9730] 33 (gtt)
+[17:14:42] 1 tRNA-Arg c[3049,3121] 34 (ccg)
+[17:14:42] 1 tRNA-Val [10257,10329] 33 (cac)
+[17:14:42] Found 37 tRNAs
+[17:14:42] Disabling rRNA search: --kingdom=Viruses or --norrna=0
+[17:14:42] Skipping ncRNA search, enable with --rfam if desired.
+[17:14:42] Total of 37 tRNA + rRNA features
+[17:14:42] Searching for CRISPR repeats
+[17:14:43] Found 0 CRISPRs
+[17:14:43] Predicting coding sequences
+[17:14:43] Contigs total 853445 bp, so using single mode
+[17:14:43] Running: prodigal -i results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.fna -c -m -g 1 -p single -f sco -q
+[17:14:43] Excluding CDS which overlaps existing RNA (tRNA) at MFHL01000002.1:694..2199 on + strand
+[17:14:43] Excluding CDS which overlaps existing RNA (tRNA) at MFHL01000002.1:11056..12015 on - strand
+[17:14:43] Excluding CDS which overlaps existing RNA (tRNA) at MFHL01000005.1:3046..3618 on + strand
+[17:14:44] Found 925 CDS
+[17:14:44] Connecting features back to sequences
+[17:14:44] Not using genus-specific database. Try --usegenus to enable it.
+[17:14:44] Annotating CDS, please be patient.
+[17:14:44] Will use 16 CPUs for similarity searching.
+[17:14:44] There are still 925 unannotated CDS left (started with 925)
+[17:14:44] Will use blast to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Viruses/sprot with 16 CPUs
+[17:14:44] Running: cat results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.sprot\.tmp\.3287596\.faa | parallel --gnu --plain -j 16 --block 7705 --recstart '>' --pipe blastp -query - -db /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Viruses/sprot -evalue 1e-09 -qcov_hsp_perc 80 -num_threads 1 -num_descriptions 1 -num_alignments 1 -seg no > results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.sprot\.tmp\.3287596\.blast 2> /dev/null
+[17:14:46] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/SAMN04315426.sprot.tmp.3287596.faa
+[17:14:46] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/SAMN04315426.sprot.tmp.3287596.blast
+[17:14:46] Labelling remaining 920 proteins as 'hypothetical protein'
+[17:14:46] Found 4 unique /gene codes.
+[17:14:46] Fixed 0 colliding /gene names.
+[17:14:46] Adding /locus_tag identifiers
+[17:14:46] Assigned 962 locus_tags to CDS and RNA features.
+[17:14:46] Writing outputs to results/PROKKA/CPR/SAMN04315426/
+[17:14:46] Generating annotation statistics file
+[17:14:46] Generating Genbank and Sequin files
+[17:14:46] Running: tbl2asn -V b -a r10k -l paired-ends -M n -N 1 -y 'Annotated using prokka 1.14.6 from https://github.com/tseemann/prokka' -Z results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.err -i results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.fsa 2> /dev/null
+[tbl2asn-forever] Found Prokka input, correcting dates in .gbf|.sqn files.
+[tbl2asn-forever] Correcting dates in results/PROKKA/CPR/SAMN04315426/SAMN04315426.gbf
+[tbl2asn-forever] Correcting dates in results/PROKKA/CPR/SAMN04315426/SAMN04315426.sqn
+[tbl2asn-forever] Dates changed from 01-JAN-2019 to 01-JUL-2023
+[17:14:48] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/errorsummary.val
+[17:14:48] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/SAMN04315426.dr
+[17:14:48] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/SAMN04315426.fixedproducts
+[17:14:48] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/SAMN04315426.ecn
+[17:14:48] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/SAMN04315426.val
+[17:14:48] Repairing broken .GBK output that tbl2asn produces...
+[17:14:48] Running: sed 's/COORDINATES: profile/COORDINATES:profile/' < results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.gbf > results\/PROKKA\/CPR\/SAMN04315426\/SAMN04315426\.gbk
+[17:14:48] Deleting unwanted file: results/PROKKA/CPR/SAMN04315426/SAMN04315426.gbf
+[17:14:48] Output files:
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.log
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.fna
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.gff
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.faa
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.ffn
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.tbl
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.fsa
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.tsv
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.txt
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.err
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.sqn
+[17:14:48] results/PROKKA/CPR/SAMN04315426/SAMN04315426.gbk
+[17:14:48] Annotation finished successfully.
+[17:14:48] Walltime used: 0.10 minutes
+[17:14:48] If you use this result please cite the Prokka paper:
+[17:14:48] Seemann T (2014) Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9.
+[17:14:48] Type 'prokka --citation' for more details.
+[17:14:48] Thank you, come again.
+20.89user 0.74system 0:06.30elapsed 343%CPU (0avgtext+0avgdata 117856maxresident)k
+14408inputs+45584outputs (0major+243647minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 17:14:48 EDT 2023
+Run Time   : 8 seconds
+======================================================
+

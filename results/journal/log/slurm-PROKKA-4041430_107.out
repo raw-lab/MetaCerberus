@@ -1,0 +1,297 @@
+=====================================================
+Start Time  : Wed Jun 28 12:03:48 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4041542 / PROKKA
+Node List   : str-c95
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading prokka/1.14.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running PROKKA On GTDB-100/genomes/bacteria/GCA_001820785.1.fna
+======================================================
+Bacteria
+[12:03:50] This is prokka 1.14.6
+[12:03:50] Written by Torsten Seemann <torsten.seemann@gmail.com>
+[12:03:50] Homepage is https://github.com/tseemann/prokka
+[12:03:50] Local time is Wed Jun 28 12:03:50 2023
+[12:03:50] You are jlfiguer
+[12:03:50] Operating system is linux
+[12:03:50] You have BioPerl 1.7.8
+Argument "1.7.8" isn't numeric in numeric lt (<) at /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka line 259.
+[12:03:50] System has 16 cores.
+[12:03:50] Will use maximum of 16 cores.
+[12:03:50] Annotating as >>> Bacteria <<<
+[12:03:50] Generating locus_tag from 'GTDB-100/genomes/bacteria/GCA_001820785.1.fna' contents.
+[12:03:50] Setting --locustag DCBJEJNH from MD5 dcb3e371f251962a4b6cf3619b816bea
+[12:03:50] Creating new output folder: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1
+[12:03:50] Running: mkdir -p results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1
+[12:03:50] Using filename prefix: GCA_001820785.1.XXX
+[12:03:50] Setting HMMER_NCPU=1
+[12:03:50] Writing log to: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.log
+[12:03:50] Command: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka --prefix GCA_001820785.1 --outdir results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1 --kingdom Bacteria --cpus 16 GTDB-100/genomes/bacteria/GCA_001820785.1.fna
+[12:03:50] Appending to PATH: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin
+[12:03:50] Looking for 'aragorn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/aragorn
+[12:03:50] Determined aragorn version is 001002 from 'ARAGORN v1.2.41 Dean Laslett'
+[12:03:50] Looking for 'barrnap' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/barrnap
+[12:03:50] Determined barrnap version is 000009 from 'barrnap 0.9'
+[12:03:50] Looking for 'blastp' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/blastp
+[12:03:50] Determined blastp version is 002013 from 'blastp: 2.13.0+'
+[12:03:50] Looking for 'cmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmpress
+[12:03:50] Determined cmpress version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[12:03:50] Looking for 'cmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmscan
+[12:03:50] Determined cmscan version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[12:03:50] Looking for 'egrep' - found /usr/bin/egrep
+[12:03:50] Looking for 'find' - found /usr/bin/find
+[12:03:50] Looking for 'grep' - found /usr/bin/grep
+[12:03:50] Looking for 'hmmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmpress
+[12:03:50] Determined hmmpress version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[12:03:50] Looking for 'hmmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmscan
+[12:03:50] Determined hmmscan version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[12:03:50] Looking for 'java' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/java
+[12:03:50] Looking for 'makeblastdb' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/makeblastdb
+[12:03:50] Determined makeblastdb version is 002013 from 'makeblastdb: 2.13.0+'
+[12:03:50] Looking for 'minced' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/minced
+[12:03:50] Determined minced version is 004002 from 'minced 0.4.2'
+[12:03:50] Looking for 'parallel' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/parallel
+[12:03:51] Determined parallel version is 20230122 from 'GNU parallel 20230122'
+[12:03:51] Looking for 'prodigal' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prodigal
+[12:03:51] Determined prodigal version is 002006 from 'Prodigal V2.6.3: February, 2016'
+[12:03:51] Looking for 'prokka-genbank_to_fasta_db' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka-genbank_to_fasta_db
+[12:03:51] Looking for 'sed' - found /usr/bin/sed
+[12:03:51] Looking for 'tbl2asn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/tbl2asn
+[12:03:51] Determined tbl2asn version is 025007 from 'tbl2asn 25.7   arguments:'
+[12:03:51] Using genetic code table 11.
+[12:03:51] Loading and checking input file: GTDB-100/genomes/bacteria/GCA_001820785.1.fna
+[12:03:51] Wrote 49 contigs totalling 1242788 bp.
+[12:03:51] Predicting tRNAs and tmRNAs
+[12:03:51] Running: aragorn -l -gc11  -w results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.fna
+[12:03:51] 1 tRNA-Gln c[4401,4472] 33 (ctg)
+[12:03:51] 2 tRNA-Thr c[20211,20283] 33 (cgt)
+[12:03:51] 3 tRNA-Gly c[48523,48594] 33 (ccc)
+[12:03:51] 1 tRNA-Tyr c[7977,8063] 35 (gta)
+[12:03:51] 2 tRNA-Thr c[8266,8337] 33 (tgt)
+[12:03:51] 1 tRNA-Gly c[123,200] 36 (gcc)
+[12:03:51] 2 tRNA-Trp c[210,296] 35 (cca)
+[12:03:51] 3 tRNA-Phe c[401,476] 34 (gaa)
+[12:03:51] 4 tRNA-Glu c[486,564] 37 (ctc)
+[12:03:51] 5 tRNA-Asp c[631,707] 35 (gtc)
+[12:03:51] 6 tRNA-Cys c[810,883] 33 (gca)
+[12:03:51] 7 tRNA-His c[900,975] 35 (gtg)
+[12:03:51] 8 tRNA-Gly c[1043,1119] 35 (tcc)
+[12:03:51] 9 tRNA-Ala c[1134,1205] 33 (tgc)
+[12:03:51] 10 tRNA-Pro c[1214,1291] 36 (tgg)
+[12:03:51] 11 tRNA-Met c[1332,1411] 38 (cat)
+[12:03:51] 12 tRNA-Gln c[1586,1659] 33 (ttg)
+[12:03:51] 13 tRNA-Asn c[1670,1746] 34 (gtt)
+[12:03:51] 14 tRNA-Glu c[1809,1887] 37 (ttc)
+[12:03:51] 1 tRNA-Ser c[161,250] 35 (tga)
+[12:03:51] 1 tRNA-Ser c[281,372] 35 (gct)
+[12:03:51] 2 tRNA-Met [19113,19184] 33 (cat)
+[12:03:51] 1 tRNA-Leu [3383,3467] 35 (cag)
+[12:03:51] 1 tRNA-His c[117,189] 34 (gtg)
+[12:03:51] 2 tRNA-Arg c[779,850] 34 (tct)
+[12:03:51] 3 tRNA-Ile c[28689,28765] 35 (tat)
+[12:03:51] 4 tRNA-Met c[28783,28859] 35 (cat)
+[12:03:51] 5 tRNA-Leu c[28876,28960] 35 (caa)
+[12:03:51] 6 tRNA-Leu c[28972,29056] 35 (taa)
+[12:03:51] 7 tRNA-Lys c[29074,29149] 34 (ttt)
+[12:03:51] 8 tRNA-Arg c[29366,29443] 36 (tct)
+[12:03:51] 9 tRNA-Ile c[29455,29530] 34 (gat)
+[12:03:51] 10 tRNA-Arg c[29666,29741] 34 (tcg)
+[12:03:51] 11 tRNA-Val c[29755,29830] 34 (tac)
+[12:03:51] 12 tRNA-Ser c[29849,29939] 37 (tga)
+[12:03:51] 13 tRNA-Thr c[29948,30026] 37 (tgt)
+[12:03:51] 14 tRNA-Leu c[30037,30125] 37 (gag)
+[12:03:51] 15 tRNA-Leu c[30280,30364] 35 (tag)
+[12:03:51] 16 tRNA-Tyr c[30385,30475] 36 (gta)
+[12:03:51] 17 tRNA-Lys c[30481,30555] 33 (ctt)
+[12:03:51] 1 tRNA-Val [6057,6128] 33 (gac)
+[12:03:51] 2 tRNA-Glu [15237,15309] 34 (ttc)
+[12:03:51] 3 tRNA-Arg [16099,16171] 34 (gcg)
+[12:03:51] 4 tRNA-Arg [24385,24458] 35 (cct)
+[12:03:51] 1 tRNA-Val c[2856,2929] 34 (cac)
+[12:03:51] 2 tRNA-Leu [17704,17786] 35 (tag)
+[12:03:51] 1 tRNA-Ser [1107,1195] 36 (gga)
+[12:03:51] 1 tRNA-Asp c[6626,6704] 37 (gtc)
+[12:03:51] 2 tRNA-Met c[8887,8960] 35 (cat)
+[12:03:51] 1 tRNA-Pro c[23434,23507] 33 (ggg)
+[12:03:51] 1 tRNA-Gln [15115,15186] 33 (ttg)
+[12:03:51] 1 tRNA-Leu c[19506,19586] 34 (caa)
+[12:03:51] 2 tmRNA [37046,37479] 94,168 ANLSTWQKAFAAFNGRIGFAPAFA*
+[12:03:51] 1 tRNA-Glu [6387,6459] 34 (ctc)
+[12:03:51] 2 tRNA-Lys [44778,44852] 35 (ttt)
+[12:03:51] 3 tRNA-Ala c[47784,47855] 33 (tgc)
+[12:03:51] 1 tRNA-Ile [5417,5492] 34 (tat)
+[12:03:51] 2 tRNA-Ala c[16995,17065] 33 (ggc)
+[12:03:51] 3 tRNA-Ser [18335,18423] 36 (cga)
+[12:03:51] 4 tRNA-Cys [22026,22099] 34 (gca)
+[12:03:51] 5 tRNA-Leu [22193,22279] 35 (taa)
+[12:03:51] 6 tRNA-Lys [27899,27973] 35 (ctt)
+[12:03:51] 1 tRNA-Pro [1088,1161] 33 (tgg)
+[12:03:51] Found 63 tRNAs
+[12:03:51] Predicting Ribosomal RNAs
+[12:03:51] Running Barrnap with 16 threads
+[12:03:52] 1 MHQW01000004.1 14524 23S ribosomal RNA
+[12:03:52] 2 MHQW01000004.1 19071 23S ribosomal RNA (partial)
+[12:03:52] 3 MHQW01000017.1 683 16S ribosomal RNA (partial)
+[12:03:52] Found 3 rRNAs
+[12:03:52] Skipping ncRNA search, enable with --rfam if desired.
+[12:03:52] Total of 65 tRNA + rRNA features
+[12:03:52] Searching for CRISPR repeats
+[12:03:52] Found 0 CRISPRs
+[12:03:52] Predicting coding sequences
+[12:03:52] Contigs total 1242788 bp, so using single mode
+[12:03:52] Running: prodigal -i results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.fna -c -m -g 11 -p single -f sco -q
+[12:03:56] Excluding CDS which overlaps existing RNA (rRNA) at MHQW01000004.1:16399..16560 on - strand
+[12:03:56] Excluding CDS which overlaps existing RNA (rRNA) at MHQW01000004.1:17870..18052 on - strand
+[12:03:56] Excluding CDS which overlaps existing RNA (tRNA) at MHQW01000013.1:710..889 on - strand
+[12:03:56] Excluding CDS which overlaps existing RNA (tRNA) at MHQW01000027.1:3426..5366 on + strand
+[12:03:56] Excluding CDS which overlaps existing RNA (tRNA) at MHQW01000034.1:2745..2897 on + strand
+[12:03:56] Excluding CDS which overlaps existing RNA (tRNA) at MHQW01000038.1:8950..9147 on - strand
+[12:03:56] Excluding CDS which overlaps existing RNA (tRNA) at MHQW01000042.1:44790..45041 on - strand
+[12:03:56] Excluding CDS which overlaps existing RNA (tRNA) at MHQW01000042.1:46315..48042 on + strand
+[12:03:56] Excluding CDS which overlaps existing RNA (tRNA) at MHQW01000043.1:18358..18999 on + strand
+[12:03:56] Found 1284 CDS
+[12:03:56] Connecting features back to sequences
+[12:03:56] Not using genus-specific database. Try --usegenus to enable it.
+[12:03:56] Annotating CDS, please be patient.
+[12:03:56] Will use 16 CPUs for similarity searching.
+[12:03:57] There are still 1284 unannotated CDS left (started with 1284)
+[12:03:57] Will use blast to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Bacteria/IS with 16 CPUs
+[12:03:57] Running: cat results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.IS\.tmp\.673143\.faa | parallel --gnu --plain -j 16 --block 11342 --recstart '>' --pipe blastp -query - -db /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Bacteria/IS -evalue 1e-30 -qcov_hsp_perc 90 -num_threads 1 -num_descriptions 1 -num_alignments 1 -seg no > results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.IS\.tmp\.673143\.blast 2> /dev/null
+[12:03:59] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.IS.tmp.673143.faa
+[12:03:59] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.IS.tmp.673143.blast
+[12:03:59] There are still 1284 unannotated CDS left (started with 1284)
+[12:03:59] Will use blast to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Bacteria/AMR with 16 CPUs
+[12:03:59] Running: cat results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.AMR\.tmp\.673143\.faa | parallel --gnu --plain -j 16 --block 11342 --recstart '>' --pipe blastp -query - -db /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Bacteria/AMR -evalue 1e-300 -qcov_hsp_perc 90 -num_threads 1 -num_descriptions 1 -num_alignments 1 -seg no > results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.AMR\.tmp\.673143\.blast 2> /dev/null
+[12:04:01] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.AMR.tmp.673143.faa
+[12:04:01] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.AMR.tmp.673143.blast
+[12:04:01] There are still 1284 unannotated CDS left (started with 1284)
+[12:04:01] Will use blast to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Bacteria/sprot with 16 CPUs
+[12:04:01] Running: cat results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.sprot\.tmp\.673143\.faa | parallel --gnu --plain -j 16 --block 11342 --recstart '>' --pipe blastp -query - -db /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Bacteria/sprot -evalue 1e-09 -qcov_hsp_perc 80 -num_threads 1 -num_descriptions 1 -num_alignments 1 -seg no > results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.sprot\.tmp\.673143\.blast 2> /dev/null
+[12:04:08] Modify product: Uncharacterized protein YqeY => putative protein YqeY
+[12:04:08] Modify product: Uncharacterized sugar kinase YdjH => putative sugar kinase YdjH
+[12:04:08] Modify product: Probable nicotinate-nucleotide adenylyltransferase => putative nicotinate-nucleotide adenylyltransferase
+[12:04:08] Modify product: Probable fructose-bisphosphate aldolase => putative fructose-bisphosphate aldolase
+[12:04:08] Modify product: Putative 2-hydroxyacid dehydrogenase SA2098 => Putative 2-hydroxyacid dehydrogenase
+[12:04:08] Modify product: Uncharacterized ABC transporter ATP-binding protein YbiT => putative ABC transporter ATP-binding protein YbiT
+[12:04:08] Modify product: Ribonuclease TTHA0252 => Ribonuclease
+[12:04:08] Modify product: UPF0213 protein BH0048 => hypothetical protein
+[12:04:08] Modify product: N-glycosidase Npun_R5314 => N-glycosidase
+[12:04:08] Modify product: Uncharacterized zinc protease Rv2782c => putative zinc protease
+[12:04:08] Modify product: UPF0053 protein Rv2366c => hypothetical protein
+[12:04:08] Modify product: Putative multidrug export ATP-binding/permease protein SAV1866 => Putative multidrug export ATP-binding/permease protein
+[12:04:08] Modify product: Uncharacterized zinc protease Rv2782c => putative zinc protease
+[12:04:08] Modify product: Bifunctional protein FolD => Bifunctional protein FolD protein
+[12:04:08] Modify product: Protein aq_1857 => Protein
+[12:04:08] Modify product: Probable peptidoglycan glycosyltransferase FtsW => putative peptidoglycan glycosyltransferase FtsW
+[12:04:08] Modify product: Ribonuclease TTHA0252 => Ribonuclease
+[12:04:08] Modify product: Probable transcriptional regulatory protein aq_1575 => putative transcriptional regulatory protein
+[12:04:08] Modify product: Probable tRNA-dihydrouridine synthase => putative tRNA-dihydrouridine synthase
+[12:04:08] Modify product: Protease HtpX homolog => Protease HtpX 
+[12:04:09] Modify product: Probable acetyl-CoA acyltransferase => putative acetyl-CoA acyltransferase
+[12:04:09] Modify product: 60 kDa SS-A/Ro ribonucleoprotein homolog => 60 kDa SS-A/Ro ribonucleoprotein 
+[12:04:09] Modify product: Vitamin K epoxide reductase homolog => Vitamin K epoxide reductase 
+[12:04:09] Modify product: Vitamin K epoxide reductase homolog => Vitamin K epoxide reductase 
+[12:04:09] Modify product: Uncharacterized ABC transporter ATP-binding protein YknY => putative ABC transporter ATP-binding protein YknY
+[12:04:09] Modify product: Probable endonuclease 4 => putative endonuclease 4
+[12:04:09] Cleaned 26 /product names
+[12:04:09] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.sprot.tmp.673143.faa
+[12:04:09] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.sprot.tmp.673143.blast
+[12:04:09] There are still 915 unannotated CDS left (started with 1284)
+[12:04:09] Will use hmmer3 to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/hmm/HAMAP.hmm with 16 CPUs
+[12:04:09] Running: cat results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.HAMAP\.hmm\.tmp\.673143\.faa | parallel --gnu --plain -j 16 --block 7184 --recstart '>' --pipe hmmscan --noali --notextw --acc -E 1e-09 --cpu 1 /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/hmm/HAMAP.hmm /dev/stdin > results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.HAMAP\.hmm\.tmp\.673143\.hmmer3 2> /dev/null
+[12:04:14] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.HAMAP.hmm.tmp.673143.faa
+[12:04:14] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.HAMAP.hmm.tmp.673143.hmmer3
+[12:04:14] Labelling remaining 817 proteins as 'hypothetical protein'
+[12:04:14] Possible /pseudo 'Depupylase' at MHQW01000039.1 position 26464
+[12:04:14] Possible /pseudo 'DNA polymerase IV' at MHQW01000042.1 position 7808
+[12:04:14] Possible /pseudo 'Methylmalonyl-CoA mutase' at MHQW01000047.1 position 5624
+[12:04:14] Possible /pseudo 'Vitamin K epoxide reductase ' at MHQW01000049.1 position 3742
+[12:04:14] Found 386 unique /gene codes.
+[12:04:14] Fixed 4 duplicate /gene - COQ5_1 COQ5_2 COQ5_3 COQ5_4
+[12:04:14] Fixed 2 duplicate /gene - mreB_1 mreB_2
+[12:04:14] Fixed 2 duplicate /gene - rgtE_1 rgtE_2
+[12:04:14] Fixed 2 duplicate /gene - atpG_1 atpG_2
+[12:04:14] Fixed 2 duplicate /gene - nadE_1 nadE_2
+[12:04:14] Fixed 3 duplicate /gene - sasA_1 sasA_2 sasA_3
+[12:04:14] Fixed 2 duplicate /gene - guaB_1 guaB_2
+[12:04:14] Fixed 2 duplicate /gene - atpA_1 atpA_2
+[12:04:14] Fixed 2 duplicate /gene - epsF_1 epsF_2
+[12:04:14] Fixed 2 duplicate /gene - copA_1 copA_2
+[12:04:14] Fixed 2 duplicate /gene - rasP_1 rasP_2
+[12:04:14] Fixed 3 duplicate /gene - ftsH_1 ftsH_2 ftsH_3
+[12:04:14] Fixed 3 duplicate /gene - atpD_1 atpD_2 atpD_3
+[12:04:14] Fixed 2 duplicate /gene - lemA_1 lemA_2
+[12:04:14] Fixed 2 duplicate /gene - rfbB_1 rfbB_2
+[12:04:14] Fixed 2 duplicate /gene - gpmA_1 gpmA_2
+[12:04:14] Fixed 2 duplicate /gene - legI_1 legI_2
+[12:04:14] Fixed 2 duplicate /gene - ruvB_1 ruvB_2
+[12:04:14] Fixed 3 duplicate /gene - mshA_1 mshA_2 mshA_3
+[12:04:14] Fixed 2 duplicate /gene - dop_1 dop_2
+[12:04:14] Fixed 2 duplicate /gene - epsE_1 epsE_2
+[12:04:14] Fixed 5 duplicate /gene - pafA_1 pafA_2 pafA_3 pafA_4 pafA_5
+[12:04:14] Fixed 2 duplicate /gene - metG_1 metG_2
+[12:04:14] Fixed 2 duplicate /gene - nudC_1 nudC_2
+[12:04:14] Fixed 2 duplicate /gene - mpa_1 mpa_2
+[12:04:14] Fixed 2 duplicate /gene - nth_1 nth_2
+[12:04:14] Fixed 2 duplicate /gene - dinB_1 dinB_2
+[12:04:14] Fixed 2 duplicate /gene - tolB_1 tolB_2
+[12:04:14] Fixed 2 duplicate /gene - IMPDH_1 IMPDH_2
+[12:04:14] Fixed 2 duplicate /gene - mtgA_1 mtgA_2
+[12:04:14] Fixed 2 duplicate /gene - tmk_1 tmk_2
+[12:04:14] Fixed 2 duplicate /gene - scpA_1 scpA_2
+[12:04:14] Fixed 2 duplicate /gene - speE_1 speE_2
+[12:04:14] Fixed 2 duplicate /gene - purD_1 purD_2
+[12:04:14] Fixed 2 duplicate /gene - xpsE_1 xpsE_2
+[12:04:14] Fixed 4 duplicate /gene - ftsA_1 ftsA_2 ftsA_3 ftsA_4
+[12:04:14] Fixed 2 duplicate /gene - mltG_1 mltG_2
+[12:04:14] Fixed 2 duplicate /gene - gph_1 gph_2
+[12:04:14] Fixed 38 colliding /gene names.
+[12:04:14] Adding /locus_tag identifiers
+[12:04:14] Assigned 1350 locus_tags to CDS and RNA features.
+[12:04:14] Writing outputs to results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/
+[12:04:14] Generating annotation statistics file
+[12:04:14] Generating Genbank and Sequin files
+[12:04:14] Running: tbl2asn -V b -a r10k -l paired-ends -M n -N 1 -y 'Annotated using prokka 1.14.6 from https://github.com/tseemann/prokka' -Z results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.err -i results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.fsa 2> /dev/null
+[tbl2asn-forever] Found Prokka input, correcting dates in .gbf|.sqn files.
+[tbl2asn-forever] Correcting dates in results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.gbf
+[tbl2asn-forever] Correcting dates in results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.sqn
+[tbl2asn-forever] Dates changed from 01-JAN-2019 to 28-JUN-2023
+[12:04:17] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/errorsummary.val
+[12:04:17] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.dr
+[12:04:17] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.fixedproducts
+[12:04:17] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.ecn
+[12:04:17] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.val
+[12:04:17] Repairing broken .GBK output that tbl2asn produces...
+[12:04:17] Running: sed 's/COORDINATES: profile/COORDINATES:profile/' < results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.gbf > results\/PROKKA\/GTDB\-100\/genomes\/bacteria\/GCA_001820785\.1\/GCA_001820785\.1\.gbk
+[12:04:17] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.gbf
+[12:04:17] Output files:
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.log
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.fna
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.gff
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.faa
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.ffn
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.tbl
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.fsa
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.tsv
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.txt
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.err
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.sqn
+[12:04:17] results/PROKKA/GTDB-100/genomes/bacteria/GCA_001820785.1/GCA_001820785.1.gbk
+[12:04:17] Annotation finished successfully.
+[12:04:17] Walltime used: 0.45 minutes
+[12:04:17] If you use this result please cite the Prokka paper:
+[12:04:17] Seemann T (2014) Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9.
+[12:04:17] Type 'prokka --citation' for more details.
+[12:04:17] Share and enjoy!
+171.45user 27.30system 0:26.73elapsed 743%CPU (0avgtext+0avgdata 353016maxresident)k
+53552inputs+170936outputs (38major+5279464minor)pagefaults 0swaps
+
+======================================================
+End Time   : Wed Jun 28 12:04:17 EDT 2023
+Run Time   : 29 seconds
+======================================================
+
