@@ -217,7 +217,6 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
     # Update Graph Colors & Export
     os.makedirs(os.path.join(outpath, "combined", "img"),exist_ok=True)
     for key in figPlots.keys():
-        print(key)
         figPlots[key].update_layout(dict(plot_bgcolor='White', paper_bgcolor='White'))
         figPlots[key].update_xaxes(showline=True, linewidth=2, linecolor='black')
         figPlots[key].update_yaxes( showline=True, linewidth=2, linecolor='black',

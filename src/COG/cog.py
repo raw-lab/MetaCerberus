@@ -21,15 +21,15 @@ cog_out = "COG-onto_rel1.tsv"
 #2. Hexadecimal RGB color associated with the functional category
 #3. Functional category description
 
-#L1	L2	L3	KO	Function	EC
+#L1	L2	L3	ID	Function	EC
 #Metabolism	Carbohydrate metabolism	Glycolysis / Gluconeogenesis [PATH:ko00010]	K00844	HK; hexokinase	2.7.1.1
 
 
 fun = Path(fun_lookup).read_text()
 with open(cog_onto) as cog, open(cog_out, 'w') as writer:
-    print('L1', 'L2', 'L3', 'KO', 'Function', 'EC', sep='\t', file=writer)
+    print('L1', 'L2', 'ID', 'Function', 'EC', sep='\t', file=writer)
     for line in cog:
         COG_ID, FUN_CAT, NAME, GENE, PATHWAY, PUBMED, PDB_ID = line.strip('\n').split('\t')
         for c in FUN_CAT:
             COLOR,CAT = re.search(rf'{c}\t(.*)\t(.*)', fun).groups()
-            print(CAT, NAME, '', COG_ID, f"{GENE}:{PATHWAY}", '', sep='\t', file=writer)
+            print(CAT, NAME, COG_ID, f"{GENE}; {PATHWAY}", '', sep='\t', file=writer)

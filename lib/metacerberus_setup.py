@@ -54,8 +54,8 @@ def Download(pathDB):
     pathDB.mkdir(exist_ok=True, parents=True)
     print(f"Downloading Database files to {pathDB}")
     print("This will take a few minutes...")
-    url.urlretrieve("https://osf.io/muan4/download", Path(pathDB, "FOAM-onto_rel1.tsv"))#, reporthook=progress)
-    url.urlretrieve("https://osf.io/2hp7t/download", Path(pathDB, "KEGG-onto_rel1.tsv"))#, reporthook=progress)
+    url.urlretrieve("https://osf.io/d5m6h/download", Path(pathDB, "FOAM-onto_rel1.tsv"))#, reporthook=progress)
+    url.urlretrieve("https://osf.io/jgk73/download", Path(pathDB, "KEGG-onto_rel1.tsv"))#, reporthook=progress)
 
     url.urlretrieve("https://osf.io/cuw94/download", Path(pathDB, "CAZy-onto_rel1.tsv"))#, reporthook=progress)
     url.urlretrieve("https://osf.io/579bc/download", Path(pathDB, "COG-onto_rel1.tsv"))#, reporthook=progress)
