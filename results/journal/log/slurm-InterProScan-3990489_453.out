@@ -1,0 +1,29 @@
+=====================================================
+Start Time  : Sat Jun 24 21:42:33 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3996929 / InterProScan
+Node List   : str-c109
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On VIRAL_ARCHAEA/GCA_020497825.1.fna
+======================================================
+24/06/2023 21:42:34:354 Welcome to InterProScan-5.60-92.0
+24/06/2023 21:42:34:354 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 21:42:38:359 RunID: str-c109.uncc.edu_20230624_214238191_5lwb
+24/06/2023 21:42:46:630 Loading file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/GCA_020497825.1.fna
+
+The FASTA input file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/GCA_020497825.1.fna is empty.
+Therefore there are no sequences for InterproScan to analyse
+Finishing...
+42.68user 1.83system 0:12.95elapsed 343%CPU (0avgtext+0avgdata 2711920maxresident)k
+2384inputs+304outputs (9major+212477minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 21:42:46 EDT 2023
+Run Time   : 13 seconds
+======================================================
+

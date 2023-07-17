@@ -1,0 +1,33 @@
+=====================================================
+Start Time  : Sat Jul  1 20:11:15 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4129808 / InterProScan
+Node List   : str-c102
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On VIRAL_ARCHAEA/GCA_000888415.1.fna
+======================================================
+01/07/2023 20:11:23:108 Welcome to InterProScan-5.60-92.0
+01/07/2023 20:11:23:109 Running InterProScan v5 in STANDALONE mode... on Linux
+01/07/2023 20:11:28:370 RunID: str-c102.uncc.edu_20230701_201128166_eldq
+01/07/2023 20:11:37:109 Loading file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/GCA_000888415.1.fna
+01/07/2023 20:11:37:584 Running the following analyses:
+[AntiFam-7.0,CDD-3.20,Coils-2.2.1,FunFam-4.3.0,Gene3D-4.3.0,Hamap-2021_04,MobiDBLite-2.0,PANTHER-17.0,Pfam-35.0,PIRSF-3.10,PIRSR-2021_05,PRINTS-42.0,ProSitePatterns-2022_01,ProSiteProfiles-2022_01,SFLD-4,SMART-7.1,SUPERFAMILY-1.75,TIGRFAM-15.0]
+Pre-calculated match lookup service DISABLED.  Please wait for match calculations to complete...
+2023-07-01 20:14:10,602 [amqEmbeddedWorkerJmsContainer-10] [uk.ac.ebi.interpro.scan.management.model.implementations.WriteOutputStep:344] WARN - At write output completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c102.uncc.edu_20230701_201128166_eldq
+01/07/2023 20:14:10:630 100% done:  InterProScan analyses completed 
+
+2023-07-01 20:14:11,132 [main] [uk.ac.ebi.interpro.scan.jms.master.AbstractMaster:259] WARN - Master process unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c102.uncc.edu_20230701_201128166_eldq
+2023-07-01 20:14:11,138 [main] [uk.ac.ebi.interpro.scan.jms.main.Run:1778] WARN - At Run completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c102.uncc.edu_20230701_201128166_eldq
+241.33user 27.16system 2:52.60elapsed 155%CPU (0avgtext+0avgdata 3340560maxresident)k
+16689496inputs+479336outputs (5279major+1976917minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 20:14:11 EDT 2023
+Run Time   : 176 seconds
+======================================================
+

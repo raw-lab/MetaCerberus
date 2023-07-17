@@ -1,0 +1,204 @@
+=====================================================
+Start Time  : Sat Jun 24 21:42:38 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3996933 / InterProScan
+Node List   : str-c99
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On VIRAL_ARCHAEA/GCA_000896815.1.fna
+======================================================
+24/06/2023 21:42:39:980 Welcome to InterProScan-5.60-92.0
+24/06/2023 21:42:39:980 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 21:42:44:159 RunID: str-c99.uncc.edu_20230624_214243982_fxlu
+24/06/2023 21:42:52:961 Loading file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/GCA_000896815.1.fna
+
+The FASTA input file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/GCA_000896815.1.fna is empty.
+Therefore there are no sequences for InterproScan to analyse
+Finishing...
+21:42:52.967 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper - Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-199]
+21:42:52.970 [main] ERROR org.springframework.transaction.interceptor.TransactionInterceptor - Application exception overridden by rollback exception
+javax.persistence.PersistenceException: org.hibernate.exception.JDBCConnectionException: could not read next row of results
+	at org.hibernate.internal.ExceptionConverterImpl.convert(ExceptionConverterImpl.java:154) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.ExceptionConverterImpl.convert(ExceptionConverterImpl.java:181) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1538) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.Query.getResultList(Query.java:165) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at uk.ac.ebi.interpro.scan.management.dao.StepInstanceDAOImpl.retrieveUnfinishedStepInstances(StepInstanceDAOImpl.java:101) ~[interproscan-management-5.60-92.0.jar:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:564) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:344) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:367) [spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118) [spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) [spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) [spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at com.sun.proxy.$Proxy83.retrieveUnfinishedStepInstances(Unknown Source) [?:?]
+	at uk.ac.ebi.interpro.scan.jms.master.StandaloneBlackBoxMaster.run(StandaloneBlackBoxMaster.java:262) [interproscan-5.jar:?]
+	at uk.ac.ebi.interpro.scan.jms.main.Run.main(Run.java:413) [interproscan-5.jar:?]
+Caused by: org.hibernate.exception.JDBCConnectionException: could not read next row of results
+	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:48) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:42) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:113) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:99) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.process.internal.CollectionReferenceInitializerImpl.finishUpRow(CollectionReferenceInitializerImpl.java:113) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.process.internal.AbstractRowReader.readRow(AbstractRowReader.java:121) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.process.internal.ResultSetProcessorImpl.extractResults(ResultSetProcessorImpl.java:122) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.internal.AbstractLoadPlanBasedLoader.executeLoad(AbstractLoadPlanBasedLoader.java:122) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.internal.AbstractLoadPlanBasedLoader.executeLoad(AbstractLoadPlanBasedLoader.java:86) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.collection.plan.AbstractLoadPlanBasedCollectionInitializer.initialize(AbstractLoadPlanBasedCollectionInitializer.java:87) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.persister.collection.AbstractCollectionPersister.initialize(AbstractCollectionPersister.java:706) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.event.internal.DefaultInitializeCollectionEventListener.onInitializeCollection(DefaultInitializeCollectionEventListener.java:75) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.SessionImpl.initializeCollection(SessionImpl.java:2286) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection$4.doWork(AbstractPersistentCollection.java:585) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection.withTemporarySessionIfNeeded(AbstractPersistentCollection.java:263) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection.initialize(AbstractPersistentCollection.java:581) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection.forceInitialization(AbstractPersistentCollection.java:773) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.internal.StatefulPersistenceContext.initializeNonLazyCollections(StatefulPersistenceContext.java:927) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:345) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2695) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2678) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2512) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.list(Loader.java:2507) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.hql.QueryLoader.list(QueryLoader.java:504) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.hql.internal.ast.QueryTranslatorImpl.list(QueryTranslatorImpl.java:396) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.query.spi.HQLQueryPlan.performList(HQLQueryPlan.java:224) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.SessionImpl.list(SessionImpl.java:1538) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.doList(AbstractProducedQuery.java:1561) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1529) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	... 16 more
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:617) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:205) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:181) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:170) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcConnection.checkClosed(JdbcConnection.java:1571) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcStatement.checkClosed(JdbcStatement.java:1237) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcPreparedStatement.checkClosed(JdbcPreparedStatement.java:1829) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcStatement.checkClosed(JdbcStatement.java:1211) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcResultSet.checkClosed(JdbcResultSet.java:3245) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcResultSet.getColumnIndex(JdbcResultSet.java:3155) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcResultSet.get(JdbcResultSet.java:3287) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcResultSet.getLong(JdbcResultSet.java:678) ~[h2-1.4.199.jar:1.4.199]
+	at org.hibernate.type.descriptor.sql.BigIntTypeDescriptor$2.doExtract(BigIntTypeDescriptor.java:63) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.type.descriptor.sql.BasicExtractor.extract(BasicExtractor.java:47) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.type.AbstractStandardBasicType.nullSafeGet(AbstractStandardBasicType.java:257) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.type.AbstractStandardBasicType.nullSafeGet(AbstractStandardBasicType.java:253) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.type.AbstractStandardBasicType.nullSafeGet(AbstractStandardBasicType.java:243) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.type.AbstractStandardBasicType.hydrate(AbstractStandardBasicType.java:329) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.persister.collection.AbstractCollectionPersister.readKey(AbstractCollectionPersister.java:904) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.process.internal.CollectionReferenceInitializerImpl.finishUpRow(CollectionReferenceInitializerImpl.java:49) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.process.internal.AbstractRowReader.readRow(AbstractRowReader.java:121) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.process.internal.ResultSetProcessorImpl.extractResults(ResultSetProcessorImpl.java:122) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.internal.AbstractLoadPlanBasedLoader.executeLoad(AbstractLoadPlanBasedLoader.java:122) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.plan.exec.internal.AbstractLoadPlanBasedLoader.executeLoad(AbstractLoadPlanBasedLoader.java:86) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.collection.plan.AbstractLoadPlanBasedCollectionInitializer.initialize(AbstractLoadPlanBasedCollectionInitializer.java:87) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.persister.collection.AbstractCollectionPersister.initialize(AbstractCollectionPersister.java:706) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.event.internal.DefaultInitializeCollectionEventListener.onInitializeCollection(DefaultInitializeCollectionEventListener.java:75) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.SessionImpl.initializeCollection(SessionImpl.java:2286) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection$4.doWork(AbstractPersistentCollection.java:585) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection.withTemporarySessionIfNeeded(AbstractPersistentCollection.java:263) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection.initialize(AbstractPersistentCollection.java:581) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.collection.internal.AbstractPersistentCollection.forceInitialization(AbstractPersistentCollection.java:773) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.internal.StatefulPersistenceContext.initializeNonLazyCollections(StatefulPersistenceContext.java:927) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:345) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2695) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2678) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2512) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.list(Loader.java:2507) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.hql.QueryLoader.list(QueryLoader.java:504) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.hql.internal.ast.QueryTranslatorImpl.list(QueryTranslatorImpl.java:396) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.query.spi.HQLQueryPlan.performList(HQLQueryPlan.java:224) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.SessionImpl.list(SessionImpl.java:1538) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.doList(AbstractProducedQuery.java:1561) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1529) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	... 16 more
+2023-06-24 21:42:52,978 [main] [uk.ac.ebi.interpro.scan.jms.master.StandaloneBlackBoxMaster:363] ERROR - Exception thrown by StandaloneBlackBoxMaster: 
+org.springframework.transaction.TransactionSystemException: Could not roll back JPA transaction; nested exception is org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+	at org.springframework.orm.jpa.JpaTransactionManager.doRollback(JpaTransactionManager.java:565) ~[spring-orm-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processRollback(AbstractPlatformTransactionManager.java:835) ~[spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.rollback(AbstractPlatformTransactionManager.java:809) ~[spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.completeTransactionAfterThrowing(TransactionAspectSupport.java:651) ~[spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371) ~[spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118) ~[spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at com.sun.proxy.$Proxy83.retrieveUnfinishedStepInstances(Unknown Source) ~[?:?]
+	at uk.ac.ebi.interpro.scan.jms.master.StandaloneBlackBoxMaster.run(StandaloneBlackBoxMaster.java:262) [interproscan-5.jar:?]
+	at uk.ac.ebi.interpro.scan.jms.main.Run.main(Run.java:413) [interproscan-5.jar:?]
+Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+	at org.hibernate.resource.jdbc.internal.AbstractLogicalConnectionImplementor.rollback(AbstractLogicalConnectionImplementor.java:122) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.rollback(JdbcResourceLocalTransactionCoordinatorImpl.java:294) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.transaction.internal.TransactionImpl.rollback(TransactionImpl.java:145) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.springframework.orm.jpa.JpaTransactionManager.doRollback(JpaTransactionManager.java:561) ~[spring-orm-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	... 10 more
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:617) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:205) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:181) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:170) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcConnection.checkClosed(JdbcConnection.java:1571) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcConnection.checkClosedForWrite(JdbcConnection.java:1557) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcConnection.rollback(JdbcConnection.java:561) ~[h2-1.4.199.jar:1.4.199]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:564) ~[?:?]
+	at org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy$LazyConnectionInvocationHandler.invoke(LazyConnectionDataSourceProxy.java:385) ~[spring-jdbc-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at com.sun.proxy.$Proxy30.rollback(Unknown Source) ~[?:?]
+	at org.hibernate.resource.jdbc.internal.AbstractLogicalConnectionImplementor.rollback(AbstractLogicalConnectionImplementor.java:116) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.rollback(JdbcResourceLocalTransactionCoordinatorImpl.java:294) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.transaction.internal.TransactionImpl.rollback(TransactionImpl.java:145) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.springframework.orm.jpa.JpaTransactionManager.doRollback(JpaTransactionManager.java:561) ~[spring-orm-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	... 10 more
+org.springframework.transaction.TransactionSystemException: Could not roll back JPA transaction; nested exception is org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+	at org.springframework.orm.jpa.JpaTransactionManager.doRollback(JpaTransactionManager.java:565)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.processRollback(AbstractPlatformTransactionManager.java:835)
+	at org.springframework.transaction.support.AbstractPlatformTransactionManager.rollback(AbstractPlatformTransactionManager.java:809)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.completeTransactionAfterThrowing(TransactionAspectSupport.java:651)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:371)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212)
+	at com.sun.proxy.$Proxy83.retrieveUnfinishedStepInstances(Unknown Source)
+	at uk.ac.ebi.interpro.scan.jms.master.StandaloneBlackBoxMaster.run(StandaloneBlackBoxMaster.java:262)
+	at uk.ac.ebi.interpro.scan.jms.main.Run.main(Run.java:413)
+Caused by: org.hibernate.TransactionException: Unable to rollback against JDBC Connection
+	at org.hibernate.resource.jdbc.internal.AbstractLogicalConnectionImplementor.rollback(AbstractLogicalConnectionImplementor.java:122)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcResourceLocalTransactionCoordinatorImpl$TransactionDriverControlImpl.rollback(JdbcResourceLocalTransactionCoordinatorImpl.java:294)
+	at org.hibernate.engine.transaction.internal.TransactionImpl.rollback(TransactionImpl.java:145)
+	at org.springframework.orm.jpa.JpaTransactionManager.doRollback(JpaTransactionManager.java:561)
+	... 10 more
+Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: Database is already closed (to disable automatic closing at VM shutdown, add ";DB_CLOSE_ON_EXIT=FALSE" to the db URL) [90121-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:617)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.message.DbException.get(DbException.java:181)
+	at org.h2.message.DbException.get(DbException.java:170)
+	at org.h2.jdbc.JdbcConnection.checkClosed(JdbcConnection.java:1571)
+	at org.h2.jdbc.JdbcConnection.checkClosedForWrite(JdbcConnection.java:1557)
+	at org.h2.jdbc.JdbcConnection.rollback(JdbcConnection.java:561)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy$LazyConnectionInvocationHandler.invoke(LazyConnectionDataSourceProxy.java:385)
+	at com.sun.proxy.$Proxy30.rollback(Unknown Source)
+	at org.hibernate.resource.jdbc.internal.AbstractLogicalConnectionImplementor.rollback(AbstractLogicalConnectionImplementor.java:116)
+	... 13 more
+InterProScan analysis failed. Exception thrown by StandaloneBlackBoxMaster. Check the log file for details
+44.16user 2.21system 0:14.64elapsed 316%CPU (0avgtext+0avgdata 2807304maxresident)k
+2392inputs+344outputs (9major+236416minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 21:42:53 EDT 2023
+Run Time   : 15 seconds
+======================================================
+

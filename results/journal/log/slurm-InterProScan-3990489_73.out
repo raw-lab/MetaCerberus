@@ -1,0 +1,49 @@
+=====================================================
+Start Time  : Sat Jun 24 18:26:03 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3995216 / InterProScan
+Node List   : str-c108
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On GTDB-100/genomes/archaea/GCF_900182635.1.fna
+======================================================
+24/06/2023 18:26:04:397 Welcome to InterProScan-5.60-92.0
+24/06/2023 18:26:04:397 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 18:26:08:391 RunID: str-c108.uncc.edu_20230624_182608214_cgj9
+24/06/2023 18:26:17:071 Loading file /projects/raw_lab/jobs/metacerberus/GTDB-100/genomes/archaea/GCF_900182635.1.fna
+24/06/2023 18:26:17:992 Running the following analyses:
+[AntiFam-7.0,CDD-3.20,Coils-2.2.1,FunFam-4.3.0,Gene3D-4.3.0,Hamap-2021_04,MobiDBLite-2.0,PANTHER-17.0,Pfam-35.0,PIRSF-3.10,PIRSR-2021_05,PRINTS-42.0,ProSitePatterns-2022_01,ProSiteProfiles-2022_01,SFLD-4,SMART-7.1,SUPERFAMILY-1.75,TIGRFAM-15.0]
+Pre-calculated match lookup service DISABLED.  Please wait for match calculations to complete...
+2023-06-24 18:26:53,030 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,034 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 147 matches PIRSF016275: DNA polymerase II, large subunit, Euryarchaea type
+2023-06-24 18:26:53,034 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,034 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 18:26:53,034 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,034 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 ! 1451.2   0.0         0         0      16    1107 ..       9    1192 .]       3    1192 .] 0.95
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 172 matches PIRSF005508: Arsenite resistance protein, ArsB type
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  281.6  11.0   4.4e-88   1.2e-85      11     279 ..      58     333 ..      48     334 .] 0.95
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 35 matches PIRSF005719: Structural maintenance of chromosomes protein
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 18:26:53,035 [amqEmbeddedWorkerJmsContainer-13] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  896.0  62.3  1.1e-272  5.1e-271       2    1189 ..     160    1342 ..     159    1348 .. 0.97
+24/06/2023 18:36:42:433 100% done:  InterProScan analyses completed 
+
+2023-06-24 18:36:42,936 [main] [uk.ac.ebi.interpro.scan.jms.master.AbstractMaster:259] WARN - Master process unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c108.uncc.edu_20230624_182608214_cgj9
+2432.26user 189.13system 10:39.27elapsed 410%CPU (0avgtext+0avgdata 3466996maxresident)k
+1795344inputs+1248776outputs (452major+11843381minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 18:36:43 EDT 2023
+Run Time   : 640 seconds
+======================================================
+

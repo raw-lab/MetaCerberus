@@ -4,26 +4,30 @@ Uses bbduk [https://sourceforge.net/projects/bbmap/]
 """
 
 import os
+from pathlib import Path
 import subprocess
 
 
-## deconSingleReads
-#
+# Decontaminate single end reads
 def deconSingleReads(key_value, config, subdir):
-    # TODO: Find good long read mapper
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)
+    path = Path(config['DIR_OUT'], subdir)
 
     key = key_value[0]
     value = key_value[1]
 
-    deconReads = os.path.join(path, f"decon-{key}.fastq")
-    matched = os.path.join(path, "matched_"+key)
-    stats = os.path.join(path, "stats.txt")
+    deconReads = path / f"decon-{key}.fastq"
+    matched = path / f"matched_{key}"
+    stats = path / "stats.txt"
 
-    refseq = "ref="+config['REFSEQ'] if config['REFSEQ'] else ""
+    done = path / "complete"
+    if not config['REPLACE'] and done.exists() and deconReads.exists():
+        return deconReads
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
-    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=33 qtrim=r minlen=50 outm={matched} {refseq} k=31 stats={stats}"
+    qc_seq = "ref="+config['QC_SEQ'] if config['QC_SEQ'] else ""
+
+    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=30 qtrim=r minlen=50 outm={matched} {qc_seq} k=31 stats={stats}"
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
@@ -31,4 +35,5 @@ def deconSingleReads(key_value, config, subdir):
         print(e)
         print("ERROR: Failed to execute:\n", command)
 
+    done.touch()
     return deconReads

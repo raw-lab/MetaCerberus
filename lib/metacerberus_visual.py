@@ -8,9 +8,9 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
+from pathlib import Path
 import numpy as np
 import pandas as pd
-from pandas.core.frame import DataFrame
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import plotly.express as px
@@ -25,6 +25,8 @@ SUN_LIMIT = 15
 def graphSunburst(tables):
     figs = {}
     for dbName,table in tables.items():
+        if not Path(table).exists():
+            continue
         df: pd.DataFrame = pd.read_csv(table, sep='\t')
 
         # Filter top MAX_DEPTH
@@ -62,7 +64,7 @@ def graphPCA(dfTables:dict):
     # Run PCA and add to Plots
     figs = {}
     for name,file in dfTables.items():
-        df = pd.read_csv(file, sep='\t').set_index('KO', drop=True).T
+        df = pd.read_csv(file, sep='\t').set_index('ID', drop=True).T
         if df.empty:
             continue
         df = df.fillna(0).astype(int)
@@ -70,6 +72,9 @@ def graphPCA(dfTables:dict):
 
         # Do PCA
         X = df.copy()
+
+        X.sort_index(inplace=True)
+
         scaler = StandardScaler()
         scaler.fit(X)
         X_scaled = scaler.transform(X)
@@ -83,9 +88,6 @@ def graphPCA(dfTables:dict):
             columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
         loadings.reset_index(inplace=True) # Move index to column and re-index
         dfLoadings = pd.DataFrame()
-#        dfLoadings[['KO-ID','Name']] = loadings['KO'].str.split(':', n=1, expand=True)
-#        dfLoadings = pd.merge(dfLoadings, loadings, left_index=True, right_index=True)
-#        dfLoadings.drop(labels=['KO'], axis=1, inplace=True)
         
         # Loading Matrix
         loadings_matrix = pd.DataFrame(
@@ -93,9 +95,6 @@ def graphPCA(dfTables:dict):
             columns=[f"PC{pc}" for pc in range(1, pca.n_components_+1)], index=df.columns)
         loadings_matrix.reset_index(inplace=True) # Move index to column and re-index
         dfLoadings_matrix = pd.DataFrame()
-#        dfLoadings_matrix[['KO-ID','Name']] = loadings_matrix['KO'].str.split(':', n=1, expand=True)
-#        dfLoadings_matrix = pd.merge(dfLoadings_matrix, loadings_matrix, left_index=True, right_index=True)
-#        dfLoadings_matrix.drop(labels=['KO'], axis=1, inplace=True)
 
         # Create Scree Plot
         figScree = px.bar(
@@ -133,10 +132,6 @@ def graphPCA(dfTables:dict):
                         showbackground=False,
                         zerolinecolor="LightGray"
                         ),
-                    #width=700,
-                    #margin=dict(
-                    #r=10, l=10,
-                    #b=10, t=10
                   ))
         else:
             print("WARNING: Insufficient data in", name, "results for 3D PCA Plot")
@@ -156,12 +151,14 @@ def graphPCA(dfTables:dict):
     return figs
 
 
-########## Create Bar Chart Figures ##########
+########## Create Barchart Figures ##########
 def graphBarcharts(rollup_files:dict, dfCounts):
     dfCounts = dfCounts.copy()
 
     # Set index for our dataframes
     for dbName,table in dfCounts.items():
+        if not Path(table).exists():
+            continue
         df = pd.read_csv(table, sep='\t')
         dfCounts[dbName] = df.set_index('Name', inplace=False)
     
@@ -173,26 +170,26 @@ def graphBarcharts(rollup_files:dict, dfCounts):
                  name = cols.pop(0)
             if name not in branch[0]:
                 branch[0][name] = ({}, 0) if not name else ({}, dfCounts[dbName].loc[name,'Count'])
-            #else:
-                #print("WARNING: duplicate line in rollup: ", dbName, name, cols) #TODO: Remove when bugs not found
             buildTree(branch[0][name], cols, dbName)
 
     # Add rows to tree
     dbTrees = dict()
     for dbName,filepath in rollup_files.items():
-        df = pd.read_csv(filepath, sep='\t')
-        tree = [dict(), 0]
-        for _,row in df.iterrows():
-            cols = list()
-            for colName,colData in row.iteritems():
-                if colName.startswith('L'):
-                    level = colName[1]
-                    if colData:
-                        cols.append(f"lvl{level}: {colData}")
-            if row.Function:
-                cols.append(f"{row.KO}: {row.Function}")
-                buildTree(tree, cols, dbName)
-        dbTrees[dbName] = tree[0]
+        try:
+            df = pd.read_csv(filepath, sep='\t')
+            tree = [dict(), 0]
+            for _,row in df.iterrows():
+                cols = list()
+                for colName,colData in row.items():
+                    if colName.startswith('L'):
+                        level = colName[1]
+                        if colData:
+                            cols.append(f"lvl{level}: {colData}")
+                if row.Function:
+                    cols.append(f"{row.KO}: {row.Function}")
+                    buildTree(tree, cols, dbName)
+            dbTrees[dbName] = tree[0]
+        except: pass
 
     # Create Figures
     figs = dict()
@@ -207,7 +204,6 @@ def createBarFigs(tree, level=1, name=""):
     chart = {}
     data = {}
     for k,v in tree.items():
-        #print("\t"*level, k, ' ', v[1], sep='')
         data[k] = v[1]
         chart.update(createBarFigs(v[0], level+1, k)) # updating from empty dict does nothing
     if len(data): #if no data at this level, just return the empty chart{}
@@ -215,7 +211,7 @@ def createBarFigs(tree, level=1, name=""):
         data = dict(sorted(data.items(), key=lambda item: item[1], reverse=True)[:BAR_LIMIT])
         fig = go.Figure( # Create the figure of this level's data
             layout={'title':title,
-                'yaxis_title':"KO Count"},
+                'yaxis_title':"KO Count"}, # TODO: Remove KO References from code
             data=[go.Bar(x=list(data.keys()), y=list(data.values()))]
             )
         if max(data.values()) < 20: # to remove decimals from graph with low counts, let plotly decide tick marks otherwise

@@ -1,0 +1,47 @@
+=====================================================
+Start Time  : Sat Jun 24 21:46:35 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3997010 / InterProScan
+Node List   : str-c88
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On VIRAL/genomes/NC_025373.1.fna
+======================================================
+24/06/2023 21:46:36:968 Welcome to InterProScan-5.60-92.0
+24/06/2023 21:46:36:969 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 21:46:41:045 RunID: str-c88.uncc.edu_20230624_214640863_e2yd
+24/06/2023 21:46:49:976 Loading file /projects/raw_lab/jobs/metacerberus/VIRAL/genomes/NC_025373.1.fna
+24/06/2023 21:46:50:466 Running the following analyses:
+[AntiFam-7.0,CDD-3.20,Coils-2.2.1,FunFam-4.3.0,Gene3D-4.3.0,Hamap-2021_04,MobiDBLite-2.0,PANTHER-17.0,Pfam-35.0,PIRSF-3.10,PIRSR-2021_05,PRINTS-42.0,ProSitePatterns-2022_01,ProSiteProfiles-2022_01,SFLD-4,SMART-7.1,SUPERFAMILY-1.75,TIGRFAM-15.0]
+Pre-calculated match lookup service DISABLED.  Please wait for match calculations to complete...
+2023-06-24 21:47:04,446 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 1 matches PIRSF001072: Hemagglutinin-neuraminidase, paramyxovirus type
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  492.7  14.5  6.8e-152  2.2e-148      24     569 ..      30     589 ..      15     592 .] 0.90
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 7 matches PIRSF000830: RNA-directed RNA polymerase, Paramyxoviridae type
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:47:04,450 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:47:04,451 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:47:04,451 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  530.9   0.0  9.8e-163  1.1e-159      10     609 ..      13     625 ..      10     639 .. 0.87
+2023-06-24 21:47:04,451 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:47:04,451 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 2 ! 1314.3   4.5         0         0     644    2201 ..     625    2194 ..     619    2202 .. 0.94
+2023-06-24 21:47:53,054 [amqEmbeddedWorkerJmsContainer-7] [uk.ac.ebi.interpro.scan.management.model.implementations.WriteOutputStep:344] WARN - At write output completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c88.uncc.edu_20230624_214640863_e2yd
+24/06/2023 21:47:53:093 100% done:  InterProScan analyses completed 
+
+2023-06-24 21:47:53,595 [main] [uk.ac.ebi.interpro.scan.jms.master.AbstractMaster:259] WARN - Master process unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c88.uncc.edu_20230624_214640863_e2yd
+2023-06-24 21:47:53,603 [main] [uk.ac.ebi.interpro.scan.jms.main.Run:1778] WARN - At Run completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c88.uncc.edu_20230624_214640863_e2yd
+211.68user 22.56system 1:17.34elapsed 302%CPU (0avgtext+0avgdata 3103184maxresident)k
+481968inputs+432536outputs (16major+1640533minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 21:47:53 EDT 2023
+Run Time   : 78 seconds
+======================================================
+

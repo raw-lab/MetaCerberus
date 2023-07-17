@@ -1,0 +1,220 @@
+=====================================================
+Start Time  : Wed Jun 28 12:03:07 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4041500 / PROKKA
+Node List   : str-c89
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading prokka/1.14.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running PROKKA On GTDB-100/genomes/archaea/GCA_005222965.1.fna
+======================================================
+Archaea
+[12:03:09] This is prokka 1.14.6
+[12:03:09] Written by Torsten Seemann <torsten.seemann@gmail.com>
+[12:03:09] Homepage is https://github.com/tseemann/prokka
+[12:03:09] Local time is Wed Jun 28 12:03:09 2023
+[12:03:09] You are jlfiguer
+[12:03:09] Operating system is linux
+[12:03:09] You have BioPerl 1.7.8
+Argument "1.7.8" isn't numeric in numeric lt (<) at /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka line 259.
+[12:03:10] System has 16 cores.
+[12:03:10] Will use maximum of 16 cores.
+[12:03:10] Annotating as >>> Archaea <<<
+[12:03:10] Generating locus_tag from 'GTDB-100/genomes/archaea/GCA_005222965.1.fna' contents.
+[12:03:10] Setting --locustag JGNNFCPD from MD5 3077fc9d8850504c99756a450a92a2ad
+[12:03:10] Creating new output folder: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1
+[12:03:10] Running: mkdir -p results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1
+[12:03:10] Using filename prefix: GCA_005222965.1.XXX
+[12:03:10] Setting HMMER_NCPU=1
+[12:03:10] Writing log to: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.log
+[12:03:10] Command: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka --prefix GCA_005222965.1 --outdir results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1 --kingdom Archaea --cpus 16 GTDB-100/genomes/archaea/GCA_005222965.1.fna
+[12:03:10] Appending to PATH: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin
+[12:03:10] Looking for 'aragorn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/aragorn
+[12:03:10] Determined aragorn version is 001002 from 'ARAGORN v1.2.41 Dean Laslett'
+[12:03:10] Looking for 'barrnap' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/barrnap
+[12:03:10] Determined barrnap version is 000009 from 'barrnap 0.9'
+[12:03:10] Looking for 'blastp' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/blastp
+[12:03:10] Determined blastp version is 002013 from 'blastp: 2.13.0+'
+[12:03:10] Looking for 'cmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmpress
+[12:03:10] Determined cmpress version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[12:03:10] Looking for 'cmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmscan
+[12:03:10] Determined cmscan version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[12:03:10] Looking for 'egrep' - found /usr/bin/egrep
+[12:03:10] Looking for 'find' - found /usr/bin/find
+[12:03:10] Looking for 'grep' - found /usr/bin/grep
+[12:03:10] Looking for 'hmmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmpress
+[12:03:10] Determined hmmpress version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[12:03:10] Looking for 'hmmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmscan
+[12:03:10] Determined hmmscan version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[12:03:10] Looking for 'java' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/java
+[12:03:10] Looking for 'makeblastdb' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/makeblastdb
+[12:03:10] Determined makeblastdb version is 002013 from 'makeblastdb: 2.13.0+'
+[12:03:10] Looking for 'minced' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/minced
+[12:03:10] Determined minced version is 004002 from 'minced 0.4.2'
+[12:03:10] Looking for 'parallel' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/parallel
+[12:03:10] Determined parallel version is 20230122 from 'GNU parallel 20230122'
+[12:03:10] Looking for 'prodigal' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prodigal
+[12:03:10] Determined prodigal version is 002006 from 'Prodigal V2.6.3: February, 2016'
+[12:03:10] Looking for 'prokka-genbank_to_fasta_db' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka-genbank_to_fasta_db
+[12:03:10] Looking for 'sed' - found /usr/bin/sed
+[12:03:10] Looking for 'tbl2asn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/tbl2asn
+[12:03:10] Determined tbl2asn version is 025007 from 'tbl2asn 25.7   arguments:'
+[12:03:10] Using genetic code table 11.
+[12:03:10] Loading and checking input file: GTDB-100/genomes/archaea/GCA_005222965.1.fna
+[12:03:10] Wrote 4 contigs totalling 1021708 bp.
+[12:03:10] Predicting tRNAs and tmRNAs
+[12:03:10] Running: aragorn -l -gc11  -w results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.fna
+[12:03:10] 1 tRNA-Lys [38030,38104] 36 (ttt)
+[12:03:10] 2 tRNA-Gly c[82682,82755] 35 (gcc)
+[12:03:10] 3 tRNA-Gln c[193076,193148] 35 (ttg)
+[12:03:10] tRNA [197810,197905] is a pseudo/wacky gene - skipping.
+[12:03:10] 5 tRNA-Gly [273461,273532] 34 (tcc)
+[12:03:10] 6 tRNA-Cys [277958,278028] 33 (gca)
+[12:03:10] 7 tRNA-Thr [614398,614470] 34 (tgt)
+[12:03:10] 8 tRNA-Phe [640742,640816] 35 (gaa)
+[12:03:10] 9 tRNA-His [695067,695141] 36 (gtg)
+[12:03:10] 10 tRNA-Ile [696288,696363] 36 (gat)
+[12:03:10] 11 tRNA-Leu [714366,714451] 36 (gag)
+[12:03:10] 12 tRNA-Ser c[728643,728728] 36 (cga)
+[12:03:10] 13 tRNA-Asp c[847155,847242] 29 (atc)
+[12:03:10] 14 tRNA-Leu c[849687,849774] 38 (taa)
+[12:03:10] 15 tRNA-Val [850698,850770] 34 (gac)
+[12:03:10] 16 tRNA-Arg [910941,911017] 38 (tcg)
+[12:03:10] 17 tRNA-Gln [959974,960046] 35 (ctg)
+[12:03:10] 18 tRNA-Ser c[983065,983147] 35 (gga)
+[12:03:10] 1 tRNA-Lys [5815,5887] 34 (ctt)
+[12:03:10] 2 tRNA-Glu [5896,5970] 34 (ttc)
+[12:03:10] 3 tRNA-Val [5991,6066] 34 (cac)
+[12:03:10] 4 tRNA-Thr [6087,6162] 34 (cgt)
+[12:03:10] Found 21 tRNAs
+[12:03:10] Predicting Ribosomal RNAs
+[12:03:10] Running Barrnap with 16 threads
+[12:03:11] 1 NJBG01000001.1 444891 5S ribosomal RNA
+[12:03:11] 2 NJBG01000001.1 986023 16S ribosomal RNA (partial)
+[12:03:11] 3 NJBG01000001.1 986875 16S ribosomal RNA (partial)
+[12:03:11] 4 NJBG01000001.1 987975 23S ribosomal RNA
+[12:03:11] 5 NJBG01000001.1 987984 5.8S ribosomal RNA (partial)
+[12:03:11] Found 5 rRNAs
+[12:03:11] Skipping ncRNA search, enable with --rfam if desired.
+[12:03:11] Total of 26 tRNA + rRNA features
+[12:03:11] Searching for CRISPR repeats
+[12:03:11] Found 0 CRISPRs
+[12:03:11] Predicting coding sequences
+[12:03:11] Contigs total 1021708 bp, so using single mode
+[12:03:11] Running: prodigal -i results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.fna -c -m -g 11 -p single -f sco -q
+[12:03:12] Found 1107 CDS
+[12:03:12] Connecting features back to sequences
+[12:03:12] Not using genus-specific database. Try --usegenus to enable it.
+[12:03:12] Annotating CDS, please be patient.
+[12:03:12] Will use 16 CPUs for similarity searching.
+[12:03:13] There are still 1107 unannotated CDS left (started with 1107)
+[12:03:13] Will use blast to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Archaea/sprot with 16 CPUs
+[12:03:13] Running: cat results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.sprot\.tmp\.230039\.faa | parallel --gnu --plain -j 16 --block 10007 --recstart '>' --pipe blastp -query - -db /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Archaea/sprot -evalue 1e-09 -qcov_hsp_perc 80 -num_threads 1 -num_descriptions 1 -num_alignments 1 -seg no > results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.sprot\.tmp\.230039\.blast 2> /dev/null
+[12:03:14] Modify product: Probable aspartokinase => putative aspartokinase
+[12:03:14] Modify product: Uncharacterized ABC transporter ATP-binding protein MJ0796 => putative ABC transporter ATP-binding protein
+[12:03:14] Modify product: Probable ATP-dependent RNA helicase MJ0669 => putative ATP-dependent RNA helicase
+[12:03:14] Modify product: Uncharacterized HTH-type transcriptional regulator PH1519 => putative HTH-type transcriptional regulator
+[12:03:14] Modify product: Probable tRNA pseudouridine synthase B => putative tRNA pseudouridine synthase B
+[12:03:14] Modify product: Uncharacterized NOP5 family protein MJ0694 => putative NOP5 family protein
+[12:03:14] Modify product: Uncharacterized KH and PIN-domain containing protein MJ1533 => putative KH and PIN-domain containing protein
+[12:03:14] Modify product: Ribosome maturation protein SDO1 homolog => Ribosome maturation protein SDO1 
+[12:03:14] Modify product: Probable translation initiation factor IF-2 => putative translation initiation factor IF-2
+[12:03:14] Modify product: Probable deoxyhypusine synthase => putative deoxyhypusine synthase
+[12:03:14] Modify product: Probable phosphoenolpyruvate synthase => putative phosphoenolpyruvate synthase
+[12:03:14] Modify product: ATP-dependent DNA helicase Ta0057 => ATP-dependent DNA helicase
+[12:03:14] Modify product: Iron-sulfur flavoprotein MJ1083 => Iron-sulfur flavoprotein
+[12:03:14] Modify product: Uncharacterized ABC transporter ATP-binding protein MJ0796 => putative ABC transporter ATP-binding protein
+[12:03:14] Modify product: Probable tRNA pseudouridine synthase D => putative tRNA pseudouridine synthase D
+[12:03:14] Modify product: GTP cyclohydrolase 1 type 2 homolog => GTP cyclohydrolase 1 type 2 
+[12:03:14] Modify product: Probable Thioredoxin => putative Thioredoxin
+[12:03:14] Modify product: Protein PH0010 => Protein
+[12:03:14] Modify product: Putative FKBP-type peptidyl-prolyl cis-trans isomerase MJ0825 => Putative FKBP-type peptidyl-prolyl cis-trans isomerase
+[12:03:14] Modify product: Protein pelota homolog => Protein pelota 
+[12:03:14] Modify product: Protein translation factor SUI1 homolog => Protein translation factor SUI1 
+[12:03:14] Cleaned 21 /product names
+[12:03:14] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.sprot.tmp.230039.faa
+[12:03:14] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.sprot.tmp.230039.blast
+[12:03:15] There are still 863 unannotated CDS left (started with 1107)
+[12:03:15] Will use hmmer3 to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/hmm/HAMAP.hmm with 16 CPUs
+[12:03:15] Running: cat results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.HAMAP\.hmm\.tmp\.230039\.faa | parallel --gnu --plain -j 16 --block 7649 --recstart '>' --pipe hmmscan --noali --notextw --acc -E 1e-09 --cpu 1 /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/hmm/HAMAP.hmm /dev/stdin > results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.HAMAP\.hmm\.tmp\.230039\.hmmer3 2> /dev/null
+[12:03:20] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.HAMAP.hmm.tmp.230039.faa
+[12:03:20] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.HAMAP.hmm.tmp.230039.hmmer3
+[12:03:20] Labelling remaining 698 proteins as 'hypothetical protein'
+[12:03:20] Possible /pseudo 'GTP 3',8-cyclase' at NJBG01000001.1 position 437601
+[12:03:20] Possible /pseudo 'D-inositol-3-phosphate glycosyltransferase' at NJBG01000001.1 position 591105
+[12:03:20] Possible /pseudo 'D-inositol-3-phosphate glycosyltransferase' at NJBG01000001.1 position 592359
+[12:03:20] Found 290 unique /gene codes.
+[12:03:20] Fixed 2 duplicate /gene - gph_1 gph_2
+[12:03:20] Fixed 2 duplicate /gene - uppS_1 uppS_2
+[12:03:20] Fixed 2 duplicate /gene - der_1 der_2
+[12:03:20] Fixed 7 duplicate /gene - moaA_1 moaA_2 moaA_3 moaA_4 moaA_5 moaA_6 moaA_7
+[12:03:20] Fixed 2 duplicate /gene - lysA_1 lysA_2
+[12:03:20] Fixed 2 duplicate /gene - lon_1 lon_2
+[12:03:20] Fixed 2 duplicate /gene - ppaX_1 ppaX_2
+[12:03:20] Fixed 2 duplicate /gene - glmU_1 glmU_2
+[12:03:20] Fixed 2 duplicate /gene - tmk_1 tmk_2
+[12:03:20] Fixed 2 duplicate /gene - rppH_1 rppH_2
+[12:03:20] Fixed 2 duplicate /gene - prmC_1 prmC_2
+[12:03:20] Fixed 2 duplicate /gene - rhaD_1 rhaD_2
+[12:03:20] Fixed 2 duplicate /gene - dph2_1 dph2_2
+[12:03:20] Fixed 3 duplicate /gene - arnC_1 arnC_2 arnC_3
+[12:03:20] Fixed 2 duplicate /gene - srmB_1 srmB_2
+[12:03:20] Fixed 2 duplicate /gene - ppsA_1 ppsA_2
+[12:03:20] Fixed 2 duplicate /gene - trmBL2_1 trmBL2_2
+[12:03:20] Fixed 2 duplicate /gene - zupT_1 zupT_2
+[12:03:20] Fixed 2 duplicate /gene - ileS_1 ileS_2
+[12:03:20] Fixed 3 duplicate /gene - fcl_1 fcl_2 fcl_3
+[12:03:20] Fixed 2 duplicate /gene - ftsZ1_1 ftsZ1_2
+[12:03:20] Fixed 3 duplicate /gene - COQ5_1 COQ5_2 COQ5_3
+[12:03:20] Fixed 13 duplicate /gene - mshA_1 mshA_2 mshA_3 mshA_4 mshA_5 mshA_6 mshA_7 mshA_8 mshA_9 mshA_10 mshA_11 mshA_12 mshA_13
+[12:03:20] Fixed 2 duplicate /gene - arnB_1 arnB_2
+[12:03:20] Fixed 3 duplicate /gene - miaB_1 miaB_2 miaB_3
+[12:03:20] Fixed 25 colliding /gene names.
+[12:03:20] Adding /locus_tag identifiers
+[12:03:20] Assigned 1133 locus_tags to CDS and RNA features.
+[12:03:20] Writing outputs to results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/
+[12:03:21] Generating annotation statistics file
+[12:03:21] Generating Genbank and Sequin files
+[12:03:21] Running: tbl2asn -V b -a r10k -l paired-ends -M n -N 1 -y 'Annotated using prokka 1.14.6 from https://github.com/tseemann/prokka' -Z results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.err -i results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.fsa 2> /dev/null
+[tbl2asn-forever] Found Prokka input, correcting dates in .gbf|.sqn files.
+[tbl2asn-forever] Correcting dates in results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.gbf
+[tbl2asn-forever] Correcting dates in results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.sqn
+[tbl2asn-forever] Dates changed from 01-JAN-2019 to 28-JUN-2023
+[12:03:23] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/errorsummary.val
+[12:03:23] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.dr
+[12:03:23] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.fixedproducts
+[12:03:23] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.ecn
+[12:03:23] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.val
+[12:03:23] Repairing broken .GBK output that tbl2asn produces...
+[12:03:23] Running: sed 's/COORDINATES: profile/COORDINATES:profile/' < results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.gbf > results\/PROKKA\/GTDB\-100\/genomes\/archaea\/GCA_005222965\.1\/GCA_005222965\.1\.gbk
+[12:03:23] Deleting unwanted file: results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.gbf
+[12:03:23] Output files:
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.log
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.fna
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.gff
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.faa
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.ffn
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.tbl
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.fsa
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.tsv
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.txt
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.err
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.sqn
+[12:03:23] results/PROKKA/GTDB-100/genomes/archaea/GCA_005222965.1/GCA_005222965.1.gbk
+[12:03:23] Annotation finished successfully.
+[12:03:23] Walltime used: 0.23 minutes
+[12:03:23] If you use this result please cite the Prokka paper:
+[12:03:23] Seemann T (2014) Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9.
+[12:03:23] Type 'prokka --citation' for more details.
+[12:03:23] Thank you, come again.
+57.64user 24.30system 0:13.48elapsed 607%CPU (0avgtext+0avgdata 257372maxresident)k
+21368inputs+110240outputs (0major+4469843minor)pagefaults 0swaps
+
+======================================================
+End Time   : Wed Jun 28 12:03:23 EDT 2023
+Run Time   : 16 seconds
+======================================================
+

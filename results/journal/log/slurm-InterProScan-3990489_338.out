@@ -1,0 +1,101 @@
+=====================================================
+Start Time  : Sat Jun 24 21:10:23 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3996771 / InterProScan
+Node List   : str-c89
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On CPR/SAMN03319521.fna
+======================================================
+24/06/2023 21:10:24:360 Welcome to InterProScan-5.60-92.0
+24/06/2023 21:10:24:361 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 21:10:28:294 RunID: str-c89.uncc.edu_20230624_211028119_24tc
+24/06/2023 21:10:36:885 Loading file /projects/raw_lab/jobs/metacerberus/CPR/SAMN03319521.fna
+24/06/2023 21:10:37:476 Running the following analyses:
+[AntiFam-7.0,CDD-3.20,Coils-2.2.1,FunFam-4.3.0,Gene3D-4.3.0,Hamap-2021_04,MobiDBLite-2.0,PANTHER-17.0,Pfam-35.0,PIRSF-3.10,PIRSR-2021_05,PRINTS-42.0,ProSitePatterns-2022_01,ProSiteProfiles-2022_01,SFLD-4,SMART-7.1,SUPERFAMILY-1.75,TIGRFAM-15.0]
+Pre-calculated match lookup service DISABLED.  Please wait for match calculations to complete...
+2023-06-24 21:11:36,452 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,456 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 106 matches PIRSF000854: Phosphoenolpyruvate synthase
+2023-06-24 21:11:36,456 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,456 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  700.6   1.5  1.2e-214    2e-212       7     793 ..      10     755 ..       5     758 .. 0.93
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 108 matches PIRSF002161: Ribosomal protein, L5p/L5a/L11e/organellar L5 types
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  193.3   0.5   1.6e-61   2.6e-59       5     187 ..       9     187 ..       4     188 .] 0.96
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 126 matches PIRSF000386: tRNA-(m1G37) methyltransferase
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,457 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  295.0   0.0   1.7e-92   2.9e-90       2     223 ..      11     230 ..      10     231 .] 0.97
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 13 matches PIRSF001265: H(+)-translocating inorganic pyrophosphatase
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  579.0  42.7  1.9e-177  1.6e-175      17     551 ..      30     530 ..      17     531 .] 0.94
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 146 matches PIRSF001400: Enolase
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  518.2   1.0  7.8e-160  1.3e-157       2     416 ..       7     423 ..       6     425 .] 0.98
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 148 matches PIRSF002158: Ribosomal protein, L2p/L2a/L8e/organellar L2 types
+2023-06-24 21:11:36,458 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  275.4   5.4   2.5e-86   4.3e-84       5     264 ..      21     274 ..       6     275 .] 0.94
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 32 matches PIRSF005499: Polyribonucleotide nucleotidyltransferase
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  873.1   6.1  8.2e-267  1.4e-264       3     721 ..       9     726 ..       7     731 .. 0.96
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 61 matches PIRSF005917: Predicted methyltransferase, YraL type
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,459 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  294.2   0.1   4.3e-92   7.3e-90      10     232 ..       2     226 ..       1     227 [] 0.98
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 69 matches PIRSF002741: Peptide binding protein, MppA type
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !   40.2   0.3   7.8e-15   1.3e-12      68     124 ..      74     130 ..      66     135 .. 0.91
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 2 !  118.0   9.1   2.1e-38   3.5e-36     230     516 ..     199     451 ..     131     457 .. 0.89
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 84 matches PIRSF002122: Ribosomal protein, S7p/S7a/S5e/organellar S7 types
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,460 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  174.9   1.9   1.1e-55   1.9e-53      74     223 ..       9     166 .]       2     166 .] 0.91
+2023-06-24 21:11:36,461 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,461 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: Query sequence: 92 matches PIRSF001174: Lon protease
+2023-06-24 21:11:36,461 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,461 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+2023-06-24 21:11:36,461 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:129] WARN - Couldn't parse the given raw match line, because it is of an unexpected format.
+2023-06-24 21:11:36,461 [amqEmbeddedWorkerJmsContainer-15] [uk.ac.ebi.interpro.scan.io.pirsf.hmmer3.PirsfHmmer3RawMatchParser:130] WARN - Unexpected Raw match line: 1 !  982.3   7.8  1.9e-299  1.6e-297      16     774 ..       3     760 ..       1     762 [. 0.99
+2023-06-24 21:16:00,930 [amqEmbeddedWorkerJmsContainer-16] [uk.ac.ebi.interpro.scan.management.model.implementations.WriteOutputStep:344] WARN - At write output completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c89.uncc.edu_20230624_211028119_24tc
+24/06/2023 21:16:00:996 100% done:  InterProScan analyses completed 
+
+2023-06-24 21:16:01,499 [main] [uk.ac.ebi.interpro.scan.jms.master.AbstractMaster:259] WARN - Master process unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c89.uncc.edu_20230624_211028119_24tc
+2023-06-24 21:16:01,506 [main] [uk.ac.ebi.interpro.scan.jms.main.Run:1778] WARN - At Run completion, unable to delete temporary directory /projects/raw_lab/jobs/metacerberus/temp/str-c89.uncc.edu_20230624_211028119_24tc
+1139.77user 120.56system 5:37.88elapsed 373%CPU (0avgtext+0avgdata 3535732maxresident)k
+883216inputs+862384outputs (83major+8295101minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 21:16:01 EDT 2023
+Run Time   : 338 seconds
+======================================================
+

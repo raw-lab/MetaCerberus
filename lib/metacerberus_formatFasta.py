@@ -4,28 +4,35 @@ Also removes N's from scaffolds
 """
 
 import os
+from pathlib import Path
 import re
 import subprocess
 import textwrap
 
 
-## format_fastq
+# Remove quality from fastq
 def reformat(fastq, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)    
+    path = Path(config['DIR_OUT'], subdir)
 
-    fasta, ext = os.path.splitext(fastq)
-    fasta = os.path.basename(fasta) + ".fna"
-    fasta = os.path.join(path, fasta)
+    fasta = path / Path(fastq).with_suffix(".fna")
+
+    done = Path(path, 'complete')
+    if not config['REPLACE'] and done.exists() and fasta.exists():
+        return fasta
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     if not config['REPLACE'] and os.path.exists(fasta):
         return fasta
 
     command = "sed -n '1~4s/^@/>/p;2~4p' " +fastq+ " > " +fasta
     subprocess.call(command, shell=True)
+
+    done.touch()
     return fasta
 
 
+# Helper for removeN
 def split_sequenceN(name, sequence):
     N_lengths = []
     regex = re.compile(r"(N+)")
@@ -46,19 +53,25 @@ def split_sequenceN(name, sequence):
 
 # Remove N's
 def removeN(fasta:str, config:dict, subdir:os.PathLike):
-    path = f"{config['DIR_OUT']}/{subdir}"
-    os.makedirs(path, exist_ok=True)    
+    path = Path(config['DIR_OUT'], subdir)
 
     outFasta, ext = os.path.splitext(fasta)
     outFasta = os.path.basename(outFasta) + "_clean"+ ext
-    outFasta = os.path.join(path, outFasta)
+    outFasta = Path(path, outFasta)
+
+    done = Path(path, 'complete')
+    if not config['REPLACE'] and done.exists() and outFasta.exists():
+        return outFasta, None
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
 
     proc = subprocess.run(['grep', '-cE', '^[^>].*N', fasta], stdout=subprocess.PIPE, text=True)
     res = int(proc.stdout.strip())
     if res == 0:
+        done.touch()
         return fasta, None
 
-    with open(fasta) as reader, open(outFasta, 'w') as writer:
+    with open(fasta) as reader, outFasta.open('w') as writer:
         NStats = dict()
         line = reader.readline()
         while line:
@@ -83,4 +96,5 @@ def removeN(fasta:str, config:dict, subdir:os.PathLike):
                 continue #already got next line, next item in loop
             line = reader.readline()
 
+    done.touch()
     return outFasta, NStats

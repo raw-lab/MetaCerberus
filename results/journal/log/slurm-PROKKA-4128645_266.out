@@ -1,0 +1,143 @@
+=====================================================
+Start Time  : Sat Jul  1 17:14:17 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4128715 / PROKKA
+Node List   : str-c91
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading prokka/1.14.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running PROKKA On PHAGES/genomes/NC_041871.fna
+======================================================
+Viruses
+[17:14:19] This is prokka 1.14.6
+[17:14:19] Written by Torsten Seemann <torsten.seemann@gmail.com>
+[17:14:19] Homepage is https://github.com/tseemann/prokka
+[17:14:19] Local time is Sat Jul  1 17:14:19 2023
+[17:14:19] You are jlfiguer
+[17:14:19] Operating system is linux
+[17:14:19] You have BioPerl 1.7.8
+Argument "1.7.8" isn't numeric in numeric lt (<) at /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka line 259.
+[17:14:19] System has 16 cores.
+[17:14:19] Will use maximum of 16 cores.
+[17:14:19] Annotating as >>> Viruses <<<
+[17:14:19] Generating locus_tag from 'PHAGES/genomes/NC_041871.fna' contents.
+[17:14:19] Setting --locustag FLLDHNPA from MD5 f55d179a38f658c0b0811845d76a684c
+[17:14:19] Creating new output folder: results/PROKKA/PHAGES/genomes/NC_041871
+[17:14:19] Running: mkdir -p results\/PROKKA\/PHAGES\/genomes\/NC_041871
+[17:14:19] Using filename prefix: NC_041871.XXX
+[17:14:19] Setting HMMER_NCPU=1
+[17:14:19] Writing log to: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.log
+[17:14:19] Command: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka --prefix NC_041871 --outdir results/PROKKA/PHAGES/genomes/NC_041871 --kingdom Viruses --cpus 16 PHAGES/genomes/NC_041871.fna
+[17:14:19] Appending to PATH: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin
+[17:14:19] Looking for 'aragorn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/aragorn
+[17:14:19] Determined aragorn version is 001002 from 'ARAGORN v1.2.41 Dean Laslett'
+[17:14:19] Looking for 'barrnap' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/barrnap
+[17:14:19] Determined barrnap version is 000009 from 'barrnap 0.9'
+[17:14:19] Looking for 'blastp' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/blastp
+[17:14:19] Determined blastp version is 002013 from 'blastp: 2.13.0+'
+[17:14:19] Looking for 'cmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmpress
+[17:14:19] Determined cmpress version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[17:14:19] Looking for 'cmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmscan
+[17:14:19] Determined cmscan version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[17:14:19] Looking for 'egrep' - found /usr/bin/egrep
+[17:14:19] Looking for 'find' - found /usr/bin/find
+[17:14:19] Looking for 'grep' - found /usr/bin/grep
+[17:14:19] Looking for 'hmmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmpress
+[17:14:19] Determined hmmpress version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[17:14:19] Looking for 'hmmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmscan
+[17:14:19] Determined hmmscan version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[17:14:19] Looking for 'java' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/java
+[17:14:19] Looking for 'makeblastdb' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/makeblastdb
+[17:14:19] Determined makeblastdb version is 002013 from 'makeblastdb: 2.13.0+'
+[17:14:19] Looking for 'minced' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/minced
+[17:14:19] Determined minced version is 004002 from 'minced 0.4.2'
+[17:14:19] Looking for 'parallel' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/parallel
+[17:14:19] Determined parallel version is 20230122 from 'GNU parallel 20230122'
+[17:14:19] Looking for 'prodigal' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prodigal
+[17:14:19] Determined prodigal version is 002006 from 'Prodigal V2.6.3: February, 2016'
+[17:14:19] Looking for 'prokka-genbank_to_fasta_db' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka-genbank_to_fasta_db
+[17:14:19] Looking for 'sed' - found /usr/bin/sed
+[17:14:19] Looking for 'tbl2asn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/tbl2asn
+[17:14:19] Determined tbl2asn version is 025007 from 'tbl2asn 25.7   arguments:'
+[17:14:19] Using genetic code table 1.
+[17:14:19] Loading and checking input file: PHAGES/genomes/NC_041871.fna
+[17:14:19] Wrote 1 contigs totalling 135391 bp.
+[17:14:19] Predicting tRNAs and tmRNAs
+[17:14:19] Running: aragorn -l -gc1  -w results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.fna
+[17:14:19] 1 tRNA-Pro c[60714,60790] 35 (tgg)
+[17:14:19] 2 tRNA-Met c[60802,60876] 34 (cat)
+[17:14:19] 3 tRNA-Thr c[60878,60953] 34 (tgt)
+[17:14:19] tRNA c[60959,61057] is a pseudo/wacky gene - skipping.
+[17:14:19] 5 tRNA-Ser c[61156,61246] 34 (tga)
+[17:14:19] 6 tRNA-Tyr c[61361,61447] 35 (gta)
+[17:14:19] 7 tRNA-Arg c[61452,61526] 34 (tct)
+[17:14:19] Found 6 tRNAs
+[17:14:19] Disabling rRNA search: --kingdom=Viruses or --norrna=0
+[17:14:19] Skipping ncRNA search, enable with --rfam if desired.
+[17:14:19] Total of 6 tRNA + rRNA features
+[17:14:19] Searching for CRISPR repeats
+[17:14:19] Found 0 CRISPRs
+[17:14:19] Predicting coding sequences
+[17:14:19] Contigs total 135391 bp, so using single mode
+[17:14:19] Running: prodigal -i results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.fna -c -m -g 1 -p single -f sco -q
+[17:14:19] Found 202 CDS
+[17:14:19] Connecting features back to sequences
+[17:14:19] Not using genus-specific database. Try --usegenus to enable it.
+[17:14:19] Annotating CDS, please be patient.
+[17:14:19] Will use 16 CPUs for similarity searching.
+[17:14:19] There are still 202 unannotated CDS left (started with 202)
+[17:14:19] Will use blast to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Viruses/sprot with 16 CPUs
+[17:14:19] Running: cat results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.sprot\.tmp\.165561\.faa | parallel --gnu --plain -j 16 --block 1255 --recstart '>' --pipe blastp -query - -db /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Viruses/sprot -evalue 1e-09 -qcov_hsp_perc 80 -num_threads 1 -num_descriptions 1 -num_alignments 1 -seg no > results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.sprot\.tmp\.165561\.blast 2> /dev/null
+[17:14:20] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.sprot.tmp.165561.faa
+[17:14:20] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.sprot.tmp.165561.blast
+[17:14:20] Labelling remaining 198 proteins as 'hypothetical protein'
+[17:14:20] Found 3 unique /gene codes.
+[17:14:20] Fixed 0 colliding /gene names.
+[17:14:20] Adding /locus_tag identifiers
+[17:14:20] Assigned 208 locus_tags to CDS and RNA features.
+[17:14:20] Writing outputs to results/PROKKA/PHAGES/genomes/NC_041871/
+[17:14:20] Generating annotation statistics file
+[17:14:20] Generating Genbank and Sequin files
+[17:14:20] Running: tbl2asn -V b -a r10k -l paired-ends -M n -N 1 -y 'Annotated using prokka 1.14.6 from https://github.com/tseemann/prokka' -Z results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.err -i results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.fsa 2> /dev/null
+[tbl2asn-forever] Found Prokka input, correcting dates in .gbf|.sqn files.
+[tbl2asn-forever] Correcting dates in results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.gbf
+[tbl2asn-forever] Correcting dates in results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.sqn
+[tbl2asn-forever] Dates changed from 01-JAN-2019 to 01-JUL-2023
+[17:14:21] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/errorsummary.val
+[17:14:21] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.dr
+[17:14:21] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.fixedproducts
+[17:14:21] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.ecn
+[17:14:21] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.val
+[17:14:21] Repairing broken .GBK output that tbl2asn produces...
+[17:14:21] Running: sed 's/COORDINATES: profile/COORDINATES:profile/' < results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.gbf > results\/PROKKA\/PHAGES\/genomes\/NC_041871\/NC_041871\.gbk
+[17:14:21] Deleting unwanted file: results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.gbf
+[17:14:21] Output files:
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.log
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.fna
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.gff
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.faa
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.ffn
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.tbl
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.fsa
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.tsv
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.txt
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.err
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.sqn
+[17:14:21] results/PROKKA/PHAGES/genomes/NC_041871/NC_041871.gbk
+[17:14:21] Annotation finished successfully.
+[17:14:21] Walltime used: 0.03 minutes
+[17:14:21] If you use this result please cite the Prokka paper:
+[17:14:21] Seemann T (2014) Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9.
+[17:14:21] Type 'prokka --citation' for more details.
+[17:14:21] Thank you, come again.
+5.35user 0.54system 0:02.43elapsed 241%CPU (0avgtext+0avgdata 70872maxresident)k
+2096inputs+16256outputs (0major+176180minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 17:14:21 EDT 2023
+Run Time   : 4 seconds
+======================================================
+

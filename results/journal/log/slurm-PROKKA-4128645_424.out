@@ -1,0 +1,175 @@
+=====================================================
+Start Time  : Sat Jul  1 17:14:56 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4128873 / PROKKA
+Node List   : str-c98
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading prokka/1.14.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running PROKKA On VIRAL_ARCHAEA/KC292026.fna
+======================================================
+Viruses
+[17:14:58] This is prokka 1.14.6
+[17:14:58] Written by Torsten Seemann <torsten.seemann@gmail.com>
+[17:14:58] Homepage is https://github.com/tseemann/prokka
+[17:14:58] Local time is Sat Jul  1 17:14:58 2023
+[17:14:58] You are jlfiguer
+[17:14:58] Operating system is linux
+[17:14:58] You have BioPerl 1.7.8
+Argument "1.7.8" isn't numeric in numeric lt (<) at /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka line 259.
+[17:14:58] System has 16 cores.
+[17:14:58] Will use maximum of 16 cores.
+[17:14:58] Annotating as >>> Viruses <<<
+[17:14:58] Generating locus_tag from 'VIRAL_ARCHAEA/KC292026.fna' contents.
+[17:14:58] Setting --locustag MPNHJICA from MD5 697132cade997629e49cb250a79411f6
+[17:14:58] Creating new output folder: results/PROKKA/VIRAL_ARCHAEA/KC292026
+[17:14:58] Running: mkdir -p results\/PROKKA\/VIRAL_ARCHAEA\/KC292026
+[17:14:58] Using filename prefix: KC292026.XXX
+[17:14:58] Setting HMMER_NCPU=1
+[17:14:58] Writing log to: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.log
+[17:14:58] Command: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka --prefix KC292026 --outdir results/PROKKA/VIRAL_ARCHAEA/KC292026 --kingdom Viruses --cpus 16 VIRAL_ARCHAEA/KC292026.fna
+[17:14:58] Appending to PATH: /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin
+[17:14:58] Looking for 'aragorn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/aragorn
+[17:14:58] Determined aragorn version is 001002 from 'ARAGORN v1.2.41 Dean Laslett'
+[17:14:58] Looking for 'barrnap' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/barrnap
+[17:14:58] Determined barrnap version is 000009 from 'barrnap 0.9'
+[17:14:58] Looking for 'blastp' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/blastp
+[17:14:58] Determined blastp version is 002013 from 'blastp: 2.13.0+'
+[17:14:58] Looking for 'cmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmpress
+[17:14:58] Determined cmpress version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[17:14:58] Looking for 'cmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/cmscan
+[17:14:58] Determined cmscan version is 001001 from '# INFERNAL 1.1.4 (Dec 2020)'
+[17:14:58] Looking for 'egrep' - found /usr/bin/egrep
+[17:14:58] Looking for 'find' - found /usr/bin/find
+[17:14:58] Looking for 'grep' - found /usr/bin/grep
+[17:14:58] Looking for 'hmmpress' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmpress
+[17:14:58] Determined hmmpress version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[17:14:58] Looking for 'hmmscan' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/hmmscan
+[17:14:58] Determined hmmscan version is 003003 from '# HMMER 3.3.2 (Nov 2020); http://hmmer.org/'
+[17:14:58] Looking for 'java' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/java
+[17:14:58] Looking for 'makeblastdb' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/makeblastdb
+[17:14:58] Determined makeblastdb version is 002013 from 'makeblastdb: 2.13.0+'
+[17:14:58] Looking for 'minced' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/minced
+[17:14:58] Determined minced version is 004002 from 'minced 0.4.2'
+[17:14:58] Looking for 'parallel' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/parallel
+[17:14:58] Determined parallel version is 20230122 from 'GNU parallel 20230122'
+[17:14:58] Looking for 'prodigal' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prodigal
+[17:14:58] Determined prodigal version is 002006 from 'Prodigal V2.6.3: February, 2016'
+[17:14:58] Looking for 'prokka-genbank_to_fasta_db' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/prokka-genbank_to_fasta_db
+[17:14:58] Looking for 'sed' - found /usr/bin/sed
+[17:14:58] Looking for 'tbl2asn' - found /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/bin/tbl2asn
+[17:14:58] Determined tbl2asn version is 025007 from 'tbl2asn 25.7   arguments:'
+[17:14:58] Using genetic code table 1.
+[17:14:58] Loading and checking input file: VIRAL_ARCHAEA/KC292026.fna
+[17:14:58] Wrote 1 contigs totalling 143855 bp.
+[17:14:58] Predicting tRNAs and tmRNAs
+[17:14:58] Running: aragorn -l -gc1  -w results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.fna
+[17:14:58] 1 tRNA-Ser c[42266,42352] 35 (gga)
+[17:14:58] 2 tRNA-Val c[42609,42683] 36 (gac)
+[17:14:58] 3 tRNA-Val c[42688,42762] 36 (tac)
+[17:14:58] 4 tRNA-Pro c[42770,42840] 33 (tgg)
+[17:14:58] 5 tRNA-Leu c[45441,45526] 38 (taa)
+[17:14:58] 6 tRNA-Leu c[45530,45613] 35 (caa)
+[17:14:58] 7 tRNA-Leu c[45617,45700] 35 (gag)
+[17:14:58] 8 tRNA-Leu c[45786,45869] 36 (tag)
+[17:14:58] 9 tRNA-Arg c[46355,46430] 36 (tct)
+[17:14:58] 10 tRNA-Arg c[46700,46775] 36 (tcg)
+[17:14:58] 11 tRNA-Ser c[47447,47532] 34 (tga)
+[17:14:58] 12 tRNA-Cys c[47537,47609] 33 (gca)
+[17:14:58] 13 tRNA-Ile c[48011,48085] 35 (gat)
+[17:14:58] 14 tRNA-Gln c[48088,48162] 36 (ctg)
+[17:14:58] 15 tRNA-Ser c[48164,48246] 34 (gct)
+[17:14:58] 16 tRNA-Ile c[48250,48320] 33 (gat)
+[17:14:58] 17 tRNA-Ser c[48383,48468] 36 (cga)
+[17:14:58] 18 tRNA-Trp c[48474,48544] 33 (cca)
+[17:14:58] 19 tRNA-Gln c[48548,48620] 35 (ttg)
+[17:14:58] 20 tRNA-Lys c[48804,48876] 35 (ttt)
+[17:14:58] 21 tRNA-Thr c[48880,48952] 34 (ggt)
+[17:14:58] 22 tRNA-Thr c[48954,49029] 36 (cgt)
+[17:14:58] 23 tRNA-Thr c[49031,49103] 34 (tgt)
+[17:14:58] 24 tRNA-Met c[50107,50194] 38 (cat)
+[17:14:58] 25 tRNA-Lys c[50195,50271] 37 (ctt)
+[17:14:58] 26 tRNA-Tyr c[50274,50347] 34 (gta)
+[17:14:58] 27 tRNA-Asn c[50350,50424] 35 (gtt)
+[17:14:58] 28 tRNA-Gly c[50474,50544] 33 (gcc)
+[17:14:58] 29 tRNA-Gly c[50549,50619] 33 (tcc)
+[17:14:58] 30 tRNA-His c[50624,50697] 35 (gtg)
+[17:14:58] 31 tRNA-Glu c[51556,51632] 37 (ctc)
+[17:14:58] 32 tRNA-Phe c[51636,51710] 35 (gaa)
+[17:14:58] 33 tRNA-Ala c[52081,52168] 32 (agc)
+[17:14:58] 34 tRNA-Asp c[52304,52376] 34 (gtc)
+[17:14:58] 35 tRNA-Arg c[53348,53420] 34 (gcg)
+[17:14:58] 36 tRNA-Gly c[121104,121188] 32 (tcc)
+[17:14:58] Found 36 tRNAs
+[17:14:58] Disabling rRNA search: --kingdom=Viruses or --norrna=0
+[17:14:58] Skipping ncRNA search, enable with --rfam if desired.
+[17:14:58] Total of 36 tRNA + rRNA features
+[17:14:58] Searching for CRISPR repeats
+[17:14:58] Found 0 CRISPRs
+[17:14:58] Predicting coding sequences
+[17:14:58] Contigs total 143855 bp, so using single mode
+[17:14:58] Running: prodigal -i results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.fna -c -m -g 1 -p single -f sco -q
+[17:14:59] Excluding CDS which overlaps existing RNA (tRNA) at KC292026.1:121047..121265 on + strand
+[17:14:59] Found 257 CDS
+[17:14:59] Connecting features back to sequences
+[17:14:59] Not using genus-specific database. Try --usegenus to enable it.
+[17:14:59] Annotating CDS, please be patient.
+[17:14:59] Will use 16 CPUs for similarity searching.
+[17:14:59] There are still 257 unannotated CDS left (started with 257)
+[17:14:59] Will use blast to search against /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Viruses/sprot with 16 CPUs
+[17:14:59] Running: cat results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.sprot\.tmp\.709749\.faa | parallel --gnu --plain -j 16 --block 1328 --recstart '>' --pipe blastp -query - -db /apps/pkg/anaconda3/2022.10/envs/prokka-1.14.6/db/kingdom/Viruses/sprot -evalue 1e-09 -qcov_hsp_perc 80 -num_threads 1 -num_descriptions 1 -num_alignments 1 -seg no > results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.sprot\.tmp\.709749\.blast 2> /dev/null
+[17:15:00] Modify product: Probable flavin-dependent thymidylate synthase => putative flavin-dependent thymidylate synthase
+[17:15:00] Cleaned 1 /product names
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.sprot.tmp.709749.faa
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.sprot.tmp.709749.blast
+[17:15:00] Labelling remaining 255 proteins as 'hypothetical protein'
+[17:15:00] Found 0 unique /gene codes.
+[17:15:00] Fixed 0 colliding /gene names.
+[17:15:00] Adding /locus_tag identifiers
+[17:15:00] Assigned 293 locus_tags to CDS and RNA features.
+[17:15:00] Writing outputs to results/PROKKA/VIRAL_ARCHAEA/KC292026/
+[17:15:00] Generating annotation statistics file
+[17:15:00] Generating Genbank and Sequin files
+[17:15:00] Running: tbl2asn -V b -a r10k -l paired-ends -M n -N 1 -y 'Annotated using prokka 1.14.6 from https://github.com/tseemann/prokka' -Z results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.err -i results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.fsa 2> /dev/null
+[tbl2asn-forever] Found Prokka input, correcting dates in .gbf|.sqn files.
+[tbl2asn-forever] Correcting dates in results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.gbf
+[tbl2asn-forever] Correcting dates in results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.sqn
+[tbl2asn-forever] Dates changed from 01-JAN-2019 to 01-JUL-2023
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/errorsummary.val
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.dr
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.fixedproducts
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.ecn
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.val
+[17:15:00] Repairing broken .GBK output that tbl2asn produces...
+[17:15:00] Running: sed 's/COORDINATES: profile/COORDINATES:profile/' < results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.gbf > results\/PROKKA\/VIRAL_ARCHAEA\/KC292026\/KC292026\.gbk
+[17:15:00] Deleting unwanted file: results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.gbf
+[17:15:00] Output files:
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.log
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.fna
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.gff
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.faa
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.ffn
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.tbl
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.fsa
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.tsv
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.txt
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.err
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.sqn
+[17:15:00] results/PROKKA/VIRAL_ARCHAEA/KC292026/KC292026.gbk
+[17:15:00] Annotation finished successfully.
+[17:15:00] Walltime used: 0.03 minutes
+[17:15:00] If you use this result please cite the Prokka paper:
+[17:15:00] Seemann T (2014) Prokka: rapid prokaryotic genome annotation. Bioinformatics. 30(14):2068-9.
+[17:15:00] Type 'prokka --citation' for more details.
+[17:15:00] Thank you, come again.
+6.52user 0.71system 0:02.48elapsed 291%CPU (0avgtext+0avgdata 70184maxresident)k
+2544inputs+18280outputs (0major+236138minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 17:15:00 EDT 2023
+Run Time   : 4 seconds
+======================================================
+

@@ -1,0 +1,1134 @@
+KO Id	Name	Level	Count
+	lvl1: 01_Fermentation	1	218
+	lvl2: Acetylene degradation	2	5
+	lvl3: nan	3	1061
+	lvl4: nan	4	1503
+K00001	K00001: E1.1.1.1, adh; alcohol dehydrogenase	Function	10
+	lvl2: Heterolactic fermentation	2	9
+	lvl2: Lysine fermentation to acetate and butyrate	2	6
+	lvl2: Pyruvate Fermentation	2	117
+	lvl3: Pyruvate fermentation to butanoate	3	9
+	lvl3: Pyruvate fermentation to ethanol I	3	3
+	lvl3: Pyruvate fermentation to ethanol II	3	3
+	lvl3: Superpathway of clostridium acetobutylicum acidogenic and solventogenic fermentation	3	23
+	lvl3: Superpathway of clostridium acetobutylicum acidogenic fermentation	3	20
+	lvl3: Superpathway of clostridium acetobutylicum solventogenic fermentation	3	11
+	lvl1: 21_Cellular response to stress	1	221
+	lvl2: Response to osmotic stress	2	83
+	lvl1: 06_Amino acid utilization biosynthesis metabolism	1	426
+	lvl2: Alanine, aspartate and glutamate metabolism (contain asparagin as well)	2	25
+K00003	K00003: hom; homoserine dehydrogenase	Function	6
+	lvl2: Phenylalanine metabolism	2	20
+	lvl2: D-arginine and D-ornithine metabolism	2	2
+	lvl2: Valine, leucine and isoleucine biosynthesis	2	11
+	lvl2: Amino acid biosynthesis precursor pyruvate and oxaloacetate	2	147
+	lvl3: Oxaloacetate to lysine	3	33
+	lvl3: Cysteine and methionine	3	33
+	lvl2: Acetyl-coA fermentation to butyrate II (clostridium)	2	4
+K00004	K00004: BDH, butB; (R,R)-butanediol dehydrogenase / meso-butanediol dehydrogenase / diacetyl reductase	Function	7
+	lvl2: Acetoin biosynthesis	2	20
+	lvl3: Acetoin biosynthesis III	3	2
+	lvl3: (s,s)-butanediol biosynthesis	3	2
+	lvl3: Meso-butanediol biosynthesis I	3	2
+	lvl3: Superpathway of (R,R)-butanediol biosynthesis	3	4
+	lvl3: Superpathway of 2,3-butanediol biosynthesis	3	4
+	lvl1: 20_Hydrolysis of polymers	1	92
+	lvl2: Starch	2	25
+K00012	K00012: UGDH, ugd; UDPglucose 6-dehydrogenase	Function	2
+	lvl2: Xylose	2	25
+	lvl2: Lysine biosynthesis	2	15
+K00013	K00013: hisD; histidinol dehydrogenase	Function	2
+	lvl3: Histidine	3	43
+	lvl2: Tryptophan metabolism	2	16
+K00014	K00014: aroE; shikimate dehydrogenase	Function	2
+	lvl3: PEP	3	26
+	lvl2: Histidine degradation	2	3
+K00020	K00020: HIBADH, mmsB; 3-hydroxyisobutyrate dehydrogenase	Function	1
+	lvl2: Succinate fermentation to butyrate	2	2
+K00023	K00023: phbB; acetoacetyl-CoA reductase	Function	2
+	lvl1: 08_Hydrocarbon degradation	1	28
+	lvl2: Aromatic carboxylic acid degradation	2	10
+	lvl2: Mixed acid fermentation	2	18
+K00024	K00024: mdh; malate dehydrogenase	Function	5
+	lvl3: Pyruvate fermentation to lactate	3	7
+	lvl1: 10_TCA cycle	1	26
+	lvl2: Replenishment of TCA cycle intermediates (necessary because some intermediates serve as precursors for biosysnthesis)	2	4
+	lvl2: Incomplete TCA fork	2	9
+	lvl1: 15_Methylotrophy	1	24
+	lvl2: Serine pathway for formaldehyde fixation	2	5
+K00031	K00031: IDH1, IDH2, icd; isocitrate dehydrogenase	Function	3
+	lvl2: TCA cycle	2	10
+	lvl2: Reductive TCA cycle	2	3
+K00033	K00033: PGD, gnd, gntZ; 6-phosphogluconate dehydrogenase	Function	2
+	lvl2: Cellular response to stress	2	37
+	lvl2: Galactose	2	15
+K00035	K00035: gal; D-galactose 1-dehydrogenase	Function	1
+K00036	K00036: G6PD, zwf; glucose-6-phosphate 1-dehydrogenase	Function	3
+	lvl2: RuMP pathway for formaldehyde fixation (first two steps are common to both RuMP pathway variants)	2	4
+K00039	K00039: rbtD; ribitol 2-dehydrogenase	Function	1
+K00040	K00040: uxuB; fructuronate reductase	Function	1
+	lvl2: Homolactic fermentation	2	8
+K00043	K00043: gbd; 4-hydroxybutyrate dehydrogenase	Function	1
+	lvl2: Histidine biosynthesis, pRpp => histidine	2	10
+K00052	K00052: leuB, IMDH; 3-isopropylmalate dehydrogenase	Function	1
+K00053	K00053: ilvC; ketol-acid reductoisomerase	Function	1
+	lvl2: Other aromatics degradation	2	7
+K00055	K00055: E1.1.1.90; aryl-alcohol dehydrogenase	Function	1
+	lvl2: Glycine, serine and threonine metabolism	2	32
+K00058	K00058: serA, PHGDH; D-3-phosphoglycerate dehydrogenase / 2-oxoglutarate reductase	Function	1
+K00060	K00060: tdh; threonine 3-dehydrogenase	Function	1
+K00065	K00065: kduD; 2-dehydro-3-deoxy-D-gluconate 5-dehydrogenase	Function	1
+	lvl1: 07_Nucleic acid metabolism	1	122
+	lvl2: Purine metabolism	2	66
+K00073	K00073: allD; ureidoglycolate dehydrogenase (NAD+)	Function	1
+	lvl1: 19_Saccharide and derivated synthesis	1	133
+	lvl2: Polysaccharide biosynthesis and assembly of cell surface structure	2	120
+	lvl3: Peptidoglycan biosynthesis	3	31
+K00075	K00075: murB; UDP-N-acetylmuramate dehydrogenase	Function	2
+	lvl3: Murein	3	5
+K00087	K00087: ygeS, xdhA; xanthine dehydrogenase molybdenum-binding subunit	Function	2
+	lvl2: Degradation of purine bases	2	7
+K00088	K00088: IMPDH, guaB; IMP dehydrogenase	Function	1
+K00108	K00108: betA, CHDH; choline dehydrogenase	Function	2
+K00121	K00121: frmA, ADH5, adhC; S-(hydroxymethyl)glutathione dehydrogenase / alcohol dehydrogenase	Function	11
+	lvl2: Glutamate degradation V (via hydroxyglutarate)	2	7
+	lvl2: Formaldehyde oxidation (glutathione-dependent)	2	5
+	lvl1: 14_Methanogenesis	1	9
+	lvl2: From formate	2	4
+K00123	K00123: fdoG, fdhF, fdwA; formate dehydrogenase major subunit	Function	4
+	lvl2: Methane oxidation to cO2	2	6
+	lvl2: Formaldehyde oxidation (tetrahydrofolate pathway)	2	4
+K00126	K00126: fdsD; formate dehydrogenase subunit delta	Function	4
+K00127	K00127: fdoI, fdsG; formate dehydrogenase subunit gamma	Function	2
+	lvl1: 05_Fatty acid oxidation	1	30
+	lvl2: Fatty acid alpha-oxidation	2	1
+K00128	K00128: ALDH; aldehyde dehydrogenase (NAD+)	Function	8
+	lvl2: Fatty acid omega-oxidation	2	1
+	lvl2: Valine, leucine and isoleucine degradation	2	27
+	lvl2: Phenylalanine, tyrosine and tryptophan biosynthesis	2	21
+	lvl2: Hydrocarbon degradation	2	1
+K00130	K00130: betB, gbsA; betaine-aldehyde dehydrogenase	Function	2
+	lvl2: Cysteine and methionine metabolism	2	22
+K00133	K00133: asd; aspartate-semialdehyde dehydrogenase	Function	6
+	lvl2: Methionine biosynthesis	2	5
+	lvl2: Bifidobacterium shunt	2	7
+K00134	K00134: GAPDH, gapA; glyceraldehyde 3-phosphate dehydrogenase	Function	8
+	lvl1: 02_Homoacetogenesis	1	34
+	lvl2: Glycolysis	2	15
+	lvl1: 16_Embden Meyerhof-Parnos (EMP)	1	30
+	lvl2: EMP	2	11
+	lvl2: Glycolysis III (EMP)	2	11
+	lvl1: 17_Gluconeogenesis	1	10
+	lvl2: Gluconeogenesis in archea	2	7
+	lvl2: Regulation of stress-activated protein kinase signaling cascade	2	1
+	lvl2: Lysine degradation VIII	2	1
+K00135	K00135: gabD; succinate-semialdehyde dehydrogenase / glutarate-semialdehyde dehydrogenase	Function	3
+	lvl2: Methionine degradation	2	6
+	lvl2: Arginine and proline metabolism	2	50
+K00137	K00137: prr; aminobutyraldehyde dehydrogenase	Function	1
+	lvl3: Pyruvate fermentation to acetate and lactate I	3	5
+K00138	K00138: aldB; aldehyde dehydrogenase	Function	4
+	lvl3: Pyruvate fermentation to acetate I	3	5
+	lvl3: Pyruvate fermentation to acetate IV	3	5
+K00140	K00140: mmsA, iolA, ALDH6A1; malonate-semialdehyde dehydrogenase (acetylating) / methylmalonate-semialdehyde dehydrogenase	Function	1
+K00145	K00145: argC; N-acetyl-gamma-glutamyl-phosphate reductase	Function	6
+K00147	K00147: proA; glutamate-5-semialdehyde dehydrogenase	Function	1
+K00148	K00148: fdhA; glutathione-independent formaldehyde dehydrogenase	Function	1
+K00161	K00161: PDHA, pdhA; pyruvate dehydrogenase E1 component alpha subunit	Function	1
+K00162	K00162: PDHB, pdhB; pyruvate dehydrogenase E1 component beta subunit	Function	1
+K00164	K00164: OGDH, sucA; 2-oxoglutarate dehydrogenase E1 component	Function	2
+K00166	K00166: BCKDHA, bkdA1; 2-oxoisovalerate dehydrogenase E1 component alpha subunit	Function	1
+K00167	K00167: BCKDHB, bkdA2; 2-oxoisovalerate dehydrogenase E1 component beta subunit	Function	1
+	lvl2: Fatty acid activation	2	7
+K00215	K00215: dapB; 4-hydroxy-tetrahydrodipicolinate reductase	Function	2
+K00220	K00220: tyrC; cyclohexadieny/prephenate dehydrogenase	Function	1
+K00239	K00239: sdhA, frdA; succinate dehydrogenase / fumarate reductase, flavoprotein subunit	Function	3
+K00242	K00242: sdhD, frdD; succinate dehydrogenase / fumarate reductase, membrane anchor subunit	Function	3
+	lvl3: Pyruvate fermentation to propionate II (acrylate pathway)	3	4
+K00248	K00248: ACADS, bcd; butyryl-CoA dehydrogenase	Function	6
+	lvl2: Fatty acid beta-oxidation I	2	10
+K00249	K00249: ACADM, acd; acyl-CoA dehydrogenase	Function	3
+K00252	K00252: GCDH, gcdH; glutaryl-CoA dehydrogenase	Function	2
+K00253	K00253: IVD, ivd; isovaleryl-CoA dehydrogenase	Function	1
+	lvl2: Oxydation deamination	2	3
+K00259	K00259: ald; alanine dehydrogenase	Function	2
+K00265	K00265: gltB; glutamate synthase (NADPH) large chain	Function	2
+	lvl1: 11_Nitrogen cycle	1	12
+	lvl2: Ammonia assimilation	2	6
+K00266	K00266: gltD; glutamate synthase (NADPH) small chain	Function	3
+K00274	K00274: MAO, aofH; monoamine oxidase	Function	5
+K00276	K00276: AOC3, AOC2, tynA; primary-amine oxidase	Function	3
+K00278	K00278: nadB; L-aspartate oxidase	Function	1
+K00281	K00281: GLDC, gcvP; glycine dehydrogenase	Function	1
+K00285	K00285: dadA; D-amino-acid dehydrogenase	Function	1
+K00286	K00286: proC; pyrroline-5-carboxylate reductase	Function	1
+K00301	K00301: E1.5.3.1; sarcosine oxidase	Function	1
+K00302	K00302: soxA; sarcosine oxidase, subunit alpha	Function	1
+K00303	K00303: soxB; sarcosine oxidase, subunit beta	Function	1
+K00304	K00304: soxD; sarcosine oxidase, subunit delta	Function	1
+K00305	K00305: soxG; sarcosine oxidase, subunit gamma	Function	1
+K00320	K00320: mer; 5,10-methylenetetrahydromethanopterin reductase	Function	2
+	lvl2: From CO2	2	1
+K00330	K00330: nuoA; NADH-quinone oxidoreductase subunit A	Function	1
+K00331	K00331: nuoB; NADH-quinone oxidoreductase subunit B	Function	1
+K00332	K00332: nuoC; NADH-quinone oxidoreductase subunit C	Function	1
+K00333	K00333: nuoD; NADH-quinone oxidoreductase subunit D	Function	1
+	lvl1: 13_Hydrogen metabolism	1	5
+	lvl2: Hydrogen production VII (chlorophyta, cyanobacteria)	2	2
+K00355	K00355: NQO1; NAD(P)H dehydrogenase (quinone)	Function	1
+	lvl2: Nitrogenated compounds Reduction	2	3
+	lvl3: Assimilatory nitrate reduction	3	1
+	lvl4: Nitrate to ammonia	4	1
+K00362	K00362: nirB; nitrite reductase (NADH) large subunit	Function	1
+	lvl3: Denitrification	3	2
+	lvl4: Nitrate to nitrite	4	2
+K00372	K00372: nasA; assimilatory nitrate reductase catalytic subunit	Function	2
+	lvl1: 18_Sulfur compounds metabolism	1	25
+	lvl2: Sulfur compounds cycle	2	22
+	lvl3: Sulfate reduction (assimilatory)	3	4
+K00381	K00381: cysI; sulfite reductase (NADPH) hemoprotein beta-component	Function	1
+K00382	K00382: DLD, lpd, pdhD; dihydrolipoamide dehydrogenase	Function	2
+K00383	K00383: GSR, gor; glutathione reductase (NADPH)	Function	1
+	lvl2: Pyrimidine metabolism	2	45
+K00384	K00384: trxB, TRR; thioredoxin reductase (NADPH)	Function	2
+	lvl3: Sulfite oxidation	3	4
+K00387	K00387: SUOX; sulfite oxidase	Function	1
+K00390	K00390: cysH; phosphoadenosine phosphosulfate reductase	Function	1
+K00428	K00428: E1.11.1.5; cytochrome c peroxidase	Function	2
+	lvl2: Response to oxidative stress	2	11
+K00432	K00432: gpx, btuE, bsaA; glutathione peroxidase	Function	3
+K00446	K00446: dmpB, xylE; catechol 2,3-dioxygenase	Function	1
+	lvl2: Polycyclic aromatic hydrocarbon degradation	2	4
+K00448	K00448: pcaG; protocatechuate 3,4-dioxygenase, alpha subunit	Function	2
+K00449	K00449: pcaH; protocatechuate 3,4-dioxygenase, beta subunit	Function	1
+K00451	K00451: HGD, hmgA; homogentisate 1,2-dioxygenase	Function	2
+K00457	K00457: HPD, hppD; 4-hydroxyphenylpyruvate dioxygenase	Function	2
+K00481	K00481: pobA; p-hydroxybenzoate 3-monooxygenase	Function	1
+K00500	K00500: phhA, PAH; phenylalanine-4-hydroxylase	Function	3
+K00525	K00525: E1.17.4.1A, nrdA, nrdE; ribonucleoside-diphosphate reductase alpha chain	Function	2
+K00526	K00526: E1.17.4.1B, nrdB, nrdF; ribonucleoside-diphosphate reductase beta chain	Function	2
+K00529	K00529: hcaD; 3-phenylpropionate/trans-cinnamate dioxygenase ferredoxin reductase component	Function	1
+K00547	K00547: mmuM, BHMT2; homocysteine S-methyltransferase	Function	1
+K00548	K00548: metH, MTR; 5-methyltetrahydrofolate--homocysteine methyltransferase	Function	3
+K00558	K00558: DNMT1, dcm; DNA (cytosine-5)-methyltransferase 1	Function	2
+K00560	K00560: thyA, TYMS; thymidylate synthase	Function	1
+K00567	K00567: ogt, MGMT; methylated-DNA-[protein]-cysteine S-methyltransferase	Function	2
+	lvl2: Response to nitrosative stress	2	15
+	lvl2: Reductive acetyl coenzyme A pathway	2	17
+K00568	K00568: ubiG; 2-polyprenyl-6-hydroxyphenyl methylase / 3-demethylubiquinone-9 3-methyltransferase	Function	2
+K00588	K00588: E2.1.1.104; caffeoyl-CoA O-methyltransferase	Function	2
+K00600	K00600: glyA, SHMT; glycine hydroxymethyltransferase	Function	3
+K00602	K00602: purH; phosphoribosylaminoimidazolecarboxamide formyltransferase / IMP cyclohydrolase	Function	1
+K00605	K00605: gcvT, AMT; aminomethyltransferase	Function	1
+K00609	K00609: pyrB, PYR2; aspartate carbamoyltransferase catalytic subunit	Function	2
+K00611	K00611: OTC, argF, argI; ornithine carbamoyltransferase	Function	1
+	lvl3: (R)-acetoin biosynthesis I	3	2
+K00615	K00615: E2.2.1.1, tktA, tktB; transketolase	Function	4
+	lvl3: (s)-acetoin biosynthesis	3	2
+	lvl3: Meso-butanediol biosynthesis II	3	2
+K00616	K00616: E2.2.1.2, talA, talB; transaldolase	Function	4
+K00619	K00619: argA; amino-acid N-acetyltransferase	Function	1
+K00620	K00620: argJ; glutamate N-acetyltransferase / amino-acid N-acetyltransferase	Function	1
+K00625	K00625: E2.3.1.8, pta; phosphate acetyltransferase	Function	11
+	lvl2: Pyruvate fermentation to butanol	2	15
+	lvl3: Pyruvate fermentation to acetone	3	4
+	lvl2: From acetate	2	4
+	lvl3: Sulfoacetaldehyde degradation	3	1
+	lvl3: Sulfolactate degradation	3	4
+K00626	K00626: ACAT, atoB; acetyl-CoA C-acetyltransferase	Function	2
+K00632	K00632: fadA, fadI; acetyl-CoA acyltransferase	Function	1
+K00639	K00639: kbl, GCAT; glycine C-acetyltransferase	Function	1
+K00640	K00640: cysE; serine O-acetyltransferase	Function	13
+	lvl3: Pyruvate fermentation to acetate and lactate II	3	3
+	lvl3: Pyruvate fermentation to acetate II	3	3
+	lvl3: Pyruvate fermentation to acetate VII	3	2
+	lvl2: Acetate formation from acetyl-coA I	2	2
+K00641	K00641: metX; homoserine O-acetyltransferase/O-succinyltransferase	Function	1
+K00643	K00643: E2.3.1.37, ALAS; 5-aminolevulinate synthase	Function	1
+K00651	K00651: metA; homoserine O-succinyltransferase/O-acetyltransferase	Function	2
+K00657	K00657: speG, SAT; diamine N-acetyltransferase	Function	1
+K00658	K00658: DLST, sucB; 2-oxoglutarate dehydrogenase E2 component (dihydrolipoamide succinyltransferase)	Function	1
+K00677	K00677: lpxA; UDP-N-acetylglucosamine acyltransferase	Function	3
+	lvl2: Fatty acid beta-oxidation II (core pathway)	2	6
+	lvl3: Lipopolysaccharide biosynthesis	3	51
+K00681	K00681: ggt; gamma-glutamyltranspeptidase / glutathione hydrolase	Function	1
+	lvl1: 09_Carbohydrate Active enzyme - CAZy	1	54
+	lvl2: Glycosyltransferase	2	14
+K00688	K00688: PYG, glgP; glycogen phosphorylase	Function	3
+K00694	K00694: bcsA; cellulose synthase (UDP-forming)	Function	3
+K00697	K00697: otsA; trehalose 6-phosphate synthase	Function	4
+	lvl2: Trehalose metabolism in response to cold stress	2	2
+	lvl2: Glycoside hydrolase	2	32
+K00700	K00700: GBE1, glgB; 1,4-alpha-glucan branching enzyme	Function	1
+K00703	K00703: glgA; starch synthase	Function	2
+K00705	K00705: malQ; 4-alpha-glucanotransferase	Function	3
+	lvl2: Disaccaride phosphorylase	2	13
+	lvl3: Maltose	3	4
+K00721	K00721: DPM1; dolichol-phosphate mannosyltransferase	Function	2
+	lvl3: N-glycan biosynthesis	3	17
+K00748	K00748: lpxB; lipid-A-disaccharide synthase	Function	2
+K00750	K00750: GYG1, GYG2; glycogenin	Function	1
+K00758	K00758: deoA, TYMP; thymidine phosphorylase	Function	2
+	lvl2: Degradation of pyrimidine bases	2	4
+K00759	K00759: APRT, apt; adenine phosphoribosyltransferase	Function	1
+K00760	K00760: hprT, hpt, HPRT1; hypoxanthine phosphoribosyltransferase	Function	1
+K00761	K00761: upp, UPRT; uracil phosphoribosyltransferase	Function	1
+K00762	K00762: pyrE; orotate phosphoribosyltransferase	Function	1
+K00764	K00764: purF, PPAT; amidophosphoribosyltransferase	Function	2
+K00765	K00765: hisG; ATP phosphoribosyltransferase	Function	2
+K00766	K00766: trpD; anthranilate phosphoribosyltransferase	Function	2
+K00769	K00769: gpt; xanthine phosphoribosyltransferase	Function	1
+K00789	K00789: metK; S-adenosylmethionine synthetase	Function	4
+K00790	K00790: murA; UDP-N-acetylglucosamine 1-carboxyvinyltransferase	Function	4
+K00794	K00794: ribH, RIB4; 6,7-dimethyl-8-ribityllumazine synthase	Function	2
+K00797	K00797: speE, SRM, SPE3; spermidine synthase	Function	3
+K00799	K00799: GST, gst; glutathione S-transferase	Function	1
+K00800	K00800: aroA; 3-phosphoshikimate 1-carboxyvinyltransferase	Function	2
+K00812	K00812: aspB; aspartate aminotransferase	Function	9
+	lvl3: Pyruvate to leucine	3	4
+K00813	K00813: aspC; aspartate aminotransferase	Function	7
+K00817	K00817: hisC; histidinol-phosphate aminotransferase	Function	3
+K00819	K00819: rocD, OAT; ornithine--oxo-acid transaminase	Function	1
+K00820	K00820: glmS, GFPT; glutamine---fructose-6-phosphate transaminase (isomerizing)	Function	2
+K00821	K00821: argD; acetylornithine/N-succinyldiaminopimelate aminotransferase	Function	4
+	lvl3: Pyruvate fermentation to acetate and alanine	3	2
+K00822	K00822: E2.6.1.18; beta-alanine--pyruvate transaminase	Function	2
+K00824	K00824: dat; D-alanine transaminase	Function	3
+K00826	K00826: E2.6.1.42, ilvE; branched-chain amino acid aminotransferase	Function	2
+K00830	K00830: AGXT; alanine-glyoxylate transaminase / serine-glyoxylate transaminase / serine-pyruvate transaminase	Function	4
+K00831	K00831: serC, PSAT1; phosphoserine aminotransferase	Function	1
+K00845	K00845: glk; glucokinase	Function	3
+K00847	K00847: E2.7.1.4, scrK; fructokinase	Function	1
+K00854	K00854: xylB, XYLB; xylulokinase	Function	1
+	lvl1: 04_Utililization of sugar, conversion of pentose to EMP pathway intermediates	1	4
+	lvl2: Hexose	2	1
+K00857	K00857: tdk, TK; thymidine kinase	Function	2
+	lvl2: Pentose	2	3
+K00873	K00873: PK, pyk; pyruvate kinase	Function	5
+	lvl2: EMP  in archea	2	8
+K00874	K00874: kdgK; 2-dehydro-3-deoxygluconokinase	Function	1
+K00875	K00875: rbtK; D-ribulokinase	Function	1
+K00880	K00880: lyxK; L-xylulokinase	Function	1
+K00883	K00883: dgoK; 2-dehydro-3-deoxygalactonokinase	Function	1
+K00887	K00887: dgkA; undecaprenol kinase	Function	1
+K00912	K00912: lpxK; tetraacyldisaccharide 4'-kinase	Function	1
+K00925	K00925: ackA; acetate kinase	Function	3
+K00926	K00926: arcC; carbamate kinase	Function	2
+K00927	K00927: PGK, pgk; phosphoglycerate kinase	Function	5
+K00928	K00928: lysC; aspartate kinase	Function	6
+K00930	K00930: argB; acetylglutamate kinase	Function	2
+K00931	K00931: proB; glutamate 5-kinase	Function	3
+K00937	K00937: ppk1; polyphosphate kinase	Function	1
+K00939	K00939: adk, AK; adenylate kinase	Function	2
+K00940	K00940: ndk, NME; nucleoside-diphosphate kinase	Function	2
+K00942	K00942: E2.7.4.8, gmk; guanylate kinase	Function	1
+K00943	K00943: tmk, DTYMK; dTMP kinase	Function	1
+K00945	K00945: cmk; CMP/dCMP kinase	Function	1
+K00948	K00948: PRPS, prsA; ribose-phosphate pyrophosphokinase	Function	1
+K00956	K00956: cysN; sulfate adenylyltransferase subunit 1	Function	9
+	lvl2: Chemoautotrophic oxidation of sulfur compounds	2	3
+	lvl3: Superpathway of sulfur metabolism (Desulfocapsa sulfoexigens)	3	2
+	lvl3: Sulfate reduction (dissimilatory)	3	2
+	lvl3: Sulfur disproportionation	3	2
+	lvl3: Thiosulfate disproportionation	3	5
+	lvl2: Cellular response to oxidative stress	2	6
+K00957	K00957: cysD; sulfate adenylyltransferase subunit 2	Function	9
+K00962	K00962: pnp, PNPT1; polyribonucleotide nucleotidyltransferase	Function	2
+	lvl1: 03_Superpathway of thiosulfate metabolism (Desulfovibrio sulfodismutans)	1	3
+	lvl2: nan	2	3
+K00971	K00971: manC, cpsB; mannose-1-phosphate guanylyltransferase	Function	2
+	lvl2: Mannose	2	23
+K00975	K00975: glgC; glucose-1-phosphate adenylyltransferase	Function	2
+K00979	K00979: kdsB; 3-deoxy-manno-octulosonate cytidylyltransferase (CMP-KDO synthetase)	Function	2
+K01000	K01000: mraY; phospho-N-acetylmuramoyl-pentapeptide-transferase	Function	2
+K01006	K01006: ppdK; pyruvate, orthophosphate dikinase	Function	7
+	lvl2: Gluconeogenesis	2	3
+K01011	K01011: TST, MPST, sseA; thiosulfate/3-mercaptopyruvate sulfurtransferase	Function	3
+K01026	K01026: pct; propionate CoA-transferase	Function	3
+	lvl2: Polysaccharide lyase	2	3
+K01046	K01046: lip, TGL2; triacylglycerol lipase	Function	1
+	lvl2: Cellular response to osmotic stress	2	33
+K01048	K01048: pldB; lysophospholipase	Function	2
+K01057	K01057: PGLS, pgl, devB; 6-phosphogluconolactonase	Function	1
+K01070	K01070: frmB, ESD, fghA; S-formylglutathione hydrolase	Function	1
+K01079	K01079: serB, PSPH; phosphoserine phosphatase	Function	1
+K01087	K01087: otsB; trehalose 6-phosphate phosphatase	Function	3
+K01119	K01119: cpdB; 2',3'-cyclic-nucleotide 2'-phosphodiesterase / 3'-nucleotidase	Function	2
+K01129	K01129: dgt; dGTPase	Function	1
+K01139	K01139: spoT; GTP diphosphokinase / guanosine-3',5'-bis(diphosphate) 3'-diphosphatase	Function	1
+K01178	K01178: SGA1; glucoamylase	Function	2
+K01181	K01181: E3.2.1.8, xynA; endo-1,4-beta-xylanase	Function	1
+K01182	K01182: IMA, malL; oligo-1,6-glucosidase	Function	3
+K01184	K01184: E3.2.1.15; polygalacturonase	Function	4
+	lvl2: Pectin	2	1
+K01185	K01185: E3.2.1.17; lysozyme	Function	1
+K01186	K01186: NEU1; sialidase-1	Function	1
+K01190	K01190: lacZ; beta-galactosidase	Function	3
+	lvl3: Lactose	3	4
+K01191	K01191: MAN2C1; alpha-mannosidase	Function	1
+K01192	K01192: E3.2.1.25, MANBA, manB; beta-mannosidase	Function	1
+K01193	K01193: INV, sacA; beta-fructofuranosidase	Function	4
+	lvl3: Sucrose	3	3
+K01198	K01198: xynB; xylan 1,4-beta-xylosidase	Function	3
+K01206	K01206: FUCA; alpha-L-fucosidase	Function	1
+K01207	K01207: nagZ; beta-N-acetylhexosaminidase	Function	2
+	lvl2: Chitin	2	2
+K01209	K01209: abfA; alpha-L-arabinofuranosidase	Function	2
+	lvl2: Arabinose	2	1
+K01214	K01214: ISA, treX; isoamylase	Function	1
+K01217	K01217: IDUA; L-iduronidase	Function	1
+K01218	K01218: gmuG; mannan endo-1,4-beta-mannosidase	Function	2
+K01236	K01236: treZ, glgZ; maltooligosyltrehalose trehalohydrolase	Function	1
+K01239	K01239: iunH; purine nucleosidase	Function	1
+K01240	K01240: URH1; uridine nucleosidase	Function	1
+K01241	K01241: amn; AMP nucleosidase	Function	1
+K01243	K01243: mtnN, mtn, pfs; adenosylhomocysteine nucleosidase	Function	1
+K01247	K01247: alkA; DNA-3-methyladenine glycosylase II	Function	1
+K01251	K01251: E3.3.1.1, ahcY; adenosylhomocysteinase	Function	2
+K01259	K01259: pip; proline iminopeptidase	Function	1
+	lvl2: Carbohydrate esterase	2	5
+K01286	K01286: E3.4.16.4; D-alanyl-D-alanine carboxypeptidase	Function	2
+K01425	K01425: glsA, GLS; glutaminase	Function	4
+	lvl2: D-glutamine and D-glutamate metabolism	2	4
+K01426	K01426: E3.5.1.4, amiE; amidase	Function	5
+K01428	K01428: ureC; urease subunit alpha	Function	2
+K01429	K01429: ureB; urease subunit beta	Function	2
+K01430	K01430: ureA; urease subunit gamma	Function	2
+K01438	K01438: argE; acetylornithine deacetylase	Function	2
+K01439	K01439: dapE; succinyl-diaminopimelate desuccinylase	Function	2
+K01443	K01443: nagA, AMDHD2; N-acetylglucosamine-6-phosphate deacetylase	Function	1
+K01448	K01448: amiABC; N-acetylmuramoyl-L-alanine amidase	Function	1
+	lvl3: Oxaloacetate to aspartate and asparagine	3	6
+K01449	K01449: cwlJ, sleB; N-acetylmuramoyl-L-alanine amidase	Function	2
+	lvl3: Glutamate	3	2
+K01451	K01451: hipO; hippurate hydrolase	Function	1
+K01457	K01457: atzF; allophanate hydrolase	Function	1
+K01458	K01458: hutG; N-formylglutamate deformylase	Function	1
+K01464	K01464: DPYS, dht, hydA; dihydropyrimidinase	Function	1
+K01465	K01465: URA4, pyrC; dihydroorotase	Function	1
+K01466	K01466: allB; allantoinase	Function	2
+K01468	K01468: hutI, AMDHD1; imidazolonepropionase	Function	2
+K01470	K01470: E3.5.2.10; creatinine amidohydrolase	Function	1
+K01473	K01473: hyuA; N-methylhydantoinase A	Function	3
+	lvl2: BTEX and related aromatics degradation	2	2
+K01474	K01474: hyuB; N-methylhydantoinase B	Function	2
+K01476	K01476: E3.5.3.1, rocF, arg; arginase	Function	1
+K01478	K01478: arcA; arginine deiminase	Function	1
+K01480	K01480: speB; agmatinase	Function	1
+K01483	K01483: allA; ureidoglycolate lyase	Function	1
+K01485	K01485: codA; cytosine/creatinine deaminase	Function	3
+K01486	K01486: ade; adenine deaminase	Function	2
+K01487	K01487: E3.5.4.3, guaD; guanine deaminase	Function	2
+K01489	K01489: cdd, CDA; cytidine deaminase	Function	1
+K01491	K01491: folD; methylenetetrahydrofolate dehydrogenase (NADP+) / methenyltetrahydrofolate cyclohydrolase	Function	2
+K01494	K01494: dcd; dCTP deaminase	Function	1
+K01496	K01496: hisI; phosphoribosyl-AMP cyclohydrolase	Function	2
+K01501	K01501: E3.5.5.1; nitrilase	Function	2
+K01517	K01517: ADPRM; manganese-dependent ADP-ribose/CDP-alcohol diphosphatase	Function	1
+K01519	K01519: ITPA; inosine triphosphate pyrophosphatase	Function	2
+K01520	K01520: dut, DUT; dUTP pyrophosphatase	Function	1
+K01523	K01523: hisE; phosphoribosyl-ATP pyrophosphohydrolase	Function	1
+K01524	K01524: ppx-gppA; exopolyphosphatase / guanosine-5'-triphosphate,3'-diphosphate pyrophosphatase	Function	1
+K01581	K01581: E4.1.1.17, ODC1, speC, speF; ornithine decarboxylase	Function	1
+K01584	K01584: adiA; arginine decarboxylase	Function	3
+K01586	K01586: lysA; diaminopimelate decarboxylase	Function	2
+K01588	K01588: purE; 5-(carboxyamino)imidazole ribonucleotide mutase	Function	1
+K01589	K01589: purK; 5-(carboxyamino)imidazole ribonucleotide synthase	Function	1
+K01591	K01591: pyrF; orotidine-5'-phosphate decarboxylase	Function	1
+K01593	K01593: DDC, TDC; aromatic-L-amino-acid/L-tryptophan decarboxylase	Function	3
+K01595	K01595: ppc; phosphoenolpyruvate carboxylase	Function	3
+K01609	K01609: trpC; indole-3-glycerol phosphate synthase	Function	1
+K01610	K01610: E4.1.1.49, pckA; phosphoenolpyruvate carboxykinase (ATP)	Function	2
+K01619	K01619: deoC, DERA; deoxyribose-phosphate aldolase	Function	1
+K01620	K01620: ltaE; threonine aldolase	Function	1
+K01621	K01621: xfp, xpk; xylulose-5-phosphate/fructose-6-phosphate phosphoketolase	Function	1
+K01623	K01623: ALDO; fructose-bisphosphate aldolase, class I	Function	3
+K01624	K01624: FBA, fbaA; fructose-bisphosphate aldolase, class II	Function	5
+K01625	K01625: eda; 2-dehydro-3-deoxyphosphogluconate aldolase / (4S)-4-hydroxy-2-oxoglutarate aldolase	Function	3
+K01627	K01627: kdsA; 2-dehydro-3-deoxyphosphooctonate aldolase (KDO 8-P synthase)	Function	3
+K01631	K01631: dgoA; 2-dehydro-3-deoxyphosphogalactonate aldolase	Function	1
+K01637	K01637: E4.1.3.1, aceA; isocitrate lyase	Function	1
+K01638	K01638: aceB, glcB; malate synthase	Function	1
+K01649	K01649: leuA, IMS; 2-isopropylmalate synthase	Function	1
+K01652	K01652: E2.2.1.6L, ilvB, ilvG, ilvI; acetolactate synthase I/II/III large subunit	Function	2
+K01653	K01653: E2.2.1.6S, ilvH, ilvN; acetolactate synthase I/III small subunit	Function	2
+K01676	K01676: E4.2.1.2A, fumA, fumB; fumarate hydratase, class I	Function	3
+K01679	K01679: E4.2.1.2B, fumC, FH; fumarate hydratase, class II	Function	3
+K01681	K01681: ACO, acnA; aconitate hydratase	Function	4
+	lvl2: Regulation of translation in response to oxidative stress	2	1
+K01684	K01684: dgoD; galactonate dehydratase	Function	1
+K01685	K01685: uxaA; altronate hydrolase	Function	1
+K01686	K01686: uxuA; mannonate dehydratase	Function	2
+K01687	K01687: ilvD; dihydroxy-acid dehydratase	Function	3
+K01689	K01689: ENO, eno; enolase	Function	9
+	lvl2: Fatty acid beta-oxidation IV (unsaturated)	2	4
+K01693	K01693: hisB; imidazoleglycerol-phosphate dehydratase	Function	3
+K01695	K01695: trpA; tryptophan synthase alpha chain	Function	3
+K01696	K01696: trpB; tryptophan synthase beta chain	Function	4
+K01702	K01702: LEU1; 3-isopropylmalate dehydratase	Function	1
+K01711	K01711: gmd, GMDS; GDPmannose 4,6-dehydratase	Function	2
+K01712	K01712: hutU, UROC1; urocanate hydratase	Function	2
+K01714	K01714: dapA; 4-hydroxy-tetrahydrodipicolinate synthase	Function	1
+K01721	K01721: nthA; nitrile hydratase subunit alpha	Function	3
+	lvl2: Nitoaromatics degradation	2	2
+K01735	K01735: aroB; 3-dehydroquinate synthase	Function	1
+K01736	K01736: aroC; chorismate synthase	Function	1
+K01738	K01738: cysK; cysteine synthase	Function	2
+K01740	K01740: metY; O-acetylhomoserine (thiol)-lyase	Function	1
+K01744	K01744: aspA; aspartate ammonia-lyase	Function	1
+	lvl2: Lysine degradation X	2	1
+K01745	K01745: hutH, HAL; histidine ammonia-lyase	Function	2
+K01750	K01750: E4.3.1.12, ocd; ornithine cyclodeaminase	Function	1
+K01752	K01752: E4.3.1.17, sdaA, sdaB, tdcG; L-serine dehydratase	Function	2
+K01754	K01754: E4.3.1.19, ilvA, tdcB; threonine dehydratase	Function	2
+K01755	K01755: argH, ASL; argininosuccinate lyase	Function	2
+K01756	K01756: purB, ADSL; adenylosuccinate lyase	Function	2
+K01759	K01759: GLO1, gloA; lactoylglutathione lyase	Function	1
+K01760	K01760: metC; cysteine-S-conjugate beta-lyase	Function	4
+K01761	K01761: E4.4.1.11; methionine-gamma-lyase	Function	2
+K01768	K01768: E4.6.1.1; adenylate cyclase	Function	1
+K01776	K01776: murI; glutamate racemase	Function	3
+K01778	K01778: dapF; diaminopimelate epimerase	Function	1
+K01779	K01779: racD; aspartate racemase	Function	1
+K01782	K01782: fadJ; 3-hydroxyacyl-CoA dehydrogenase / enoyl-CoA hydratase / 3-hydroxybutyryl-CoA epimerase	Function	12
+K01783	K01783: rpe, RPE; ribulose-phosphate 3-epimerase	Function	2
+K01784	K01784: galE, GALE; UDP-glucose 4-epimerase	Function	2
+K01801	K01801: nagL; maleylpyruvate isomerase	Function	1
+K01803	K01803: TPI, tpiA; triosephosphate isomerase (TIM)	Function	5
+K01805	K01805: xylA; xylose isomerase	Function	5
+K01807	K01807: rpiA; ribose 5-phosphate isomerase A	Function	4
+K01808	K01808: rpiB; ribose 5-phosphate isomerase B	Function	4
+K01810	K01810: GPI, pgi; glucose-6-phosphate isomerase	Function	9
+	lvl2: Fatty acid beta-oxidation III (unsaturated)	2	1
+K01812	K01812: uxaC; glucuronate isomerase	Function	2
+K01814	K01814: hisA; phosphoribosylformimino-5-aminoimidazole carboxamide ribotide isomerase	Function	2
+K01815	K01815: kduI; 4-deoxy-L-threo-5-hexosulose-uronate ketol-isomerase	Function	2
+K01817	K01817: trpF; phosphoribosylanthranilate isomerase	Function	1
+K01834	K01834: PGAM, gpmA; 2,3-bisphosphoglycerate-dependent phosphoglycerate mutase	Function	4
+K01835	K01835: pgm; phosphoglucomutase	Function	4
+K01838	K01838: pgmB; beta-phosphoglucomutase	Function	2
+K01839	K01839: deoB; phosphopentomutase	Function	2
+K01840	K01840: manB; phosphomannomutase	Function	2
+K01843	K01843: kamA; lysine 2,3-aminomutase	Function	1
+K01847	K01847: MUT; methylmalonyl-CoA mutase	Function	2
+K01856	K01856: catB; muconate cycloisomerase	Function	1
+K01895	K01895: ACSS1_2, acs; acetyl-CoA synthetase	Function	1
+	lvl3: Pyruvate fermentation to acetate V	3	3
+K01899	K01899: LSC1; succinyl-CoA synthetase alpha subunit	Function	2
+	lvl3: Pyruvate fermentation to acetate VI	3	3
+K01903	K01903: sucC; succinyl-CoA synthetase beta subunit	Function	4
+K01915	K01915: glnA, GLUL; glutamine synthetase	Function	3
+K01921	K01921: ddl; D-alanine-D-alanine ligase	Function	1
+K01923	K01923: purC; phosphoribosylaminoimidazole-succinocarboxamide synthase	Function	1
+K01924	K01924: murC; UDP-N-acetylmuramate--alanine ligase	Function	3
+K01925	K01925: murD; UDP-N-acetylmuramoylalanine--D-glutamate ligase	Function	3
+K01928	K01928: murE; UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase	Function	3
+K01929	K01929: murF; UDP-N-acetylmuramoyl-tripeptide--D-alanyl-D-alanine ligase	Function	3
+K01937	K01937: pyrG, CTPS; CTP synthase	Function	1
+K01938	K01938: fhs; formate--tetrahydrofolate ligase	Function	2
+K01939	K01939: purA, ADSS; adenylosuccinate synthase	Function	2
+K01940	K01940: argG, ASS1; argininosuccinate synthase	Function	2
+K01941	K01941: E6.3.4.6; urea carboxylase	Function	1
+K01945	K01945: purD; phosphoribosylamine---glycine ligase	Function	1
+K01951	K01951: guaA, GMPS; GMP synthase (glutamine-hydrolysing)	Function	1
+K01953	K01953: asnB, ASNS; asparagine synthase (glutamine-hydrolysing)	Function	3
+K01955	K01955: carB, CPA2; carbamoyl-phosphate synthase large subunit	Function	2
+K01956	K01956: carA, CPA1; carbamoyl-phosphate synthase small subunit	Function	2
+K01958	K01958: PC, pyc; pyruvate carboxylase	Function	2
+K01965	K01965: PCCA, pccA; propionyl-CoA carboxylase alpha chain	Function	1
+K01966	K01966: PCCB, pccB; propionyl-CoA carboxylase beta chain	Function	1
+K01968	K01968: E6.4.1.4A; 3-methylcrotonyl-CoA carboxylase alpha subunit	Function	1
+K01969	K01969: E6.4.1.4B; 3-methylcrotonyl-CoA carboxylase beta subunit	Function	1
+	lvl1: 12_Transporters	1	209
+	lvl2: ABC transporters, prokaryotic type	2	175
+	lvl3:  metallic cation, iron-siderophore and vitamin b12 transporters	3	12
+	lvl4: Putative ABC transporter [mD:m00247]	4	3
+K01989	K01989: K01989; putative tryptophan/tyrosine transport system substrate-binding protein	Function	1
+	lvl3: ABC-2 type and other transporters	3	19
+	lvl4: ABC-2 type transporter [mD:m00254]	4	1
+K01990	K01990: ABC-2.A; ABC-2 type transport system ATP-binding protein	Function	1
+	lvl3: Phosphate and amino acid transporters	3	33
+	lvl4: Branched-chain amino acid transporter [mD:m00237]	4	5
+K01995	K01995: livG; branched-chain amino acid transport system ATP-binding protein	Function	1
+K01996	K01996: livF; branched-chain amino acid transport system ATP-binding protein	Function	1
+K01997	K01997: livH; branched-chain amino acid transport system permease protein	Function	1
+K01998	K01998: livM; branched-chain amino acid transport system permease protein	Function	1
+K01999	K01999: livK; branched-chain amino acid transport system substrate-binding protein	Function	1
+	lvl3: Mineral and organic ion transporters	3	34
+	lvl4: Glycine betaine/proline transporter [mD:m00208]	4	3
+K02000	K02000: proV; glycine betaine/proline transport system ATP-binding protein	Function	1
+K02001	K02001: proW; glycine betaine/proline transport system permease protein	Function	1
+K02002	K02002: proX; glycine betaine/proline transport system substrate-binding protein	Function	1
+	lvl4: Uncharacterized ABC transporter [mD:m00258]	4	2
+K02003	K02003: ABC.CD.A; putative ABC transport system ATP-binding protein	Function	1
+K02004	K02004: ABC.CD.P; putative ABC transport system permease protein	Function	1
+	lvl4: Iron(III) transporter [mD:m00190]	4	3
+K02010	K02010: afuC, fbpC; iron(III) transport system ATP-binding protein	Function	1
+K02011	K02011: afuB, fbpB; iron(III) transport system permease protein	Function	1
+K02012	K02012: afuA, fbpA; iron(III) transport system substrate-binding protein	Function	1
+	lvl4: Iron complex transporter [mD:m00240]	4	3
+K02013	K02013: ABC.FEV.A; iron complex transport system ATP-binding protein	Function	1
+K02015	K02015: ABC.FEV.P; iron complex transport system permease protein	Function	1
+K02016	K02016: ABC.FEV.S; iron complex transport system substrate-binding protein	Function	1
+	lvl4: Molybdate transporter [mD:m00189]	4	3
+K02017	K02017: modC; molybdate transport system ATP-binding protein	Function	1
+K02018	K02018: modB; molybdate transport system permease protein	Function	1
+K02020	K02020: modA; molybdate transport system substrate-binding protein	Function	1
+	lvl3: Oligosaccharide and polyol transporters	3	32
+	lvl4: Multiple sugar transporter [mD:m00207]	4	3
+K02025	K02025: ABC.MS.P; multiple sugar transport system permease protein	Function	1
+K02026	K02026: ABC.MS.P1; multiple sugar transport system permease protein	Function	1
+K02027	K02027: ABC.MS.S; multiple sugar transport system substrate-binding protein	Function	1
+	lvl4: Polar amino acid transporter [mD:m00236]	4	3
+K02028	K02028: ABC.PA.A; polar amino acid transport system ATP-binding protein	Function	1
+K02029	K02029: ABC.PA.P; polar amino acid transport system permease protein	Function	1
+K02030	K02030: ABC.PA.S; polar amino acid transport system substrate-binding protein	Function	1
+	lvl3: PEPtide and nickel transporters	3	14
+	lvl4: PEPtides/nickel transporter [mD:m00239]	4	5
+K02031	K02031: ddpD; peptide/nickel transport system ATP-binding protein	Function	1
+K02032	K02032: ddpF; peptide/nickel transport system ATP-binding protein	Function	1
+K02033	K02033: ABC.PE.P; peptide/nickel transport system permease protein	Function	1
+K02034	K02034: ABC.PE.P1; peptide/nickel transport system permease protein	Function	1
+K02035	K02035: ABC.PE.S; peptide/nickel transport system substrate-binding protein	Function	1
+	lvl3: Monosaccharide transporters	3	31
+	lvl4: Phosphate transporter [mD:m00222]	4	4
+K02036	K02036: pstB; phosphate transport system ATP-binding protein	Function	1
+K02037	K02037: pstC; phosphate transport system permease protein	Function	1
+K02038	K02038: pstA; phosphate transport system permease protein	Function	1
+K02040	K02040: pstS; phosphate transport system substrate-binding protein	Function	1
+	lvl4: Phosphonate transporter [mD:m00223]	4	3
+K02041	K02041: phnC; phosphonate transport system ATP-binding protein	Function	1
+K02042	K02042: phnE; phosphonate transport system permease protein	Function	1
+K02044	K02044: phnD; phosphonate transport system substrate-binding protein	Function	1
+	lvl4: Sulfate transporter [mD:m00185]	4	3
+K02045	K02045: cysA; sulfate/thiosulfate transport system ATP-binding protein	Function	1
+K02046	K02046: cysU; sulfate/thiosulfate transport system permease protein	Function	1
+K02047	K02047: cysW; sulfate/thiosulfate transport system permease protein	Function	1
+	lvl4: Sulfonate/nitrate/taurine transporter [mD:m00188]	4	3
+K02049	K02049: ABC.SN.A; NitT/TauT family transport system ATP-binding protein	Function	1
+K02050	K02050: ABC.SN.P; NitT/TauT family transport system permease protein	Function	1
+K02051	K02051: ABC.SN.S; NitT/TauT family transport system substrate-binding protein	Function	1
+	lvl4: Putative spermidine/putrescine transporter [mD:m00193]	4	4
+K02052	K02052: ABC.SP.A; putative spermidine/putrescine transport system ATP-binding protein	Function	1
+K02053	K02053: ABC.SP.P; putative spermidine/putrescine transport system permease protein	Function	1
+K02054	K02054: ABC.SP.P1; putative spermidine/putrescine transport system permease protein	Function	1
+K02055	K02055: ABC.SP.S; putative spermidine/putrescine transport system substrate-binding protein	Function	1
+	lvl4: Simple sugar transporter [mD:m00221]	4	3
+K02056	K02056: ABC.SS.A; simple sugar transport system ATP-binding protein	Function	1
+K02057	K02057: ABC.SS.P; simple sugar transport system permease protein	Function	1
+K02058	K02058: ABC.SS.S; simple sugar transport system substrate-binding protein	Function	1
+	lvl4: Putative ABC transporter [mD:m00210]	4	3
+K02065	K02065: mlaF, linL, mkl; phospholipid/cholesterol/gamma-HCH transport system ATP-binding protein	Function	1
+K02066	K02066: mlaE, linK; phospholipid/cholesterol/gamma-HCH transport system permease protein	Function	1
+K02067	K02067: mlaD, linM; phospholipid/cholesterol/gamma-HCH transport system substrate-binding protein	Function	1
+	lvl4: D-methionine transporter [mD:m00238]	4	3
+K02071	K02071: metN; D-methionine transport system ATP-binding protein	Function	1
+K02072	K02072: metI; D-methionine transport system permease protein	Function	1
+K02073	K02073: metQ; D-methionine transport system substrate-binding protein	Function	1
+	lvl4: Zinc/manganese transporter [mD:m00244]	4	3
+K02074	K02074: ABC.ZM.A; zinc/manganese transport system ATP-binding protein	Function	1
+K02075	K02075: ABC.ZM.P; zinc/manganese transport system permease protein	Function	1
+K02077	K02077: ABC.ZM.S; zinc/manganese transport system substrate-binding protein	Function	1
+	lvl4: Heme transporter [mD:m00259]	4	4
+K02193	K02193: ccmA; heme exporter protein A	Function	1
+K02194	K02194: ccmB; heme exporter protein B	Function	1
+K02195	K02195: ccmC; heme exporter protein C	Function	1
+K02196	K02196: ccmD; heme exporter protein D	Function	1
+K02204	K02204: thrB2; homoserine kinase type II	Function	1
+K02257	K02257: COX10, ctaB, cyoE; heme o synthase	Function	2
+K02294	K02294: crtR; beta-carotene hydroxylase	Function	2
+K02316	K02316: dnaG; DNA primase	Function	1
+K02335	K02335: polA; DNA polymerase I	Function	2
+K02337	K02337: dnaE; DNA polymerase III subunit alpha	Function	2
+K02338	K02338: dnaN; DNA polymerase III subunit beta	Function	2
+K02339	K02339: holC; DNA polymerase III subunit chi	Function	2
+K02340	K02340: holA; DNA polymerase III subunit delta	Function	2
+K02341	K02341: holB; DNA polymerase III subunit delta'	Function	2
+K02342	K02342: dnaQ; DNA polymerase III subunit epsilon	Function	2
+K02343	K02343: dnaX; DNA polymerase III subunit gamma/tau	Function	2
+K02364	K02364: entF; enterobactin synthetase component F	Function	1
+K02372	K02372: fabZ; 3-hydroxyacyl-[acyl-carrier-protein] dehydratase	Function	8
+K02377	K02377: TSTA3, fcl; GDP-L-fucose synthase	Function	1
+	lvl4: Cystine transporter [mD:m00234]	4	3
+K02424	K02424: fliY, tcyA; L-cystine transport system substrate-binding protein	Function	1
+K02427	K02427: rlmE, rrmJ, ftsJ; 23S rRNA (uridine2552-2'-O)-methyltransferase	Function	2
+K02439	K02439: glpE; thiosulfate sulfurtransferase	Function	1
+K02480	K02480: K02480; two-component system, NarL family, sensor kinase	Function	3
+	lvl2: Regulation of response to osmotic stress	2	28
+K02484	K02484: K02484; two-component system, OmpR family, sensor kinase	Function	3
+K02486	K02486: K02486; two-component system, sensor kinase	Function	3
+K02493	K02493: hemK, prmC, HEMK; release factor glutamine methyltransferase	Function	2
+K02500	K02500: hisF; imidazole glycerol-phosphate synthase subunit HisF	Function	1
+K02501	K02501: hisH; imidazole glycerol-phosphate synthase subunit HisH	Function	2
+K02502	K02502: hisZ; ATP phosphoribosyltransferase regulatory subunit	Function	1
+K02510	K02510: hpaI, hpcH; 4-hydroxy-2-oxoheptanedioate aldolase	Function	1
+K02517	K02517: lpxL, htrB; Kdo2-lipid IVA lauroyltransferase/acyltransferase	Function	2
+K02523	K02523: ispB; octaprenyl-diphosphate synthase	Function	2
+K02533	K02533: lasT; tRNA/rRNA methyltransferase	Function	2
+K02535	K02535: lpxC; UDP-3-O-[3-hydroxymyristoyl] N-acetylglucosamine deacetylase	Function	2
+K02536	K02536: lpxD; UDP-3-O-[3-hydroxymyristoyl] glucosamine N-acyltransferase	Function	2
+K02554	K02554: mhpD; 2-keto-4-pentenoate hydratase	Function	2
+K02563	K02563: murG; UDP-N-acetylglucosamine--N-acetylmuramyl-(pentapeptide) pyrophosphoryl-undecaprenol N-acetylglucosamine transferase	Function	2
+	lvl2: Major Facilitator superfamily (MFS)	2	28
+	lvl3: Nitrate/nitrite transporters	3	1
+	lvl4: Nitrate/nitrite porter (nnp) family [tc:2.A.1.8]	4	1
+K02575	K02575: NRT, narK, nrtP, nasA; MFS transporter, NNP family, nitrate/nitrite transporter	Function	1
+	lvl2: Nitrogen Fixation	2	3
+K02586	K02586: nifD; nitrogenase molybdenum-iron protein alpha chain	Function	1
+K02588	K02588: nifH; nitrogenase iron protein NifH	Function	1
+K02591	K02591: nifK; nitrogenase molybdenum-iron protein beta chain	Function	1
+K02636	K02636: petC; cytochrome b6-f complex iron-sulfur subunit	Function	1
+K02687	K02687: prmA; ribosomal protein L11 methyltransferase	Function	2
+	lvl2: Phosphotransferase system (pts)	2	6
+	lvl3: Enzyme I and hpr	3	6
+	lvl4: Phosphocarrier protein hpr	4	1
+K02784	K02784: ptsH; phosphocarrier protein HPr	Function	1
+	lvl4: Mannose-specific II component [mD:m00276]	4	1
+K02793	K02793: manXa; mannose PTS system EIIA component	Function	7
+	lvl4: Nitrogen regulatory II component	4	1
+K02806	K02806: ptsN; nitrogen PTS system EIIA component	Function	7
+K03040	K03040: rpoA; DNA-directed RNA polymerase subunit alpha	Function	2
+K03046	K03046: rpoC; DNA-directed RNA polymerase subunit beta'	Function	2
+K03060	K03060: rpoZ; DNA-directed RNA polymerase subunit omega	Function	2
+K03179	K03179: ubiA; 4-hydroxybenzoate polyprenyltransferase	Function	2
+K03183	K03183: ubiE; demethylmenaquinone methyltransferase / 2-methoxy-6-polyprenyl-1,4-benzoquinol methylase	Function	2
+K03185	K03185: ubiH; 2-octaprenyl-6-methoxyphenol hydroxylase	Function	2
+K03215	K03215: rumA; 23S rRNA (uracil1939-C5)-methyltransferase	Function	2
+K03216	K03216: trmL, cspR; tRNA (cytidine/uridine-2'-O-)-methyltransferase	Function	2
+K03218	K03218: rlmB; 23S rRNA (guanosine2251-2'-O)-methyltransferase	Function	2
+K03269	K03269: lpxH; UDP-2,3-diacylglucosamine hydrolase	Function	1
+K03276	K03276: waaR, waaT, rfaJ; UDP-glucose/galactose:(glucosyl)LPS alpha-1,2-glucosyl/galactosyltransferase	Function	6
+	lvl3: Mucin type O-glycan biosynthesis	3	16
+K03279	K03279: waaJ, rfaJ; UDP-glucose:(galactosyl)LPS alpha-1,2-glucosyltransferase	Function	2
+	lvl3: Sugar transporters	3	2
+	lvl4: Sugar efflux transporter (sEt) [tc:2.A.1.20]	4	1
+K03291	K03291: MFS.SET; MFS transporter, SET family, sugar efflux transporter	Function	1
+K03331	K03331: DCXR; L-xylulose reductase	Function	1
+K03337	K03337: iolB; 5-deoxy-glucuronate isomerase	Function	2
+K03366	K03366: butA, budC; meso-butanediol dehydrogenase / (S,S)-butanediol dehydrogenase / diacetyl reductase	Function	6
+K03381	K03381: catA; catechol 1,2-dioxygenase	Function	1
+K03396	K03396: gfa; S-(hydroxymethyl)glutathione synthase	Function	1
+K03407	K03407: cheA; two-component system, chemotaxis family, sensor kinase CheA	Function	3
+K03424	K03424: tatD; TatD DNase family protein	Function	1
+K03431	K03431: glmM; phosphoglucosamine mutase	Function	2
+K03438	K03438: mraW, rsmH; 16S rRNA (cytosine1402-N4)-methyltransferase	Function	2
+	lvl3: Drug transporters	3	12
+	lvl4: Drug:h+ antiporter-1 (12 spanner) (DhA1) family [tc:2.A.1.2]	4	5
+K03445	K03445: nepI; MFS transporter, DHA1 family, purine ribonucleoside efflux pump	Function	1
+	lvl4: Drug:h+ antiporter-2 (14 spanner) (DhA2) family [tc:2.A.1.3]	4	3
+K03446	K03446: emrB; MFS transporter, DHA2 family, multidrug resistance protein	Function	1
+	lvl3: Organic acid transporters	3	9
+	lvl4: Cyanate porter (cp) family [tc:2.A.1.17]	4	1
+K03449	K03449: MFS.CP; MFS transporter, CP family, cyanate transporter	Function	1
+K03465	K03465: thyX, thy1; thymidylate synthase (FAD)	Function	1
+K03500	K03500: rsmB, sun; 16S rRNA (cytosine967-C5)-methyltransferase	Function	2
+	lvl2: Hydrogen production	2	3
+K03518	K03518: coxS; aerobic carbon-monoxide dehydrogenase small subunit	Function	1
+K03519	K03519: coxM, cutM; aerobic carbon-monoxide dehydrogenase medium subunit	Function	1
+K03520	K03520: coxL, cutL; aerobic carbon-monoxide dehydrogenase large subunit	Function	1
+K03564	K03564: BCP, PRXQ, DOT5; thioredoxin-dependent peroxiredoxin	Function	2
+K03574	K03574: mutT, NUDT15, MTH2; 8-oxo-dGTP diphosphatase	Function	1
+K03575	K03575: mutY; A/G-specific adenine glycosylase	Function	1
+K03579	K03579: hrpB; ATP-dependent helicase HrpB	Function	1
+K03587	K03587: ftsI; cell division protein FtsI (penicillin-binding protein 3)	Function	2
+K03648	K03648: UNG, UDG; uracil-DNA glycosylase	Function	1
+K03649	K03649: mug; double-stranded uracil-DNA glycosylase	Function	1
+K03652	K03652: MPG; DNA-3-methyladenine glycosylase	Function	2
+	lvl4: Metabolite:h+ symporter (mhs) family [tc:2.A.1.6]	4	2
+K03762	K03762: proP; MFS transporter, MHS family, proline/betaine transporter	Function	1
+K03768	K03768: PPIB, ppiB; peptidyl-prolyl cis-trans isomerase B (cyclophilin B)	Function	1
+K03769	K03769: ppiC; peptidyl-prolyl cis-trans isomerase C	Function	1
+K03770	K03770: ppiD; peptidyl-prolyl cis-trans isomerase D	Function	1
+K03771	K03771: surA; peptidyl-prolyl cis-trans isomerase SurA	Function	1
+K03781	K03781: katE, CAT, catB, srpA; catalase	Function	4
+K03782	K03782: katG; catalase-peroxidase	Function	5
+K03783	K03783: punA, PNP; purine-nucleoside phosphorylase	Function	2
+K03786	K03786: aroQ, qutE; 3-dehydroquinate dehydratase II	Function	2
+K03787	K03787: surE; 5'-nucleotidase	Function	2
+K03814	K03814: mtgA; monofunctional glycosyltransferase	Function	6
+K03820	K03820: lnt; apolipoprotein N-acyltransferase	Function	2
+K03821	K03821: phbC, phaC; polyhydroxyalkanoate synthase subunit PhaC	Function	2
+K03824	K03824: yhbS; putative acetyltransferase	Function	2
+K03825	K03825: aaaT; L-phenylalanine/L-methionine N-acetyltransferase	Function	2
+K03826	K03826: yiaC; putative acetyltransferase	Function	2
+K03828	K03828: yjgM; putative acetyltransferase	Function	2
+K03829	K03829: yedL; putative acetyltransferase	Function	2
+K03830	K03830: yafP; putative acetyltransferase	Function	2
+K03885	K03885: ndh; NADH:ubiquinone reductase (H+-translocating)	Function	1
+K03934	K03934: NDUFS1; NADH dehydrogenase (ubiquinone) Fe-S protein 1	Function	1
+K03935	K03935: NDUFS2; NADH dehydrogenase (ubiquinone) Fe-S protein 2	Function	1
+K03936	K03936: NDUFS3; NADH dehydrogenase (ubiquinone) Fe-S protein 3	Function	1
+K03937	K03937: NDUFS4; NADH dehydrogenase (ubiquinone) Fe-S protein 4	Function	1
+K03940	K03940: NDUFS7; NADH dehydrogenase (ubiquinone) Fe-S protein 7	Function	1
+K03941	K03941: NDUFS8; NADH dehydrogenase (ubiquinone) Fe-S protein 8	Function	1
+K03942	K03942: NDUFV1; NADH dehydrogenase (ubiquinone) flavoprotein 1	Function	1
+K03953	K03953: NDUFA9; NADH dehydrogenase (ubiquinone) 1 alpha subcomplex subunit 9	Function	1
+K03981	K03981: dsbC; thiol:disulfide interchange protein DsbC	Function	1
+K04042	K04042: glmU; bifunctional UDP-N-acetylglucosamine pyrophosphorylase / glucosamine-1-phosphate N-acetyltransferase	Function	1
+K04092	K04092: tyrA1; chorismate mutase	Function	2
+K04097	K04097: HPGDS; prostaglandin-H2 D-isomerase / glutathione transferase	Function	1
+K04098	K04098: chqB; hydroxyquinol 1,2-dioxygenase	Function	1
+K04102	K04102: pht5; 4,5-dihydroxyphthalate decarboxylase	Function	3
+K04103	K04103: ipdC; indolepyruvate decarboxylase	Function	1
+	lvl2: Transamination	2	1
+K04487	K04487: iscS, NFS1; cysteine desulfurase	Function	1
+K04518	K04518: pheA2; prephenate dehydratase	Function	1
+K04564	K04564: SOD2; superoxide dismutase, Fe-Mn family	Function	2
+K04565	K04565: SOD1; superoxide dismutase, Cu-Zn family	Function	2
+K04765	K04765: mazG; nucleoside triphosphate diphosphatase	Function	2
+	lvl3: Sulfite oxidation I (sulfite oxidoreductase)	3	1
+K05301	K05301: sorA; sulfite dehydrogenase (cytochrome) subunit A	Function	3
+K05343	K05343: treS; maltose alpha-D-glucosyltransferase / alpha-amylase	Function	2
+K05349	K05349: bglX; beta-glucosidase	Function	4
+	lvl3: Cellobiose	3	2
+K05350	K05350: bglB; beta-glucosidase	Function	4
+K05351	K05351: E1.1.1.9; D-xylulose reductase	Function	1
+K05358	K05358: quiA; quinate dehydrogenase (quinone)	Function	2
+K05366	K05366: mrcA; penicillin-binding protein 1A	Function	6
+K05367	K05367: pbpC; penicillin-binding protein 1C	Function	6
+	lvl4: Aromatic acid:h+ symporter (AAhs) family [tc:2.A.1.15]	4	1
+K05548	K05548: benK; MFS transporter, AAHS family, benzoate transport protein	Function	1
+K05549	K05549: benA-xylX; benzoate/toluate 1,2-dioxygenase subunit alpha	Function	1
+K05550	K05550: benB-xylY; benzoate/toluate 1,2-dioxygenase subunit beta	Function	1
+K05592	K05592: deaD, cshA; ATP-dependent RNA helicase DeaD	Function	1
+K05603	K05603: hutF; formimidoylglutamate deiminase	Function	1
+K05605	K05605: HIBCH; 3-hydroxyisobutyryl-CoA hydrolase	Function	1
+K05606	K05606: MCEE, epi; methylmalonyl-CoA/ethylmalonyl-CoA epimerase	Function	1
+K05710	K05710: hcaC; 3-phenylpropionate/trans-cinnamate dioxygenase ferredoxin component	Function	1
+K05712	K05712: mhpA; 3-(3-hydroxy-phenyl)propionate hydroxylase	Function	4
+K05714	K05714: mhpC; 2-hydroxy-6-oxonona-2,4-dienedioate hydrolase	Function	1
+	lvl4: Putative phosphonate transporter [mD:m00224]	4	2
+K05780	K05780: phnL; alpha-D-ribose 1-methylphosphonate 5-triphosphate synthase subunit PhnL	Function	1
+K05781	K05781: phnK; putative phosphonate transport system ATP-binding protein	Function	1
+	lvl4: Sn-glycerol 3-phosphate transporter [mD:m00198]	4	3
+K05813	K05813: ugpB; sn-glycerol 3-phosphate transport system substrate-binding protein	Function	1
+K05814	K05814: ugpA; sn-glycerol 3-phosphate transport system permease protein	Function	1
+K05815	K05815: ugpE; sn-glycerol 3-phosphate transport system permease protein	Function	1
+	lvl4: Phenylproprionate permease (ppp) [tc:2.A.1.27]	4	1
+K05820	K05820: hcaT; MFS transporter, PPP family, 3-phenylpropionic acid transporter	Function	1
+K05825	K05825: LYSN; 2-aminoadipate transaminase	Function	3
+K05832	K05832: K05832; putative tryptophan/tyrosine transport system permease protein	Function	1
+K05833	K05833: K05833; putative tryptophan/tyrosine transport system ATP-binding protein	Function	1
+	lvl4: Osmoprotectant transporter [mD:m00209]	4	3
+K05845	K05845: opuC; osmoprotectant transport system substrate-binding protein	Function	1
+K05846	K05846: opuBD; osmoprotectant transport system permease protein	Function	1
+K05847	K05847: opuA; osmoprotectant transport system ATP-binding protein	Function	1
+K05878	K05878: dhaK; phosphoenolpyruvate---glycerone phosphotransferase subunit DhaK	Function	1
+K05879	K05879: dhaL; phosphoenolpyruvate---glycerone phosphotransferase subunit DhaL	Function	1
+	lvl4: Hybrid protein	4	1
+K05881	K05881: dhaM; phosphoenolpyruvate---glycerone phosphotransferase subunit DhaM	Function	1
+K05884	K05884: comC; L-2-hydroxycarboxylate dehydrogenase (NAD+)	Function	2
+K05972	K05972: AXE1; acetylxylan esterase	Function	2
+K05989	K05989: ramA; alpha-L-rhamnosidase	Function	1
+	lvl2: Cellular response to cation stress	2	2
+K06023	K06023: hprK, ptsK; HPr kinase/phosphorylase	Function	4
+K06044	K06044: treY, glgY; (1->4)-alpha-D-glucan 1-alpha-D-glucosylmutase	Function	1
+K06117	K06117: E3.1.3.21; glycerol-1-phosphatase	Function	3
+K06125	K06125: COQ2; 4-hydroxybenzoate polyprenyltransferase	Function	2
+K06127	K06127: COQ5; 2-methoxy-6-polyprenyl-1,4-benzoquinol methylase	Function	2
+K06134	K06134: COQ7; 3-demethoxyubiquinol 3-hydroxylase	Function	2
+K06153	K06153: bacA; undecaprenyl-diphosphatase	Function	2
+K06607	K06607: iolS; myo-inositol catabolism protein IolS	Function	5
+K06720	K06720: ectC; L-ectoine synthase	Function	5
+	lvl4: Lipopolysaccharide transporter [mD:m00320]	4	3
+K06861	K06861: lptB; lipopolysaccharide export system ATP-binding protein	Function	1
+	lvl3: Unknown transporters	3	3
+	lvl4: Unknown major facilitator-1 (UmF1) [tc:2.A.1.24]	4	1
+K06902	K06902: UMF1; MFS transporter, UMF1 family	Function	1
+K06941	K06941: rlmN; 23S rRNA (adenine2503-C2)-methyltransferase	Function	2
+K06949	K06949: rsgA, engC; ribosome biogenesis GTPase / thiamine phosphate phosphatase	Function	1
+K06969	K06969: rlmI; 23S rRNA (cytosine1962-C5)-methyltransferase	Function	2
+K07091	K07091: lptF; lipopolysaccharide export system permease protein	Function	1
+K07250	K07250: gabT; 4-aminobutyrate aminotransferase / (S)-3-amino-2-methylpropionate transaminase / 5-aminovalerate transaminase	Function	2
+K07258	K07258: dacC, dacA, dacD; serine-type D-Ala-D-Ala carboxypeptidase (penicillin-binding protein 5/6)	Function	2
+K07260	K07260: vanY; zinc D-Ala-D-Ala carboxypeptidase	Function	2
+K07272	K07272: rgpF; rhamnosyltransferase	Function	6
+K07304	K07304: msrA; peptide-methionine (S)-S-oxide reductase	Function	3
+K07305	K07305: msrB; peptide-methionine (R)-S-oxide reductase	Function	2
+K07313	K07313: pphA; serine/threonine protein phosphatase 1	Function	2
+K07402	K07402: xdhC; xanthine dehydrogenase accessory factor	Function	1
+K07406	K07406: melA; alpha-galactosidase	Function	2
+K07441	K07441: ALG14; beta-1,4-N-acetylglucosaminyltransferase	Function	1
+K07451	K07451: mcrA; 5-methylcytosine-specific restriction enzyme A	Function	1
+K07452	K07452: mcrB; 5-methylcytosine-specific restriction enzyme B	Function	1
+K07511	K07511: ECHS1; enoyl-CoA hydratase	Function	6
+K07535	K07535: badH; 2-hydroxycyclohexanecarboxyl-CoA dehydrogenase	Function	5
+K07552	K07552: bcr, tcaB; MFS transporter, DHA1 family, multidrug resistance protein	Function	1
+K07559	K07559: kptA; putative RNA 2'-phosphotransferase	Function	1
+K07636	K07636: phoR; two-component system, OmpR family, phosphate regulon sensor histidine kinase PhoR	Function	3
+K07637	K07637: phoQ; two-component system, OmpR family, sensor histidine kinase PhoQ	Function	3
+K07638	K07638: envZ; two-component system, OmpR family, osmolarity sensor histidine kinase EnvZ	Function	3
+K07640	K07640: cpxA; two-component system, OmpR family, sensor histidine kinase CpxA	Function	3
+K07642	K07642: baeS, smeS; two-component system, OmpR family, sensor histidine kinase BaeS	Function	3
+K07644	K07644: cusS, copS, silS; two-component system, OmpR family, heavy metal sensor histidine kinase CusS	Function	3
+K07645	K07645: qseC; two-component system, OmpR family, sensor histidine kinase QseC	Function	3
+K07646	K07646: kdpD; two-component system, OmpR family, sensor histidine kinase KdpD	Function	3
+K07649	K07649: tctE; two-component system, OmpR family, sensor histidine kinase TctE	Function	3
+K07652	K07652: vicK; two-component system, OmpR family, sensor histidine kinase VicK	Function	3
+K07678	K07678: barA, gacS, varS; two-component system, NarL family, sensor histidine kinase BarA	Function	3
+K07708	K07708: glnL, ntrB; two-component system, NtrC family, nitrogen regulation sensor histidine kinase GlnL	Function	3
+K07709	K07709: zraS, hydH; two-component system, NtrC family, sensor histidine kinase HydH	Function	3
+K07716	K07716: pleC; two-component system, cell cycle sensor histidine kinase PleC	Function	3
+K07718	K07718: yesM; two-component system, sensor histidine kinase YesM	Function	3
+K08151	K08151: tetA; MFS transporter, DHA1 family, tetracycline resistance protein	Function	1
+K08153	K08153: blt; MFS transporter, DHA1 family, multidrug resistance protein	Function	1
+K08161	K08161: mdtG; MFS transporter, DHA1 family, multidrug resistance protein	Function	1
+K08166	K08166: mmr; MFS transporter, DHA2 family, methylenomycin A resistance protein	Function	1
+K08169	K08169: yebQ; MFS transporter, DHA2 family, multidrug resistance protein	Function	1
+K08172	K08172: shiA; MFS transporter, MHS family, shikimate and dehydroshikimate transport protein	Function	1
+	lvl4: Fucose:h+ symporter (Fhs) family [tc:2.A.1.7]	4	1
+K08174	K08174: glcP; MFS transporter, FHS family, glucose/mannose:H+ symporter	Function	1
+	lvl4: Oxalate:formate antiporter (oFA) family [tc:2.A.1.11]	4	1
+K08177	K08177: oxlT; MFS transporter, OFA family, oxalate/formate antiporter	Function	1
+	lvl4: Sialate:h+ symporter (shs) family [tc:2.A.1.12]	4	1
+K08178	K08178: JEN; MFS transporter, SHS family, lactate transporter	Function	1
+	lvl4: Anion:cation symporter (Acs) family [tc:2.A.1.14]	4	2
+K08194	K08194: dgoT; MFS transporter, ACS family, D-galactonate transporter	Function	1
+	lvl4: Drug:h+ antiporter-3 (12 spanner) (DhA3) [tc:2.A.1.21]	4	1
+K08217	K08217: mef; MFS transporter, DHA3 family, macrolide efflux protein	Function	1
+	lvl4: Unknown major facilitator-2 (UmF2) [tc:2.A.1.26]	4	1
+K08219	K08219: UMF2; MFS transporter, UMF2 family, putative MFS family transporter protein	Function	1
+	lvl4: Putative aromatic compound/drug exporter (AcDE) family [tc:2.A.1.32]	4	1
+K08221	K08221: yitG, ymfD, yfmO; MFS transporter, ACDE family, multidrug resistance protein	Function	1
+	lvl4: Fosmidomycin resistance (Fsr) family [tc:2.A.1.35]	4	1
+K08223	K08223: fsr; MFS transporter, FSR family, fosmidomycin resistance protein	Function	1
+	lvl4: Acriflavin-sensitivity (Ynfm) family [tc:2.A.1.36]	4	1
+K08224	K08224: ynfM; MFS transporter, YNFM family, putative membrane transport protein	Function	1
+	lvl3: Metal transporters	3	1
+	lvl4: Enterobactin (siderophore) exporter (Ents) family [tc:2.A.1.38]	4	1
+K08225	K08225: entS; MFS transporter, ENTS family, enterobactin (siderophore) exporter	Function	1
+K08281	K08281: pncA; nicotinamidase/pyrazinamidase	Function	2
+K08282	K08282: E2.7.11.1; non-specific serine/threonine protein kinase	Function	3
+	lvl2: Regulation of translational initiation in response to osmotic stress	2	2
+K08296	K08296: sixA; phosphohistidine phosphatase	Function	1
+K08299	K08299: caiD; crotonobetainyl-CoA hydratase	Function	8
+K08311	K08311: nudH; putative (di)nucleoside polyphosphate hydrolase	Function	1
+K08319	K08319: ltnD; L-threonate 2-dehydrogenase	Function	1
+K08320	K08320: nudG; (d)CTP diphosphatase	Function	1
+	lvl4: Others	4	1
+K08369	K08369: ydjE; MFS transporter, putative metabolite:H+ symporter	Function	1
+	lvl4: Enzyme I	4	2
+K08483	K08483: ptsI; phosphoenolpyruvate-protein phosphotransferase (PTS system enzyme I)	Function	1
+K08484	K08484: ptsP; phosphotransferase system, enzyme I, PtsP	Function	1
+K08678	K08678: UXS1, uxs; UDP-glucuronate decarboxylase	Function	2
+K08679	K08679: GAE, cap1J; UDP-glucuronate 4-epimerase	Function	3
+K08683	K08683: HSD17B10; 3-hydroxyacyl-CoA dehydrogenase / 3-hydroxy-2-methylbutyryl-CoA dehydrogenase	Function	8
+K09001	K09001: anmK; anhydro-N-acetylmuramic acid kinase	Function	1
+	lvl4: Orphan ABC Atpase	4	1
+K09013	K09013: sufC; Fe-S cluster assembly ATP-binding protein	Function	1
+K09470	K09470: puuA; gamma-glutamylputrescine synthase	Function	1
+K09471	K09471: puuB, ordL; gamma-glutamylputrescine oxidase	Function	1
+K09472	K09472: puuC, aldH; 4-(gamma-glutamylamino)butanal dehydrogenase	Function	5
+K09667	K09667: OGT; protein O-GlcNAc transferase	Function	6
+	lvl4: Lipopolysaccharide transporter [mD:m00250]	4	1
+K09691	K09691: ABC-2.LPSE.A; lipopolysaccharide transport system ATP-binding protein	Function	1
+	lvl4: Lipooligosaccharide transporter [mD:m00252]	4	2
+K09694	K09694: nodJ; lipooligosaccharide transport system permease protein	Function	1
+K09695	K09695: nodI; lipooligosaccharide transport system ATP-binding protein	Function	1
+K09699	K09699: DBT, bkdB; 2-oxoisovalerate dehydrogenase E2 component (dihydrolipoyl transacylase)	Function	1
+K09761	K09761: rsmE; 16S rRNA (uracil1498-N3)-methyltransferase	Function	2
+	lvl4: Lipoprotein-releasing transporter [mD:m00255]	4	2
+K09808	K09808: lolC_E; lipoprotein-releasing system permease protein	Function	1
+K09810	K09810: lolD; lipoprotein-releasing system ATP-binding protein	Function	1
+	lvl4: Cell division transporter [mD:m00256]	4	2
+K09811	K09811: ftsX; cell division transport system permease protein	Function	1
+K09812	K09812: ftsE; cell division transport system ATP-binding protein	Function	1
+	lvl4: Zinc transporter [mD:m00242]	4	3
+K09815	K09815: znuA; zinc transport system substrate-binding protein	Function	1
+K09816	K09816: znuB; zinc transport system permease protein	Function	1
+K09817	K09817: znuC; zinc transport system ATP-binding protein	Function	1
+K09903	K09903: pyrH; uridylate kinase	Function	1
+	lvl4: General l-amino acid transporter [mD:m00232]	4	4
+K09969	K09969: aapJ, bztA; general L-amino acid transport system substrate-binding protein	Function	1
+K09970	K09970: aapQ, bztB; general L-amino acid transport system permease protein	Function	1
+K09971	K09971: aapM, bztC; general L-amino acid transport system permease protein	Function	1
+K09972	K09972: aapP, bztD; general L-amino acid transport system ATP-binding protein	Function	1
+K09994	K09994: phnO; (aminoalkyl)phosphonate N-acetyltransferase	Function	2
+	lvl4: Glutamate/aspartate transporter [mD:m00230]	4	1
+K10001	K10001: gltI, aatJ; glutamate/aspartate transport system substrate-binding protein	Function	1
+K10009	K10009: tcyB, yecS; L-cystine transport system permease protein	Function	1
+K10010	K10010: tcyC, yecC; L-cystine transport system ATP-binding protein	Function	1
+	lvl4: Octopine/nopaline transporter [mD:m00231]	4	4
+K10018	K10018: occT, nocT; octopine/nopaline transport system substrate-binding protein	Function	1
+K10019	K10019: occM, nocM; octopine/nopaline transport system permease protein	Function	1
+K10020	K10020: occQ, nocQ; octopine/nopaline transport system permease protein	Function	1
+K10021	K10021: occP, nocP; octopine/nopaline transport system ATP-binding protein	Function	1
+	lvl4: Arginine/ornithine transporter [mD:m00235]	4	2
+K10022	K10022: aotJ; arginine/ornithine transport system substrate-binding protein	Function	1
+K10023	K10023: aotM; arginine/ornithine transport system permease protein	Function	1
+	lvl4: Glutamine transporter [mD:m00227]	4	2
+K10036	K10036: glnH; glutamine transport system substrate-binding protein	Function	1
+K10037	K10037: glnP; glutamine transport system permease protein	Function	1
+	lvl4: Putative glutamine transporter [mD:m00228]	4	1
+K10039	K10039: peb1A, glnH; aspartate/glutamate/glutamine transport system substrate-binding protein	Function	1
+	lvl4: Maltose/maltodextrin transporter [mD:m00194]	4	2
+K10111	K10111: malK, mtlK, thuK; multiple sugar transport system ATP-binding protein	Function	1
+K10112	K10112: msmX, msmK, malK, sugC, ggtA, msiK; multiple sugar transport system ATP-binding protein	Function	3
+	lvl4: Multiple sugar transporter [mD:m00196]	4	4
+	lvl4: Putative sugar transporter [mD:m00197]	4	2
+K10117	K10117: msmE; raffinose/stachyose/melibiose transport system substrate-binding protein	Function	1
+K10118	K10118: msmF; raffinose/stachyose/melibiose transport system permease protein	Function	1
+K10119	K10119: msmG; raffinose/stachyose/melibiose transport system permease protein	Function	1
+K10120	K10120: K10120, msmE; fructooligosaccharide transport system substrate-binding protein	Function	1
+K10125	K10125: dctB; two-component system, NtrC family, C4-dicarboxylate transport sensor histidine kinase DctB	Function	3
+	lvl4: Lactose/l-arabinose transporter [mD:m00199]	4	4
+K10188	K10188: lacE, araN; lactose/L-arabinose transport system substrate-binding protein	Function	1
+K10189	K10189: lacF, araP; lactose/L-arabinose transport system permease protein	Function	1
+K10190	K10190: lacG, araQ; lactose/L-arabinose transport system permease protein	Function	1
+K10191	K10191: lacK; lactose/L-arabinose transport system ATP-binding protein	Function	1
+	lvl4: Oligogalacturonide transporter [mD:m00202]	4	2
+K10192	K10192: togB; oligogalacturonide transport system substrate-binding protein	Function	1
+K10193	K10193: togM; oligogalacturonide transport system permease protein	Function	1
+K10213	K10213: rihB; ribosylpyrimidine nucleosidase	Function	2
+	lvl4: Sorbitol/mannitol transporter [mD:m00200]	4	3
+K10227	K10227: smoE, mtlE; polyol transport system substrate-binding protein	Function	1
+K10228	K10228: smoF, mtlF; polyol transport system permease protein	Function	1
+K10229	K10229: smoG, mtlG; polyol transport system permease protein	Function	1
+	lvl4: Alpha-glucoside transporter [mD:m00201]	4	4
+K10232	K10232: aglE, ggtB; alpha-glucoside transport system substrate-binding protein	Function	1
+K10233	K10233: aglF, ggtC; alpha-glucoside transport system permease protein	Function	1
+K10234	K10234: aglG, ggtD; alpha-glucoside transport system permease protein	Function	1
+K10235	K10235: aglK; alpha-glucoside transport system ATP-binding protein	Function	1
+	lvl4: Trehalose/maltose transporter [mD:m00204]	4	2
+K10236	K10236: thuE, lpqY; trehalose/maltose transport system substrate-binding protein	Function	1
+K10237	K10237: thuF, sugA; trehalose/maltose transport system permease protein	Function	1
+	lvl4: Ribose transporter [mD:m00212]	4	3
+K10439	K10439: rbsB; ribose transport system substrate-binding protein	Function	1
+K10440	K10440: rbsC; ribose transport system permease protein	Function	1
+K10441	K10441: rbsA; ribose transport system ATP-binding protein	Function	1
+	lvl4: L-Arabinose transporter [mD:m00213]	4	3
+K10537	K10537: araF; L-arabinose transport system substrate-binding protein	Function	1
+K10538	K10538: araH; L-arabinose transport system permease protein	Function	1
+K10539	K10539: araG; L-arabinose transport system ATP-binding protein	Function	1
+	lvl4: D-Xylose transporter [mD:m00215]	4	3
+K10543	K10543: xylF; D-xylose transport system substrate-binding protein	Function	1
+K10544	K10544: xylH; D-xylose transport system permease protein	Function	1
+K10545	K10545: xylG; D-xylose transport system ATP-binding protein	Function	1
+	lvl4: Putative multiple sugar transporter [mD:m00216]	4	3
+K10546	K10546: ABC.GGU.S, chvE; putative multiple sugar transport system substrate-binding protein	Function	1
+K10547	K10547: ABC.GGU.P, gguB; putative multiple sugar transport system permease protein	Function	1
+K10548	K10548: ABC.GGU.A, gguA; putative multiple sugar transport system ATP-binding protein	Function	1
+	lvl4: Fructose transporter [mD:m00218]	4	3
+K10552	K10552: frcB; fructose transport system substrate-binding protein	Function	1
+K10553	K10553: frcC; fructose transport system permease protein	Function	1
+K10554	K10554: frcA; fructose transport system ATP-binding protein	Function	1
+	lvl4: Rhamnose transporter [mD:m00220]	4	4
+K10559	K10559: rhaS; rhamnose transport system substrate-binding protein	Function	1
+K10560	K10560: rhaP; rhamnose transport system permease protein	Function	1
+K10561	K10561: rhaQ; rhamnose transport system permease protein	Function	1
+K10562	K10562: rhaT; rhamnose transport system ATP-binding protein	Function	1
+K10563	K10563: mutM, fpg; formamidopyrimidine-DNA glycosylase	Function	4
+	lvl2: Chlorinated aromatics degradation	2	1
+K10676	K10676: tfdB; 2,4-dichlorophenol 6-monooxygenase	Function	2
+	lvl2: Heterocyclic aromatics degradation	2	1
+K10764	K10764: metZ; O-succinylhomoserine sulfhydrylase	Function	3
+K10773	K10773: NTH; endonuclease III	Function	3
+K10778	K10778: ada; AraC family transcriptional regulator, regulatory protein of adaptative response / methylated-DNA-[protein]-cysteine methyltransferase	Function	2
+K10804	K10804: tesA; acyl-CoA thioesterase I	Function	2
+K10907	K10907: K10907; aminotransferase	Function	2
+K11066	K11066: E3.5.1.28D, amiD; N-acetylmuramoyl-L-alanine amidase	Function	1
+	lvl4: Spermidine/putrescine transporter [mD:m00299]	4	4
+K11069	K11069: potD; spermidine/putrescine transport system substrate-binding protein	Function	1
+K11070	K11070: potC; spermidine/putrescine transport system permease protein	Function	1
+K11071	K11071: potB; spermidine/putrescine transport system permease protein	Function	1
+K11072	K11072: potA; spermidine/putrescine transport system ATP-binding protein	Function	1
+	lvl4: Putrescine transporter [mD:m00300]	4	4
+K11073	K11073: potF; putrescine transport system substrate-binding protein	Function	1
+K11074	K11074: potI; putrescine transport system permease protein	Function	1
+K11075	K11075: potH; putrescine transport system permease protein	Function	1
+K11076	K11076: potG; putrescine transport system ATP-binding protein	Function	1
+	lvl4: Mannopine transporter [mD:m00301]	4	4
+K11077	K11077: attC; mannopine transport system substrate-binding protein	Function	1
+K11078	K11078: attB; mannopine transport system permease protein	Function	1
+K11079	K11079: attA2; mannopine transport system permease protein	Function	1
+K11080	K11080: attA1; mannopine transport system ATP-binding protein	Function	1
+K11150	K11150: RDH8; retinol dehydrogenase 8	Function	5
+K11153	K11153: RDH12; retinol dehydrogenase 12	Function	5
+K11162	K11162: RDH14; retinol dehydrogenase 14	Function	5
+K11163	K11163: DHRS1; dehydrogenase/reductase SDR family member 1	Function	1
+K11265	K11265: ADCY10; adenylate cyclase 10	Function	1
+K11352	K11352: NDUFA12; NADH dehydrogenase (ubiquinone) 1 alpha subcomplex subunit 12	Function	1
+K11354	K11354: cph1; two-component system, chemotaxis family, sensor kinase Cph1	Function	3
+K11357	K11357: divJ; two-component system, cell cycle sensor histidine kinase DivJ	Function	3
+K11381	K11381: bkdA; 2-oxoisovalerate dehydrogenase E1 component	Function	1
+K11383	K11383: kinB; two-component system, NtrC family, sensor histidine kinase KinB	Function	3
+K11407	K11407: HDAC6; histone deacetylase 6	Function	1
+K11529	K11529: gck, gckA, GLYCTK; glycerate 2-kinase	Function	1
+	lvl4: Bacitracin transporter [mD:m00314]	4	1
+K11632	K11632: bceB, vraE; bacitracin transport system permease protein	Function	1
+K11645	K11645: fbaB; fructose-bisphosphate aldolase, class I	Function	3
+K11711	K11711: dctS; two-component system, LuxR family, sensor histidine kinase DctS	Function	3
+K11720	K11720: lptG; lipopolysaccharide export system permease protein	Function	1
+K11788	K11788: ADE5; phosphoribosylamine--glycine ligase / phosphoribosylformylglycinamidine cyclo-ligase	Function	1
+K11927	K11927: rhlE; ATP-dependent RNA helicase RhlE	Function	1
+	lvl4: Urea transporter [mD:m00323]	4	5
+K11959	K11959: urtA; urea transport system substrate-binding protein	Function	1
+K11960	K11960: urtB; urea transport system permease protein	Function	1
+K11961	K11961: urtC; urea transport system permease protein	Function	1
+K11962	K11962: urtD; urea transport system ATP-binding protein	Function	1
+K11963	K11963: urtE; urea transport system ATP-binding protein	Function	1
+K12235	K12235: SRR; serine racemase	Function	1
+K12251	K12251: aguB; N-carbamoylputrescine amidase	Function	1
+K12256	K12256: spuC; putrescine---pyruvate transaminase	Function	3
+K12308	K12308: bgaB, lacA; beta-galactosidase	Function	3
+	lvl4: DiPEPtide transporter [mD:m00324]	4	5
+K12368	K12368: dppA; dipeptide transport system substrate-binding protein	Function	1
+K12369	K12369: dppB; dipeptide transport system permease protein	Function	1
+K12370	K12370: dppC; dipeptide transport system permease protein	Function	1
+K12371	K12371: dppD; dipeptide transport system ATP-binding protein	Function	1
+K12372	K12372: dppF; dipeptide transport system ATP-binding protein	Function	1
+K12373	K12373: HEXA_B; hexosaminidase	Function	2
+K12583	K12583: mgtA; phosphatidylinositol alpha 1,6-mannosyltransferase	Function	6
+K12658	K12658: lhpA; 4-hydroxyproline epimerase	Function	1
+K12945	K12945: nudK; GDP-mannose pyrophosphatase NudK	Function	1
+K12972	K12972: ghrA; glyoxylate/hydroxypyruvate reductase	Function	1
+K12978	K12978: lpxF; lipid A 4'-phosphatase	Function	3
+K12988	K12988: wapR; alpha-1,3-rhamnosyltransferase	Function	6
+K12989	K12989: lpcC; mannosyltransferase	Function	6
+K12990	K12990: rfbF, rhlC; rhamnosyltransferase	Function	6
+K12997	K12997: rgpB; rhamnosyltransferase	Function	6
+K13015	K13015: wbpA; UDP-N-acetyl-D-glucosamine dehydrogenase	Function	5
+K13017	K13017: wbpE, wlbC; UDP-2-acetamido-2-deoxy-ribo-hexuluronate aminotransferase	Function	2
+K13018	K13018: wbpD, wlbB; UDP-2-acetamido-3-amino-2,3-dideoxy-glucuronate N-acetyltransferase	Function	2
+K13020	K13020: wlbA, bplA; UDP-N-acetyl-2-amino-2-deoxyglucuronate dehydrogenase	Function	5
+K13021	K13021: ttuB; MFS transporter, ACS family, tartrate transporter	Function	1
+K13412	K13412: CPK; calcium-dependent protein kinase	Function	3
+K13481	K13481: xdhA; xanthine dehydrogenase small subunit	Function	2
+K13482	K13482: xdhB; xanthine dehydrogenase large subunit	Function	2
+K13485	K13485: PRHOXNB, URAD; 2-oxo-4-hydroxy-4-carboxy-5-ureidoimidazoline decarboxylase	Function	1
+K13503	K13503: trpEG; anthranilate synthase	Function	8
+K13529	K13529: ada-alkA; AraC family transcriptional regulator, regulatory protein of adaptative response / DNA-3-methyladenine glycosylase II	Function	2
+K13533	K13533: kinE; two-component system, sporulation sensor kinase E	Function	4
+K13587	K13587: cckA; two-component system, cell cycle sensor histidine kinase and response regulator CckA	Function	4
+K13598	K13598: ntrY; two-component system, NtrC family, nitrogen regulation sensor histidine kinase NtrY	Function	15
+K13657	K13657: gumH, aceA; alpha-1,3-mannosyltransferase	Function	7
+K13668	K13668: pimB; phosphatidyl-myo-inositol dimannoside synthase	Function	6
+K13688	K13688: chvB, cgs, ndvB; cyclic beta-1,2-glucan synthetase	Function	6
+K13693	K13693: gpgS; glucosyl-3-phosphoglycerate synthase	Function	6
+K13788	K13788: pta; phosphate acetyltransferase	Function	2
+K13797	K13797: rpoBC; DNA-directed RNA polymerase subunit beta-beta'	Function	2
+K13821	K13821: putA; RHH-type transcriptional regulator, proline utilization regulon repressor / proline dehydrogenase / delta 1-pyrroline-5-carboxylate dehydrogenase	Function	3
+K13829	K13829: aroKB; shikimate kinase / 3-dehydroquinate synthase	Function	1
+	lvl4: Microcin c transporter [mD:m00349]	4	4
+K13893	K13893: yejA; microcin C transport system substrate-binding protein	Function	1
+K13894	K13894: yejB; microcin C transport system permease protein	Function	1
+K13895	K13895: yejE; microcin C transport system permease protein	Function	1
+K13896	K13896: yejF; microcin C transport system ATP-binding protein	Function	1
+K13953	K13953: adhP; alcohol dehydrogenase, propanol-preferring	Function	10
+K14085	K14085: ALDH7A1; aldehyde dehydrogenase family 7 member A1	Function	26
+	lvl3: Pyruvate fermentation to acetate VIII	3	1
+	lvl3: Pyruvate fermentation to ethanol III	3	1
+	lvl2: Deamination of cystein and methionine	2	1
+	lvl2: Lysine degradation Iv	2	1
+	lvl2: Lysine degradation v	2	1
+	lvl2: Lysine degradation vI	2	1
+K14159	K14159: rnhA-dnaQ; ribonuclease HI / DNA polymerase III subunit epsilon	Function	2
+K14259	K14259: kdaD, xacE, kdxD; 2-dehydro-3-deoxy-D-arabinonate dehydratase	Function	2
+K14261	K14261: alaC; alanine-synthesizing transaminase	Function	3
+K14286	K14286: AGXT2L1, ETNPPL; ethanolamine-phosphate phospho-lyase	Function	3
+K14340	K14340: K14340; mannosyltransferase	Function	6
+K14633	K14633: gra6, RED2; ketoreductase RED2	Function	5
+K14977	K14977: ylbA, UGHY; (S)-ureidoglycine aminohydrolase	Function	1
+K15054	K15054: mdlB; (S)-mandelate dehydrogenase	Function	1
+K15371	K15371: GDH2; glutamate dehydrogenase	Function	4
+K15634	K15634: gpmB; 2,3-bisphosphoglycerate-dependent phosphoglycerate mutase	Function	4

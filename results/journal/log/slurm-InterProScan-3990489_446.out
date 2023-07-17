@@ -1,0 +1,193 @@
+=====================================================
+Start Time  : Sat Jun 24 21:42:14 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 3996921 / InterProScan
+Node List   : str-c90
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading interproscan/5.60-92.0
+  Loading requirement: anaconda3/2020.11 openjdk/15
+======================================================
+Running InterProScan On VIRAL_ARCHAEA/GCA_002989825.1.fna
+======================================================
+24/06/2023 21:42:15:426 Welcome to InterProScan-5.60-92.0
+24/06/2023 21:42:15:427 Running InterProScan v5 in STANDALONE mode... on Linux
+24/06/2023 21:42:19:711 RunID: str-c90.uncc.edu_20230624_214219532_gu7m
+24/06/2023 21:42:28:487 Loading file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/GCA_002989825.1.fna
+
+The FASTA input file /projects/raw_lab/jobs/metacerberus/VIRAL_ARCHAEA/GCA_002989825.1.fna is empty.
+Therefore there are no sequences for InterproScan to analyse
+Finishing...
+21:42:28.593 [main] ERROR org.hibernate.engine.jdbc.spi.SqlExceptionHelper - Table "STEP_INSTANCE" not found; SQL statement:
+select distinct stepinstan0_.id as id1_110_, stepinstan0_.bottom_model as bottom_m2_110_, stepinstan0_.bottom_protein as bottom_p3_110_, stepinstan0_.step_id as step_id4_110_, stepinstan0_.time_created as time_cre5_110_, stepinstan0_.top_model as top_mode6_110_, stepinstan0_.top_protein as top_prot7_110_ from public.step_instance stepinstan0_ where stepinstan0_.id not in  (select stepinstan1_.id from public.step_instance stepinstan1_ inner join public.step_execution executions2_ on stepinstan1_.id=executions2_.step_instance_id where executions2_.state=?) order by stepinstan0_.id desc [42102-199]
+2023-06-24 21:42:28,597 [main] [uk.ac.ebi.interpro.scan.jms.master.StandaloneBlackBoxMaster:363] ERROR - Exception thrown by StandaloneBlackBoxMaster: 
+javax.persistence.PersistenceException: org.hibernate.exception.SQLGrammarException: could not prepare statement
+	at org.hibernate.internal.ExceptionConverterImpl.convert(ExceptionConverterImpl.java:154) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.ExceptionConverterImpl.convert(ExceptionConverterImpl.java:181) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1538) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.Query.getResultList(Query.java:165) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at uk.ac.ebi.interpro.scan.management.dao.StepInstanceDAOImpl.retrieveUnfinishedStepInstances(StepInstanceDAOImpl.java:101) ~[interproscan-management-5.60-92.0.jar:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:?]
+	at jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:564) ~[?:?]
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:344) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:367) ~[spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118) ~[spring-tx-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212) ~[spring-aop-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at com.sun.proxy.$Proxy83.retrieveUnfinishedStepInstances(Unknown Source) ~[?:?]
+	at uk.ac.ebi.interpro.scan.jms.master.StandaloneBlackBoxMaster.run(StandaloneBlackBoxMaster.java:161) [interproscan-5.jar:?]
+	at uk.ac.ebi.interpro.scan.jms.main.Run.main(Run.java:413) [interproscan-5.jar:?]
+Caused by: org.hibernate.exception.SQLGrammarException: could not prepare statement
+	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:63) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:42) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:113) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$StatementPreparationTemplate.prepareStatement(StatementPreparerImpl.java:182) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl.prepareQueryStatement(StatementPreparerImpl.java:148) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.prepareQueryStatement(Loader.java:1990) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1920) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1898) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doQuery(Loader.java:937) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:340) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2695) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2678) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2512) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.list(Loader.java:2507) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.hql.QueryLoader.list(QueryLoader.java:504) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.hql.internal.ast.QueryTranslatorImpl.list(QueryTranslatorImpl.java:396) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.query.spi.HQLQueryPlan.performList(HQLQueryPlan.java:224) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.SessionImpl.list(SessionImpl.java:1538) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.doList(AbstractProducedQuery.java:1561) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1529) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	... 16 more
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STEP_INSTANCE" not found; SQL statement:
+select distinct stepinstan0_.id as id1_110_, stepinstan0_.bottom_model as bottom_m2_110_, stepinstan0_.bottom_protein as bottom_p3_110_, stepinstan0_.step_id as step_id4_110_, stepinstan0_.time_created as time_cre5_110_, stepinstan0_.top_model as top_mode6_110_, stepinstan0_.top_protein as top_prot7_110_ from public.step_instance stepinstan0_ where stepinstan0_.id not in  (select stepinstan1_.id from public.step_instance stepinstan1_ inner join public.step_execution executions2_ on stepinstan1_.id=executions2_.step_instance_id where executions2_.state=?) order by stepinstan0_.id desc [42102-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:451) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:205) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.message.DbException.get(DbException.java:181) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.readTableOrView(Parser.java:7146) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.readTableFilter(Parser.java:1895) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parseSelectSimpleFromPart(Parser.java:2641) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parseSelectSimple(Parser.java:2788) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parseSelectSub(Parser.java:2636) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parseSelectUnion(Parser.java:2469) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parseSelect(Parser.java:2440) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parsePrepared(Parser.java:814) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parse(Parser.java:788) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.parse(Parser.java:760) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.command.Parser.prepareCommand(Parser.java:683) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.engine.Session.prepareLocal(Session.java:627) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.engine.Session.prepareCommand(Session.java:565) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1292) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcPreparedStatement.<init>(JdbcPreparedStatement.java:77) ~[h2-1.4.199.jar:1.4.199]
+	at org.h2.jdbc.JdbcConnection.prepareStatement(JdbcConnection.java:349) ~[h2-1.4.199.jar:1.4.199]
+	at jdk.internal.reflect.GeneratedMethodAccessor73.invoke(Unknown Source) ~[?:?]
+	at jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:?]
+	at java.lang.reflect.Method.invoke(Method.java:564) ~[?:?]
+	at org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy$LazyConnectionInvocationHandler.invoke(LazyConnectionDataSourceProxy.java:385) ~[spring-jdbc-5.2.22.RELEASE.jar:5.2.22.RELEASE]
+	at com.sun.proxy.$Proxy30.prepareStatement(Unknown Source) ~[?:?]
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$5.doPrepare(StatementPreparerImpl.java:146) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$StatementPreparationTemplate.prepareStatement(StatementPreparerImpl.java:172) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl.prepareQueryStatement(StatementPreparerImpl.java:148) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.prepareQueryStatement(Loader.java:1990) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1920) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1898) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doQuery(Loader.java:937) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:340) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2695) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.doList(Loader.java:2678) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2512) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.Loader.list(Loader.java:2507) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.loader.hql.QueryLoader.list(QueryLoader.java:504) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.hql.internal.ast.QueryTranslatorImpl.list(QueryTranslatorImpl.java:396) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.engine.query.spi.HQLQueryPlan.performList(HQLQueryPlan.java:224) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.internal.SessionImpl.list(SessionImpl.java:1538) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.doList(AbstractProducedQuery.java:1561) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1529) ~[hibernate-core-5.4.2.Final.jar:5.4.2.Final]
+	... 16 more
+javax.persistence.PersistenceException: org.hibernate.exception.SQLGrammarException: could not prepare statement
+	at org.hibernate.internal.ExceptionConverterImpl.convert(ExceptionConverterImpl.java:154)
+	at org.hibernate.internal.ExceptionConverterImpl.convert(ExceptionConverterImpl.java:181)
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1538)
+	at org.hibernate.query.Query.getResultList(Query.java:165)
+	at uk.ac.ebi.interpro.scan.management.dao.StepInstanceDAOImpl.retrieveUnfinishedStepInstances(StepInstanceDAOImpl.java:101)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:344)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:198)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:163)
+	at org.springframework.transaction.interceptor.TransactionAspectSupport.invokeWithinTransaction(TransactionAspectSupport.java:367)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:118)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:186)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:212)
+	at com.sun.proxy.$Proxy83.retrieveUnfinishedStepInstances(Unknown Source)
+	at uk.ac.ebi.interpro.scan.jms.master.StandaloneBlackBoxMaster.run(StandaloneBlackBoxMaster.java:161)
+	at uk.ac.ebi.interpro.scan.jms.main.Run.main(Run.java:413)
+Caused by: org.hibernate.exception.SQLGrammarException: could not prepare statement
+	at org.hibernate.exception.internal.SQLExceptionTypeDelegate.convert(SQLExceptionTypeDelegate.java:63)
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:42)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:113)
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$StatementPreparationTemplate.prepareStatement(StatementPreparerImpl.java:182)
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl.prepareQueryStatement(StatementPreparerImpl.java:148)
+	at org.hibernate.loader.Loader.prepareQueryStatement(Loader.java:1990)
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1920)
+	at org.hibernate.loader.Loader.executeQueryStatement(Loader.java:1898)
+	at org.hibernate.loader.Loader.doQuery(Loader.java:937)
+	at org.hibernate.loader.Loader.doQueryAndInitializeNonLazyCollections(Loader.java:340)
+	at org.hibernate.loader.Loader.doList(Loader.java:2695)
+	at org.hibernate.loader.Loader.doList(Loader.java:2678)
+	at org.hibernate.loader.Loader.listIgnoreQueryCache(Loader.java:2512)
+	at org.hibernate.loader.Loader.list(Loader.java:2507)
+	at org.hibernate.loader.hql.QueryLoader.list(QueryLoader.java:504)
+	at org.hibernate.hql.internal.ast.QueryTranslatorImpl.list(QueryTranslatorImpl.java:396)
+	at org.hibernate.engine.query.spi.HQLQueryPlan.performList(HQLQueryPlan.java:224)
+	at org.hibernate.internal.SessionImpl.list(SessionImpl.java:1538)
+	at org.hibernate.query.internal.AbstractProducedQuery.doList(AbstractProducedQuery.java:1561)
+	at org.hibernate.query.internal.AbstractProducedQuery.list(AbstractProducedQuery.java:1529)
+	... 16 more
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "STEP_INSTANCE" not found; SQL statement:
+select distinct stepinstan0_.id as id1_110_, stepinstan0_.bottom_model as bottom_m2_110_, stepinstan0_.bottom_protein as bottom_p3_110_, stepinstan0_.step_id as step_id4_110_, stepinstan0_.time_created as time_cre5_110_, stepinstan0_.top_model as top_mode6_110_, stepinstan0_.top_protein as top_prot7_110_ from public.step_instance stepinstan0_ where stepinstan0_.id not in  (select stepinstan1_.id from public.step_instance stepinstan1_ inner join public.step_execution executions2_ on stepinstan1_.id=executions2_.step_instance_id where executions2_.state=?) order by stepinstan0_.id desc [42102-199]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:451)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:427)
+	at org.h2.message.DbException.get(DbException.java:205)
+	at org.h2.message.DbException.get(DbException.java:181)
+	at org.h2.command.Parser.readTableOrView(Parser.java:7146)
+	at org.h2.command.Parser.readTableFilter(Parser.java:1895)
+	at org.h2.command.Parser.parseSelectSimpleFromPart(Parser.java:2641)
+	at org.h2.command.Parser.parseSelectSimple(Parser.java:2788)
+	at org.h2.command.Parser.parseSelectSub(Parser.java:2636)
+	at org.h2.command.Parser.parseSelectUnion(Parser.java:2469)
+	at org.h2.command.Parser.parseSelect(Parser.java:2440)
+	at org.h2.command.Parser.parsePrepared(Parser.java:814)
+	at org.h2.command.Parser.parse(Parser.java:788)
+	at org.h2.command.Parser.parse(Parser.java:760)
+	at org.h2.command.Parser.prepareCommand(Parser.java:683)
+	at org.h2.engine.Session.prepareLocal(Session.java:627)
+	at org.h2.engine.Session.prepareCommand(Session.java:565)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1292)
+	at org.h2.jdbc.JdbcPreparedStatement.<init>(JdbcPreparedStatement.java:77)
+	at org.h2.jdbc.JdbcConnection.prepareStatement(JdbcConnection.java:349)
+	at jdk.internal.reflect.GeneratedMethodAccessor73.invoke(Unknown Source)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy$LazyConnectionInvocationHandler.invoke(LazyConnectionDataSourceProxy.java:385)
+	at com.sun.proxy.$Proxy30.prepareStatement(Unknown Source)
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$5.doPrepare(StatementPreparerImpl.java:146)
+	at org.hibernate.engine.jdbc.internal.StatementPreparerImpl$StatementPreparationTemplate.prepareStatement(StatementPreparerImpl.java:172)
+	... 32 more
+InterProScan analysis failed. Exception thrown by StandaloneBlackBoxMaster. Check the log file for details
+45.48user 2.06system 0:14.68elapsed 323%CPU (0avgtext+0avgdata 2643912maxresident)k
+2392inputs+336outputs (9major+231462minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jun 24 21:42:29 EDT 2023
+Run Time   : 15 seconds
+======================================================
+

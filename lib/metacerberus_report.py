@@ -3,13 +3,13 @@
 """
 
 def warn(*args, **kwargs):
-    #print("args", str(args))
     pass
 import warnings
 warnings.warn = warn
 
 from collections import OrderedDict
 import os
+from pathlib import Path
 import time
 import shutil
 import base64
@@ -84,21 +84,27 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
     reTrim = re.compile(r"Filtering result:[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)[\w\s]*: ([0-9]*)")
     reDecon = re.compile(r"([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)[\w\s(0-9-.%)]*:[\s]*([0-9]*) reads \([0-9%.]*\)[\s]*([0-9]*)")
     for key,value in readStats.items():
-        # GC Count
-        gcCount = reGC.search(value, re.MULTILINE)
-        if gcCount: dictStats[key]['GC count'] = gcCount.group(1)
-        if gcCount: dictStats[key]['GC %'] = gcCount.group(2)
-        # N25-N90
-        Nstats = reNstats.search(value, re.MULTILINE)
-        if Nstats:
-            for i,label in enumerate(nstatLabels, 1):
-                dictStats[key][label] = Nstats.group(i)
-        # Min-Max fasta
-        min_max = reMinMax.search(value, re.MULTILINE)
-        if min_max: dictStats[key]['Contig Min Length'] = min_max.group(2)
-        if min_max: dictStats[key]['Contig Max Length'] = min_max.group(1)
-        # Trimmed stats
         try:
+            # GC Count
+            gcCount = reGC.search(value, re.MULTILINE)
+            if gcCount: dictStats[key]['GC count'] = gcCount.group(1)
+            if gcCount: dictStats[key]['GC %'] = gcCount.group(2)
+        except: pass
+        try:
+            # N25-N90
+            Nstats = reNstats.search(value, re.MULTILINE)
+            if Nstats:
+                for i,label in enumerate(nstatLabels, 1):
+                    dictStats[key][label] = Nstats.group(i)
+        except: pass
+        try:
+            # Min-Max fasta
+            min_max = reMinMax.search(value, re.MULTILINE)
+            if min_max: dictStats[key]['Contig Min Length'] = min_max.group(2)
+            if min_max: dictStats[key]['Contig Max Length'] = min_max.group(1)
+        except: pass
+        try:
+            # Trimmed stats
             infile = os.path.join(config['DIR_OUT'], config['STEP'][3], key, "stderr.txt")
             trimStats = '\n'.join(open(infile).readlines())
             trim = reTrim.search(trimStats, re.MULTILINE)
@@ -131,19 +137,19 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
         dictStats[key]["N-repeat Average "] = round(sum(repeats)/len(repeats), 2)
 
 
-    #Write Combined Stats to File
+    # Write Combined Stats to File
     outfile = os.path.join(outpath, "combined", "stats.tsv")
     os.makedirs(os.path.join(outpath, "combined"), exist_ok=True)
     dfStats = pd.DataFrame(dictStats)
     dfStats.to_csv(outfile, sep='\t')
 
-    # HTML Plots of Stats
+    # Statistical plotting (HTML)
     outfile = os.path.join(outpath, "combined", "stats.html")
 
     tsv_stats = base64.b64encode(dfStats.to_csv(sep='\t').encode('utf-8')).decode('utf-8')
     dfStats = dfStats.apply(pd.to_numeric).T.rename_axis('Sample').reset_index()
     regex = re.compile(r"^([a-zA-Z]*_)")
-    prefixes = {regex.search(x).group(1):i for i,x in dfStats['Sample'].iteritems()}.keys()
+    prefixes = {regex.search(x).group(1):i for i,x in dfStats['Sample'].items()}.keys()
 
     figPlots = OrderedDict()
     for prefix in prefixes:
@@ -165,9 +171,14 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             figPlots[f'Average Protein Length ({prefix[:-1]})'] = fig
         except: pass
         # Annotations
-        try:
-            df = dfPre[['Sample', 'FOAM KO Count', 'KEGG KO Count']]
-            df.rename(columns={'FOAM KO Count': 'FOAM KO', 'KEGG KO Count':'KEGG KO'}, inplace=True)
+        try: #TODO: Add COG, CAZy...
+            columns = ['Sample']
+            for column in dfPre.columns:
+                if re.search(r'[A-Za-z] ID Count', column):
+                    columns.append(column)
+            df = dfPre[columns]
+            columns = {col:col.replace(" Count", "") for col in columns}
+            df.rename(columns=columns, inplace=True)
             df = df.melt(id_vars=['Sample'], var_name='group', value_name='value')
             fig = px.bar(df, x='Sample', y='value', color='group', barmode='group',
                 labels={'value': 'count', 'group':''})
@@ -219,10 +230,10 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
             script(type="text/javascript", src="plotly-2.0.0.min.js")
             with style(type="text/css"):
                 raw('\n'+STYLESHEET)
-        with div(cls="document", id="cerberus-summary"):
+        with div(cls="document", id="metacerberus-summary"):
             with h1(cls="title"):
                 img(src=f"data:image/png;base64,{ICON}", height="40")
-                a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
+                a("METACERBERUS", cls="reference external", href="https://github.com/raw-lab/metacerberus")
                 raw(" - Statistical Summary")
             with div(cls="contents topic", id="contents"):
                 with ul(cls="simple"):
@@ -256,27 +267,26 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
 def write_PCA(outpath, pcaFigures):
     # PCA Files
     os.makedirs(os.path.join(outpath), exist_ok=True)
-#    countpathlist = []
     for database,figures in pcaFigures.items():
         prefix = f"{outpath}/{database}"
-        with open(prefix+"_PCA.htm", 'w') as htmlOut:
+        with open(prefix+"_PCA.html", 'w') as htmlOut:
             htmlOut.write("\n".join(htmlHeader))
             htmlOut.write(f"<h1>PCA Report for {database}<h1>\n")
             for graph,fig in figures.items():
                 if type(fig) is pd.DataFrame:
                     fig.to_csv(f"{prefix}_{graph}.tsv", index=False, header=True, sep='\t')
-#                    if "Counts" in graph:
-#                        countpathlist.append(f"{prefix}_{graph}.tsv")
                 else:
                     htmlFig = fig.to_html(full_html=False, include_plotlyjs=PLOTLY_SOURCE)
                     htmlOut.write(htmlFig + '\n')
                     fig.write_image(os.path.join(outpath, "img", f"{database}_{graph}.svg"))
             htmlOut.write('\n</body>\n</html>\n')
-    return# countpathlist
+    return
 
 
 ########## Write Tables ##########
 def writeTables(table_path: os.PathLike, filePrefix: os.PathLike):
+    if not Path(table_path).exists():
+        return
     table = pd.read_csv(table_path, sep='\t')
 
     regex = re.compile(r"^lvl[0-9]: ")
@@ -290,24 +300,24 @@ def writeTables(table_path: os.PathLike, filePrefix: os.PathLike):
         table['Name'] = table['Name'].apply(lambda x : regex.sub('',x))
     except:
         return
-    table[table['Level']=='Function'][['KO Id','Name','Count']].to_csv(f"{filePrefix}_level-ko.tsv", index = False, header=True, sep='\t')
+    table[table['Level']=='Function'][['Id','Name','Count']].to_csv(f"{filePrefix}_level-id.tsv", index = False, header=True, sep='\t')
     return
 
 
 ########## Write HTML Files ##########
 def write_HTML_files(outfile, figure, sample, name):
     sample = re.sub(r'^[a-zA-Z]*_', '', sample)
-    with dominate.document(title=f'Cerberus: {name} - {sample}') as doc:
+    with dominate.document(title=f'MetaCerberus: {name} - {sample}') as doc:
         with doc.head:
             meta(charset="utf-8")
             script(type="text/javascript", src="plotly-2.0.0.min.js")
             with style(type="text/css"):
                 raw('\n'+STYLESHEET)
-        with div(cls="document", id="cerberus-report"):
+        with div(cls="document", id="metacerberus-report"):
             # Header
             with h1(cls="title"):
                 img(src=f"data:image/png;base64,{ICON}", height="40")
-                a("CERBERUS", cls="reference external", href="https://github.com/raw-lab/cerberus")
+                a("METACERBERUS", cls="reference external", href="https://github.com/raw-lab/metacerberus")
                 raw(f" - {name} Bar Graphs for '{sample}'")
             # Side Panel
             with div(cls="contents topic", id="contents"):

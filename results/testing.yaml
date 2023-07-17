@@ -1,0 +1,63 @@
+# MetaCerberus config file
+
+
+#### TESTING ####
+#hmm: KOFam_all, KOFam_prokaryote, KOFam_eukaryote, COG
+hmm: COG, CAZy, KOFam_prokaryote
+#fraggenescan: [../data/five_genomes/RW1.fna]
+protein: [../data/example_data/RW1.faa]
+dir_out: result_testing
+chunker: 1
+#keep: True
+
+
+#protein: [../data/example_data/KO_validated_proteins.faa]
+#dir_out: KO_validated_proteins
+
+#### Illumina Microbial, Archaea and Bacteriophage
+#prodigal: [../../data/five_genomes]
+#illumina: True
+#meta: True
+#dir_out: Illumina_Microbial_Archaea_Bacteriophage
+
+#### Illumina Eukaryotes and Viruses
+#fraggenescan: [../data/five_genomes]
+#illumina: True
+#meta: True
+#dir_out: Illumina_Eukaryotes_Viruses
+
+#### Nanopore Microbial, Archaea and Bacteriophage
+#prodigal: [../../data/five_genomes]
+#nanopore: True
+#meta: True
+#dir_out: Nanopore_Microbial_Archaea_Bacteriophage
+
+#### Nanopore Eukaryotes and Viruses
+#fraggenescan: [../../data/five_genomes]
+#nanopore: True
+#meta: True
+#dir_out: Nanopore_Eukaryotes_Viruses
+
+#### PacBio Microbial, Archaea and Bacteriophage
+#prodigal: [../../data/five_genomes]
+#pacbio: True
+#meta: True
+#dir_out: PacBio_Microbial_Archaea_Bacteriophage
+
+#### PacBio Eukaryotes and Viruses
+#fraggenescan: [../../data/five_genomes]
+#pacbio: True
+#meta: True
+#dir_out: PacBio_Eukaryotes_Viruses
+
+#### SUPER Illumina
+#super: [../../data/five_genomes]
+#illumina: True
+#meta: True
+#dir_out: Illumina_super
+
+#### SUPER Nanopore
+#super: [../../data/five_genomes]
+#nanopore: True
+#meta: True
+#dir_out: Nanopore_super
