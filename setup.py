@@ -2,8 +2,6 @@ import os
 import setuptools
 
 
-from bin.metacerberus import __version__
-
 # recursively load package files
 def package_files(directory):
     paths = []
@@ -19,7 +17,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="MetaCerberus",
-    version=__version__,
+    version="1.1",
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
     description="Versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
@@ -47,6 +45,7 @@ setuptools.setup(
     install_requires=[
             'setuptools',
             'ray',
+            'grpcio',
             'metaomestats',
             'configargparse',
             'kaleido',
