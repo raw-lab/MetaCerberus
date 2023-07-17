@@ -34,6 +34,39 @@ def convert_json(dicData, writer, level=0, parents={}):
     return table
 
 
+#### Build KOFam ####
+def koFam():
+    #url.urlretrieve("https://www.genome.jp/ftp/db/kofam/profiles.tar.gz", Path(pathDB, "profiles.tar.gz"))#, reporthook=progress)
+    #print("Extracting KOFam")
+    #subprocess.run(['tar', '-xzf', "profiles.tar.gz"], cwd=pathDB)
+    #Path(pathDB, "profiles.tar.gz").unlink()
+    #
+    #pathProfiles = Path(pathDB, 'profiles')
+    #reKO = re.compile(r'NAME  K', re.MULTILINE)
+    #for db in ['prokaryote', 'eukaryote']:
+    #    print(f"Building KOFam_{db}")
+    #    dbList = Path(pathProfiles, f'{db}.hal')
+    #    dbOut = Path(pathDB, f'KOFam_{db}.hmm')
+    #    with open(dbList) as reader, open(dbOut, 'w') as writer:
+    #        for line in reader:
+    #            nextKO = os.path.join(pathProfiles, line.strip())
+    #            #writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
+    #            writer.write(open(nextKO).read())
+    #    dbList.unlink()
+    #    subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
+    #
+    #print("Building KOFam_all")
+    #dbOut = os.path.join(pathDB, 'KOFam_all.hmm')
+    #with open(dbOut, 'w') as writer:
+    #    for filename in os.listdir(pathProfiles):
+    #        nextKO = os.path.join(pathProfiles, filename)
+    #        if filename.endswith('.hmm'):
+    #            writer.write(reKO.sub(r'NAME  KO:K', open(nextKO).read()))
+    #        os.remove(nextKO)
+    #os.removedirs(pathProfiles)
+    #subprocess.run(['gzip', '-f', dbOut], cwd=pathDB)
+    pass
+
 #### START ####
 
 # read file
@@ -42,7 +75,7 @@ with open(in_KEGG) as reader:
 
 # parse json
 with open(out_KEGG, 'w') as writer:
-    print("L1", "L2", "L3", "KO", "Function", "EC", sep='\t', file=writer)
+    print("L1", "L2", "L3", "ID", "Function", "EC", sep='\t', file=writer)
     table = convert_json(data, writer)
 
 # add functions from KEGG to FOAM
