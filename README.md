@@ -1,9 +1,12 @@
 # Welcome to MetaCerberus
 
-## About 
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/metacerberus/README.html)
+
+## About
+
 MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM) database and KEGG via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis.
 
-![GitHub Logo](metacerberus_logo.jpg)
+![GitHub Logo](https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/metacerberus_logo.jpg)
 
 ## Installing MetaCerberus
 
@@ -11,7 +14,7 @@ MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/meta
 
 - Anaconda install from bioconda with all dependencies:
 
-```
+```bash
 conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
 metacerberus.py --setup
@@ -21,13 +24,13 @@ metacerberus.py --setup
 
 1. Clone github Repo
 
-```
+```bash
 git clone https://github.com/raw-lab/metacerberus.git
 ```
 
 2. Run Setup File
 
-```
+```bash
 cd metacerberus
 bash install_metacerberus.sh
 conda activate metacerberus
@@ -57,30 +60,34 @@ This creates an anaconda environment called "metacerberus" with all dependencies
 
 ## Quick start examples
 
-### Illumina data 
+### Illumina data
 
-#### Bacterial, Archaea and Bacteriophage 
-```
+#### Bacterial, Archaea and Bacteriophage
+
+```bash
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder] --illumina --meta --dir_out [out_folder] 
 ```
 
 #### Eukaryotes and Viruses
-```
+
+```bash
 conda activate metacerberus
 metacerberus.py --fraggenescan [input_folder] --illumina --meta --dir_out [out_folder] 
 ```
 
-### Nanopore data 
+### Nanopore data
 
 #### Bacterial, Archaea and Bacteriophage
-```
+
+```bash
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder]  --nanopore --meta --dir_out [out_folder]
 ```
 
 #### Eukaryotes and Viruses
-```
+
+```bash
 conda activate metacerberus
 metacerberus.py --fraggenescan [input_folder] --nanopore --meta --dir_out [out_folder] 
 ```
@@ -88,32 +95,31 @@ metacerberus.py --fraggenescan [input_folder] --nanopore --meta --dir_out [out_f
 ### PacBio data
 
 #### Microbial, Archaea and Bacteriophage
-```
+
+```bash
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder]  --pacbio --meta --dir_out [out_folder]
 ```
 
 #### Eukaryotes and Viruses
-```
+
+```bash
 conda activate metacerberus
 metacerberus.py --fraggenescan [input_folder]  --pacbio --meta --dir_out [out_folder]
 ```
 
 ### SUPER (both methods)
-```
+
+```bash
 conda activate metacerberus
 metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --dir_out [out_folder]
 ```
 
 - Note: Fraggenescan will work for prokaryotes and viruses/bacteriophage but prodigal will not work for eukaryotes. 
 
-
 ## Prerequisites and dependencies
 
-- python >= 3.7
-- MetaCerberus currently runs best with Python version 3.7, 3.8, 3.9 due to compatibility with dependencies.
-- MetaCerberus currently doesn't support Python 3.10 due to the "Ray" dependency. 
-- Python 3.10 is not currently supported.
+- python >= 3.8
 
 ### Available from Bioconda
 
@@ -132,12 +138,11 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 - Run metacerberus.py with the options required for your project.
 
 ```
-usage: metacerberus.py [-c CONFIG] [--prodigal PRODIGAL] [--fraggenescan FRAGGENESCAN] [--meta META] [--super SUPER] [--protein PROTEIN]
-                       [--illumina | --nanopore | --pacbio] [--setup] [--uninstall] [--dir_out DIR_OUT] [--scaffolds] [--minscore MINSCORE] [--cpus CPUS]
-                       [--chunker CHUNKER] [--replace] [--keep] [--hmm HMM] [--class CLASS] [--slurm_nodes SLURM_NODES] [--tmpdir TMPDIR] [--version] [-h]
-                       [--adapters ADAPTERS] [--control_seq CONTROL_SEQ]
+usage: metacerberus.py [-c CONFIG] [--prodigal PRODIGAL] [--fraggenescan FRAGGENESCAN] [--super SUPER] [--protein PROTEIN] [--illumina | --nanopore | --pacbio] [--setup]
+                       [--uninstall] [--dir_out DIR_OUT] [--meta] [--scaffolds] [--minscore MINSCORE] [--evalue EVALUE] [--cpus CPUS] [--chunker CHUNKER] [--replace]
+                       [--keep] [--hmm HMM] [--class CLASS] [--tmpdir TMPDIR] [--version] [-h] [--adapters ADAPTERS] [--qc_seq QC_SEQ]
 
-optional arguments:
+options:
   --illumina            Specifies that the given FASTQ files are from Illumina
   --nanopore            Specifies that the given FASTQ files are from Nanopore
   --pacbio              Specifies that the given FASTQ files are from PacBio
@@ -154,7 +159,6 @@ Example:
   --prodigal PRODIGAL   Prokaryote nucleotide sequence (includes microbes, bacteriophage)
   --fraggenescan FRAGGENESCAN
                         Eukaryote nucleotide sequence (includes other viruses, works all around for everything)
-  --meta META           Metagenomic nucleotide sequences (Uses prodigal)
   --super SUPER         Run sequence in both --prodigal and --fraggenescan modes
   --protein PROTEIN, --amino PROTEIN
                         Protein Amino Acid sequence
@@ -162,24 +166,23 @@ Example:
 optional arguments:
   --setup               Set this flag to ensure dependencies are setup [False]
   --uninstall           Set this flag to remove downloaded databases and FragGeneScan+ [False]
-  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to current directory. [./meta_cerberus]
+  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]
+  --meta                Metagenomic nucleotide sequences (for prodigal) [False]
   --scaffolds           Sequences are treated as scaffolds [False]
-  --minscore MINSCORE   Filter for parsing HMMER results [25]
+  --minscore MINSCORE   Score cutoff for parsing HMMER results [25]
+  --evalue EVALUE       E-value cutoff for parsing HMMER results [1e-09]
   --cpus CPUS           Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]
   --chunker CHUNKER     Split files into smaller chunks, in Megabytes [Disabled by default]
   --replace             Flag to replace existing files. [False]
   --keep                Flag to keep temporary files. [False]
-  --hmm HMM             Specify a custom HMM file for HMMER. Default uses downloaded FOAM HMM Database
+  --hmm HMM             Specify the database for HMMER. (KOFam_all, KOFam_eukariote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]
   --class CLASS         path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R
-  --slurm_nodes SLURM_NODES
-                        list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST
   --tmpdir TMPDIR       temp directory for RAY [system tmp dir]
   --version, -v         show the version number and exit
   -h, --help            show this help message and exit
 
   --adapters ADAPTERS   FASTA File containing adapter sequences for trimming
-  --control_seq CONTROL_SEQ
-                        FASTA File containing control sequences for decontamination
+  --qc_seq QC_SEQ       FASTA File containing control sequences for decontamination
 
 Args that start with '--' (eg. --prodigal) can also be set in a config file (specified via -c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for
 details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override config file values which override defaults.
