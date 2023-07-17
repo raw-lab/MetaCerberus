@@ -2,7 +2,7 @@
 
 set -e
 
-ENV_NAME=metacerberus-dev
+ENV_NAME=metacerberus
 
 # initialize conda environment in bash script
 eval "$(conda shell.bash hook)"
