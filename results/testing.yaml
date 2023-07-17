@@ -3,12 +3,12 @@
 
 #### TESTING ####
 #hmm: KOFam_all, KOFam_prokaryote, KOFam_eukaryote, COG
-hmm: COG, KOFam_prokaryote
+hmm: COG, CAZy, KOFam_prokaryote
 #fraggenescan: [../data/five_genomes/RW1.fna]
-protein: [../data/example_data/KO_validated_proteins.faa]
-illumina: True
-dir_out: testing
-
+protein: [../data/example_data/RW1.faa]
+dir_out: result_testing
+chunker: 1
+#keep: True
 
 
 #protein: [../data/example_data/KO_validated_proteins.faa]
