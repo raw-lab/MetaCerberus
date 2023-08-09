@@ -34,7 +34,6 @@ git clone https://github.com/raw-lab/metacerberus.git
 cd metacerberus
 bash install_metacerberus.sh
 conda activate metacerberus
-metacerberus.py --setup
 ```
 
 This creates an anaconda environment called "metacerberus" with all dependencies installed.
