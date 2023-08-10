@@ -4,13 +4,24 @@
 
 ## About
 
-MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM) database and KEGG via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis.
+MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy, VOG/pVOG, PHROG, and COG databases via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis. MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
 
 ![GitHub Logo](https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/metacerberus_logo.jpg)
 
 ## Installing MetaCerberus
 
-### Option 1) Anaconda
+### Option 1) Mamba
+
+- Mamba install from bioconda with all dependencies:
+
+```bash
+mamba create -n metacerberus -c bioconda -c conda-forge metacerberus
+conda activate metacerberus
+metacerberus.py --setup
+```
+- NOTE: Mamba is the fastest installer. Anaconda or miniconda can be slow. Also, install mamba from conda not from pip. The pip mamba doesn't work for install. 
+
+### Option 2) Anaconda
 
 - Anaconda install from bioconda with all dependencies:
 
@@ -20,7 +31,7 @@ conda activate metacerberus
 metacerberus.py --setup
 ```
 
-### Option 2) Manual Install
+### Option 3) Manual Install
 
 1. Clone github Repo
 
@@ -122,14 +133,29 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 
 ### Available from Bioconda
 
-- fastqc - <https://github.com/s-andrews/FastQC>
-- fastp - <https://github.com/OpenGene/fastp>
-- porechop - <https://github.com/rrwick/Porechop>
-- bbmap - <https://sourceforge.net/projects/bbmap/> or <https://github.com/BioInfoTools/BBMap>
-- prodigal - <https://github.com/hyattpd/Prodigal>
-- hmmer - <https://github.com/EddyRivasLab/hmmer>
+- [fastqc](https://github.com/s-andrews/FastQC).  
+- [fastp](https://github.com/OpenGene/fastp>). 
+- [porechop](https://github.com/rrwick/Porechop)
+- [bbmap](https://github.com/BioInfoTools/BBMap)
+- [prodigal](https://github.com/hyattpd/Prodigal)
+- [HMMER](https://github.com/EddyRivasLab/hmmer)
 
 - NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
+
+## MetaCerberus databases
+
+All pre-formatted databases are present at OSF 
+- [OSF](https://osf.io/3uz2j)
+
+### Sources for databases for MetaCerberus
+- [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/)
+- [COG](https://ftp.ncbi.nih.gov/pub/COG/COG2020/data/)
+- [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)
+- [VOG](https://vogdb.org/download)
+- [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)
+- [PHROG](https://phrogs.lmge.uca.fr/)
+
+- NOTE: pfam, eggNOG, MEROPS, GVDB, and FunGene databases are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
 
 ## MetaCerberus Options
 
@@ -174,7 +200,7 @@ optional arguments:
   --chunker CHUNKER     Split files into smaller chunks, in Megabytes [Disabled by default]
   --replace             Flag to replace existing files. [False]
   --keep                Flag to keep temporary files. [False]
-  --hmm HMM             Specify the database for HMMER. (KOFam_all, KOFam_eukariote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]
+  --hmm HMM             Specify the database for HMMER. (KOFam_all, KOFam_eukaryote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]
   --class CLASS         path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R
   --tmpdir TMPDIR       temp directory for RAY [system tmp dir]
   --version, -v         show the version number and exit
@@ -242,14 +268,25 @@ echo "======================================================"
 echo ""
 ```
 
+## Contributing to MetaCerberus and Fungene
+
+MetaCerberus as a community resource as recently acquired [FunGene](http://fungene.cme.msu.edu/), we welcome contributions of other experts expanding annotation of all domains of life (viruses, bacteria, archaea, eukaryotes).  Please send us an issue on our MetaCerberus GitHub [open an issue](https://github.com/raw-lab/metacerberus/issues); or email us we will fully annotate your genome, add suggested pathways/metabolisms of interest, make custom HMMs to be added to MetaCerberus and FunGene. 
+
 ## Citing MetaCerberus
 
-MetaCerberus: python code for versatile Functional Ontology Assignments for Metagenomes (FOAM) database searching via Hidden Markov Models (HMM) with environmental focus of shotgun metaomics data. Preprints.
+If you are publishing results obtained using MetaCerberus, please cite: <br />
+Figueroa JL, Dhungel E, Brouwer CR, White III RA. 2023.  <br />
+MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. bioRxiv.  <br />
+[paper](https://www.biorxiv.org/content/)   <br />
 
 ## CONTACT
 
 The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw-lab).  
 If you have any questions or feedback, please feel free to get in touch by email.  
-Dr. Richard Allen White III - rwhit101@uncc.edu or raw937@gmail.com.  
-Jose L. Figueroa III - jlfiguer@uncc.edu  
+[Dr. Richard Allen White III](mailto:rwhit101@uncc.edu)<br /> 
+[Jose Luis Figueroa](mailto:jlfiguer@uncc.edu) <br />
 Or [open an issue](https://github.com/raw-lab/metacerberus/issues).  
+
+
+
+
