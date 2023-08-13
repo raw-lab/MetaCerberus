@@ -277,7 +277,7 @@ MetaCerberus as a community resource as recently acquired [FunGene](http://funge
 If you are publishing results obtained using MetaCerberus, please cite: <br />
 Figueroa JL, Dhungel E, Brouwer CR, White III RA. 2023.  <br />
 MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. bioRxiv.  <br />
-[paper](https://www.biorxiv.org/content/)   <br />
+[paper](https://www.biorxiv.org/content/10.1101/2023.08.10.552700v1)   <br />
 
 ## CONTACT
 
