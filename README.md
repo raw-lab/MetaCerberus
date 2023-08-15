@@ -133,8 +133,8 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 
 ### Available from Bioconda
 
-- [fastqc](https://github.com/s-andrews/FastQC).  
-- [fastp](https://github.com/OpenGene/fastp>). 
+- [fastqc](https://github.com/s-andrews/FastQC) 
+- [fastp](https://github.com/OpenGene/fastp>)
 - [porechop](https://github.com/rrwick/Porechop)
 - [bbmap](https://github.com/BioInfoTools/BBMap)
 - [prodigal](https://github.com/hyattpd/Prodigal)
