@@ -14,6 +14,13 @@ MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/meta
 
 - Mamba install from bioconda with all dependencies:
 
+#### Install mamba using conda
+```bash
+conda install mamba
+```
+- NOTE: Make sure you install mamba in your base conda environment
+
+#### Install MetaCerberus with mamba
 ```bash
 mamba create -n metacerberus -c bioconda -c conda-forge metacerberus
 conda activate metacerberus
@@ -70,16 +77,49 @@ This creates an anaconda environment called "metacerberus" with all dependencies
 
 ## Quick start examples
 
+### Genome examples
+
+#### All databases
+```bash
+conda activate metacerberus
+metacerberus.py --prodigal lambda.fna --hmm "KOFam_all, COG, VOG, PHROG, CAZy" --dir_out lambda_dir
+```
+
+#### Only KEGG/FOAM all
+```bash
+conda activate metacerberus
+metacerberus.py --prodigal lambda.fna --hmm "KOFam_all" --dir_out lambda_ko-only_dir
+```
+
+#### Only KEGG/FOAM prokaryotic centric
+```bash
+conda activate metacerberus
+metacerberus.py --prodigal ecoli.fna --hmm "KOFam_prokaryote" --dir_out ecoli_ko-only_dir
+```
+
+#### Only KEGG/FOAM eukaryotic centric
+```bash
+conda activate metacerberus
+metacerberus.py --fraggenescan human.fna --hmm "KOFam_eukaryote" --dir_out human_ko-only_dir
+```
+
+#### Only Viral/Phage databases
+```bash
+conda activate metacerberus
+metacerberus.py --prodigal lambda.fna --hmm "VOG, PHROG" --dir_out lambda_vir-only_dir
+```
+- NOTE: You can pick any single database you want for your analysis including KOFam_all, COG, VOG, PHROG, CAZy or specific KO databases for eukaryotes and prokaryotes (KOFam_eukaryote or KOFam_prokaryote).
+  
 ### Illumina data
 
-#### Bacterial, Archaea and Bacteriophage
+#### Bacterial, Archaea and Bacteriophage metagenomes/metatranscriptomes
 
 ```bash
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder] --illumina --meta --dir_out [out_folder] 
 ```
 
-#### Eukaryotes and Viruses
+#### Eukaryotes and Viruses metagenomes/metatranscriptomes
 
 ```bash
 conda activate metacerberus
@@ -88,14 +128,14 @@ metacerberus.py --fraggenescan [input_folder] --illumina --meta --dir_out [out_f
 
 ### Nanopore data
 
-#### Bacterial, Archaea and Bacteriophage
+#### Bacterial, Archaea and Bacteriophage metagenomes/metatranscriptomes
 
 ```bash
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder]  --nanopore --meta --dir_out [out_folder]
 ```
 
-#### Eukaryotes and Viruses
+#### Eukaryotes and Viruses metagenomes/metatranscriptomes
 
 ```bash
 conda activate metacerberus
@@ -104,14 +144,14 @@ metacerberus.py --fraggenescan [input_folder] --nanopore --meta --dir_out [out_f
 
 ### PacBio data
 
-#### Microbial, Archaea and Bacteriophage
+#### Microbial, Archaea and Bacteriophage metagenomes/metatranscriptomes
 
 ```bash
 conda activate metacerberus
 metacerberus.py --prodigal [input_folder]  --pacbio --meta --dir_out [out_folder]
 ```
 
-#### Eukaryotes and Viruses
+#### Eukaryotes and Viruses metagenomes/metatranscriptomes
 
 ```bash
 conda activate metacerberus
@@ -125,7 +165,7 @@ conda activate metacerberus
 metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --dir_out [out_folder]
 ```
 
-- Note: Fraggenescan will work for prokaryotes and viruses/bacteriophage but prodigal will not work for eukaryotes. 
+- Note: Fraggenescan will work for prokaryotes and viruses/bacteriophage but prodigal will not work well for eukaryotes. 
 
 ## Prerequisites and dependencies
 
