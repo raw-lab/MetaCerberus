@@ -1,0 +1,156 @@
+=====================================================
+Start Time  : Sat Jul  8 16:28:15 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4315597 / Metacerberus
+Node List   : str-ac[2-5,8]
+Num Tasks   : 5 total [5 nodes @ 64 CPUs/node]
+======================================================
+
+======================================================
+Running Metacerberus On META/genomes/50mb.fna
+======================================================
+Initializing Ray on 5 Nodes
+IP Head: 192.168.190.2:6379
+Starting HEAD at str-ac2
+2023-07-08 16:28:17,063	INFO usage_lib.py:408 -- Usage stats collection is enabled by default without user confirmation because this terminal is detected to be non-interactive. To disable this, add `--disable-usage-stats` to the command that starts the cluster, or run the following command: `ray disable-usage-stats` before starting the cluster. See https://docs.ray.io/en/master/cluster/usage-stats.html for more details.
+2023-07-08 16:28:17,063	INFO scripts.py:712 -- [37mLocal node IP[39m: [1m192.168.190.2[22m
+2023-07-08 16:28:18,946	SUCC scripts.py:749 -- [32m--------------------[39m
+2023-07-08 16:28:18,946	SUCC scripts.py:750 -- [32mRay runtime started.[39m
+2023-07-08 16:28:18,946	SUCC scripts.py:751 -- [32m--------------------[39m
+2023-07-08 16:28:18,946	INFO scripts.py:753 -- [36mNext steps[39m
+2023-07-08 16:28:18,946	INFO scripts.py:756 -- To add another node to this Ray cluster, run
+2023-07-08 16:28:18,946	INFO scripts.py:759 -- [1m  ray start --address='192.168.190.2:6379'[22m
+2023-07-08 16:28:18,946	INFO scripts.py:768 -- To connect to this Ray cluster:
+2023-07-08 16:28:18,946	INFO scripts.py:770 -- [35mimport[39m[26m ray
+2023-07-08 16:28:18,947	INFO scripts.py:771 -- ray[35m.[39m[26minit(_node_ip_address[35m=[39m[26m[33m'192.168.190.2'[39m[26m)
+2023-07-08 16:28:18,947	INFO scripts.py:783 -- To submit a Ray job using the Ray Jobs CLI:
+2023-07-08 16:28:18,947	INFO scripts.py:784 -- [1m  RAY_ADDRESS='http://127.0.0.1:8265' ray job submit --working-dir . -- python my_script.py[22m
+2023-07-08 16:28:18,947	INFO scripts.py:793 -- See https://docs.ray.io/en/latest/cluster/running-applications/job-submission/index.html 
+2023-07-08 16:28:18,947	INFO scripts.py:797 -- for more information on submitting Ray jobs to the Ray cluster.
+2023-07-08 16:28:18,947	INFO scripts.py:802 -- To terminate the Ray runtime, run
+2023-07-08 16:28:18,947	INFO scripts.py:803 -- [1m  ray stop[22m
+2023-07-08 16:28:18,947	INFO scripts.py:806 -- To view the status of the cluster, use
+2023-07-08 16:28:18,947	INFO scripts.py:807 --   [1mray status[22m[26m
+2023-07-08 16:28:18,947	INFO scripts.py:811 -- To monitor and debug Ray, view the dashboard at 
+2023-07-08 16:28:18,947	INFO scripts.py:812 --   [1m127.0.0.1:8265[22m[26m
+2023-07-08 16:28:18,947	INFO scripts.py:819 -- [4mIf connection to the dashboard fails, check your firewall settings and network configuration.[24m
+2023-07-08 16:28:18,947	INFO scripts.py:919 -- [36m[1m--block[22m[39m
+2023-07-08 16:28:18,947	INFO scripts.py:920 -- This command will now block forever until terminated by a signal.
+2023-07-08 16:28:18,947	INFO scripts.py:923 -- Running subprocesses are monitored and a message will be printed if any of them terminate unexpectedly. Subprocesses exit with SIGTERM will be treated as graceful, thus NOT reported.
+Starting WORKER 1 at str-ac3
+[2023-07-08 16:28:22,092 I 3583944 3583944] global_state_accessor.cc:356: This node has an IP address of 192.168.190.3, but we cannot find a local Raylet with the same address. This can happen when you connect to the Ray cluster with a different IP address or when connecting to a container.
+2023-07-08 16:28:22,066	INFO scripts.py:894 -- [37mLocal node IP[39m: [1m192.168.190.3[22m
+2023-07-08 16:28:22,093	SUCC scripts.py:906 -- [32m--------------------[39m
+2023-07-08 16:28:22,093	SUCC scripts.py:907 -- [32mRay runtime started.[39m
+2023-07-08 16:28:22,093	SUCC scripts.py:908 -- [32m--------------------[39m
+2023-07-08 16:28:22,093	INFO scripts.py:910 -- To terminate the Ray runtime, run
+2023-07-08 16:28:22,093	INFO scripts.py:911 -- [1m  ray stop[22m
+2023-07-08 16:28:22,093	INFO scripts.py:919 -- [36m[1m--block[22m[39m
+2023-07-08 16:28:22,093	INFO scripts.py:920 -- This command will now block forever until terminated by a signal.
+2023-07-08 16:28:22,094	INFO scripts.py:923 -- Running subprocesses are monitored and a message will be printed if any of them terminate unexpectedly. Subprocesses exit with SIGTERM will be treated as graceful, thus NOT reported.
+Starting WORKER 2 at str-ac4
+[2023-07-08 16:28:27,063 I 1959987 1959987] global_state_accessor.cc:356: This node has an IP address of 192.168.190.4, but we cannot find a local Raylet with the same address. This can happen when you connect to the Ray cluster with a different IP address or when connecting to a container.
+2023-07-08 16:28:27,038	INFO scripts.py:894 -- [37mLocal node IP[39m: [1m192.168.190.4[22m
+2023-07-08 16:28:27,064	SUCC scripts.py:906 -- [32m--------------------[39m
+2023-07-08 16:28:27,064	SUCC scripts.py:907 -- [32mRay runtime started.[39m
+2023-07-08 16:28:27,064	SUCC scripts.py:908 -- [32m--------------------[39m
+2023-07-08 16:28:27,064	INFO scripts.py:910 -- To terminate the Ray runtime, run
+2023-07-08 16:28:27,064	INFO scripts.py:911 -- [1m  ray stop[22m
+2023-07-08 16:28:27,064	INFO scripts.py:919 -- [36m[1m--block[22m[39m
+2023-07-08 16:28:27,064	INFO scripts.py:920 -- This command will now block forever until terminated by a signal.
+2023-07-08 16:28:27,064	INFO scripts.py:923 -- Running subprocesses are monitored and a message will be printed if any of them terminate unexpectedly. Subprocesses exit with SIGTERM will be treated as graceful, thus NOT reported.
+Starting WORKER 3 at str-ac5
+[2023-07-08 16:28:32,096 I 1399483 1399483] global_state_accessor.cc:356: This node has an IP address of 192.168.190.5, but we cannot find a local Raylet with the same address. This can happen when you connect to the Ray cluster with a different IP address or when connecting to a container.
+2023-07-08 16:28:32,066	INFO scripts.py:894 -- [37mLocal node IP[39m: [1m192.168.190.5[22m
+2023-07-08 16:28:32,097	SUCC scripts.py:906 -- [32m--------------------[39m
+2023-07-08 16:28:32,097	SUCC scripts.py:907 -- [32mRay runtime started.[39m
+2023-07-08 16:28:32,097	SUCC scripts.py:908 -- [32m--------------------[39m
+2023-07-08 16:28:32,097	INFO scripts.py:910 -- To terminate the Ray runtime, run
+2023-07-08 16:28:32,097	INFO scripts.py:911 -- [1m  ray stop[22m
+2023-07-08 16:28:32,097	INFO scripts.py:919 -- [36m[1m--block[22m[39m
+2023-07-08 16:28:32,097	INFO scripts.py:920 -- This command will now block forever until terminated by a signal.
+2023-07-08 16:28:32,097	INFO scripts.py:923 -- Running subprocesses are monitored and a message will be printed if any of them terminate unexpectedly. Subprocesses exit with SIGTERM will be treated as graceful, thus NOT reported.
+Starting WORKER 4 at str-ac8
+[2023-07-08 16:28:37,048 I 2018586 2018586] global_state_accessor.cc:356: This node has an IP address of 192.168.190.8, but we cannot find a local Raylet with the same address. This can happen when you connect to the Ray cluster with a different IP address or when connecting to a container.
+2023-07-08 16:28:37,021	INFO scripts.py:894 -- [37mLocal node IP[39m: [1m192.168.190.8[22m
+2023-07-08 16:28:37,049	SUCC scripts.py:906 -- [32m--------------------[39m
+2023-07-08 16:28:37,049	SUCC scripts.py:907 -- [32mRay runtime started.[39m
+2023-07-08 16:28:37,049	SUCC scripts.py:908 -- [32m--------------------[39m
+2023-07-08 16:28:37,049	INFO scripts.py:910 -- To terminate the Ray runtime, run
+2023-07-08 16:28:37,049	INFO scripts.py:911 -- [1m  ray stop[22m
+2023-07-08 16:28:37,049	INFO scripts.py:919 -- [36m[1m--block[22m[39m
+2023-07-08 16:28:37,049	INFO scripts.py:920 -- This command will now block forever until terminated by a signal.
+2023-07-08 16:28:37,049	INFO scripts.py:923 -- Running subprocesses are monitored and a message will be printed if any of them terminate unexpectedly. Subprocesses exit with SIGTERM will be treated as graceful, thus NOT reported.
+HMM: 'KOFam_all'
+HMM: 'COG'
+HMM: 'VOG'
+HMM: 'PHROG'
+HMM: 'CAZy'
+
+Starting MetaCerberus Pipeline
+
+Checking for external dependencies:
+fastqc               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastqc
+flash2               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/flash2
+fastp                /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastp
+porechop             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/porechop
+bbduk.sh             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/bbduk.sh
+FragGeneScanRs       /users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/meta_cerberus/FGS/FragGeneScanRs
+prodigal             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/prodigal
+hmmsearch            /users/jlfiguer/.conda/envs/metacerberus-dev/bin/hmmsearch
+countAssembly.py     /users/jlfiguer/.conda/envs/metacerberus-dev/bin/countAssembly.py
+Initializing RAY
+2023-07-08 16:28:42,623	INFO worker.py:1452 -- Connecting to existing Ray cluster at address: 192.168.190.2:6379...
+2023-07-08 16:28:42,695	INFO worker.py:1627 -- Connected to Ray cluster. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+Started RAY on cluster
+Running RAY on 5 node(s)
+Using 64 CPUs per node
+
+STEP 1: Loading sequence files:
+Processing 0 fastq sequences
+Processing 1 fasta sequences
+Processing 0 protein Sequences
+
+STEP 5a: Removing N's from contig files
+
+STEP 6: Metaome Stats
+
+
+STEP 7: ORF Finder
+
+
+STEP 8: HMMER Search
+
+
+STEP 8: Filtering HMMER results
+
+
+STEP 9: Parse HMMER results
+
+
+STEP 10: Creating Reports
+Saving Statistics
+ORF Calling Results (prodigal)
+Average Protein Length (prodigal)
+Annotations (prodigal)
+GC (%) (prodigal)
+Assembly Stats (prodigal)
+Min-Max FASTA Length (prodigal)
+Creating Rollup Tables
+Creating Count Tables
+NOTE: PCA Tables created only when there are at least four sequence files.
+
+NOTE: Pathview created only when there are at least four sequence files.
+
+Creating combined sunburst and bargraphs
+
+Finished Pipeline
+1437.37user 12.53system 3:13:09elapsed 12%CPU (0avgtext+0avgdata 359680maxresident)k
+211984inputs+916696outputs (0major+392839minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  8 19:41:50 EDT 2023
+Run Time   : 11615 seconds
+======================================================
+
+Disk Used 201868 results/Metacerberus/META/genomes/50mb

@@ -1,0 +1,62 @@
+=====================================================
+Start Time  : Fri Jul 21 23:03:49 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 5138953 / Metacerberus
+Node List   : str-c74
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+======================================================
+Running Metacerberus On META_VIRAL/genomes/QGNH01000788.1.fna
+======================================================
+HMM: 'KOFam_all'
+HMM: 'COG'
+HMM: 'VOG'
+HMM: 'PHROG'
+HMM: 'CAZy'
+
+Starting MetaCerberus Pipeline
+
+Checking for external dependencies:
+fastqc               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastqc
+flash2               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/flash2
+fastp                /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastp
+porechop             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/porechop
+bbduk.sh             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/bbduk.sh
+FragGeneScanRs       /users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/meta_cerberus/FGS/FragGeneScanRs
+prodigal             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/prodigal
+hmmsearch            /users/jlfiguer/.conda/envs/metacerberus-dev/bin/hmmsearch
+countAssembly.py     /users/jlfiguer/.conda/envs/metacerberus-dev/bin/countAssembly.py
+Initializing RAY
+2023-07-21 23:03:51,589	INFO worker.py:1452 -- Connecting to existing Ray cluster at address: 192.168.170.74:55125...
+2023-07-21 23:03:51,630	INFO worker.py:1627 -- Connected to Ray cluster. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+Started RAY on cluster
+Running RAY on 1 node(s)
+Using 36 CPUs per node
+
+STEP 1: Loading sequence files:
+Processing 0 fastq sequences
+Processing 1 fasta sequences
+Processing 0 protein Sequences
+
+STEP 5a: Removing N's from contig files
+
+STEP 6: Metaome Stats
+
+
+STEP 7: ORF Finder
+
+
+STEP 8: HMMER Search
+
+[2023-07-21 23:06:29,643 E 3837096 3843693] gcs_rpc_client.h:537: Failed to connect to GCS within 60 seconds. GCS may have been killed. It's either GCS is terminated by `ray stop` or is killed unexpectedly. If it is killed unexpectedly, see the log file gcs_server.out. https://docs.ray.io/en/master/ray-observability/ray-logging.html#logging-directory-structure. The program will terminate.
+Command exited with non-zero status 1
+60.62user 24.28system 2:39.20elapsed 53%CPU (0avgtext+0avgdata 217728maxresident)k
+0inputs+200outputs (0major+92598minor)pagefaults 0swaps
+
+======================================================
+End Time   : Fri Jul 21 23:06:29 EDT 2023
+Run Time   : 160 seconds
+======================================================
+
+Disk Used 64 results/Metacerberus/META_VIRAL/genomes/QGNH01000788.1

@@ -1,0 +1,126 @@
+=====================================================
+Start Time  : Fri Jul 21 18:25:14 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 5136712 / DRAM
+Node List   : str-c74
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading dram/1.4.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running DRAM On META_VIRAL/genomes/QGNH01000481.1.fna
+======================================================
+2023-07-21 18:25:18,001 - 1 fastas found
+2023-07-21 18:25:18,001 - Checking for duplicate names
+2023-07-21 18:25:18,002 - No duplicate names found
+2023-07-21 18:25:18,003 - Starting the Viral Annotation of Genes with database configuration: 
+ 
+
+KOfam db:
+    Citation: T. Aramaki, R. Blanc-Mathieu, H. Endo, K. Ohkubo, M. Kanehisa, S. Goto, and H. Ogata, "Kofamkoala: Kegg ortholog assignment based on profile hmm and adaptive score threshold," Bioinformatics, vol. 36, no. 7, pp. 2251–2252, 2020.
+    Download Time: 06/10/2023, 10:32:33
+    Origin: Downloaded by DRAM
+KOfam KO list:
+    Citation: T. Aramaki, R. Blanc-Mathieu, H. Endo, K. Ohkubo, M. Kanehisa, S. Goto, and H. Ogata, "Kofamkoala: Kegg ortholog assignment based on profile hmm and adaptive score threshold," Bioinformatics, vol. 36, no. 7, pp. 2251–2252, 2020.
+    Download Time: 06/10/2023, 10:32:36
+    Origin: Downloaded by DRAM
+Pfam db:
+    Citation: J. Mistry, S. Chuguransky, L. Williams, M. Qureshi, G. A. Salazar, E. L. Sonnhammer, S. C. Tosatto, L. Paladin, S. Raj, L. J. Richardson et al., "Pfam: The protein families database in 2021," Nucleic acids research, vol. 49, no. D1, pp. D412–D419, 2021.
+    Download Time: 06/10/2023, 18:44:32
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:42
+dbCAN db:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Download Time: 06/10/2023, 18:44:36
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:42
+RefSeq Viral db:
+    Description_Db_Updated: 06/12/2023, 01:23:21
+    Citation: J. R. Brister, D. Ako-Adjei, Y. Bao, and O. Blinkova, "Ncbi viral genomes resource," Nucleic acids research, vol. 43, no. D1, pp. D571–D577, 2015. [3] M. Kanehisa, M. Furumichi, Y. Sato, M. Ishiguro-Watanabe, and M. Tan-abe, "Kegg: integrating viruses and cellular organisms," Nucleic acids research, vol. 49, no. D1, pp. D545–D551, 2021.
+    Viral_Files: 1
+    Download Time: 06/10/2023, 18:45:02
+    Origin: Downloaded by DRAM
+MEROPS peptidase db:
+    Description_Db_Updated: 06/12/2023, 01:23:41
+    Citation: N. D. Rawlings, A. J. Barrett, P. D. Thomas, X. Huang, A. Bateman, and R. D. Finn, "The merops database of proteolytic enzymes, their substrates and inhibitors in 2017 and a comparison with peptidases in the panther database," Nucleic acids research, vol. 46, no. D1, pp. D624–D632, 2018.
+    Download Time: 06/10/2023, 18:45:19
+    Origin: Downloaded by DRAM
+VOGDB db:
+    Citation: J. Thannesberger, H.-J. Hellinger, I. Klymiuk, M.-T. Kastner, F. J. Rieder, M. Schneider, S. Fister, T. Lion, K. Kosulin, J. Laengle et al., "Viruses comprise an extensive pool of mobile genetic elements in eukaryote cell cultures and human clinical samples," The FASEB Journal, vol. 31, no. 5, pp. 1987–2000, 2017.
+    Version: latest
+    Download Time: 06/10/2023, 18:44:59
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:44
+
+Pfam hmm dat:
+    Description_Db_Updated: Unknown, or Never
+    Citation: J. Mistry, S. Chuguransky, L. Williams, M. Qureshi, G. A. Salazar, E. L. Sonnhammer, S. C. Tosatto, L. Paladin, S. Raj, L. J. Richardson et al., "Pfam: The protein families database in 2021," Nucleic acids research, vol. 49, no. D1, pp. D412–D419, 2021.
+    Download Time: 06/10/2023, 18:44:33
+    Origin: Downloaded by DRAM
+dbCAN family activities:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Upload_Date: 08062022
+    Download Time: 06/10/2023, 18:44:37
+    Origin: Downloaded by DRAM
+dbCAN subfamily EC numbers:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Upload_Date: 08062022
+    Download Time: 06/10/2023, 18:44:37
+    Origin: Downloaded by DRAM
+VOG annotations:
+    Description_Db_Updated: Unknown, or Never
+    Citation: J. Thannesberger, H.-J. Hellinger, I. Klymiuk, M.-T. Kastner, F. J. Rieder, M. Schneider, S. Fister, T. Lion, K. Kosulin, J. Laengle et al., "Viruses comprise an extensive pool of mobile genetic elements in eukaryote cell cultures and human clinical samples," The FASEB Journal, vol. 31, no. 5, pp. 1987–2000, 2017.
+    Version: latest
+    Download Time: 06/10/2023, 18:45:00
+    Origin: Downloaded by DRAM
+
+Genome summary form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+Module step form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+ETC module database:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:21
+    Origin: Downloaded by DRAM
+Function heatmap form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+AMG database:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+2023-07-21 18:25:18,004 - Retrieved database locations and descriptions
+2023-07-21 18:25:18,004 - Annotating QGNH01000481.1
+2023-07-21 18:25:18,524 - Turning genes from prodigal to mmseqs2 db
+2023-07-21 18:25:22,623 - Getting hits from kofam
+2023-07-21 18:26:17,000 - Getting forward best hits from viral
+2023-07-21 18:26:17,792 - Getting reverse best hits from viral
+2023-07-21 18:26:19,817 - Getting descriptions of hits from viral
+2023-07-21 18:26:19,986 - Getting forward best hits from peptidase
+2023-07-21 18:26:20,810 - Getting reverse best hits from peptidase
+2023-07-21 18:26:21,327 - Getting descriptions of hits from peptidase
+2023-07-21 18:26:21,395 - Getting hits from pfam
+2023-07-21 18:26:26,332 - Getting hits from dbCAN
+2023-07-21 18:26:27,380 - Getting hits from VOGDB
+2023-07-21 18:27:08,747 - Merging ORF annotations
+2023-07-21 18:27:09,028 - No tRNAs were detected, no trnas.tsv file will be created.
+2023-07-21 18:27:09,153 - No rRNAs were detected, no rrnas.tsv file will be created.
+2023-07-21 18:27:09,416 - Annotations complete, processing annotations
+122.82user 109.22system 1:54.09elapsed 203%CPU (0avgtext+0avgdata 18177264maxresident)k
+1767936inputs+1771512outputs (47major+725049minor)pagefaults 0swaps
+
+======================================================
+End Time   : Fri Jul 21 18:27:09 EDT 2023
+Run Time   : 115 seconds
+======================================================
+
+Disk Used 360 results/DRAM/META_VIRAL/genomes/QGNH01000481.1

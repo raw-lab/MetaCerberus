@@ -1,0 +1,43 @@
+=====================================================
+Start Time  : Sat Jul 22 01:08:29 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 5140348 / Metacerberus
+Node List   : str-c76
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+======================================================
+Running Metacerberus On META_VIRAL/genomes/QGNH01001259.1.fna
+======================================================
+HMM: 'KOFam_all'
+HMM: 'COG'
+HMM: 'VOG'
+HMM: 'PHROG'
+HMM: 'CAZy'
+
+Starting MetaCerberus Pipeline
+
+Checking for external dependencies:
+fastqc               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastqc
+flash2               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/flash2
+fastp                /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastp
+porechop             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/porechop
+bbduk.sh             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/bbduk.sh
+FragGeneScanRs       /users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/meta_cerberus/FGS/FragGeneScanRs
+prodigal             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/prodigal
+hmmsearch            /users/jlfiguer/.conda/envs/metacerberus-dev/bin/hmmsearch
+countAssembly.py     /users/jlfiguer/.conda/envs/metacerberus-dev/bin/countAssembly.py
+Initializing RAY
+2023-07-22 01:08:31,160	INFO worker.py:1452 -- Connecting to existing Ray cluster at address: 192.168.170.76:57142...
+[2023-07-22 01:08:31,165 W 136425 136425] global_state_accessor.cc:389: Some processes that the driver needs to connect to have not registered with GCS, so retrying. Have you run 'ray start' on this node?
+[2023-07-22 01:09:32,170 E 136425 136459] gcs_rpc_client.h:537: Failed to connect to GCS within 60 seconds. GCS may have been killed. It's either GCS is terminated by `ray stop` or is killed unexpectedly. If it is killed unexpectedly, see the log file gcs_server.out. https://docs.ray.io/en/master/ray-observability/ray-logging.html#logging-directory-structure. The program will terminate.
+Command exited with non-zero status 1
+1.43user 1.00system 1:02.15elapsed 3%CPU (0avgtext+0avgdata 201176maxresident)k
+0inputs+80outputs (0major+28868minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul 22 01:09:32 EDT 2023
+Run Time   : 63 seconds
+======================================================
+
+Disk Used 0 results/Metacerberus/META_VIRAL/genomes/QGNH01001259.1
