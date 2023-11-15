@@ -124,7 +124,10 @@ def findORF_phanotate(contig, config, subdir, meta=False):
         print(e)
         return None
 
-    subprocess.run(['sed', '-i', 's/#//g', faaOut])
+    try:
+        subprocess.run(['sed', '-i', 's/#//g', faaOut])
+    except Exception as e:
+        print(e)
 
     done.touch()
     return faaOut
