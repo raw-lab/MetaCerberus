@@ -78,3 +78,53 @@ def findORF_meta(contig, config, subdir):
 
     done.touch()
     return faaOut
+
+# Giant Virus
+def findORF_prodgv(contig, config, subdir, meta=False):
+    path = Path(config['DIR_OUT'], subdir)
+    done = path / "complete"
+
+    faaOut  = path / "proteins.faa"
+
+    if not config['REPLACE'] and done.exists() and faaOut.exists():
+            return faaOut
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
+
+    command = f"{config['EXE_PRODIGAL-GV']} -i {contig} -a {faaOut} -o {path / 'proteins.gbk'} {'-p meta' if meta else ''}"
+    print(command)
+    try:
+        with Path(path,"stdout.txt").open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
+            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e)
+        return None
+
+    done.touch()
+    return faaOut
+
+# Phage
+def findORF_phanotate(contig, config, subdir, meta=False):
+    path = Path(config['DIR_OUT'], subdir)
+    done = path / "complete"
+
+    faaOut  = path / "proteins.faa"
+
+    if not config['REPLACE'] and done.exists() and faaOut.exists():
+            return faaOut
+    done.unlink(missing_ok=True)
+    path.mkdir(exist_ok=True, parents=True)
+
+    command = [config['EXE_PHANOTATE'], '-f', 'faa', '-o', faaOut, contig]
+    print(command)
+    try:
+        with Path(path,"stdout.txt").open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
+            subprocess.run(command, check=True, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e)
+        return None
+
+    subprocess.run(['sed', '-i', 's/#//g', faaOut])
+
+    done.touch()
+    return faaOut

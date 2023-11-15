@@ -38,8 +38,8 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
         # HMMER
         errfile=Path(outfile).with_suffix('.err').open('w')
         try:
-            reduce_awk = """grep -Ev '^#' | awk '{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }'""" + f" >> {outfile}"
-            command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domT {minscore} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_awk}"
+            reduce_awk = f"""grep -Ev '^#' | awk '$7 < {evalue} && $14 > {minscore} {{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }}' >> {outfile}"""
+            command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_awk}"
             if not Path(outfile).exists():
                 jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=errfile)
             outlist.append(outfile)
@@ -67,18 +67,19 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
             dbLookup = Path(dbpath, f"{name}-onto_rel1.tsv").read_text()
             BH_target = dict()
             with open(hmm_tsv, "r") as reader:
-                for line in reader:
+                reader.readline() # Skip header
+                for i,line in enumerate(reader, 1):
                     line = line.split('\t')
                     try:
                         target = line[0]
                         query = line[1]
-                        e_value = line[2]
-                        line[3] = float(line[3])
-                        score = line[3]
+                        e_value = float(line[2])
+                        score = float(line[3])
                         length = int(line[4])
                         start = int(line[5])
                         end = int(line[6])
                     except:
+                        print("Failed to read line:", i, hmm_tsv)
                         continue
                     # Check if Query is in the Database
                     if not re.search(query, dbLookup, re.MULTILINE):
@@ -96,11 +97,19 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
                         for i,match in enumerate(BH_target[target]):
                             # Check for overlap
                             if start <= match[5] and end >= match[4]:
-                                #overlap = end - match[4]
-                                overlap = True
-                                if score > match[2]:
-                                    BH_target[target][i] = item
-                        if not overlap: # Did not overlap
+                                overlap_len = min(end, match[5]) - max(start, match[4])
+                                if overlap_len > 10:
+                                    # Winner takes all
+                                    overlap = True
+                                    print("OVERLAP:", overlap_len)
+                                    if score == match[2]:
+                                        BH_target[target] += [item]
+                                    if score > match[2]:
+                                        BH_target[target][i] = item
+                                else:
+                                    print("NO OVERLAP:", overlap_len)
+                        if not overlap:
+                            # Dual domain
                             BH_target[target] += [item]
             # Write filtered overlaps to file
             for target in BH_target:
@@ -109,3 +118,17 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
                     print(target, query, e_value, score, length, start, end, sep='\t', file=writer)
 
     return outfile
+
+
+#* Each pORF match to an HMM is recorded by default or user selected e-value/bitscores per database independently or per user specification of selected database
+#* If two HMM hits are non-overlapping from the same database both are counted as long as they are the within the default or user selected e-value/bitscores
+# If two HMM hits are overlapping (>10 amino acids) from the same database the lowest resulting e-value and highest bitscore wins or the ‘top hit,’ or ‘winner take all,’ approach
+#   If both have the same equal value e-value and bitscore but are different accessions from the same database (e.g., KO1 and KO3) then both are reported
+# If a hit is overlapping <10 amino acids both hits are counted due to the dual domain issue
+# No partial hits or fractions of hits are counted
+
+# min(ends) - max(starts)
+
+               #AAAAA
+      #BBBBBBBBBBB
+
