@@ -27,10 +27,10 @@ def deconSingleReads(key_value, config, subdir):
 
     qc_seq = "ref="+config['QC_SEQ'] if config['QC_SEQ'] else ""
 
-    command = f"{config['EXE_BBDUK']} -Xmx1g in={value} out={deconReads} qin=30 qtrim=r minlen=50 outm={matched} {qc_seq} k=31 stats={stats}"
+    command = [config['EXE_BBDUK'], "-Xmx1g", f"in={value}", f"out={deconReads}", "qin=30", "qtrim=r", "minlen=50", "k=31", f"ref={qc_seq}", "hdist=1", f"stats={stats}"]
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
-            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
+            subprocess.run(command, check=True, stdout=fout, stderr=ferr)
     except Exception as e:
         print(e)
         print("ERROR: Failed to execute:\n", command)
