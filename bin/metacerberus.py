@@ -132,9 +132,9 @@ def main():
     # At least one of these options are required
     required = parser.add_argument_group('''Required arguments
 At least one sequence is required.
-<accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
+<accepted formats {.fastq .fasta .faa .fna .ffn}>
 Example:
-> metaerberus.py --prodigal file1.fasta
+> metacerberus.py --prodigal file1.fasta
 > metacerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
@@ -162,7 +162,7 @@ Example:
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
-    optional.add_argument('--hmm', type=str, default='KOFam_all', help="Specify a coma seperated list of databases for HMMER. Use quotes around the list, or avoid spaces. (KOFam_all, KOFam_eukariote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]")
+    optional.add_argument('--hmm', type=str, default='KOFam_all', help="Specify a coma seperated list of databases for HMMER. Use quotes around the list, or avoid spaces. (KOFam_all, KOFam_eukaryote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
     optional.add_argument('--slurm_nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
     optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY [system tmp dir]')
