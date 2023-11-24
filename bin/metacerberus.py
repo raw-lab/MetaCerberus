@@ -294,11 +294,11 @@ Example:
     if 'CPUS' not in config:
         config['CPUS'] = psutil.cpu_count()
     try:
-        ray.init(address='auto')#, log_to_driver=False)
+        ray.init(address='auto', log_to_driver=False)
         print("Started RAY on cluster")
         config['CLUSTER'] = True
     except:
-        ray.init(num_cpus=config['CPUS'])#log_to_driver=False)
+        ray.init(num_cpus=config['CPUS'], log_to_driver=False)
         print("Started RAY single node")
         config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")

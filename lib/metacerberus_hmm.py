@@ -101,13 +101,14 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
                                 if overlap_len > 10:
                                     # Winner takes all
                                     overlap = True
-                                    print("OVERLAP:", overlap_len)
+                                    #print("OVERLAP:", overlap_len)
                                     if score == match[2]:
                                         BH_target[target] += [item]
                                     if score > match[2]:
                                         BH_target[target][i] = item
                                 else:
-                                    print("NO OVERLAP:", overlap_len)
+                                    pass
+                                    #print("NO OVERLAP:", overlap_len)
                         if not overlap:
                             # Dual domain
                             BH_target[target] += [item]
