@@ -15,13 +15,13 @@ MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/meta
 - Mamba install from bioconda with all dependencies:
 
 #### Linux/OSX-64
-#### 1. Install mamba using conda
+1. Install mamba using conda
 ```bash
 conda install mamba
 ```
 - NOTE: Make sure you install mamba in your base conda environment unless you have OSX with ARM architecture (M1/M2 Macs). Follow the OSX-ARM instructions below if you have a Mac with ARM architecture.
 
-#### 2. Install MetaCerberus with mamba
+2. Install MetaCerberus with mamba
 ```bash
 mamba create -n metacerberus -c bioconda -c conda-forge metacerberus
 conda activate metacerberus
@@ -29,7 +29,7 @@ metacerberus.py --setup
 ```
 
 #### OSX-ARM (M1/M2)
-#### 1. Install MetaCerberus with mamba
+1. Install MetaCerberus with mamba
 ```bash
 conda create -y -n metacerberus
 conda activate metacerberus
