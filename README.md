@@ -29,12 +29,18 @@ metacerberus.py --setup
 ```
 
 #### OSX-ARM (M1/M2)
-1. Install MetaCerberus with mamba
+1. Set up conda environment
 ```bash
 conda create -y -n metacerberus
 conda activate metacerberus
 conda config --env --set subdir osx-64
+```
+2. Install mamba, python, and pydantic inside the environment
+```bash
 conda install -y -c conda-forge mamba python=3.10 "pydantic<2"
+```
+3. Install MetaCerberus with mamba
+```bash
 mamba install -y -c bioconda -c conda-forge metacerberus
 metacerberus.py --setup
 ```
