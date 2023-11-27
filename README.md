@@ -14,21 +14,34 @@ MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/meta
 
 - Mamba install from bioconda with all dependencies:
 
-#### Install mamba using conda
+#### Linux/OSX-64
+#### 1. Install mamba using conda
 ```bash
 conda install mamba
 ```
-- NOTE: Make sure you install mamba in your base conda environment
+- NOTE: Make sure you install mamba in your base conda environment unless you have OSX with ARM architecture (M1/M2 Macs). Follow the OSX-ARM instructions below if you have a Mac with ARM architecture.
 
-#### Install MetaCerberus with mamba
+#### 2. Install MetaCerberus with mamba
 ```bash
 mamba create -n metacerberus -c bioconda -c conda-forge metacerberus
 conda activate metacerberus
 metacerberus.py --setup
 ```
+
+#### OSX-ARM (M1/M2)
+#### 1. Install MetaCerberus with mamba
+```bash
+conda create -y -n metacerberus
+conda activate metacerberus
+conda config --env --set subdir osx-64
+conda install -y -c conda-forge mamba python=3.10 "pydantic<2"
+mamba install -y -c bioconda -c conda-forge metacerberus
+metacerberus.py --setup
+```
+
 - NOTE: Mamba is the fastest installer. Anaconda or miniconda can be slow. Also, install mamba from conda not from pip. The pip mamba doesn't work for install. 
 
-### Option 2) Anaconda
+### Option 2) Anaconda - Linux/OSX-64 Only
 
 - Anaconda install from bioconda with all dependencies:
 
@@ -38,7 +51,7 @@ conda activate metacerberus
 metacerberus.py --setup
 ```
 
-### Option 3) Manual Install
+### Option 3) Manual Install - Linux/OSX-64 Only
 
 1. Clone github Repo
 
