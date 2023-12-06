@@ -165,6 +165,7 @@ Example:
     optional.add_argument('--hmm', type=str, default='KOFam_all', help="Specify a coma seperated list of databases for HMMER. Use quotes around the list, or avoid spaces. (KOFam_all, KOFam_eukaryote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
     optional.add_argument('--slurm_nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
+    optional.add_argument('--slurm_single', action="store_true", help=argparse.SUPPRESS)# help='Force single node use, do not connect to host')
     optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY [system tmp dir]')
     optional.add_argument('--version', '-v', action='version',
                         version=f'MetaCerberus: \n version: {__version__} {__date__}',
@@ -193,7 +194,7 @@ Example:
     # TODO: Add Custom HMM DB
     dbHMM = dict()
     if args.hmm.upper() == "ALL":
-        args.hmm = ','.join([x for x in DB_HMM.keys()])
+        args.hmm = "KOFam_all, COG, VOG, PHROG, CAZy"
     for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')], 1):
         print(f"HMM: '{hmm}'")
         if hmm in DB_HMM:
@@ -287,20 +288,27 @@ Example:
 
     # First try if ray is setup for a cluster
     #TODO: Fix this, does not set up slurm script
-    if config['SLURM_NODES']:
-        metacerberus_setup.slurm(config['SLURM_NODES'])
+    #if config['SLURM_NODES']:
+    #    metacerberus_setup.slurm(config['SLURM_NODES'])
     
     # Get CPU Count
     if 'CPUS' not in config:
         config['CPUS'] = psutil.cpu_count()
-    try:
-        ray.init(address='auto', log_to_driver=False)
-        print("Started RAY on cluster")
-        config['CLUSTER'] = True
-    except:
+    
+    if args.slurm_single:
+        # Force single node
         ray.init(num_cpus=config['CPUS'], log_to_driver=False)
         print("Started RAY single node")
         config['CLUSTER'] = False
+    else:
+        try:
+            ray.init(address='auto', log_to_driver=False)
+            print("Started RAY on cluster")
+            config['CLUSTER'] = True
+        except:
+            ray.init(num_cpus=config['CPUS'], log_to_driver=False)
+            print("Started RAY single node")
+            config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
 
