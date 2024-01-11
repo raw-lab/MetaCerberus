@@ -297,16 +297,16 @@ Example:
     
     if args.slurm_single:
         # Force single node
-        ray.init(num_cpus=config['CPUS'], log_to_driver=False)
+        ray.init(num_cpus=config['CPUS'])#, log_to_driver=False)
         print("Started RAY single node")
         config['CLUSTER'] = False
     else:
         try:
-            ray.init(address='auto', log_to_driver=False)
+            ray.init(address='auto')#, log_to_driver=False)
             print("Started RAY on cluster")
             config['CLUSTER'] = True
         except:
-            ray.init(num_cpus=config['CPUS'], log_to_driver=False)
+            ray.init(num_cpus=config['CPUS'])#, log_to_driver=False)
             print("Started RAY single node")
             config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")
@@ -519,7 +519,7 @@ Example:
             set_add(step_curr, 8, "STEP 8: HMMER Search")
             if value:
                 amino[key] = value
-                if not config['CLUSTER']:
+                if True:#not config['CLUSTER']: #TODO: Debugging chunker
                     if config['CHUNKER'] > 0:
                         chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
                         chunkCount = 1
@@ -533,12 +533,10 @@ Example:
                     else:
                         outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
                         if config['REPLACE'] or not outfile.exists():
-                            print("REPLACE", outfile)
                             for hmm in dbHMM.items():
                                 pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key], config['DIR_OUT'],
                                                                         [{key:value}, config, Path(STEP[8]), hmm, 4]))
                         else:
-                            print("EXISTS", outfile)
                             tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
                             set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                             pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
@@ -575,11 +573,13 @@ Example:
                     if key not in dictChunks:
                         dictChunks[key] = list()
                     dictChunks[key].append(tsv_file)
-                    if len(dictChunks[key]) >= int(l):
+                    print("Added:", key, ":", tsv_file)
+                    if len(dictChunks[key]) == int(l):
                         # All chunks of a file have returned
                         tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
                         tsv_out.parent.mkdir(parents=True, exist_ok=True)
                         if key not in dictHMM:
+                            print("Writing", key, ":", item)
                             dictHMM[key] = 1
                             with tsv_out.open('w') as writer:
                                 print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
@@ -589,12 +589,15 @@ Example:
                                     os.remove(item)
                         else:
                             dictHMM[key] += 1
+                            print("Appending", key, ":", item)
                             with tsv_out.open('a') as writer:
                                 for item in sorted(dictChunks[key]):
                                     writer.write(open(item).read())
                                     dictChunks[key].remove(item)
                                     os.remove(item)
-                        if dictHMM[key] == len(dbHMM):
+                        print("TODO: FILTER:", dictHMM[key], len(dbHMM))
+                        if dictHMM[key] == len(dbHMM): #TODO: Not Filtering here??? Seems to be merging only
+                            # All HMM DBs returned
                             tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
                             set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                             pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
