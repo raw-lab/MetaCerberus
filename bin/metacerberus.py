@@ -144,12 +144,14 @@ Example:
     required.add_argument('--prodigalgv', action='append', default=[], help='Giant virus nucleotide sequence')
     required.add_argument('--phanotate', action='append', default=[], help='Phage sequence')
     required.add_argument('--protein', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
+    required.add_argument('--rollup', action='append', default=[], help='Rolled up annotations from HMMER')
     # Raw-read identification
     readtype = parser.add_mutually_exclusive_group(required=False)
     readtype.add_argument('--illumina', action="store_true", help="Specifies that the given FASTQ files are from Illumina")
     readtype.add_argument('--nanopore', action="store_true", help="Specifies that the given FASTQ files are from Nanopore")
     readtype.add_argument('--pacbio', action="store_true", help="Specifies that the given FASTQ files are from PacBio")
     # optional flags
+    # TODO: Add flag to skip decon
     optional = parser.add_argument_group('optional arguments')
     optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
     optional.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
@@ -216,7 +218,7 @@ Example:
         args.fraggenescan += args.super
 
     # Check if required flags are set
-    if not any([args.prodigal, args.fraggenescan, args.prodigalgv, args.phanotate, args.protein]):
+    if not any([args.prodigal, args.fraggenescan, args.prodigalgv, args.phanotate, args.protein, args.rollup]):
         parser.error('At least one sequence must be declared either in the command line or through the config file')
     # Check sequence type
     for file in args.prodigal + args.fraggenescan + args.prodigalgv + args.phanotate:
@@ -319,6 +321,7 @@ Example:
     fastq = {}
     fasta = {}
     amino = {}
+    rollup = {}
     # Load protein input
     for item in args.protein:
         item = os.path.abspath(os.path.expanduser(item))
@@ -404,10 +407,20 @@ Example:
                     args.phanotate.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
+    # Load Rollup input
+    for item in args.rollup:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in ['.tsv']:
+                rollup['rollup_'+name] = item
+        else:
+            print(f'{item} is not a valid sequence')
     
     print(f"Processing {len(fastq)} fastq sequences")
     print(f"Processing {len(fasta)} fasta sequences")
-    print(f"Processing {len(amino)} protein Sequences")
+    print(f"Processing {len(amino)} protein sequences")
+    print(f"Processing {len(rollup)} rollup files")
 
     # Main Pipeline
     pipeline = list()
@@ -445,7 +458,16 @@ Example:
         for key,value in amino.items():
             pipeline += [ray.put([key, value, 'findORF_'])]
             jobsORF += 1
-    
+
+    # Step 9 Rollup Entry Point
+    hmm_tsv = dict()
+    if rollup:
+        set_add(step_curr, 8.5, "STEP 8: Filtering rollup file(s)")
+        for key,value in rollup.items():
+            amino[key] = None
+            tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [value, tsv_filtered, config['PATHDB']]))
+
     NStats = dict()
     readStats = dict()
     report_path = os.path.join(config['DIR_OUT'], STEP[10])
@@ -454,7 +476,6 @@ Example:
     jobs_per_node = int(-(config["CPUS"] // -4))
     dictChunks = dict()
     dictHMM = dict()
-    hmm_tsv = dict()
     hmmRollup = {}
     hmmCounts = {}
     while pipeline:
@@ -519,7 +540,7 @@ Example:
             set_add(step_curr, 8, "STEP 8: HMMER Search")
             if value:
                 amino[key] = value
-                if True:#not config['CLUSTER']: #TODO: Debugging chunker
+                if not config['CLUSTER']:
                     if config['CHUNKER'] > 0:
                         chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
                         chunkCount = 1
@@ -598,6 +619,7 @@ Example:
                         print("TODO: FILTER:", dictHMM[key], len(dbHMM))
                         if dictHMM[key] == len(dbHMM): #TODO: Not Filtering here??? Seems to be merging only
                             # All HMM DBs returned
+                            print("HMMs returned, Sending to filter")
                             tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
                             set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                             pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))

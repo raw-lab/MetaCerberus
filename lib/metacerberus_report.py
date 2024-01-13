@@ -131,10 +131,11 @@ def write_Stats(outpath:os.PathLike, readStats:dict, protStats:dict, NStats:dict
     # N-Stats
     for key,value in NStats.items():
         repeats = [y for x in value.values() for y in x]
-        dictStats[key]["Contigs w/ N-repeats:"] = len(value)
-        dictStats[key]["N-repeat Count"] = len(repeats)
-        dictStats[key]["N-repeat Total Length"] = sum(repeats)
-        dictStats[key]["N-repeat Average "] = round(sum(repeats)/len(repeats), 2)
+        if key in dictStats:
+            dictStats[key]["Contigs w/ N-repeats:"] = len(value)
+            dictStats[key]["N-repeat Count"] = len(repeats)
+            dictStats[key]["N-repeat Total Length"] = sum(repeats)
+            dictStats[key]["N-repeat Average "] = round(sum(repeats)/len(repeats), 2)
 
 
     # Write Combined Stats to File

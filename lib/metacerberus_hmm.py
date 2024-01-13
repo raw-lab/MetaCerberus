@@ -61,6 +61,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
     return outlist
 
 def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
+    outfile.parent.mkdir(parents=True, exist_ok=True)
     with outfile.open('w') as writer:
         print("target", "query", "e-value", "score", "length", "start", "end", file=writer, sep='\t')
         for name in ['KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
