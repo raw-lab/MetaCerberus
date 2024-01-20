@@ -566,16 +566,22 @@ Example:
                 if config['CHUNKER'] > 0:
                     chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
                     chunkCount = 1
+                    jobsORF -= 1
                     for chunk in chunks.files:
                         amino_queue[f'chunk{chunkCount}-{len(chunks.files)}_{key}'] = chunk
                         chunkCount += 1
-                        jobsORF -= 1
                         # submit searchHMM jobs
                         if len(amino_queue) >= jobs_per_node:
                             for hmm in dbHMM.items():
                                 pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
                                                                     [amino_queue, config, Path(STEP[8]), hmm]))
                             amino_queue = dict()
+                    if len(amino_queue) > 0:
+                        # Leftover chunks in queue not submited yet
+                        for hmm in dbHMM.items():
+                            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
+                                                                [amino_queue, config, Path(STEP[8]), hmm]))
+                        amino_queue = dict()
                 else:
                     amino_queue[key] = value
                     jobsORF -= 1
