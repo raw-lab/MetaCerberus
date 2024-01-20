@@ -57,24 +57,6 @@ conda activate metacerberus
 metacerberus.py --setup
 ```
 
-### Option 3) Manual Install - Linux/OSX-64 Only
-
-1. Clone github Repo
-
-```bash
-git clone https://github.com/raw-lab/metacerberus.git
-```
-
-2. Run Setup File
-
-```bash
-cd metacerberus
-bash install_metacerberus.sh
-conda activate metacerberus
-```
-
-This creates an anaconda environment called "metacerberus" with all dependencies installed.
-
 ## Input formats
 
 - From any NextGen sequencing technology (from Illumina, PacBio, Oxford Nanopore)
