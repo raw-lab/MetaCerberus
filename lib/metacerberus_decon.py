@@ -15,6 +15,9 @@ def deconSingleReads(key_value, config, subdir):
     key = key_value[0]
     value = key_value[1]
 
+    if config['SKIP_DECON']:
+        return key
+
     deconReads = path / f"decon-{key}.fastq"
     matched = path / f"matched_{key}"
     stats = path / "stats.txt"
