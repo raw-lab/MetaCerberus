@@ -23,8 +23,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
         path = Path(config['DIR_OUT'], subdir, key)
         os.makedirs(path, exist_ok=True)
 
-        name = os.path.basename(amino)
-        name_dom = os.path.splitext(name)[0] + "_tmp.hmm"
+        name_dom = f"{key}_tmp.hmm"
         hmmOut[os.path.join(path, name_dom)] = amino
 
     jobs = dict()
@@ -33,7 +32,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
         pathname = os.path.dirname(domtbl_out)
         basename = os.path.basename(domtbl_out)
         outname = os.path.splitext(basename)[0] + ".tsv"
-        outfile = os.path.join(pathname, f"{hmmKey}_{outname}")
+        outfile = os.path.join(pathname, f"{hmmKey}-{outname}")
 
         # HMMER
         errfile=Path(outfile).with_suffix('.err').open('w')
@@ -60,15 +59,22 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
 
     return outlist
 
+
+# Filter HMM results
 def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
     outfile.parent.mkdir(parents=True, exist_ok=True)
-    with outfile.open('w') as writer:
-        print("target", "query", "e-value", "score", "length", "start", "end", file=writer, sep='\t')
-        for name in ['KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
+
+    hmm,key = hmm_tsv.stem.split(sep='-', maxsplit=1)
+    if hmm in ['COG', 'CAZy', 'PHROG', 'VOG']:
+        lookup_list = [hmm]
+    else:
+        lookup_list = ['KEGG']
+
+    with outfile.open('w') as writer, outfile.with_suffix('.log').open('w') as logger:
+        for name in lookup_list:
             dbLookup = Path(dbpath, f"{name}-onto_rel1.tsv").read_text()
             BH_target = dict()
             with open(hmm_tsv, "r") as reader:
-                reader.readline() # Skip header
                 for i,line in enumerate(reader, 1):
                     line = line.split('\t')
                     try:
@@ -80,7 +86,7 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
                         start = int(line[5])
                         end = int(line[6])
                     except:
-                        print("Failed to read line:", i, hmm_tsv)
+                        print("Failed to read line:", i, hmm_tsv, file=logger)
                         continue
                     # Check if Query is in the Database
                     if not re.search(query, dbLookup, re.MULTILINE):
@@ -94,43 +100,31 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
                     else: # More than one match/target
                         #keys = list(BH_target[target].keys())
                         item = (query, e_value, score, length, start, end)
+                        add = False
                         overlap = False
-                        for i,match in enumerate(BH_target[target]):
+                        for c,match in enumerate(BH_target[target]):
                             # Check for overlap
                             if start <= match[5] and end >= match[4]:
                                 overlap_len = min(end, match[5]) - max(start, match[4])
                                 if overlap_len > 10:
                                     # Winner takes all
                                     overlap = True
-                                    #print("OVERLAP:", overlap_len)
                                     if score == match[2]:
-                                        BH_target[target] += [item]
-                                    if score > match[2]:
-                                        BH_target[target][i] = item
+                                        add = True
+                                    elif score > match[2]:
+                                        BH_target[target][c] = item
                                 else:
+                                    #print("NO OVERLAP:", overlap_len, file=logger)
                                     pass
-                                    #print("NO OVERLAP:", overlap_len)
-                        if not overlap:
-                            # Dual domain
+                        if add or not overlap:
+                            # Equal score OR Dual domain
                             BH_target[target] += [item]
+                    # next line
+                    continue
             # Write filtered overlaps to file
-            for target in BH_target:
+            for target in sorted(BH_target):
                 for match in set(BH_target[target]):
                     query, e_value, score, length, start, end = match
                     print(target, query, e_value, score, length, start, end, sep='\t', file=writer)
 
     return outfile
-
-
-#* Each pORF match to an HMM is recorded by default or user selected e-value/bitscores per database independently or per user specification of selected database
-#* If two HMM hits are non-overlapping from the same database both are counted as long as they are the within the default or user selected e-value/bitscores
-# If two HMM hits are overlapping (>10 amino acids) from the same database the lowest resulting e-value and highest bitscore wins or the ‘top hit,’ or ‘winner take all,’ approach
-#   If both have the same equal value e-value and bitscore but are different accessions from the same database (e.g., KO1 and KO3) then both are reported
-# If a hit is overlapping <10 amino acids both hits are counted due to the dual domain issue
-# No partial hits or fractions of hits are counted
-
-# min(ends) - max(starts)
-
-               #AAAAA
-      #BBBBBBBBBBB
-
