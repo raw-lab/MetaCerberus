@@ -11,10 +11,10 @@ import textwrap
 
 
 # Remove quality from fastq
-def reformat(fastq, config, subdir):
+def reformat(fastq:Path, config:dict, subdir:Path):
     path = Path(config['DIR_OUT'], subdir)
 
-    fasta = path / Path(fastq).with_suffix(".fna")
+    fasta = Path(path, fastq.name).with_suffix(".fna")
 
     done = Path(path, 'complete')
     if not config['REPLACE'] and done.exists() and fasta.exists():
@@ -25,7 +25,7 @@ def reformat(fastq, config, subdir):
     if not config['REPLACE'] and os.path.exists(fasta):
         return fasta
 
-    command = "sed -n '1~4s/^@/>/p;2~4p' " +fastq+ " > " +fasta
+    command = "sed -n '1~4s/^@/>/p;2~4p' " +fastq.as_posix()+ " > " +fasta.as_posix()
     subprocess.call(command, shell=True)
 
     done.touch()

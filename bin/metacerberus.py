@@ -228,7 +228,7 @@ Example:
         args.chunker = 1
     # Check sequence type
     for file in args.prodigal + args.fraggenescan + args.prodigalgv + args.phanotate:
-        if '.fastq' in file:
+        if Path(file).suffix in FILES_FASTQ:
             if not any([args.illumina, args.nanopore, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
             elif args.qc_seq =="default":
@@ -435,18 +435,25 @@ Example:
     # Entry Point: Fastq
     if fastq:
         # Step 2 (check quality of fastq files)
-        print("\nSTEP 2: Checking quality of fastq files")
-        for key,value in fastq.items():
-            pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key, config['DIR_OUT'], [value, config, f"{STEP[2]}/{key}"]))
+        #print("\nSTEP 2: Checking quality of fastq files")
+        #for key,value in fastq.items():
+        #    pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key, config['DIR_OUT'], [value, config, f"{STEP[2]}/{key}"]))
         print("\nSTEP 3: Trimming fastq files")
         # Merge Paired End Reads
-        fastqPaired = {k:v for k,v in fastq.items() if "R1.fastq" in v and v.replace("R1.fastq", "R2.fastq") in fastq.values() }
+        fastqPaired = dict()
+        for ext in FILES_FASTQ:
+            fastqPaired.update( {k:v for k,v in fastq.items() if "R1"+ext in v and v.replace("R1"+ext, "R2"+ext) in fastq.values() } )
         for key,value in fastqPaired.items():
+            print("PAIRED:", key, value)
             reverse = fastq.pop(key.replace("R1", "R2"))
+            fastq.pop(key)
+            key = key.removesuffix("R1").rstrip('-_')
+            print(key)
             fastq[key] = metacerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
         del fastqPaired # memory cleanup
         # Trim
         for key,value in fastq.items():
+            print("Trimming:", key, value)
             pipeline.append(rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)]))
 
     # Step 5 Contig Entry Point
@@ -492,23 +499,30 @@ Example:
         key,value,func = ray.get(ready[0])
 
         if func == "checkQuality":
-            name = key
-            key = key.rstrip('_decon').rstrip('_trim')
-            os.makedirs(os.path.join(report_path, key), exist_ok=True)
-            shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
+            if value:
+                name = key
+                key = key.rstrip('_decon').rstrip('_trim')
+                #os.makedirs(os.path.join(report_path, key), exist_ok=True)
+                #shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
         if func == "trimSingleRead":
             # Wait for Trimmed Reads
             fastq[key] = value
             pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_trim', config['DIR_OUT'], [value, config, f"{STEP[3]}/{key}/quality"]))
             if fastq and config['ILLUMINA']:
-                set_add(step_curr, 4, "STEP 4: Decontaminating trimmed files")
-                pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, config['DIR_OUT'], key, [[key, value], config, f"{STEP[4]}/{key}"]))
+                if config['SKIP_DECON']:
+                    set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
+                    pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
+                else:
+                    set_add(step_curr, 4, "STEP 4: Decontaminating trimmed files")
+                    pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, key, config['DIR_OUT'], [[key, value], config, f"{STEP[4]}/{key}"]))
             else:
                 set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, config['DIR_OUT'], key, [value, config, f"{STEP[5]}/{key}"]))
-        if func == "deconSingleReads":
+                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
+        if func.startswith("decon"):
             fastq[key] = value
+            set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
             pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_decon', config['DIR_OUT'], [value, config, f"{STEP[4]}/{key}/quality"]))
+            pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
         if func == "removeN":
             fasta[key] = value[0]
             if value[1]:
