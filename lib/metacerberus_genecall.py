@@ -5,6 +5,7 @@ Uses FGS+
 """
 
 from pathlib import Path
+import re
 import subprocess
 import pkg_resources as pkg
 
@@ -115,19 +116,25 @@ def findORF_phanotate(contig, config, subdir, meta=False):
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    command = [config['EXE_PHANOTATE'], '-f', 'faa', '-o', faaOut, contig]
-    print(command)
+    command = [config['EXE_PHANOTATE'], '-f', 'faa', contig] #, '-o', faaOut, contig]
+        #awk '{ if (substr($1,1,1) != ">") gsub(/#|\+|\*/, ""); print $1 }'
     try:
-        with Path(path,"stdout.txt").open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
-            subprocess.run(command, check=True, stdout=fout, stderr=ferr)
+        with faaOut.open('r') as fout, Path(path,"stderr.txt").open('w') as ferr:
+            pout = subprocess.run(command, stdout=faaOut, stderr=ferr)
     except Exception as e:
-        print(e)
-        return None
+         print(e)
+    #    for line in pout:
+    #        line=line.strip()
+    #        if line.startswith('>'):
+    #            print(line, file=fout)
+    #        else:
+    #            re.sub(r'[^A-Za-z]', '', line, file=fout)
 
-    try:
-        subprocess.run(['sed', '-i', 's/#//g', faaOut])
-    except Exception as e:
-        print(e)
+    #try:
+    #    subprocess.run(['sed', '-i', 's/#//g', faaOut])
+    #except Exception as e:
+    #    with Path(path,"stderr.txt").open('a') as ferr:
+    #        print(e, file=ferr)
 
     done.touch()
     return faaOut
