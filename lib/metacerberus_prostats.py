@@ -14,22 +14,24 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict, summary_out:
 
     # sum up proteins in FASTA file
     proteins = {}
-    with open(faa, "r") as reader:
-        name = ""
-        line = reader.readline()
-        while line:
-            if line.startswith('>'):
-                name = line[1:].rstrip().split(sep=None, maxsplit=1)[0]
-                length = 0
-                line = reader.readline()
-                while line:
-                    if line.startswith('>'):
-                        break
-                    length += len(line.strip())
-                    line = reader.readline()
-                proteins[name] = dict(count=0, found=0, length=length)
-                continue
+    if faa:
+        with open(faa, "r") as reader:
+            name = ""
             line = reader.readline()
+            while line:
+                if line.startswith('>'):
+                    name = line[1:].rstrip().split(sep=None, maxsplit=1)[0]
+                    length = 0
+                    line = reader.readline()
+                    while line:
+                        if line.startswith('>'):
+                            break
+                        length += len(line.strip())
+                        line = reader.readline()
+                    proteins[name] = dict(count=0, found=0, length=length)
+                    continue
+                line = reader.readline()
+    #else:
 
     # sum up proteins in HMMER file
     hmmHits = dict()
@@ -54,8 +56,16 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict, summary_out:
                     hmmHits[target] = list()
                 hmmHits[target].append([query, score, evalue, length])
             else:
-                print("ERROR: Target on line", i, "of HMMER file not in protein fasta:", fileHmmer)
-                return None
+                if faa:
+                    print("ERROR: Target on line", i, "of HMMER file not in protein fasta:", fileHmmer)
+                    return None
+                else: #TODO: There is probably a better way to do this.
+                    proteins[target] = dict(count=1, found=0, length=length)
+                    if score >= minscore:
+                        proteins[target]['found'] += 1
+                    if target not in hmmHits:
+                        hmmHits[target] = list()
+                    hmmHits[target].append([query, score, evalue, length])
     
     # Annotate proteins
     dfLookup = dict()

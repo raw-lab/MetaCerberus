@@ -7,10 +7,10 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.1"
+__version__     = "1.2"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2023"
-__date__        = "July 2023"
+__date__        = "September 2023"
 
 def warn(*args, **kwargs):
     pass
@@ -46,7 +46,7 @@ from meta_cerberus import (
 ##### Global Variables #####
 
 # known file extensions
-FILES_FASTQ = ['.fastq', '.fastq.gz']
+FILES_FASTQ = ['.fastq', '.fq']#, '.fastq.gz', '.fq.gz']
 FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
 FILES_AMINO = [".faa"]
 
@@ -71,7 +71,9 @@ DEPENDENCIES = {
     'EXE_BBDUK': 'bbduk.sh',
     'EXE_FGS': 'FragGeneScanRs',
     'EXE_PRODIGAL': 'prodigal',
-    'EXE_HMMSEARCH': 'hmmsearch',
+    'EXE_PRODIGAL-GV': 'prodigal-gv',
+    'EXE_PHANOTATE' : 'phanotate.py',
+    'EXE_HMMSEARCH' : 'hmmsearch',
     'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
     }
 
@@ -130,16 +132,19 @@ def main():
     # At least one of these options are required
     required = parser.add_argument_group('''Required arguments
 At least one sequence is required.
-<accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
+<accepted formats {.fastq .fasta .faa .fna .ffn}>
 Example:
-> metaerberus.py --prodigal file1.fasta
+> metacerberus.py --prodigal file1.fasta
 > metacerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
     required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     required.add_argument('--prodigal', action='append', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
     required.add_argument('--fraggenescan', action='append', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
     required.add_argument('--super', action='append', default=[], help='Run sequence in both --prodigal and --fraggenescan modes')
+    required.add_argument('--prodigalgv', action='append', default=[], help='Giant virus nucleotide sequence')
+    required.add_argument('--phanotate', action='append', default=[], help='Phage sequence')
     required.add_argument('--protein', '--amino', action='append', default=[], help='Protein Amino Acid sequence')
+    required.add_argument('--rollup', action='append', default=[], help='Rolled up annotations from HMMER')
     # Raw-read identification
     readtype = parser.add_mutually_exclusive_group(required=False)
     readtype.add_argument('--illumina', action="store_true", help="Specifies that the given FASTQ files are from Illumina")
@@ -152,15 +157,19 @@ Example:
     optional.add_argument('--dir_out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
     optional.add_argument('--meta', action="store_true", help="Metagenomic nucleotide sequences (for prodigal) [False]")
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
-    optional.add_argument('--minscore', type=float, default=25, help="Score cutoff for parsing HMMER results [25]")
+    optional.add_argument('--minscore', type=float, default=60, help="Score cutoff for parsing HMMER results [60]")
     optional.add_argument('--evalue', type=float, default=1e-09, help="E-value cutoff for parsing HMMER results [1e-09]")
+    optional.add_argument('--skip_decon', action="store_true", help="Skip decontamination step. [False]")
+    optional.add_argument('--skip_pca', action="store_true", help="Skip PCA. [False]")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
+    optional.add_argument('--grouped', action="store_true", help="Group multiple fasta files into a single file before processing. When used with chunker can improve speed")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
-    optional.add_argument('--hmm', type=str, default='KOFam_all', help="Specify the database for HMMER. (KOFam_all, KOFam_eukariote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]")
+    optional.add_argument('--hmm', type=str, default='KOFam_all', help="Specify a coma seperated list of databases for HMMER. Use quotes around the list, or avoid spaces. (KOFam_all, KOFam_eukaryote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
     optional.add_argument('--slurm_nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
+    optional.add_argument('--slurm_single', action="store_true", help=argparse.SUPPRESS)# help='Force single node use, do not connect to host')
     optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY [system tmp dir]')
     optional.add_argument('--version', '-v', action='version',
                         version=f'MetaCerberus: \n version: {__version__} {__date__}',
@@ -188,6 +197,8 @@ Example:
 
     # TODO: Add Custom HMM DB
     dbHMM = dict()
+    if args.hmm.upper() == "ALL":
+        args.hmm = "KOFam_all, COG, VOG, PHROG, CAZy"
     for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')], 1):
         print(f"HMM: '{hmm}'")
         if hmm in DB_HMM:
@@ -209,11 +220,15 @@ Example:
         args.fraggenescan += args.super
 
     # Check if required flags are set
-    if not any([args.prodigal, args.fraggenescan, args.protein]):
+    if not any([args.prodigal, args.fraggenescan, args.prodigalgv, args.phanotate, args.protein, args.rollup]):
         parser.error('At least one sequence must be declared either in the command line or through the config file')
+    if args.chunker < 0:
+        args.chunker = 0
+    if args.grouped and args.chunker == 0:
+        args.chunker = 1
     # Check sequence type
-    for file in args.prodigal + args.fraggenescan:
-        if '.fastq' in file:
+    for file in args.prodigal + args.fraggenescan + args.prodigalgv + args.phanotate:
+        if Path(file).suffix in FILES_FASTQ:
             if not any([args.illumina, args.nanopore, args.pacbio]):
                 parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
             elif args.qc_seq =="default":
@@ -240,7 +255,7 @@ Example:
                 value = os.path.abspath(os.path.expanduser(value))
             config[arg] = value
     config['HMM'] = dbHMM
-    
+
 
     # Create output directory
     config['DIR_OUT'] = os.path.abspath(os.path.expanduser(args.dir_out))
@@ -281,20 +296,27 @@ Example:
 
     # First try if ray is setup for a cluster
     #TODO: Fix this, does not set up slurm script
-    if config['SLURM_NODES']:
-        metacerberus_setup.slurm(config['SLURM_NODES'])
+    #if config['SLURM_NODES']:
+    #    metacerberus_setup.slurm(config['SLURM_NODES'])
     
     # Get CPU Count
     if 'CPUS' not in config:
         config['CPUS'] = psutil.cpu_count()
-    try:
-        ray.init(address='auto')#, log_to_driver=False)
-        print("Started RAY on cluster")
-        config['CLUSTER'] = True
-    except:
-        ray.init(num_cpus=config['CPUS'])#log_to_driver=False)
+    
+    if args.slurm_single:
+        # Force single node
+        ray.init(num_cpus=config['CPUS'])#, log_to_driver=False)
         print("Started RAY single node")
         config['CLUSTER'] = False
+    else:
+        try:
+            ray.init(address='auto')#, log_to_driver=False)
+            print("Started RAY on cluster")
+            config['CLUSTER'] = True
+        except:
+            ray.init(num_cpus=config['CPUS'])#, log_to_driver=False)
+            print("Started RAY single node")
+            config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
 
@@ -305,6 +327,7 @@ Example:
     fastq = {}
     fasta = {}
     amino = {}
+    rollup = {}
     # Load protein input
     for item in args.protein:
         item = os.path.abspath(os.path.expanduser(item))
@@ -319,7 +342,24 @@ Example:
                 ext = os.path.splitext(file)[1]
                 if ext in FILES_AMINO:
                     args.protein.append(os.path.join(item, file))
-    # Load prodigal input
+    # Load prodigal-gv input
+    for item in args.prodigalgv:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in FILES_FASTQ:
+                fastq['prodigalgv_'+name] = item
+            elif ext in FILES_FASTA:
+                fasta['prodigalgv_'+name] = item
+            elif ext in FILES_AMINO:
+                print(f"WARNING: Ignoring protein sequence '{item}', please use --protein option for these.")
+        elif os.path.isdir(item):
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_FASTQ + FILES_FASTA:
+                    args.prodigalgv.append(os.path.join(item, file))
+        else:
+            print(f'{item} is not a valid sequence')
     for item in args.prodigal:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -355,10 +395,38 @@ Example:
                     args.fraggenescan.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
+    # Load Phanotate input
+    for item in args.phanotate:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in FILES_FASTQ:
+                fastq['phanotate_'+name] = item
+            elif ext in FILES_FASTA:
+                fasta['phanotate_'+name] = item
+            elif ext in FILES_AMINO:
+                print(f"WARNING: Ignoring protein sequence '{item}', please use --protein option for these.")
+        elif os.path.isdir(item):
+            for file in os.listdir(item):
+                ext = os.path.splitext(file)[1]
+                if ext in FILES_FASTQ + FILES_FASTA:
+                    args.phanotate.append(os.path.join(item, file))
+        else:
+            print(f'{item} is not a valid sequence')
+    # Load Rollup input
+    for item in args.rollup:
+        item = os.path.abspath(os.path.expanduser(item))
+        if os.path.isfile(item):
+            name, ext = os.path.splitext(os.path.basename(item))
+            if ext in ['.tsv']:
+                rollup['rollup_'+name] = item
+        else:
+            print(f'{item} is not a valid sequence')
     
     print(f"Processing {len(fastq)} fastq sequences")
     print(f"Processing {len(fasta)} fasta sequences")
-    print(f"Processing {len(amino)} protein Sequences")
+    print(f"Processing {len(amino)} protein sequences")
+    print(f"Processing {len(rollup)} rollup files")
 
     # Main Pipeline
     pipeline = list()
@@ -367,18 +435,25 @@ Example:
     # Entry Point: Fastq
     if fastq:
         # Step 2 (check quality of fastq files)
-        print("\nSTEP 2: Checking quality of fastq files")
-        for key,value in fastq.items():
-            pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key, config['DIR_OUT'], [value, config, f"{STEP[2]}/{key}"]))
+        #print("\nSTEP 2: Checking quality of fastq files")
+        #for key,value in fastq.items():
+        #    pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key, config['DIR_OUT'], [value, config, f"{STEP[2]}/{key}"]))
         print("\nSTEP 3: Trimming fastq files")
         # Merge Paired End Reads
-        fastqPaired = {k:v for k,v in fastq.items() if "R1.fastq" in v and v.replace("R1.fastq", "R2.fastq") in fastq.values() }
+        fastqPaired = dict()
+        for ext in FILES_FASTQ:
+            fastqPaired.update( {k:v for k,v in fastq.items() if "R1"+ext in v and v.replace("R1"+ext, "R2"+ext) in fastq.values() } )
         for key,value in fastqPaired.items():
+            print("PAIRED:", key, value)
             reverse = fastq.pop(key.replace("R1", "R2"))
+            fastq.pop(key)
+            key = key.removesuffix("R1").rstrip('-_')
+            print(key)
             fastq[key] = metacerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
         del fastqPaired # memory cleanup
         # Trim
         for key,value in fastq.items():
+            print("Trimming:", key, value)
             pipeline.append(rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)]))
 
     # Step 5 Contig Entry Point
@@ -396,16 +471,25 @@ Example:
         for key,value in amino.items():
             pipeline += [ray.put([key, value, 'findORF_'])]
             jobsORF += 1
-    
+
+    # Step 9 Rollup Entry Point
+    hmm_tsv = dict()
+    if rollup:
+        set_add(step_curr, 8.5, "STEP 8: Filtering rollup file(s)")
+        for key,value in rollup.items():
+            amino[key] = None
+            tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [value, tsv_filtered, config['PATHDB']]))
+
     NStats = dict()
     readStats = dict()
     report_path = os.path.join(config['DIR_OUT'], STEP[10])
 
+    groupIndex = dict()
     amino_queue = dict()
     jobs_per_node = int(-(config["CPUS"] // -4))
     dictChunks = dict()
-    dictHMM = dict()
-    hmm_tsv = dict()
+    dictFiltered = dict()
     hmmRollup = {}
     hmmCounts = {}
     while pipeline:
@@ -415,23 +499,30 @@ Example:
         key,value,func = ray.get(ready[0])
 
         if func == "checkQuality":
-            name = key
-            key = key.rstrip('_decon').rstrip('_trim')
-            os.makedirs(os.path.join(report_path, key), exist_ok=True)
-            shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
+            if value:
+                name = key
+                key = key.rstrip('_decon').rstrip('_trim')
+                #os.makedirs(os.path.join(report_path, key), exist_ok=True)
+                #shutil.copy(value, os.path.join(report_path, key, f"qc_{name}.html"))
         if func == "trimSingleRead":
             # Wait for Trimmed Reads
             fastq[key] = value
             pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_trim', config['DIR_OUT'], [value, config, f"{STEP[3]}/{key}/quality"]))
             if fastq and config['ILLUMINA']:
-                set_add(step_curr, 4, "STEP 4: Decontaminating trimmed files")
-                pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, config['DIR_OUT'], key, [[key, value], config, f"{STEP[4]}/{key}"]))
+                if config['SKIP_DECON']:
+                    set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
+                    pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
+                else:
+                    set_add(step_curr, 4, "STEP 4: Decontaminating trimmed files")
+                    pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, key, config['DIR_OUT'], [[key, value], config, f"{STEP[4]}/{key}"]))
             else:
                 set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, config['DIR_OUT'], key, [value, config, f"{STEP[5]}/{key}"]))
-        if func == "deconSingleReads":
+                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
+        if func.startswith("decon"):
             fastq[key] = value
+            set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
             pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_decon', config['DIR_OUT'], [value, config, f"{STEP[4]}/{key}/quality"]))
+            pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
         if func == "removeN":
             fasta[key] = value[0]
             if value[1]:
@@ -441,118 +532,189 @@ Example:
             set_add(step_curr, 7, "STEP 7: ORF Finder")
             if key.startswith("FragGeneScan_"):
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
-            else:
+            elif key.startswith("prodigalgv_"):
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prodgv, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
+            elif key.startswith("prodigal_"):
                 if config['META']:
                     pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_meta, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
                 else:
                     pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
+            elif key.startswith("phanotate_"):
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             jobsORF += 1
         if func == "reformat":
             fasta[key] = value
             set_add(step_curr, 7, "STEP 7: ORF Finder")
             if key.startswith("FragGeneScan_"):
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
-            else:
+            elif key.startswith("prodigalgv_"):
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prodgv, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
+            elif key.startswith("prodigal_"):
                 if config['META']:
                     pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_meta, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
                 else:
                     pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
+            elif key.startswith("phanotate_"):
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             jobsORF += 1
         if func.startswith("findORF_"):
+            if config['GROUPED']:
+                amino[key] = value
+                jobsORF -= 1
+                if not Path(config['DIR_OUT'], 'grouped').exists():
+                    Path(config['DIR_OUT'], 'grouped').mkdir(parents=True, exist_ok=True)
+                outfile = Path(config['DIR_OUT'], 'grouped', 'grouped.faa')
+                Path(config['DIR_OUT'], STEP[8], key).mkdir(parents=True, exist_ok=True)
+                with outfile.open('a') as writer, Path(value).open() as reader:
+                    for line in reader:
+                        writer.write(line)
+                        if line.startswith('>'):
+                            name = line[1:].rstrip().split()[0]
+                            if name in groupIndex:
+                                print("WARN: Duplicate header:", name)
+                            groupIndex[name] = key
+                if jobsORF > 0:
+                    continue #Continue until all ORFs are done
+                value = outfile
+                key = "grouped"
             set_add(step_curr, 8, "STEP 8: HMMER Search")
-            if value:
+            if value: # TODO: Put this check at top of "findORF_" block
                 amino[key] = value
                 if not config['CLUSTER']:
                     if config['CHUNKER'] > 0:
                         chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
-                        chunkCount = 1
-                        for chunk in chunks.files:
-                            key_chunk = f'chunk{chunkCount}-{len(chunks.files)}_{key}'
-                            chunkCount += 1
-                            val_chunk = chunk
-                            for hmm in dbHMM.items(): #TODO: Fix long line syntax
-                                pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
-                                                                                        [{key_chunk:val_chunk}, config, Path(STEP[8], key), hmm, 4]))
-                    else:
                         for hmm in dbHMM.items():
-                            pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key], config['DIR_OUT'],
-                                                                    [{key:value}, config, Path(STEP[8]), hmm, 4]))
+                            chunkCount = 1
+                            for chunk in chunks.files:
+                                key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
+                                key_name = f'chunk-{chunkCount}-{len(chunks.files)}_{key}'
+                                chunkCount += 1
+                                pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
+                                                                                        [{key_name:chunk}, config, Path(STEP[8], key), hmm, 4]))
+                    else:
+                        outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
+                        if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
+                            for hmm in dbHMM.items():
+                                hmm_key = f"{hmm[0]}-{key}"
+                                pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [hmm_key], config['DIR_OUT'],
+                                                                        [{key:value}, config, Path(STEP[8]), hmm, 4]))
+                        else:
+                            #TODO: distinguish filtered tsv per hmm
+                            tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+                            set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
+                            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
+
                     continue
                 if config['CHUNKER'] > 0:
                     chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
-                    chunkCount = 1
-                    for chunk in chunks.files:
-                        amino_queue[f'chunk{chunkCount}-{len(chunks.files)}_{key}'] = chunk
-                        chunkCount += 1
-                        jobsORF -= 1
-                        # submit searchHMM jobs
-                        if len(amino_queue) >= jobs_per_node:
-                            for hmm in dbHMM.items():
+                    jobsORF -= 1
+                    for hmm in dbHMM.items():
+                        chunkCount = 1
+                        for chunk in chunks.files:
+                            amino_queue[f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'] = chunk
+                            chunkCount += 1
+                            # submit searchHMM jobs
+                            if len(amino_queue) >= jobs_per_node:
                                 pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
                                                                     [amino_queue, config, Path(STEP[8]), hmm]))
-                            amino_queue = dict()
-                else:
-                    amino_queue[key] = value
-                    jobsORF -= 1
-                # submit searchHMM jobs
-                if len(amino_queue) >= jobs_per_node or jobsORF == 0:
-                    for hmm in dbHMM.items():
+                                amino_queue = dict()
+                    if len(amino_queue) > 0:
+                        # Leftover chunks in queue not submited yet
                         pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
-                                                               [amino_queue, config, Path(STEP[8]), hmm]))
+                                                                [amino_queue, config, Path(STEP[8]), hmm]))
+                        amino_queue = dict()
+                else:
+                    jobsORF -= 1
+                    for hmm in dbHMM.items():
+                        #hmm_key = f"{hmm[0]}-{key}"
+                        amino_queue[key] = value
+                        if len(amino_queue) >= jobs_per_node:
+                            print("Sending to HMMER:")
+                            amino_names = list()
+                            for k,v in amino_queue.items():
+                                amino_names += [f"{hmm[0]}-{key}"]
+                                print(k, v)
+                                print(amino_names)
+                            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, amino_names, config['DIR_OUT'],
+                                                                    [amino_queue, config, Path(STEP[8]), hmm]))
+                            amino_queue = dict()
+                # submit remaining searchHMM jobs
+                if len(amino_queue) >= jobs_per_node and jobsORF == 0:
+                    print("DEBUG: Remaining amino queue", amino_queue)
+                    pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
+                                                            [amino_queue, config, Path(STEP[8]), hmm]))
                     amino_queue = dict()
         if func.startswith('searchHMM'):
             keys = key
             for key,tsv_file in zip(keys,value):
-                match = re.search(r"^chunk(\d+)-(\d+)_(.+)", key)
+                match = re.search(r"^chunk-([A-Za-z_]+)-(\d+)-(\d+)_(.+)", key)
                 if match: # Matches if the keys are part of chunks
-                    i,l,key = match.groups()
-                    if key not in dictChunks:
-                        dictChunks[key] = list()
-                    dictChunks[key].append(tsv_file)
-                    if len(dictChunks[key]) >= int(l):
+                    hmm,i,l,key = match.groups()
+                    hmm_key = f"{hmm}-{key}"
+                    if hmm_key not in dictChunks:
+                        dictChunks[hmm_key] = list()
+                    dictChunks[hmm_key].append(tsv_file)
+                    if len(dictChunks[hmm_key]) == int(l):
                         # All chunks of a file have returned
-                        tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
-                        tsv_out.parent.mkdir(parents=True, exist_ok=True)
-                        if key not in dictHMM:
-                            dictHMM[key] = 1
-                            with tsv_out.open('w') as writer:
-                                print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
-                                for item in sorted(dictChunks[key]):
-                                    writer.write(open(item).read())
-                                    dictChunks[key].remove(item)
+                        if config['GROUPED']:
+                            key_set = set()
+                            for item in sorted(dictChunks[hmm_key]):
+                                with open(item) as reader:
+                                    for line in reader:
+                                        name = line.split()[0]
+                                        k = groupIndex[name]
+                                        key_set.add(k)
+                                        tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
+                                        with tsv_out.open('a') as writer:
+                                            writer.write(line)
+                                dictChunks[hmm_key].remove(item)
+                                if not config['KEEP']:
                                     os.remove(item)
-                        else:
-                            dictHMM[key] += 1
-                            with tsv_out.open('a') as writer:
-                                for item in sorted(dictChunks[key]):
-                                    writer.write(open(item).read())
-                                    dictChunks[key].remove(item)
-                                    os.remove(item)
-                        if dictHMM[key] == len(dbHMM):
-                            tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
                             set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
-                else: # Not chunked file
-                    tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{key}.tsv")
-                    if key not in dictHMM:
-                        dictHMM[key] = 1
+                            for k in key_set:
+                                tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
+                                tsv_filtered = Path(config['DIR_OUT'], STEP[8], k, f"filtered-{hmm}.tsv")
+                                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, k, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
+                            # FINISH SPLITTING GROUP
+                            continue
+                        # Not grouped
+                        tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm_key}.tsv")
+                        tsv_out.parent.mkdir(parents=True, exist_ok=True)
                         with tsv_out.open('w') as writer:
-                            print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
-                            writer.write(open(tsv_file).read())
-                            os.remove(tsv_file)
-                    else:
-                        dictHMM[key] += 1
-                        with tsv_out.open('a') as writer:
-                            writer.write(open(tsv_file).read())
-                            os.remove(tsv_file)
-                    if dictHMM[key] == len(dbHMM):
-                        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+                            for item in sorted(dictChunks[hmm_key]):
+                                writer.write(open(item).read())
+                                dictChunks[hmm_key].remove(item)
+                                if not config['KEEP']:
+                                    os.remove(item)
+                        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
                         set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                         pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
+                else:
+                # Not chunked file
+                    key:str
+                    hmm_key = key
+                    hmm,key = key.split(sep='-', maxsplit=1)
+                    tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm_key}.tsv")
+                    with tsv_out.open('w') as writer:
+                        writer.write(open(tsv_file).read())
+                    if not config['KEEP']:
+                            os.remove(tsv_file)
+                    set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
+                    tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
+                    pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, config['PATHDB']]))
         if func.startswith('filterHMM'):
-            hmm_tsv[key] = value
-            set_add(step_curr, 9, "STEP 9: Parse HMMER results")
-            pipeline.append(rayWorkerThread.remote(metacerberus_parser.parseHmmer, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}"]))
+            tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+            if key not in dictFiltered:
+                dictFiltered[key] = 0
+                with tsv_filtered.open('w') as writer:
+                    print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
+            dictFiltered[key] += 1
+            with tsv_filtered.open('a') as writer:
+                writer.write(open(value).read())
+            if dictFiltered[key] == len(dbHMM):
+                hmm_tsv[key] = tsv_filtered
+                set_add(step_curr, 9, "STEP 9: Parse HMMER results")
+                pipeline.append(rayWorkerThread.remote(metacerberus_parser.parseHmmer, key, config['DIR_OUT'], [tsv_filtered, config, f"{STEP[9]}/{key}"]))
         if func.startswith('parseHmmer'):
             hmmRollup[key] = value
             pipeline.append(rayWorkerThread.remote(metacerberus_parser.createCountTables, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}"]))
@@ -610,7 +772,9 @@ Example:
 
     # PCA output (HTML)
     pcaFigures = None
-    if len(hmm_tsv) < 4:
+    if config['SKIP_PCA']:
+        pass
+    elif len(hmm_tsv) < 4:
         print("NOTE: PCA Tables created only when there are at least four sequence files.\n")
     else:
         print("PCA Analysis")
@@ -629,10 +793,11 @@ Example:
             rscript = Path(outpathview, 'run_pathview.sh')
 
             # Check for internet
-            try:#attempt to open Google
-                request.urlopen('216.58.195.142', timeout=1)
+            try:
+                #attempt to connect to Google
+                request.urlopen('http://216.58.195.142', timeout=1)
                 is_internet = True
-            except request.URLError as err: 
+            except:
                 is_internet = False
             
             with rscript.open('w') as writer:

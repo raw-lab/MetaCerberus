@@ -1,0 +1,79 @@
+=====================================================
+Start Time  : Fri Jul 21 22:44:18 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 5138754 / Metacerberus
+Node List   : str-c76
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+======================================================
+Running Metacerberus On META_VIRAL/genomes/QGNH01000862.1.fna
+======================================================
+HMM: 'KOFam_all'
+HMM: 'COG'
+HMM: 'VOG'
+HMM: 'PHROG'
+HMM: 'CAZy'
+
+Starting MetaCerberus Pipeline
+
+Checking for external dependencies:
+fastqc               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastqc
+flash2               /users/jlfiguer/.conda/envs/metacerberus-dev/bin/flash2
+fastp                /users/jlfiguer/.conda/envs/metacerberus-dev/bin/fastp
+porechop             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/porechop
+bbduk.sh             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/bbduk.sh
+FragGeneScanRs       /users/jlfiguer/.conda/envs/metacerberus-dev/lib/python3.10/site-packages/meta_cerberus/FGS/FragGeneScanRs
+prodigal             /users/jlfiguer/.conda/envs/metacerberus-dev/bin/prodigal
+hmmsearch            /users/jlfiguer/.conda/envs/metacerberus-dev/bin/hmmsearch
+countAssembly.py     /users/jlfiguer/.conda/envs/metacerberus-dev/bin/countAssembly.py
+Initializing RAY
+2023-07-21 22:44:20,893	INFO worker.py:1452 -- Connecting to existing Ray cluster at address: 192.168.170.76:34824...
+2023-07-21 22:44:20,962	INFO worker.py:1627 -- Connected to Ray cluster. View the dashboard at [1m[32m127.0.0.1:8265 [39m[22m
+Started RAY on cluster
+Running RAY on 1 node(s)
+Using 36 CPUs per node
+
+STEP 1: Loading sequence files:
+Processing 0 fastq sequences
+Processing 1 fasta sequences
+Processing 0 protein Sequences
+
+STEP 5a: Removing N's from contig files
+
+STEP 6: Metaome Stats
+
+
+STEP 7: ORF Finder
+
+
+STEP 8: HMMER Search
+
+[2m[36m(rayWorkerThread pid=3791710)[0m Command '/users/jlfiguer/.conda/envs/metacerberus-dev/bin/prodigal -i /projects/raw_lab/jobs/metacerberus/results/Metacerberus/META_VIRAL/genomes/QGNH01000862.1/step_05-format/prodigal_QGNH01000862.1/QGNH01000862.1_clean.fna -o /projects/raw_lab/jobs/metacerberus/results/Metacerberus/META_VIRAL/genomes/QGNH01000862.1/step_07-geneCall/prodigal_QGNH01000862.1/genes.gff -a /projects/raw_lab/jobs/metacerberus/results/Metacerberus/META_VIRAL/genomes/QGNH01000862.1/step_07-geneCall/prodigal_QGNH01000862.1/proteins.faa -f gff' returned non-zero exit status 10.
+
+STEP 8: Filtering HMMER results
+
+
+STEP 9: Parse HMMER results
+
+
+STEP 10: Creating Reports
+Saving Statistics
+Creating Rollup Tables
+Creating Count Tables
+NOTE: PCA Tables created only when there are at least four sequence files.
+
+NOTE: Pathview created only when there are at least four sequence files.
+
+Creating combined sunburst and bargraphs
+
+Finished Pipeline
+2.14user 0.63system 0:07.86elapsed 35%CPU (0avgtext+0avgdata 260900maxresident)k
+0inputs+7704outputs (0major+84063minor)pagefaults 0swaps
+
+======================================================
+End Time   : Fri Jul 21 22:44:27 EDT 2023
+Run Time   : 9 seconds
+======================================================
+
+Disk Used 3868 results/Metacerberus/META_VIRAL/genomes/QGNH01000862.1

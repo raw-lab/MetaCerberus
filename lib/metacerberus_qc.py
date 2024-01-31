@@ -9,10 +9,10 @@ import subprocess
 
 ## Check quality
 def checkQuality(rawRead, config, subdir):
-    if type(rawRead) is str:
-        return checkSingleRead(rawRead, config, subdir)
-    else:
+    if type(rawRead) is list or type(rawRead) is tuple:
         return checkPairedRead(rawRead, config, subdir)
+    else:
+        return checkSingleRead(rawRead, config, subdir)
 
 
 # Check single end quality

@@ -1,0 +1,72 @@
+=====================================================
+Start Time  : Sat Jul  1 01:37:06 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4125050 / eggNOG
+Node List   : str-c88
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+======================================================
+Running eggNOG On GTDB-100/genomes/bacteria/GCA_003278955.1.fna
+======================================================
+Bacteria
+[1;32mFunctional annotation of hits...[0m
+0 1.430511474609375e-06 0.00 q/s (% mem usage: 2.00, % mem avail: 98.04)
+#  emapper-2.1.8
+# emapper.py  --output_dir results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1 --output GCA_003278955.1 --cpu 16 -i GTDB-100/genomes/bacteria/GCA_003278955.1.fna --itype genome -d Bacteria
+[1;33m  /users/jlfiguer/.conda/envs/eggnog/bin/diamond blastx -d /users/jlfiguer/.conda/envs/eggnog/lib/python3.10/site-packages/data/eggnog_proteins.dmnd -q /projects/raw_lab/jobs/metacerberus/GTDB-100/genomes/bacteria/GCA_003278955.1.fna --threads 16 -o /projects/raw_lab/jobs/metacerberus/results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1/GCA_003278955.1.emapper.hits --tmpdir /projects/raw_lab/jobs/metacerberus/emappertmp_dmdn_z8z8drvo --sensitive --iterate -e 0.001 --max-target-seqs 0 --max-hsps 0  --outfmt 6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore qcovhsp scovhsp[0m
+[1;32mCrafting GFF file of CDS ...[0m
+[1;32mCrafting fasta file of CDS ...[0m
+Parsing fasta file /projects/raw_lab/jobs/metacerberus/GTDB-100/genomes/bacteria/GCA_003278955.1.fna...
+Fasta file /projects/raw_lab/jobs/metacerberus/GTDB-100/genomes/bacteria/GCA_003278955.1.fna parsing complete.
+[1;32mCreating gff file /projects/raw_lab/jobs/metacerberus/results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1/GCA_003278955.1.emapper.genepred.gff...[0m
+500 123.33632159233093 4.05 q/s (% mem usage: 2.40, % mem avail: 97.60)
+1000 127.33042216300964 7.85 q/s (% mem usage: 2.40, % mem avail: 97.60)
+1500 157.63909029960632 9.52 q/s (% mem usage: 2.40, % mem avail: 97.59)
+1549 159.58419799804688 9.71 q/s (% mem usage: 2.00, % mem avail: 98.02)
+[32mDone[0m
+[1;33mResult files:[0m
+   /projects/raw_lab/jobs/metacerberus/results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1/GCA_003278955.1.emapper.genepred.fasta
+   /projects/raw_lab/jobs/metacerberus/results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1/GCA_003278955.1.emapper.genepred.gff
+   /projects/raw_lab/jobs/metacerberus/results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1/GCA_003278955.1.emapper.hits
+   /projects/raw_lab/jobs/metacerberus/results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1/GCA_003278955.1.emapper.seed_orthologs
+   /projects/raw_lab/jobs/metacerberus/results/eggNOG/GTDB-100/genomes/bacteria/GCA_003278955.1/GCA_003278955.1.emapper.annotations
+
+================================================================================
+CITATION:
+If you use this software, please cite:
+
+[1] eggNOG-mapper v2: functional annotation, orthology assignments, and domain 
+      prediction at the metagenomic scale. Carlos P. Cantalapiedra, 
+      Ana Hernandez-Plaza, Ivica Letunic, Peer Bork, Jaime Huerta-Cepas. 2021.
+      Molecular Biology and Evolution, msab293, https://doi.org/10.1093/molbev/msab293
+
+[2] eggNOG 5.0: a hierarchical, functionally and phylogenetically annotated
+      orthology resource based on 5090 organisms and 2502 viruses. Jaime
+      Huerta-Cepas, Damian Szklarczyk, Davide Heller, Ana Hernandez-Plaza,
+      Sofia K Forslund, Helen Cook, Daniel R Mende, Ivica Letunic, Thomas
+      Rattei, Lars J Jensen, Christian von Mering and Peer Bork. Nucleic Acids
+      Research, Volume 47, Issue D1, 8 January 2019, Pages D309-D314,
+      https://doi.org/10.1093/nar/gky1085 
+
+[3] Sensitive protein alignments at tree-of-life scale using DIAMOND.
+       Buchfink B, Reuter K, Drost HG. 2021.
+       Nature Methods 18, 366–368 (2021). https://doi.org/10.1038/s41592-021-01101-x
+
+e.g. Functional annotation was performed using emapper-2.1.8 [1]
+ based on eggNOG orthology data [2]. Sequence searches were performed using [3].
+
+
+================================================================================
+
+Total hits processed: 1549
+Total time: 9547 secs
+FINISHED
+45726.35user 98.65system 2:39:07elapsed 479%CPU (0avgtext+0avgdata 4748080maxresident)k
+7870216inputs+1203216outputs (0major+6458040minor)pagefaults 0swaps
+
+======================================================
+End Time   : Sat Jul  1 04:16:15 EDT 2023
+Run Time   : 9549 seconds
+======================================================
+

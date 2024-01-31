@@ -1,0 +1,150 @@
+=====================================================
+Start Time  : Fri Jul  7 09:15:11 EDT 2023
+Submit Dir  : /projects/raw_lab/jobs/metacerberus
+Job ID/Name : 4305900 / DRAM
+Node List   : str-abm2
+Num Tasks   : 1 total [1 nodes @ 16 CPUs/node]
+======================================================
+
+Loading dram/1.4.6
+  Loading requirement: anaconda3/2022.10
+======================================================
+Running DRAM On VIRAL/genomes/NC_055130.1.fna
+======================================================
+2023-07-07 09:15:14,311 - 1 fastas found
+2023-07-07 09:15:14,311 - Checking for duplicate names
+2023-07-07 09:15:14,312 - No duplicate names found
+2023-07-07 09:15:14,312 - Starting the Viral Annotation of Genes with database configuration: 
+ 
+
+KOfam db:
+    Citation: T. Aramaki, R. Blanc-Mathieu, H. Endo, K. Ohkubo, M. Kanehisa, S. Goto, and H. Ogata, "Kofamkoala: Kegg ortholog assignment based on profile hmm and adaptive score threshold," Bioinformatics, vol. 36, no. 7, pp. 2251–2252, 2020.
+    Download Time: 06/10/2023, 10:32:33
+    Origin: Downloaded by DRAM
+KOfam KO list:
+    Citation: T. Aramaki, R. Blanc-Mathieu, H. Endo, K. Ohkubo, M. Kanehisa, S. Goto, and H. Ogata, "Kofamkoala: Kegg ortholog assignment based on profile hmm and adaptive score threshold," Bioinformatics, vol. 36, no. 7, pp. 2251–2252, 2020.
+    Download Time: 06/10/2023, 10:32:36
+    Origin: Downloaded by DRAM
+Pfam db:
+    Citation: J. Mistry, S. Chuguransky, L. Williams, M. Qureshi, G. A. Salazar, E. L. Sonnhammer, S. C. Tosatto, L. Paladin, S. Raj, L. J. Richardson et al., "Pfam: The protein families database in 2021," Nucleic acids research, vol. 49, no. D1, pp. D412–D419, 2021.
+    Download Time: 06/10/2023, 18:44:32
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:42
+dbCAN db:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Download Time: 06/10/2023, 18:44:36
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:42
+RefSeq Viral db:
+    Description_Db_Updated: 06/12/2023, 01:23:21
+    Citation: J. R. Brister, D. Ako-Adjei, Y. Bao, and O. Blinkova, "Ncbi viral genomes resource," Nucleic acids research, vol. 43, no. D1, pp. D571–D577, 2015. [3] M. Kanehisa, M. Furumichi, Y. Sato, M. Ishiguro-Watanabe, and M. Tan-abe, "Kegg: integrating viruses and cellular organisms," Nucleic acids research, vol. 49, no. D1, pp. D545–D551, 2021.
+    Viral_Files: 1
+    Download Time: 06/10/2023, 18:45:02
+    Origin: Downloaded by DRAM
+MEROPS peptidase db:
+    Description_Db_Updated: 06/12/2023, 01:23:41
+    Citation: N. D. Rawlings, A. J. Barrett, P. D. Thomas, X. Huang, A. Bateman, and R. D. Finn, "The merops database of proteolytic enzymes, their substrates and inhibitors in 2017 and a comparison with peptidases in the panther database," Nucleic acids research, vol. 46, no. D1, pp. D624–D632, 2018.
+    Download Time: 06/10/2023, 18:45:19
+    Origin: Downloaded by DRAM
+VOGDB db:
+    Citation: J. Thannesberger, H.-J. Hellinger, I. Klymiuk, M.-T. Kastner, F. J. Rieder, M. Schneider, S. Fister, T. Lion, K. Kosulin, J. Laengle et al., "Viruses comprise an extensive pool of mobile genetic elements in eukaryote cell cultures and human clinical samples," The FASEB Journal, vol. 31, no. 5, pp. 1987–2000, 2017.
+    Version: latest
+    Download Time: 06/10/2023, 18:44:59
+    Origin: Downloaded by DRAM
+    Description_Db_Updated: 06/12/2023, 01:23:44
+
+Pfam hmm dat:
+    Description_Db_Updated: Unknown, or Never
+    Citation: J. Mistry, S. Chuguransky, L. Williams, M. Qureshi, G. A. Salazar, E. L. Sonnhammer, S. C. Tosatto, L. Paladin, S. Raj, L. J. Richardson et al., "Pfam: The protein families database in 2021," Nucleic acids research, vol. 49, no. D1, pp. D412–D419, 2021.
+    Download Time: 06/10/2023, 18:44:33
+    Origin: Downloaded by DRAM
+dbCAN family activities:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Upload_Date: 08062022
+    Download Time: 06/10/2023, 18:44:37
+    Origin: Downloaded by DRAM
+dbCAN subfamily EC numbers:
+    Citation: Y. Yin, X. Mao, J. Yang, X. Chen, F. Mao, and Y. Xu, "dbcan: a web resource for automated carbohydrate-active enzyme annotation," Nucleic acids research, vol. 40, no. W1, pp. W445–W451, 2012.
+    Version: 11
+    Upload_Date: 08062022
+    Download Time: 06/10/2023, 18:44:37
+    Origin: Downloaded by DRAM
+VOG annotations:
+    Description_Db_Updated: Unknown, or Never
+    Citation: J. Thannesberger, H.-J. Hellinger, I. Klymiuk, M.-T. Kastner, F. J. Rieder, M. Schneider, S. Fister, T. Lion, K. Kosulin, J. Laengle et al., "Viruses comprise an extensive pool of mobile genetic elements in eukaryote cell cultures and human clinical samples," The FASEB Journal, vol. 31, no. 5, pp. 1987–2000, 2017.
+    Version: latest
+    Download Time: 06/10/2023, 18:45:00
+    Origin: Downloaded by DRAM
+
+Genome summary form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+Module step form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+ETC module database:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:21
+    Origin: Downloaded by DRAM
+Function heatmap form:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+AMG database:
+    Branch: master
+    Download Time: 06/10/2023, 18:45:20
+    Origin: Downloaded by DRAM
+2023-07-07 09:15:14,314 - Retrieved database locations and descriptions
+2023-07-07 09:15:14,314 - Annotating NC_055130.1
+2023-07-07 09:15:14,341 - Turning genes from prodigal to mmseqs2 db
+2023-07-07 09:15:16,232 - Getting hits from kofam
+2023-07-07 09:15:52,290 - Getting forward best hits from viral
+2023-07-07 09:15:52,867 - Getting reverse best hits from viral
+2023-07-07 09:15:54,561 - Getting descriptions of hits from viral
+2023-07-07 09:15:54,569 - Getting forward best hits from peptidase
+2023-07-07 09:15:55,206 - Getting hits from pfam
+2023-07-07 09:15:57,558 - Getting hits from dbCAN
+2023-07-07 09:15:58,299 - Getting hits from VOGDB
+2023-07-07 09:16:28,658 - Merging ORF annotations
+2023-07-07 09:16:28,812 - No tRNAs were detected, no trnas.tsv file will be created.
+2023-07-07 09:16:28,889 - No rRNAs were detected, no rrnas.tsv file will be created.
+2023-07-07 09:16:29,239 - Annotations complete, processing annotations
+66.85user 102.69system 1:16.47elapsed 221%CPU (0avgtext+0avgdata 17982376maxresident)k
+1758392inputs+1763200outputs (13major+1308696minor)pagefaults 0swaps
+FINISHED
+2023-07-07 09:16:32,008 - The log file is created at results/DRAM/VIRAL/genomes/NC_055130.1/distill/distill.log
+2023-07-07 09:16:32,027 - Retrieved database locations and descriptions
+Traceback (most recent call last):
+  File "/apps/pkg/anaconda3/2022.10/envs/dram-1.4.6/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3652, in get_loc
+    return self._engine.get_loc(casted_key)
+  File "pandas/_libs/index.pyx", line 147, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 176, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7080, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7088, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'auxiliary_score'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/apps/pkg/anaconda3/2022.10/envs/dram-1.4.6/bin/DRAM-v.py", line 161, in <module>
+    args.func(**args_dict)
+  File "/apps/pkg/anaconda3/2022.10/envs/dram-1.4.6/lib/python3.10/site-packages/mag_annotator/summarize_vgfs.py", line 260, in summarize_vgfs
+    potential_amgs = filter_to_amgs(annotations, max_aux=max_auxiliary_score,
+  File "/apps/pkg/anaconda3/2022.10/envs/dram-1.4.6/lib/python3.10/site-packages/mag_annotator/summarize_vgfs.py", line 53, in filter_to_amgs
+    (annotations['auxiliary_score'] <= max_aux)
+  File "/apps/pkg/anaconda3/2022.10/envs/dram-1.4.6/lib/python3.10/site-packages/pandas/core/frame.py", line 3761, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/apps/pkg/anaconda3/2022.10/envs/dram-1.4.6/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3654, in get_loc
+    raise KeyError(key) from err
+KeyError: 'auxiliary_score'
+
+======================================================
+End Time   : Fri Jul  7 09:16:32 EDT 2023
+Run Time   : 81 seconds
+======================================================
+
+Disk Used 40 results/DRAM/VIRAL/genomes/NC_055130.1
