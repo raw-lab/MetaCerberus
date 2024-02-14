@@ -22,7 +22,7 @@ cazy_out = "CAZy-onto_rel1.tsv"
 print("Creating lookup table")
 fun = Path(fun_lookup).read_text()
 with open(cazy_lookup) as cazy, open(cazy_out, 'w') as writer:
-    print('L1', 'KO', 'Function', 'EC', 'FUN_ID', sep='\t', file=writer)
+    print('L1', 'ID', 'Function', 'EC', 'FUN_ID', sep='\t', file=writer)
     cazy.readline() # Skip Header
     for line in cazy:
         if line.startswith('#'):

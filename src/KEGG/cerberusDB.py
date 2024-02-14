@@ -25,7 +25,15 @@ def convert_json(dicData, writer, level=0, parents={}):
             match = ECregex.search(name[1])
             ec = match.group(1) if match else ''
             name[1] = ECregex.sub("", name[1])
-            print('\t'.join(parents.values()), name[0], name[1], ec, sep='\t', file=writer)
+            try:
+                gene,func = name[1].split('; ')
+            except:
+                gene = ''
+                func = name[1]
+            func = func[0].upper() + func[1:]
+            if gene == name[0]:
+                gene = ''
+            print('\t'.join(parents.values()), name[0], func, ec, gene, sep='\t', file=writer)
             table[ name[0] ] = name[1]
     for value in dicData.values():
         if type(value) is list:
@@ -75,7 +83,7 @@ with open(in_KEGG) as reader:
 
 # parse json
 with open(out_KEGG, 'w') as writer:
-    print("L1", "L2", "L3", "ID", "Function", "EC", sep='\t', file=writer)
+    print("L1", "L2", "L3", "ID", "Function", "EC", "Gene", sep='\t', file=writer)
     table = convert_json(data, writer)
 
 # add functions from KEGG to FOAM
