@@ -7,10 +7,10 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.2"
+__version__     = "1.2.1"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2023"
-__date__        = "September 2023"
+__date__        = "February 2024"
 
 def warn(*args, **kwargs):
     pass
@@ -31,7 +31,6 @@ import datetime
 from urllib import request
 import socket
 import ray #parallel-processing
-import pandas as pd
 
 
 # our package import
@@ -86,6 +85,7 @@ DB_HMM = dict(
     CAZy=Path(pathDB, 'CAZy.hmm.gz'),
     PHROG=Path(pathDB, 'PHROG.hmm.gz'),
     VOG=Path(pathDB, 'VOG.hmm.gz'),
+    ALL="KOFam_all, CAZy, COG, VOG, PHROG",
     )
 
 # step names
@@ -198,7 +198,7 @@ Example:
     # TODO: Add Custom HMM DB
     dbHMM = dict()
     if args.hmm.upper() == "ALL":
-        args.hmm = "KOFam_all, COG, VOG, PHROG, CAZy"
+        args.hmm = DB_HMM['ALL']
     for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')], 1):
         print(f"HMM: '{hmm}'")
         if hmm in DB_HMM:
@@ -226,18 +226,6 @@ Example:
         args.chunker = 0
     if args.grouped and args.chunker == 0:
         args.chunker = 1
-    # Check sequence type
-    for file in args.prodigal + args.fraggenescan + args.prodigalgv + args.phanotate:
-        if Path(file).suffix in FILES_FASTQ:
-            if not any([args.illumina, args.nanopore, args.pacbio]):
-                parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
-            elif args.qc_seq =="default":
-                if args.illumina:
-                    args.qc_seq = QC_SEQ["illumina"]
-                if args.nanopore:
-                    args.qc_seq = QC_SEQ["lambda"]
-                if args.pacbio:
-                    args.qc_seq = QC_SEQ["pacbio"]
 
     # Initialize Config Dictionary
     config = {}
@@ -305,16 +293,16 @@ Example:
     
     if args.slurm_single:
         # Force single node
-        ray.init(num_cpus=config['CPUS'])#, log_to_driver=False)
+        ray.init(num_cpus=config['CPUS'], log_to_driver=False)
         print("Started RAY single node")
         config['CLUSTER'] = False
     else:
         try:
-            ray.init(address='auto')#, log_to_driver=False)
+            ray.init(address='auto', log_to_driver=False)
             print("Started RAY on cluster")
             config['CLUSTER'] = True
         except:
-            ray.init(num_cpus=config['CPUS'])#, log_to_driver=False)
+            ray.init(num_cpus=config['CPUS'], log_to_driver=False)
             print("Started RAY single node")
             config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")
@@ -427,6 +415,17 @@ Example:
     print(f"Processing {len(fasta)} fasta sequences")
     print(f"Processing {len(amino)} protein sequences")
     print(f"Processing {len(rollup)} rollup files")
+
+    if len(fastq) > 0:
+        if not any([args.illumina, args.nanopore, args.pacbio]):
+            parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
+        else:
+            if args.illumina:
+                config['QC_SEQ'] = QC_SEQ["illumina"]
+            if args.nanopore:
+                config['QC_SEQ'] = QC_SEQ["lambda"]
+            if args.pacbio:
+                config['QC_SEQ'] = QC_SEQ["pacbio"]
 
     # Main Pipeline
     pipeline = list()
