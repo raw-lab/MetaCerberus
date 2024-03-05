@@ -318,6 +318,11 @@ MetaCerberus as a community resource as recently acquired [FunGene](http://funge
 ## Citing MetaCerberus
 
 If you are publishing results obtained using MetaCerberus, please cite: <br />
+### Publication
+Figueroa JL, Dhungel E, Brouwer CR, White III RA. 2024.
+MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. [Bioinformatics](https://doi.org/10.1093/bioinformatics/btae119)  <br />
+
+### Pre-print
 Figueroa JL, Dhungel E, Brouwer CR, White III RA. 2023.  <br />
 MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.08.10.552700v1)   <br />
 
@@ -326,7 +331,7 @@ MetaCerberus: distributed highly parallelized HMM-based processing for robust fu
 The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw-lab).  
 If you have any questions or feedback, please feel free to get in touch by email.  
 [Dr. Richard Allen White III](mailto:rwhit101@uncc.edu)<br /> 
-[Jose Luis Figueroa](mailto:jlfiguer@uncc.edu) <br />
+[Jose Luis Figueroa III](mailto:jlfiguer@uncc.edu) <br />
 Or [open an issue](https://github.com/raw-lab/metacerberus/issues).  
 
 
