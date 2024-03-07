@@ -64,67 +64,65 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4)
 def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
     outfile.parent.mkdir(parents=True, exist_ok=True)
 
-    hmm,key = hmm_tsv.stem.split(sep='-', maxsplit=1)
-    if hmm in ['COG', 'CAZy', 'PHROG', 'VOG']:
-        lookup_list = [hmm]
-    else:
-        lookup_list = ['KEGG']
+    for i in range(1, len(dbpath.suffixes)):
+        dbpath = Path(dbpath.with_suffix(''))
+    dbLookup = dbpath.with_suffix('.tsv').read_text()
 
-    with outfile.open('w') as writer, outfile.with_suffix('.log').open('w') as logger:
-        for name in lookup_list:
-            dbLookup = Path(dbpath, f"{name}-onto_rel1.tsv").read_text()
-            BH_target = dict()
-            with open(hmm_tsv, "r") as reader:
-                for i,line in enumerate(reader, 1):
-                    line = line.split('\t')
-                    try:
-                        target = line[0]
-                        query = line[1]
-                        e_value = float(line[2])
-                        score = float(line[3])
-                        length = int(line[4])
-                        start = int(line[5])
-                        end = int(line[6])
-                    except:
-                        print("Failed to read line:", i, hmm_tsv, file=logger)
-                        continue
-                    # Check if Query is in the Database
-                    if not re.search(query, dbLookup, re.MULTILINE):
-                        continue
-
-                    # Count Proper Hits
-                    # 1) Overlapping: Count best score
-                    # 2) Unique: Count both
-                    if target not in BH_target:
-                        BH_target[target] = [(query, e_value, score, length, start, end)]
-                    else: # More than one match/target
-                        #keys = list(BH_target[target].keys())
-                        item = (query, e_value, score, length, start, end)
-                        add = False
-                        overlap = False
-                        for c,match in enumerate(BH_target[target]):
-                            # Check for overlap
-                            if start <= match[5] and end >= match[4]:
-                                overlap_len = min(end, match[5]) - max(start, match[4])
-                                if overlap_len > 10:
-                                    # Winner takes all
-                                    overlap = True
-                                    if score == match[2]:
-                                        add = True
-                                    elif score > match[2]:
-                                        BH_target[target][c] = item
-                                else:
-                                    #print("NO OVERLAP:", overlap_len, file=logger)
-                                    pass
-                        if add or not overlap:
-                            # Equal score OR Dual domain
-                            BH_target[target] += [item]
-                    # next line
-                    continue
-            # Write filtered overlaps to file
-            for target in sorted(BH_target):
-                for match in set(BH_target[target]):
-                    query, e_value, score, length, start, end = match
-                    print(target, query, e_value, score, length, start, end, sep='\t', file=writer)
+    BH_target = dict()
+    logfile = outfile.with_suffix('.log')
+    with hmm_tsv.open() as reader, logfile.open('w') as logger:
+        for i,line in enumerate(reader, 1):
+            line = line.split('\t')
+            try:
+                target = line[0]
+                query = line[1]
+                e_value = float(line[2])
+                score = float(line[3])
+                length = int(line[4])
+                start = int(line[5])
+                end = int(line[6])
+            except:
+                print("Failed to read line:", i, hmm_tsv, file=logger)
+                continue
+            # Check if Query is in the Database
+            if not re.search(query, dbLookup, re.MULTILINE):
+                continue
+            
+            # Count Proper Hits
+            # 1) Overlapping: Count best score
+            # 2) Unique: Count both
+            if target not in BH_target:
+                BH_target[target] = [(query, e_value, score, length, start, end)]
+            else: # More than one match/target
+                #keys = list(BH_target[target].keys())
+                item = (query, e_value, score, length, start, end)
+                add = False
+                overlap = False
+                for c,match in enumerate(BH_target[target]):
+                    # Check for overlap
+                    if start <= match[5] and end >= match[4]:
+                        overlap_len = min(end, match[5]) - max(start, match[4])
+                        if overlap_len > 10:
+                            # Winner takes all
+                            overlap = True
+                            if score == match[2]:
+                                add = True
+                            elif score > match[2]:
+                                BH_target[target][c] = item
+                        else:
+                            #print("NO OVERLAP:", overlap_len, file=logger)
+                            pass
+                if add or not overlap:
+                    # Equal score OR Dual domain
+                    BH_target[target] += [item]
+            # next line
+            continue
+    # Write filtered overlaps to file
+    with outfile.open('w') as writer:
+        print("target", "query", "e-value", "score", "length", "start", "end", sep='\t', file=writer)
+        for target in sorted(BH_target):
+            for match in set(BH_target[target]):
+                query, e_value, score, length, start, end = match
+                print(target, query, e_value, score, length, start, end, sep='\t', file=writer)
 
     return outfile

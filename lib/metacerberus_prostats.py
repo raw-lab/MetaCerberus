@@ -9,7 +9,7 @@ import pandas as pd
 import statistics as stat
 
 
-def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict, summary_out:str):
+def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summary_out:str):
     minscore = config["MINSCORE"]
 
     # sum up proteins in FASTA file
@@ -35,75 +35,92 @@ def getStats(faa: str, fileHmmer: str, dfCount: dict, config: dict, summary_out:
 
     # sum up proteins in HMMER file
     hmmHits = dict()
-    with open(fileHmmer, "r") as reader:
+    for hmm,filename in hmm_tsv.items():
+    #with open(hmm_tsv, "r") as reader:
+        reader = open(filename, "r")
         for i,line in enumerate(reader,1):
             #"target", "query", "e-value", "score", "length", "start", "end"
             line = line.split('\t')
             try:
                 target = line[0]
                 query = line[1]
-                evalue = line[2]
+                evalue = float(line[2])
                 score = float(line[3])
                 length = int(line[4])
+                start = int(line[5])
+                end = int(line[6])
             except:
                 continue
 
+            # Add to hmm tsv dict
+            if target not in hmmHits:
+                hmmHits[target] = list()
+            hmmHits[target].append([query, evalue, score, length, start, end, hmm])
+
+            # Count protein matches
             if target in proteins:
                 proteins[target]['count'] += 1
                 if score >= minscore:
                     proteins[target]['found'] += 1
-                if target not in hmmHits:
-                    hmmHits[target] = list()
-                hmmHits[target].append([query, score, evalue, length])
             else:
                 if faa:
-                    print("ERROR: Target on line", i, "of HMMER file not in protein fasta:", fileHmmer)
+                    print("ERROR: Target on line", i, "of HMMER target not in protein fasta:", hmm_tsv)
                     return None
                 else: #TODO: There is probably a better way to do this.
                     proteins[target] = dict(count=1, found=0, length=length)
                     if score >= minscore:
                         proteins[target]['found'] += 1
-                    if target not in hmmHits:
-                        hmmHits[target] = list()
-                    hmmHits[target].append([query, score, evalue, length])
-    
+        reader.close()
+
     # Annotate proteins
+    #TODO: use evalue as well as score for best comparison
+    # Load Lookup Tables, create header
+    header = ["target", "best_hit", "HMM", "product", "evalue", "score", "EC"]
+    empty = ["", "", "Hypothetical", "", "", ""]
     dfLookup = dict()
-    for dbname in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-        dbPath = Path(config['PATHDB'], f"{dbname}-onto_rel1.tsv")
-        dfLookup[dbname] = pd.read_csv(dbPath, sep='\t').fillna('')
+    for hmm,dbpath in dbhmms.items():
+        # Load .tsv of same name as hmm
+        for i in range(1, len(dbpath.suffixes)):
+            dbpath = Path(dbpath.with_suffix(''))
+        dbLookup = dbpath.with_suffix('.tsv')
+        dfLookup[hmm] = pd.read_csv(dbLookup, sep='\t').fillna('')
+        # Add hmm to header
+        header += [hmm, f"{hmm}_name", f"{hmm}_evalue", f"{hmm}_score", "EC", f"{hmm}_length"]
+        empty += ["", "", "", "", "", ""]
     with open(summary_out, 'w') as writer:
-        print("locus_tag", 'FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG', "Best hit", "length_bp", "e-value", "score", "EC_number", "product", sep='\t', file=writer)
+        print(*header, sep='\t', file=writer)
         for target in proteins.keys():
             if target in hmmHits:
-                hmmHits[target].sort(key = lambda x: x[1], reverse=True)
+                # sort by score
+                hmmHits[target].sort(key = lambda x: x[1], reverse=False)
+                # Best Match
+                query,eval,score,length,start,end,dbname = hmmHits[target][0]
+                rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].ID==query])
+                name,EC = ["", ""]
+                if not rows.empty:
+                    name = rows.iloc[0].Function
+                    EC = rows.iloc[0].EC
+                annotate = [query, dbname, name, eval, score, EC]
+                # Individual matches
                 annotations = dict()
                 for match in hmmHits[target]:
-                    q,s,e,l = match
-                    for dbname in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-                        if dbname not in annotations:
-                            annotations[dbname] = []
-                        rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].ID==q])
-                        if not rows.empty:
-                            name = f"{dbname}:{rows.iloc[0].Function}"
-                            EC = rows.iloc[0].EC
-                            annotations[dbname] += [q]
-                annotations = [", ".join(annotations[k]) for k in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']]
-                query,score,evalue,length = hmmHits[target][0]
-                name = ""
-                EC = ""
-                for dbname in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
+                    query,eval,score,length,start,end,dbname = match
                     rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].ID==query])
+                    name,EC = ["", ""]
                     if not rows.empty:
                         name = rows.iloc[0].Function
                         EC = rows.iloc[0].EC
-                        break
-                if name:
-                    print(target, *annotations, f"{dbname}:{query}", length, evalue, score, EC, name, sep='\t', file=writer)
-                else:
-                    print(target, '', '', '', '', '', '', "", "", "", "", "", "Hypothetical", sep='\t', file=writer)
+                    if dbname in annotations:
+                        print("WARNING, db already in annotations (better score ? merge):", dbname)
+                    annotations[dbname] = [query,name,eval,score,EC,length]
+                for hmm in dbhmms.keys():
+                    if hmm in annotations:
+                        annotate += annotations[hmm]
+                    else:
+                        annotate += ['', '', '', '', '', '']
+                print(target, *annotate, sep='\t', file=writer)
             else:
-                print(target, '', '', '', '', '', '', "", "", "", "", "", "Hypothetical", sep='\t', file=writer)
+                print(target, *empty, sep='\t', file=writer)
     del dfLookup
 
     # calculate stats

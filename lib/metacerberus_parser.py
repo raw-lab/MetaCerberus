@@ -15,24 +15,101 @@ from pathlib import Path
 import pandas as pd
 
 
-def parseHmmer(hmm_tsv, config, subdir):
+def top5s(hmm_tsv:dict, outfile:Path):
+    outfile.parent.mkdir(0o777, True, True)
+
+    # Calculate Best Hit
+    BH_top5 = {}
+    for hmm,filename in hmm_tsv.items():
+        with open(filename, "r") as reader:
+            reader.readline()
+            for line in reader:
+                line = line.split('\t')
+                target = line[0]
+                query = line[1]
+                e_value = line[2]
+                score = float(line[3])
+                ec = '' #TODO: Match query to EC
+
+                # store top 5 per query
+                match = [target, query, ec, e_value, score, hmm]
+                if target not in BH_top5:
+                    BH_top5[target] = [match]
+                elif len(BH_top5[target]) < 5:
+                    BH_top5[target].append(match)
+                else:
+                    BH_top5[target].sort(key = lambda x: x[3], reverse=False)
+                    if score > float(BH_top5[target][0][3]):
+                        BH_top5[target][0] = match
+
+    # Save Top 5 hits tsv rollup
+    with outfile.open('w') as writer:
+        print("Target Name", "ID", "EC value", "E-Value (sequence)", "Score (domain)", "hmmDB", sep='\t', file=writer)
+        for target in sorted(BH_top5.keys()):
+            BH_top5[target].sort(key = lambda x: x[3], reverse=True)
+            for line in BH_top5[target]:
+                print(*line, sep='\t', file=writer)
+    return outfile
+
+
+def top5(hmm_tsv:Path, outfile:Path):
+    outfile.parent.mkdir(0o777, True, True)
+
+    # Calculate Best Hit
+    BH_top5 = {}
+    with open(hmm_tsv, "r") as reader:
+        reader.readline()
+        for line in reader:
+            line = line.split('\t')
+            target = line[0]
+            query = line[1]
+            e_value = line[2]
+            score = float(line[3])
+            ec = '' #TODO: Match query to EC
+
+            # store top 5 per query
+            match = [target, query, ec, e_value, score]
+            if target not in BH_top5:
+                BH_top5[target] = [match]
+            elif len(BH_top5[target]) < 5:
+                BH_top5[target].append(match)
+            else:
+                BH_top5[target].sort(key = lambda x: x[3], reverse=False)
+                if score > float(BH_top5[target][0][3]):
+                    BH_top5[target][0] = match
+
+    # Save Top 5 hits tsv rollup
+    with outfile.open('w') as writer:
+        print("Target Name", "ID", "EC value", "E-Value (sequence)", "Score (domain)", sep='\t', file=writer)
+        for target in sorted(BH_top5.keys()):
+            BH_top5[target].sort(key = lambda x: x[3], reverse=True)
+            for line in BH_top5[target]:
+                print(*line, sep='\t', file=writer)
+    return outfile
+
+
+def parseHmmer(hmm_tsv, config, subdir, dbpath):
     path = Path(config['DIR_OUT'], subdir)
     path.mkdir(exist_ok=True, parents=True)
 
-    done = path / "complete"
-    if not config['REPLACE'] and done.exists():
-        rollup_files = dict()
-        for name in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-            outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
-            if outfile.exists():
-                rollup_files[name] = outfile
-        return rollup_files
-    done.unlink(missing_ok=True)
+    #done = path / "complete"
+    #if not config['REPLACE'] and done.exists():
+    #    print("AH CRAP!!!")
+    #    rollup_files = dict()
+    #    for name in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
+    #        outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
+    #        if outfile.exists():
+    #            rollup_files[name] = outfile
+    #    return rollup_files
+    #done.unlink(missing_ok=True)
 
 
     minscore = config["MINSCORE"]
 
-    top5File = Path(path, "HMMER_top_5.tsv")
+    for i in range(1, len(dbpath.suffixes)):
+        dbpath = Path(dbpath.with_suffix(''))
+    dbname = dbpath.name
+    top5File = Path(path, f"HMMER-{dbname}_top_5.tsv")
 
 
     # Calculate Best Hit
@@ -94,45 +171,44 @@ def parseHmmer(hmm_tsv, config, subdir):
 
     # Write rollup files to disk
 
-    dbPath = Path(config['PATHDB'])
-    dfRollups = rollupAll(ID_counts, dbPath, path)
+    #dbPath = Path(config['PATHDB'])
+    dfRollup = rollup(ID_counts, dbpath, path)
     rollup_files = dict()
-    for name,df in dfRollups.items():
-        if len(df.index) > 1:
-            outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
-            df.to_csv(outfile, index=False, header=True, sep='\t')
-            rollup_files[name] = outfile
+    #for name,df in dfRollups.items():
+    if len(dfRollup.index) > 1:
+        outfile = Path(path, f"HMMER_BH_{dbname}_rollup.tsv")
+        dfRollup.to_csv(outfile, index=False, header=True, sep='\t')
+        rollup_files[dbname] = outfile
 
-    done.touch()
+    #done.touch()
     return rollup_files
 
 ######### Roll-Up All #########
-def rollupAll(COUNTS: dict, lookupPath: str, outpath: str):
-    dfLookup = dict()
-    dfRollup = dict()
-    count_file = dict()
-    for name in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-        count_file[name] = Path(outpath, f'counts_{name}.tsv').open('w')
-        print('ID', 'count', sep='\t', file=count_file[name])
-        dbPath = Path(lookupPath, f"{name}-onto_rel1.tsv")
-        dfLookup[name] = pd.read_csv(dbPath, sep='\t').fillna('')
-        dfRollup[name] = pd.DataFrame()
+def rollup(COUNTS: dict, dbpath: str, outpath: str):
+    for i in range(1, len(dbpath.suffixes)):
+        dbpath = Path(dbpath.with_suffix(''))
+    dbLookup = dbpath.with_suffix('.tsv')
+    dbname = dbpath.name
 
-    errfile = os.path.join(outpath, 'lookup.err')
-    with open(errfile, 'w') as errlog:
+    dfLookup = pd.read_csv(dbLookup, sep='\t').fillna('')
+    dfRollup = pd.DataFrame()
+    count_file = Path(outpath, f'counts_{dbname}.tsv')
+    errfile = Path(outpath, 'lookup.err')
+
+    with count_file.open('w') as count_writer, errfile.open('w') as errlog:
+        print('ID', 'count', sep='\t', file=count_writer)
         for ID,count in sorted(COUNTS.items()):
             found = False
-            for name in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-                rows = pd.DataFrame(dfLookup[name][dfLookup[name].ID==ID])
-                if not rows.empty:
-                    found = True
-                    rows.drop(rows[rows['Function']==''].index, inplace=True)
-                    if rows.empty:
-                        print("WARNING:'", ID, "'Does not have a 'Function' in the Lookup File:", name, file=errlog)
-                        continue
-                    print(ID, count, sep='\t', file=count_file[name])
-                    rows['Count'] = count
-                    dfRollup[name] = pd.concat([dfRollup[name],rows])
+            rows = pd.DataFrame(dfLookup[dfLookup.ID==ID])
+            if not rows.empty:
+                found = True
+                rows.drop(rows[rows['Function']==''].index, inplace=True)
+                if rows.empty:
+                    print("WARNING:'", ID, "'Does not have a 'Function' in the Lookup File:", dbname, file=errlog)
+                    continue
+                print(ID, count, sep='\t', file=count_writer)
+                rows['Count'] = count
+                dfRollup = pd.concat([dfRollup,rows])
             if not found:
                 print("WARNING:'", ID, "'not found in any Lookup File", file=errlog)
                 continue
