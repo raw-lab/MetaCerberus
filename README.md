@@ -4,7 +4,7 @@
 
 ## About
 
-MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy, VOG/pVOG, PHROG, and COG databases via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis. MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
+MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy/dbCAN, VOG, pVOG, PHROG, and COG databases via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis. MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
 
 ![GitHub Logo](https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/metacerberus_logo.jpg)
 
@@ -253,6 +253,25 @@ optional arguments:
 Args that start with '--' (eg. --prodigal) can also be set in a config file (specified via -c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for
 details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override config file values which override defaults.
 ```
+### OUTPUTS (/final folder in 1.3 update)
+
+| File Extension | Description Summary |
+| --------- | ----------- |
+| .gff | coming soon |
+| .gbk | coming soon |
+| .fna | Nucleotide FASTA file of the input contig sequences. |
+| .faa | Protein FASTA file of the translated CDS sequences. |
+| .ffn | coming soon |
+| .sqn | coming soon |
+| .fsa | coming soon |
+| .tbl | coming soon |
+| .err | coming soon |
+| .log | coming soon |
+| .html | Summary statistics and/or visualizations, in step 10 folder|
+| .txt | Statistics relating to the annotated features found. |
+| level.tsv | Various levels of hierachical steps that is tab-separated file from various databases|
+| rollup.tsv | All levels of hierachical steps that is tab-separated file from various databases|
+| .tsv | Final Annotation summary, Tab-separated file of all features from various databases|
 
 ### GAGE / PathView
 
