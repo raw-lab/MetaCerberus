@@ -17,7 +17,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="MetaCerberus",
-    version="1.2.1",
+    version="1.3.0",
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
     description="Versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
