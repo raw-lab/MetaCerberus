@@ -190,12 +190,11 @@ All pre-formatted databases are present at OSF
 
 ### Database sources
 
-| Database | Last Update | Version | Link |
-| ---------- | ----------- | ------- | ------------ |
-| KEGG/KOfams | 2024-01-01 | Jan24 |
-[KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) |
+| Database | Last Update | Version |      Link |
+| -------- | ------ | --- | ------------ |
+| KEGG/KOfams | 2024-01-01 | Jan24 |[KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) |
+| COG | 2020 | 2020 |[COG](https://ftp.ncbi.nih.gov/pub/COG/COG2020/data/) |
 
-- [COG](https://ftp.ncbi.nih.gov/pub/COG/COG2020/data/)
 - [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)
 - [VOG](https://vogdb.org/download)
 - [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)
