@@ -192,7 +192,7 @@ All pre-formatted databases are present at OSF
 
 | Database | Last Update | Version |  Publication |
 | ---- | --- | --------| -----|
-| [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) | 2024-01-01 | Jan24 | [Kanehisaa et al. 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC102409/) |
+| [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) | 2024-01-01 | Jan24 | [Aramaki et al. 2020](https://doi.org/10.1093/bioinformatics/btz859) |
 | [FOAM/KOfams](https://osf.io/3uz2j/) | 2017 | 1 | |
 |[COG](https://ftp.ncbi.nlm.nih.gov/pub/COG/COG2020/data/) | 2020 | 2020 | |
 | [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)| 2023-08-02 | 12 | |
