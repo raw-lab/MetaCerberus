@@ -65,8 +65,8 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                     proteins[target]['found'] += 1
             else:
                 if faa:
-                    print("ERROR: Target on line", i, "of HMMER target not in protein fasta:", hmm_tsv)
-                    return None
+                    print("WARNING: Target on line", i, "of HMMER target not in protein fasta:", hmm_tsv)
+                    continue
                 else: #TODO: There is probably a better way to do this.
                     proteins[target] = dict(count=1, found=0, length=length)
                     if score >= minscore:
