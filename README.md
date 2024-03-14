@@ -188,8 +188,13 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 All pre-formatted databases are present at OSF 
 - [OSF](https://osf.io/3uz2j)
 
-### Sources for databases for MetaCerberus
-- [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/)
+### Database sources
+
+| Database | Last Update | Version | link |
+| ---------- | -------- | ---- | ---- |
+| KEGG/KOfams | 2024-01-01 | 12 |
+[KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) |
+
 - [COG](https://ftp.ncbi.nih.gov/pub/COG/COG2020/data/)
 - [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)
 - [VOG](https://vogdb.org/download)
