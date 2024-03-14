@@ -4,6 +4,7 @@
 
 """
 
+import re
 from pathlib import Path
 import pandas as pd
 import statistics as stat
@@ -35,7 +36,7 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
 
     # sum up proteins in HMMER file
     hmmHits = dict()
-    for hmm,filename in hmm_tsv.items():
+    for dbname,filename in hmm_tsv.items():
     #with open(hmm_tsv, "r") as reader:
         reader = open(filename, "r")
         for i,line in enumerate(reader,1):
@@ -55,7 +56,7 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
             # Add to hmm tsv dict
             if target not in hmmHits:
                 hmmHits[target] = list()
-            hmmHits[target].append([query, evalue, score, length, start, end, hmm])
+            hmmHits[target].append([query, evalue, score, length, start, end, dbname])
 
             # Count protein matches
             if target in proteins:
@@ -78,14 +79,17 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
     header = ["target", "best_hit", "HMM", "product", "evalue", "score", "EC"]
     empty = ["", "", "Hypothetical", "", "", ""]
     dfLookup = dict()
-    for hmm,dbpath in dbhmms.items():
+    for dbname,dbpath in dbhmms.items():
         # Load .tsv of same name as hmm
-        for i in range(1, len(dbpath.suffixes)):
-            dbpath = Path(dbpath.with_suffix(''))
+        while Path(dbpath).suffixes:
+            dbpath = Path(dbpath).with_suffix('')
         dbLookup = dbpath.with_suffix('.tsv')
-        dfLookup[hmm] = pd.read_csv(dbLookup, sep='\t').fillna('')
+        if dbname.startswith("KOFam"):
+            dbLookup = re.search(r"KOFam_.*_([A-Z]+)", dbname).group(1)
+            dbLookup = dbpath.with_name(f'{dbLookup}.tsv')
+        dfLookup[dbname] = pd.read_csv(dbLookup, sep='\t').fillna('')
         # Add hmm to header
-        header += [hmm, f"{hmm}_name", f"{hmm}_evalue", f"{hmm}_score", "EC", f"{hmm}_length"]
+        header += [dbname, f"{dbname}_name", f"{dbname}_evalue", f"{dbname}_score", "EC", f"{dbname}_length"]
         empty += ["", "", "", "", "", ""]
     with open(summary_out, 'w') as writer:
         print(*header, sep='\t', file=writer)
@@ -110,12 +114,14 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                     if not rows.empty:
                         name = rows.iloc[0].Function
                         EC = rows.iloc[0].EC
+                    #TODO: Debug this section for sanity...
+                    if dbname in annotations and annotations[dbname][0] != query:
+                        print("WARNING, db in annotations (score ? merge):", target,dbname,query,eval,score,'|',annotations[dbname][0],annotations[dbname][2],annotations[dbname][3])
+                    else:
+                        annotations[dbname] = [query,name,eval,score,EC,length]
+                for dbname in dbhmms.keys():
                     if dbname in annotations:
-                        print("WARNING, db already in annotations (better score ? merge):", dbname)
-                    annotations[dbname] = [query,name,eval,score,EC,length]
-                for hmm in dbhmms.keys():
-                    if hmm in annotations:
-                        annotate += annotations[hmm]
+                        annotate += annotations[dbname]
                     else:
                         annotate += ['', '', '', '', '', '']
                 print(target, *annotate, sep='\t', file=writer)

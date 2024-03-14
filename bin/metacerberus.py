@@ -7,10 +7,10 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.2.1"
+__version__     = "1.3.0"
+__date__        = "March 2024"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
-__copyright__   = "Copyright 2023"
-__date__        = "February 2024"
+__copyright__   = "Copyright 2022-2024"
 
 def warn(*args, **kwargs):
     pass
@@ -76,19 +76,6 @@ DEPENDENCIES = {
     'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
     }
 
-# Databases
-DB_HMM = dict(
-    KOFam_all=Path(PATHDB, 'KOFam_all.hmm.gz'),
-    KOFam_prokaryote=Path(PATHDB, 'KOFam_prokaryote.hmm.gz'),
-    KOFam_eukaryote=Path(PATHDB, 'KOFam_eukaryote.hmm.gz'),
-    COG=Path(PATHDB, 'COG.hmm.gz'),
-    CAZy=Path(PATHDB, 'CAZy.hmm.gz'),
-    PHROG=Path(PATHDB, 'PHROG.hmm.gz'),
-    VOG=Path(PATHDB, 'VOG.hmm.gz'),
-    PVOG=Path(PATHDB, 'PVOG.hmm.gz'),
-    ALL="KOFam_all, CAZy, COG, VOG, PVOG, PHROG",
-    )
-
 # step names
 STEP = {
     1:"step_01-loadFiles",
@@ -141,6 +128,16 @@ def main():
     ## Parse the command line
     parser = argparse.ArgumentParser(add_help=False)
     parser.set_defaults()
+
+    # Setup options
+    setup = parser.add_argument_group('''Setup arguments''')
+    setup_grp = setup.add_mutually_exclusive_group(required=False)
+    setup_grp.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
+    setup_grp.add_argument('--update', action="store_true", help="Set this flag to update downloaded databases [False]")
+    setup_grp.add_argument('--list-db', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
+    setup.add_argument('--download', nargs='*', default=None, help="Downloads selected HMMs. Use the option --list-db for a list of available databases, default is to download all available databases")
+    setup_grp.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
+
     # At least one of these options are required
     required = parser.add_argument_group('''Required arguments
 At least one sequence is required.
@@ -156,32 +153,32 @@ Example:
     required.add_argument('--prodigalgv', nargs='+', default=[], help='Giant virus nucleotide sequence')
     required.add_argument('--phanotate', nargs='+', default=[], help='Phage sequence')
     required.add_argument('--protein', '--amino', nargs='+', default=[], help='Protein Amino Acid sequence')
-    required.add_argument('--rollup', nargs='+', default=[], help='Rolled up annotations from HMMER')
+    required.add_argument('--hmmer-tsv', nargs='+', default=[], help='Annotations tsv file from HMMER (experimental)')
     # Raw-read identification
-    readtype = parser.add_mutually_exclusive_group(required=False)
+    readtype = required.add_mutually_exclusive_group(required=False)
     readtype.add_argument('--illumina', action="store_true", help="Specifies that the given FASTQ files are from Illumina")
     readtype.add_argument('--nanopore', action="store_true", help="Specifies that the given FASTQ files are from Nanopore")
     readtype.add_argument('--pacbio', action="store_true", help="Specifies that the given FASTQ files are from PacBio")
     # optional flags
     optional = parser.add_argument_group('optional arguments')
-    optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
-    optional.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
-    optional.add_argument('--dir_out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
+#    optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
+    optional.add_argument('--dir-out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
     optional.add_argument('--meta', action="store_true", help="Metagenomic nucleotide sequences (for prodigal) [False]")
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
     optional.add_argument('--minscore', type=float, default=60, help="Score cutoff for parsing HMMER results [60]")
     optional.add_argument('--evalue', type=float, default=1e-09, help="E-value cutoff for parsing HMMER results [1e-09]")
-    optional.add_argument('--skip_decon', action="store_true", help="Skip decontamination step. [False]")
-    optional.add_argument('--skip_pca', action="store_true", help="Skip PCA. [False]")
+    optional.add_argument('--skip-decon', action="store_true", help="Skip decontamination step. [False]")
+    optional.add_argument('--skip-pca', action="store_true", help="Skip PCA. [False]")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
     optional.add_argument('--grouped', action="store_true", help="Group multiple fasta files into a single file before processing. When used with chunker can improve speed")
     optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
-    optional.add_argument('--hmm', type=str, default='KOFam_all', help="Specify a coma seperated list of databases for HMMER. Use quotes around the list, or avoid spaces. (KOFam_all, KOFam_eukaryote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]")
+    optional.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. Use the option --list-db for a list of available databases [KOFam_all]")
+    optional.add_argument("--db-path", type=str, default=PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
     optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
-    optional.add_argument('--slurm_nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
-    optional.add_argument('--slurm_single', action="store_true", help=argparse.SUPPRESS)# help='Force single node use, do not connect to host')
+    optional.add_argument('--slurm-nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
+    optional.add_argument('--slurm-single', action="store_true", help=argparse.SUPPRESS)# help='Force single node use, do not connect to host')
     optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY (experimental) [system tmp dir]')
     optional.add_argument('--version', '-v', action='version',
                         version=f'MetaCerberus: \n version: {__version__} {__date__}',
@@ -195,39 +192,90 @@ Example:
     dependencies.add_argument('--qc_seq', type=str, default="default", help="FASTA File containing control sequences for decontamination")
 
     args = parser.parse_args()
+    print(args)
 
     if args.uninstall:
-        metacerberus_setup.Remove(PATHDB, PATHFGS)
-
+        metacerberus_setup.remove(args.db_path, PATHFGS)
+        return 0
+    if args.list_db:
+        downloaded,to_download,urls,hmm_version = metacerberus_setup.list_db(args.db_path)
+        if downloaded:
+            print("HMM Databases already downloaded:")
+            for name,filelist in downloaded.items():
+                print(name, hmm_version[name], sep='\t')
+                #for filepath in filelist:
+                #    print('', filepath, sep='\t')
+        else:
+            print("No HMM databases are currently downloaded at:", args.db_path)
+        if to_download:
+            print("Available HMM databases to download:")
+            for name,filelist in to_download.items():
+                print(name, hmm_version[name], sep='\t')
+                #for filepath in filelist:
+                #    print('', filepath, sep='\t')
+        else:
+            print("All available HMM databases already downloaded at:", args.db_path)
+        return 0
     if args.setup:
+        print("Setting up FragGeneScanRS")
         metacerberus_setup.FGS(PATHFGS)
-        metacerberus_setup.Download(PATHDB)
-
-    if args.setup or args.uninstall:
+        return 0
+    if args.download is not None:
+        metacerberus_setup.download(args.db_path, args.download)
+        return 0
+    if args.update:
+        metacerberus_setup.update(args.db_path)
         return 0
 
+    # HMM Databases
+    DB_HMM = dict(ALL=list())
+    if Path(PATHDB, "databases.tsv").exists():
+        with Path(PATHDB, "databases.tsv").open() as reader:
+            header = reader.readline().split()
+            for line in reader:
+                name,filename,urlpath,date = line.split()
+                if ".hmm" in Path(filename).suffixes:
+                    if name == "KOFam":
+                        name = Path(filename).with_suffix('').stem
+                        if name == "KOFam_all":
+                            DB_HMM['ALL'] += [Path(args.db_path, filename)]
+                    else:
+                        DB_HMM['ALL'] += [Path(args.db_path, filename)]
+                    DB_HMM[name] = Path(args.db_path, filename)
+
+    print(DB_HMM['ALL'])
 
     dbHMM = dict()
-    if args.hmm.upper() == "ALL":
+    if "ALL" in args.hmm:
         args.hmm = DB_HMM['ALL']
-    for i,hmm in enumerate([x.strip() for x in args.hmm.split(',')], 1):
-        print(f"HMM: '{hmm}'")
+    for hmm in [x.strip(',') for x in args.hmm]:
         if hmm in DB_HMM:
             if DB_HMM[hmm].exists():
-                dbHMM[hmm] = DB_HMM[hmm]
+                if Path(DB_HMM[hmm]).name.startswith("KOFam"):
+                    dbHMM[f"{hmm}_KEGG"] = DB_HMM[hmm]
+                    dbHMM[f"{hmm}_FOAM"] = DB_HMM[hmm]
+                else:
+                    dbHMM[hmm] = DB_HMM[hmm]
             else:
                 print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --setup")
         else:
-            if Path(hmm).exists() and Path(hmm).with_suffix('.tsv').exists():
-                dbname = Path(hmm).with_suffix('').name
-                dbpath = Path(hmm)
+            dbpath = Path(hmm)
+            while Path(hmm).suffixes:
+                hmm = Path(hmm).with_suffix('')
+            if dbpath.exists() and hmm.with_suffix('.tsv').exists():
+                dbname = Path(dbpath).with_suffix('').stem
                 dbHMM[dbname] = dbpath
                 print("Loading custom HMM:", dbname, dbpath)
+            else:
+                print("Unable to load custom database")
     if not len(dbHMM):
         print("ERROR: No HMM DB Loaded")
         return 1
 
-    print("\nStarting MetaCerberus Pipeline\n")
+    print(f"\nStarting MetaCerberus v{__version__} Pipeline\n")
+    print("Using HMMs:")
+    for k,v in dbHMM.items():
+        print(k,v)
 
     # Merge related arguments
     if args.super:
@@ -235,7 +283,7 @@ Example:
         args.fraggenescan += args.super
 
     # Check if required flags are set
-    if not any([args.prodigal, args.fraggenescan, args.prodigalgv, args.phanotate, args.protein, args.rollup]):
+    if not any([args.prodigal, args.fraggenescan, args.prodigalgv, args.phanotate, args.protein, args.hmmer_tsv]):
         parser.error('At least one sequence must be declared either in the command line or through the config file')
     if args.chunker < 0:
         args.chunker = 0
@@ -416,8 +464,8 @@ Example:
                     args.phanotate.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
-    # Load Rollup input
-    for item in args.rollup:
+    # Load HMMER input
+    for item in args.hmmer_tsv:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
             name, ext = os.path.splitext(os.path.basename(item))
@@ -495,7 +543,7 @@ Example:
             amino[key] = None
             for hmm in dbHMM:
                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [value, tsv_filtered, dbHMM[hmm]]))
+                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, f"{hmm}/{key}", config['DIR_OUT'], [value, tsv_filtered, dbHMM[hmm]]))
 
     NStats = dict()
     readStats = dict()
@@ -690,7 +738,7 @@ Example:
                             for k in key_set:
                                 tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
                                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], k, f"filtered-{hmm}.tsv")
-                                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, k, config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
+                                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, f"{hmm}/{k}", config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
                             # FINISH SPLITTING GROUP
                             continue
                         # Not grouped
@@ -704,7 +752,7 @@ Example:
                                     os.remove(item)
                         tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
                         set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
+                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, f"{hmm}/{key}", config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
                 else:
                 # Not chunked file
                     hmm,key = key.split(sep='/', maxsplit=1)
@@ -720,7 +768,7 @@ Example:
             hmm,key = key.split('/')
             set_add(step_curr, 9, "STEP 9: Parse HMMER results")
             print("PARSING:", hmm, key)
-            pipeline.append(rayWorkerThread.remote(metacerberus_parser.parseHmmer, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}", dbHMM[hmm]]))
+            pipeline.append(rayWorkerThread.remote(metacerberus_parser.parseHmmer, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}", hmm, dbHMM[hmm]]))
             
             tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
             if key not in hmm_tsvs:
@@ -791,20 +839,22 @@ Example:
             shutil.copy(table, Path(report_path, sample, f'{name}_rollup.tsv'))
 
     # Counts Tables
-    print("Creating Count Tables")
+    print("Merge Count Tables")
     dfCounts = dict()
-    #TODO: dbName: make this adaptable for custom HMMs
-    for dbName in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
+    for dbname,dbpath in dbHMM.items():
         tsv_list = dict()
         for name in hmm_tsv.keys():
-            table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{dbName}.tsv')
+            if dbname.startswith("KOFam"):
+                dbLookup = re.search(r"KOFam_.*_([A-Z]+)", dbname).group(1)
+                dbLookup = dbpath.with_name(f'{dbLookup}.tsv')
+            table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{dbname}.tsv')
             if table_path.exists():
                 name = re.sub(rf'^FragGeneScan_|prodigal_|Protein_', '', name)
                 tsv_list[name] = table_path
-        combined_path = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{dbName}.tsv')
+        combined_path = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{dbname}.tsv')
         metacerberus_parser.merge_tsv(tsv_list, Path(combined_path))
         if combined_path.exists():
-            dfCounts[dbName] = combined_path
+            dfCounts[dbname] = combined_path
         del(combined_path)
 
     # PCA output (HTML)
@@ -840,7 +890,7 @@ Example:
             with rscript.open('w') as writer:
                 writer.write(f"#!/bin/bash\n\n")
                 for name,countpath in dfCounts.items():
-                    if name not in ['FOAM', 'KEGG']:
+                    if not name.startswith("KOFam"):
                         continue
                     shutil.copy(countpath, Path(outpathview, f"{name}_counts.tsv"))
                     shutil.copy(config['CLASS'], Path(outpathview, f"{name}_class.tsv"))
@@ -889,11 +939,10 @@ Example:
     logTime(config["DIR_OUT"], socket.gethostname(), "Total_Time", config["DIR_OUT"], end)
 
     # Cleaning up
-    temp_dir = ray.worker._global_node.get_session_dir()
+    temp_dir = Path(ray.nodes()[0]['ObjectStoreSocketName']).parent.parent
     print("Cleaning up Ray temporary directory", temp_dir)
-    shutil.rmtree(temp_dir)
-
     ray.shutdown()
+    shutil.rmtree(temp_dir)
 
     return 0
 

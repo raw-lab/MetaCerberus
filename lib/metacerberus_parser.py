@@ -10,7 +10,7 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-import os
+import re
 from pathlib import Path
 import pandas as pd
 
@@ -88,7 +88,7 @@ def top5(hmm_tsv:Path, outfile:Path):
     return outfile
 
 
-def parseHmmer(hmm_tsv, config, subdir, dbpath):
+def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
     path = Path(config['DIR_OUT'], subdir)
     path.mkdir(exist_ok=True, parents=True)
 
@@ -96,19 +96,15 @@ def parseHmmer(hmm_tsv, config, subdir, dbpath):
     #if not config['REPLACE'] and done.exists():
     #    print("AH CRAP!!!")
     #    rollup_files = dict()
-    #    for name in ['FOAM', 'KEGG', 'COG', 'CAZy', 'PHROG', 'VOG']:
-    #        outfile = Path(path, f"HMMER_BH_{name}_rollup.tsv")
-    #        if outfile.exists():
-    #            rollup_files[name] = outfile
-    #    return rollup_files
+    #    outfile = Path(path, f"HMMER_BH_{dbname}_rollup.tsv")
+    #    if outfile.exists():
+    #        rollup_files[name] = outfile
+    #        return rollup_files
     #done.unlink(missing_ok=True)
 
 
     minscore = config["MINSCORE"]
 
-    for i in range(1, len(dbpath.suffixes)):
-        dbpath = Path(dbpath.with_suffix(''))
-    dbname = dbpath.name
     top5File = Path(path, f"HMMER-{dbname}_top_5.tsv")
 
 
@@ -172,7 +168,7 @@ def parseHmmer(hmm_tsv, config, subdir, dbpath):
     # Write rollup files to disk
 
     #dbPath = Path(config['PATHDB'])
-    dfRollup = rollup(ID_counts, dbpath, path)
+    dfRollup = rollup(ID_counts, dbname, dbpath, path)
     rollup_files = dict()
     #for name,df in dfRollups.items():
     if len(dfRollup.index) > 1:
@@ -184,11 +180,13 @@ def parseHmmer(hmm_tsv, config, subdir, dbpath):
     return rollup_files
 
 ######### Roll-Up All #########
-def rollup(COUNTS: dict, dbpath: str, outpath: str):
-    for i in range(1, len(dbpath.suffixes)):
+def rollup(COUNTS:dict, dbname:str, dbpath:Path, outpath:str):
+    while(dbpath.suffixes):
         dbpath = Path(dbpath.with_suffix(''))
     dbLookup = dbpath.with_suffix('.tsv')
-    dbname = dbpath.name
+    if dbname.startswith("KOFam"):
+        dbLookup = re.search(r"KOFam_.*_([A-Z]+)", dbname).group(1)
+        dbLookup = dbpath.with_name(f'{dbLookup}.tsv')
 
     dfLookup = pd.read_csv(dbLookup, sep='\t').fillna('')
     dfRollup = pd.DataFrame()

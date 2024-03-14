@@ -66,7 +66,11 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
 
     for i in range(1, len(dbpath.suffixes)):
         dbpath = Path(dbpath.with_suffix(''))
-    dbLookup = dbpath.with_suffix('.tsv').read_text()
+    dbLookup = dbpath.with_suffix('.tsv')
+    match = re.search(r"^KOFam_[a-z]+_([A-Z]+)", hmm_tsv.name)
+    if match:
+        dbLookup = dbpath.with_name(f'{match.group(1)}.tsv')
+    dbLookup = dbLookup.read_text()
 
     BH_target = dict()
     logfile = outfile.with_suffix('.log')

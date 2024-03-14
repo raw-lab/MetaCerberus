@@ -12,73 +12,97 @@ import urllib.request as url
 from pathlib import Path
 
 
+def list_db(pathDB):
+    pathDB = Path(pathDB).absolute()
+    pathDB.mkdir(exist_ok=True, parents=True)
+    db_tsv = Path(pathDB, "databases.tsv")
+    url.urlretrieve("https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/lib/DB/databases.tsv", db_tsv)
+    databases = dict()
+    url_paths = dict()
+    hmm_version = dict()
+    downloaded = dict()
+    incomplete = dict()
+    to_download = dict()
+    with db_tsv.open() as reader:
+        header = reader.readline().split()
+        for line in reader:
+            name,filename,urlpath,date = line.split()
+            if name not in databases:
+                databases[name] = list()
+            databases[name] += [filename]
+
+            if name not in url_paths:
+                url_paths[name] = dict()
+            url_paths[name][filename] = urlpath
+
+            hmm_version[name] = date
+
+    for name,filelist in databases.items():
+        down = True
+        for filename in filelist:
+            filepath = Path(pathDB, filename)
+            if not filepath.exists():
+                down = False
+        if down:
+            downloaded[name] = list()
+            for filename in filelist:
+                filepath = Path(pathDB, filename)
+                downloaded[name] += [filepath]
+        else:
+            to_download[name] = filelist
+    return downloaded, to_download, url_paths, hmm_version
+
+
 # Download Database
-def Download(pathDB):
-    start = 0
-    downloaded = 0
+def download(pathDB, hmms):
+    start = time.time()
     def progress(block, read, size):
         nonlocal start
-        nonlocal downloaded
-        if block == 1:
-            start = 0
-            downloaded = 0
-        downloaded += block*read
+        down = (100*block*read) / size
         if time.time() - start > 10:
             start = time.time()
-
-            print("Progress:", downloaded)
-
-            sz = round(block*read, 2)
-
-            if sz < 2^10:
-                sz = f"{sz} Bytes"
-            elif sz < 2^20:
-                sz = f"{round((sz)/2^10, 2)} Kb"
-            else:
-                sz = f"{round((sz)/2^20, 2)} Mb"
-
-            if size < 2^10:
-                size = f"{sz} Bytes"
-            elif size < 2^20:
-                size = f"{round((size)/2^10, 2)} Kb"
-            else:
-                size = f"{round((size)/2^20, 2)} Mb"
-
-            if size > 0:
-                print("Downloaded", sz, "out of:", size)
-            else:
-                print("Downloaded", sz)
+            print(f"Progress: {round(down,2)}%")
         return
 
     pathDB = Path(pathDB).absolute()
     pathDB.mkdir(exist_ok=True, parents=True)
     print(f"Downloading Database files to {pathDB}")
     print("This will take a few minutes...")
-    url.urlretrieve("https://osf.io/d5m6h/download", Path(pathDB, "FOAM-onto_rel1.tsv"))#, reporthook=progress)
-    url.urlretrieve("https://osf.io/jgk73/download", Path(pathDB, "KEGG-onto_rel1.tsv"))#, reporthook=progress)
+    
+    downloaded,to_download,urls,hmm_version = list_db(pathDB)
+    
+    if not hmms:
+        for name,filelist in to_download.items():
+            for filename,urlpath in urls[name].items():
+                filepath = Path(pathDB, filename)
+                start = time.time()
+                print("Downloading:", filepath)
+                url.urlretrieve(urlpath, filepath, reporthook=progress)
+                print(f"Progress: 100%")
+    else:
+        for hmm in hmms:
+            if hmm in downloaded:
+                print("Database exists, use --update to re-download:", hmm)
+                continue
+            if hmm in to_download:
+                for filename,urlpath in urls[hmm].items():
+                    filepath = Path(pathDB, filename)
+                    start = time.time()
+                    print("Downloading:", filepath)
+                    url.urlretrieve(urlpath, filepath, reporthook=progress)
+                    print(f"Progress: 100%")
+            else:
+                print("Warning: '",hmm, "' not found in HMMs to download.")
+    return
 
-    url.urlretrieve("https://osf.io/cuw94/download", Path(pathDB, "CAZy-onto_rel1.tsv"))#, reporthook=progress)
-    url.urlretrieve("https://osf.io/579bc/download", Path(pathDB, "COG-onto_rel1.tsv"))#, reporthook=progress)
-    url.urlretrieve("https://osf.io/dnc27/download", Path(pathDB, "PHROG-onto_rel1.tsv"))#, reporthook=progress)
-    url.urlretrieve("https://osf.io/pd29f/download", Path(pathDB, "VOG-onto_rel1.tsv"))#, reporthook=progress)
 
-    print("Downloading CAZy")
-    url.urlretrieve("https://osf.io/8bxyj/download", os.path.join(pathDB, "CAZy.hmm.gz"))
-
-    print("Downloading COG")
-    url.urlretrieve("https://osf.io/ncsfx/download", os.path.join(pathDB, "COG-noIter.hmm.gz"))
-
-    print("Downloading PHROG")
-    url.urlretrieve("https://osf.io/5zdnv/download", os.path.join(pathDB, "PHROG.hmm.gz"))
-
-    print("Downloading VOG")
-    url.urlretrieve("https://osf.io/93mhp/download", os.path.join(pathDB, "VOG.hmm.gz"))
-
-    print("Downloading KOFam")
-    url.urlretrieve("https://osf.io/8dse5/download", os.path.join(pathDB, "KOFam_prokaryote.hmm.gz"))
-    url.urlretrieve("https://osf.io/gk7vx/download", os.path.join(pathDB, "KOFam_eukaryote.hmm.gz"))
-    url.urlretrieve("https://osf.io/yga2f/download", os.path.join(pathDB, "KOFam_all.hmm.gz"))
-
+# Update already downloaded databases
+def update(pathDB):
+    downloaded,to_download,urls,hmm_version = list_db(pathDB)
+    for name,filelist in downloaded.items():
+        for filepath in filelist:
+            Path(filepath).unlink()
+    download(pathDB, downloaded.keys())
     return
 
 
@@ -95,7 +119,7 @@ def FGS(pathFGS:os.PathLike):
 
 
 # Remove Database and FGSRS
-def Remove(pathDB, pathFGS):
+def remove(pathDB, pathFGS):
     shutil.rmtree(pathDB, ignore_errors=True)
     shutil.rmtree(os.path.join(pathFGS, "FragGeneScanRS"), ignore_errors=True)
     return
