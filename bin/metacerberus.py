@@ -139,30 +139,42 @@ def main():
     setup_grp.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
 
     # At least one of these options are required
-    required = parser.add_argument_group('''Required arguments
+    input = parser.add_argument_group(f'''Input options
 At least one sequence is required.
-<accepted formats {.fastq .fasta .faa .fna .ffn}>
+<accepted formats [{', '.join(FILES_FASTQ + FILES_FASTA + FILES_AMINO)}]>
 Example:
 > metacerberus.py --prodigal file1.fasta
 > metacerberus.py --config file.config
 *Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
-    required.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
-    required.add_argument('--prodigal', nargs='+', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
-    required.add_argument('--fraggenescan', nargs='+', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
-    required.add_argument('--super', nargs='+', default=[], help='Run sequence in both --prodigal and --fraggenescan modes')
-    required.add_argument('--prodigalgv', nargs='+', default=[], help='Giant virus nucleotide sequence')
-    required.add_argument('--phanotate', nargs='+', default=[], help='Phage sequence')
-    required.add_argument('--protein', '--amino', nargs='+', default=[], help='Protein Amino Acid sequence')
-    required.add_argument('--hmmer-tsv', nargs='+', default=[], help='Annotations tsv file from HMMER (experimental)')
+    input.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
+    input.add_argument('--prodigal', nargs='+', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
+    input.add_argument('--fraggenescan', nargs='+', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
+    input.add_argument('--super', nargs='+', default=[], help='Run sequence in both --prodigal and --fraggenescan modes')
+    input.add_argument('--prodigalgv', nargs='+', default=[], help='Giant virus nucleotide sequence')
+    input.add_argument('--phanotate', nargs='+', default=[], help='Phage sequence')
+    input.add_argument('--protein', '--amino', nargs='+', default=[], help='Protein Amino Acid sequence')
+    input.add_argument('--hmmer-tsv', nargs='+', default=[], help='Annotations tsv file from HMMER (experimental)')
+    input.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
     # Raw-read identification
-    readtype = required.add_mutually_exclusive_group(required=False)
+    readtype = input.add_mutually_exclusive_group(required=False)
     readtype.add_argument('--illumina', action="store_true", help="Specifies that the given FASTQ files are from Illumina")
     readtype.add_argument('--nanopore', action="store_true", help="Specifies that the given FASTQ files are from Nanopore")
     readtype.add_argument('--pacbio', action="store_true", help="Specifies that the given FASTQ files are from PacBio")
+
+    # Output options
+    output = parser.add_argument_group(f'''Output options''')
+    output.add_argument('--dir-out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
+    output.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
+    output.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
+    output.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY (experimental) [system tmp dir]')
+
+    # Database options
+    database = parser.add_argument_group(f'''Database options''')
+    database.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. Use the option --list-db for a list of available databases [KOFam_all]")
+    database.add_argument("--db-path", type=str, default=PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
+
     # optional flags
     optional = parser.add_argument_group('optional arguments')
-#    optional.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
-    optional.add_argument('--dir-out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
     optional.add_argument('--meta', action="store_true", help="Metagenomic nucleotide sequences (for prodigal) [False]")
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
     optional.add_argument('--minscore', type=float, default=60, help="Score cutoff for parsing HMMER results [60]")
@@ -172,14 +184,8 @@ Example:
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
     optional.add_argument('--grouped', action="store_true", help="Group multiple fasta files into a single file before processing. When used with chunker can improve speed")
-    optional.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
-    optional.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
-    optional.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. Use the option --list-db for a list of available databases [KOFam_all]")
-    optional.add_argument("--db-path", type=str, default=PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
-    optional.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
     optional.add_argument('--slurm-nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
     optional.add_argument('--slurm-single', action="store_true", help=argparse.SUPPRESS)# help='Force single node use, do not connect to host')
-    optional.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY (experimental) [system tmp dir]')
     optional.add_argument('--version', '-v', action='version',
                         version=f'MetaCerberus: \n version: {__version__} {__date__}',
                         help='show the version number and exit')
@@ -192,7 +198,6 @@ Example:
     dependencies.add_argument('--qc_seq', type=str, default="default", help="FASTA File containing control sequences for decontamination")
 
     args = parser.parse_args()
-    print(args)
 
     if args.uninstall:
         metacerberus_setup.remove(args.db_path, PATHFGS)
@@ -365,7 +370,7 @@ Example:
             print("Started RAY on cluster")
             config['CLUSTER'] = True
         except:
-            ray.init(num_cpus=config['CPUS'], log_to_driver=True)
+            ray.init(num_cpus=config['CPUS'], log_to_driver=False)
             print("Started RAY single node")
             config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")
@@ -506,16 +511,14 @@ Example:
         for ext in FILES_FASTQ:
             fastqPaired.update( {k:v for k,v in fastq.items() if "R1"+ext in v and v.replace("R1"+ext, "R2"+ext) in fastq.values() } )
         for key,value in fastqPaired.items():
-            print("PAIRED:", key, value)
             reverse = fastq.pop(key.replace("R1", "R2"))
             fastq.pop(key)
             key = key.removesuffix("R1").rstrip('-_')
-            print(key)
+            print("PAIRED:", key, value)
             fastq[key] = metacerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
         del fastqPaired # memory cleanup
         # Trim
         for key,value in fastq.items():
-            print("Trimming:", key, value)
             pipeline.append(rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)]))
 
     # Step 5 Contig Entry Point
@@ -693,12 +696,9 @@ Example:
                         #hmm_key = f"{hmm[0]}-{key}"
                         amino_queue[key] = value
                         if len(amino_queue) >= jobs_per_node:
-                            print("Sending to HMMER:")
                             amino_names = list()
                             for k,v in amino_queue.items():
                                 amino_names += [f"{hmm[0]}-{key}"]
-                                print(k, v)
-                                print(amino_names)
                             pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, amino_names, config['DIR_OUT'],
                                                                     [amino_queue, config, Path(STEP[8]), hmm]))
                             amino_queue = dict()
@@ -767,7 +767,6 @@ Example:
         if func.startswith('filterHMM'):
             hmm,key = key.split('/')
             set_add(step_curr, 9, "STEP 9: Parse HMMER results")
-            print("PARSING:", hmm, key)
             pipeline.append(rayWorkerThread.remote(metacerberus_parser.parseHmmer, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}", hmm, dbHMM[hmm]]))
             
             tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
@@ -792,11 +791,9 @@ Example:
                 pipeline.append(rayWorkerThread.remote(metacerberus_parser.top5s, key, config['DIR_OUT'],
                                                        [hmm_tsvs[key], outfile]))
         if func.startswith('parseHmmer'):
-            print("ROLLUP:", key)
             hmmRollup[key] = value
             pipeline.append(rayWorkerThread.remote(metacerberus_parser.createCountTables, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}"]))
         if func.startswith('createCountTables'):
-            print("COUNT-TABLES:", key)
             hmmCounts[key] = value
 
     # End main pipeline
@@ -821,12 +818,6 @@ Example:
     metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
 
-    #protStats = {}
-    #for key in hmm_tsv.keys():
-    #    protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsv[key], hmmCounts[key], config, Path(report_path, key, 'annotation_summary.tsv'))
-    #metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
-    #del protStats
-
     # Write Roll-up Tables
     print("Creating Rollup Tables")
     for sample,tables in hmmCounts.items():
@@ -839,7 +830,7 @@ Example:
             shutil.copy(table, Path(report_path, sample, f'{name}_rollup.tsv'))
 
     # Counts Tables
-    print("Merge Count Tables")
+    print("Mergeing Count Tables")
     dfCounts = dict()
     for dbname,dbpath in dbHMM.items():
         tsv_list = dict()
@@ -870,44 +861,43 @@ Example:
         metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 
     # Run post processing analysis in R
-    if len(hmm_tsv) < 4:
-        print("NOTE: Pathview created only when there are at least four sequence files.\n")
+    if len(hmm_tsv) < 4 or not config['CLASS']:
+        print("NOTE: Pathview created only when there are at least four sequence files, and a class tsv file is specified with --class specifying the class for each input file.\n")
     else:
-        if config['CLASS']:
-            print("\nSTEP 11: Post Analysis with GAGE and Pathview")
-            outpathview = Path(report_path, 'pathview')
-            outpathview.mkdir(exist_ok=True, parents=True)
-            rscript = Path(outpathview, 'run_pathview.sh')
+        print("\nSTEP 11: Post Analysis with GAGE and Pathview")
+        outpathview = Path(report_path, 'pathview')
+        outpathview.mkdir(exist_ok=True, parents=True)
+        rscript = Path(outpathview, 'run_pathview.sh')
 
-            # Check for internet
-            try:
-                #attempt to connect to Google
-                request.urlopen('http://216.58.195.142', timeout=1)
-                is_internet = True
-            except:
-                is_internet = False
-            
-            with rscript.open('w') as writer:
-                writer.write(f"#!/bin/bash\n\n")
-                for name,countpath in dfCounts.items():
-                    if not name.startswith("KOFam"):
-                        continue
-                    shutil.copy(countpath, Path(outpathview, f"{name}_counts.tsv"))
-                    shutil.copy(config['CLASS'], Path(outpathview, f"{name}_class.tsv"))
-                    writer.write(f"mkdir -p {name}\n")
-                    writer.write(f"cd {name}\n")
-                    writer.write(f"pathview-metacerberus.R ../{name}_counts.tsv ../{name}_class.tsv\n")
-                    writer.write(f"cd ..\n")
-                    outcmd = Path(outpathview, name)
-                    outcmd.mkdir(parents=True, exist_ok=True)
-                    if is_internet:
-                        subprocess.run(['pathview-metacerberus.R', countpath, config['CLASS']],
-                                        cwd=outcmd,
-                                        stdout=Path(outcmd, 'stdout.txt').open('w'),
-                                        stderr=Path(outcmd, 'stderr.txt').open('w')
-                                    )
-            if not is_internet:
-                print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
+        # Check for internet
+        try:
+            #attempt to connect to Google
+            request.urlopen('http://216.58.195.142', timeout=1)
+            is_internet = True
+        except:
+            is_internet = False
+        
+        with rscript.open('w') as writer:
+            writer.write(f"#!/bin/bash\n\n")
+            for name,countpath in dfCounts.items():
+                if not name.startswith("KOFam"):
+                    continue
+                shutil.copy(countpath, Path(outpathview, f"{name}_counts.tsv"))
+                shutil.copy(config['CLASS'], Path(outpathview, f"{name}_class.tsv"))
+                writer.write(f"mkdir -p {name}\n")
+                writer.write(f"cd {name}\n")
+                writer.write(f"pathview-metacerberus.R ../{name}_counts.tsv ../{name}_class.tsv\n")
+                writer.write(f"cd ..\n")
+                outcmd = Path(outpathview, name)
+                outcmd.mkdir(parents=True, exist_ok=True)
+                if is_internet:
+                    subprocess.run(['pathview-metacerberus.R', countpath, config['CLASS']],
+                                    cwd=outcmd,
+                                    stdout=Path(outcmd, 'stdout.txt').open('w'),
+                                    stderr=Path(outcmd, 'stderr.txt').open('w')
+                                )
+        if not is_internet:
+            print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
 
     # Figure outputs (HTML)
     print("Creating combined sunburst and bargraphs")
