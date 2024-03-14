@@ -191,19 +191,19 @@ All pre-formatted databases are present at OSF
 ### Database sources
 
 | Database | Last Update | Version |      Link |
-| -------- | ------- | --- | ------------------------- |
+| ----- | ---- | --- | ----------------------- |
 | KEGG/KOfams | 2024-01-01 | Jan24 |[KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) |
 | COG | 2020 | 2020 |[COG](https://ftp.ncbi.nih.gov/pub/COG/COG2020/data/) |
 | CAZy/dbCAN | 2023-08-02 | 12 |
 [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)|
 | VOG | 2017-03-03 | 80 |
-[VOG](https://vogdb.org/download) |
+[VOG](https://vogdb.org/download)|
 | pVOG | 2016 | 2016 | 
-[pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#) |
+[pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)|
 | PHROG | 2022-06-15 | 4 | 
-[PHROG](https://phrogs.lmge.uca.fr/) |
+[PHROG](https://phrogs.lmge.uca.fr/)|
 | PFAM | 2023-09-12 | 36 | 
-[PFAM](http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release) |
+[PFAM](http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release)|
 
 - NOTE: pfam, eggNOG, MEROPS, GVDB, and FunGene databases are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
 
