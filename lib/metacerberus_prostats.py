@@ -103,7 +103,8 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                 name,EC = ["", ""]
                 if not rows.empty:
                     name = rows.iloc[0].Function
-                    EC = rows.iloc[0].EC
+                    try: EC = rows.iloc[0].EC
+                    except: pass
                 annotate = [query, dbname, name, eval, score, EC]
                 # Individual matches
                 annotations = dict()
@@ -113,7 +114,8 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                     name,EC = ["", ""]
                     if not rows.empty:
                         name = rows.iloc[0].Function
-                        EC = rows.iloc[0].EC
+                        try: EC = rows.iloc[0].EC
+                        except: pass
                     #TODO: Debug this section for sanity...
                     if dbname in annotations and annotations[dbname][0] != query:
                         print("WARNING, db in annotations (score ? merge):", target,dbname,query,eval,score,'|',annotations[dbname][0],annotations[dbname][2],annotations[dbname][3])
