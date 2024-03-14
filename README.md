@@ -194,7 +194,7 @@ All pre-formatted databases are present at OSF
 | ---- | --- | --------|
 | [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) | 2024-01-01 | Jan24 |
 | [FOAM/KOfams](https://osf.io/3uz2j/) | 2017 | 1 | 
-|[COG](https://ftp.ncbi.nih.gov/pub/COG/COG2020/data/) | 2020 | 2020 | 
+|[COG](https://ftp.ncbi.nlm.nih.gov/pub/COG/COG2020/data/) | 2020 | 2020 | 
 | [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)| 2023-08-02 | 12 | 
 |[VOG](https://vogdb.org/download)| 2017-03-03 | 80 |
 | [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)| 2016 | 2016 |
