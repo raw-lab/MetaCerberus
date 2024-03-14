@@ -199,8 +199,17 @@ All pre-formatted databases are present at OSF
 | [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)| 2016 | 2016 |
 |[PHROG](https://phrogs.lmge.uca.fr/)| 2022-06-15 | 4 | 
 | [PFAM](http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release)| 2023-09-12 | 36 | 
+| [TIGRfams](https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/) | 2018-06-19 | 15 |
+| [PGAPfams](https://ftp.ncbi.nlm.nih.gov/hmm/current/) | 2023-12-21 | 14 | 
+| [AMRFinder-fams](https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/) | 2024-02-05 | 2024-02-05 | 
+| [NFixDB](https://github.com/raw-lab/NFixDB) | 2024-01-22 | 2 | 
+| [Pads Arsenal](https://ngdc.cncb.ac.cn/padsarsenal/download.php) | 2019-09-09 | 1 | 
+| [GVDB](https://faylward.github.io/GVDB/) | 2021 | 1 | 
+| [efam-XC](https://datacommons.cyverse.org/browse/iplant/home/shared/iVirus/Zayed_efam_2020.1) | 2021-05-21 | 1 | 
+| [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | 
 
-- NOTE: pfam, eggNOG, MEROPS, GVDB, and FunGene databases are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
+
+- NOTE: eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
 
 ## MetaCerberus Options
 
