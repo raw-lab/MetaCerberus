@@ -139,13 +139,13 @@ def main():
     setup_grp.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
 
     # At least one of these options are required
-    input = parser.add_argument_group(f'''Input options
+    input = parser.add_argument_group(f'''Input files
 At least one sequence is required.
-<accepted formats [{', '.join(FILES_FASTQ + FILES_FASTA + FILES_AMINO)}]>
+    accepted formats: [{', '.join(FILES_FASTQ + FILES_FASTA + FILES_AMINO)}]
 Example:
 > metacerberus.py --prodigal file1.fasta
 > metacerberus.py --config file.config
-*Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.''')
+*Note: If a sequence is given in [{', '.join(FILES_FASTQ)}] format, one of --nanopore, --illumina, or --pacbio is required.''')
     input.add_argument('-c', '--config', help = 'Path to config file, command line takes priority', is_config_file=True)
     input.add_argument('--prodigal', nargs='+', default=[], help='Prokaryote nucleotide sequence (includes microbes, bacteriophage)')
     input.add_argument('--fraggenescan', nargs='+', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
@@ -247,8 +247,6 @@ Example:
                     else:
                         DB_HMM['ALL'] += [Path(args.db_path, filename)]
                     DB_HMM[name] = Path(args.db_path, filename)
-
-    print(DB_HMM['ALL'])
 
     dbHMM = dict()
     if "ALL" in args.hmm:
@@ -514,7 +512,6 @@ Example:
             reverse = fastq.pop(key.replace("R1", "R2"))
             fastq.pop(key)
             key = key.removesuffix("R1").rstrip('-_')
-            print("PAIRED:", key, value)
             fastq[key] = metacerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
         del fastqPaired # memory cleanup
         # Trim
@@ -861,7 +858,10 @@ Example:
         metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 
     # Run post processing analysis in R
-    if len(hmm_tsv) < 4 or not config['CLASS']:
+    print("KOFAMS", [True for x in dfCounts if x.startswith("KOFam")])
+    if not [True for x in dfCounts if x.startswith("KOFam")]:
+        print("NOTE: Pathview created only when KOFams are used since it uses KOs for its analysis.\n")
+    elif len(hmm_tsv) < 4 or not config['CLASS']:
         print("NOTE: Pathview created only when there are at least four sequence files, and a class tsv file is specified with --class specifying the class for each input file.\n")
     else:
         print("\nSTEP 11: Post Analysis with GAGE and Pathview")
