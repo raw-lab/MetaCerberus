@@ -5,9 +5,7 @@ Uses FGS+
 """
 
 from pathlib import Path
-import re
 import subprocess
-import pkg_resources as pkg
 
 
 # Eukaryotic option
@@ -23,7 +21,13 @@ def findORF_fgs(contig, config, subdir):
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    command = f"{config['EXE_FGS']} -p {config['CPUS']} -s {contig} -o {baseOut} -w 1 -t complete"
+    train = "complete"
+    if config['ILLUMINA']:
+         train = "illumina_10"
+    elif config['NANOPORE'] or config['PACBIO']:
+         train = "454_30"
+
+    command = f"{config['EXE_FGS']} -p {config['CPUS']} -s {contig} -o {baseOut} -w 1 -t {train}"
     try:
         with Path(path,"stdout.txt").open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
