@@ -300,7 +300,6 @@ For example (class.tsv):
 | ------- | -------------|
 | 1A      | rhizobium    |
 | 1B      | non-rhizobium|
-| ------- | -------------|
 
 The output is saved under the step_10-visualizeData/combined/pathview folder. Also, at least 4 samples need to be used for this type of analysis.  
   
