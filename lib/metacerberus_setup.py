@@ -67,28 +67,31 @@ def download(pathDB, hmms):
     pathDB = Path(pathDB).absolute()
     pathDB.mkdir(exist_ok=True, parents=True)
     print(f"Downloading Database files to {pathDB}")
-    print("This will take a few minutes...")
     
     downloaded,to_download,urls,hmm_version = list_db(pathDB)
-    
+
     if not hmms:
+        if to_download:
+            print("This may take a few minutes...")
+        else:
+            print("All know databases already downloaded")
         for name,filelist in to_download.items():
             for filename,urlpath in urls[name].items():
                 filepath = Path(pathDB, filename)
                 start = time.time()
-                print("Downloading:", filepath)
+                print("Downloading:", filename)
                 url.urlretrieve(urlpath, filepath, reporthook=progress)
                 print(f"Progress: 100%")
     else:
+        print("This may take a few minutes...")
         for hmm in hmms:
             if hmm in downloaded:
                 print("Database exists, use --update to re-download:", hmm)
-                continue
-            if hmm in to_download:
+            elif hmm in to_download:
                 for filename,urlpath in urls[hmm].items():
                     filepath = Path(pathDB, filename)
                     start = time.time()
-                    print("Downloading:", filepath)
+                    print("Downloading:", filename)
                     url.urlretrieve(urlpath, filepath, reporthook=progress)
                     print(f"Progress: 100%")
             else:
