@@ -1,4 +1,4 @@
-[![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1093/bioinformatics/btac776)
+[![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1093/bioinformatics/btae119)
 [![BioConda Install](https://anaconda.org/bioconda/metacerberus/badges/downloads.svg)](https://anaconda.org/bioconda/metacerberus)
 
 # Welcome to MetaCerberus
