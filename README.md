@@ -1,3 +1,5 @@
+[![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)]([https://doi.org/10.1093/bioinformatics/btac776)
+
 # Welcome to MetaCerberus
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/metacerberus/README.html)
@@ -56,6 +58,7 @@ conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
 metacerberus.py --setup
 ```
+
 
 ## Input formats
 
