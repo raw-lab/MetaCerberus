@@ -172,14 +172,16 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 
 - python >= 3.8
 
-### Available from Bioconda
+### Available from Bioconda - external tool list
 
-- [fastqc](https://github.com/s-andrews/FastQC) 
-- [fastp](https://github.com/OpenGene/fastp>)
-- [porechop](https://github.com/rrwick/Porechop)
-- [bbmap](https://github.com/BioInfoTools/BBMap)
-- [prodigal](https://github.com/hyattpd/Prodigal)
-- [HMMER](https://github.com/EddyRivasLab/hmmer)
+| Tool | Version |  Publication |
+| ---- | -----| ---------|
+| [fastqc](https://github.com/s-andrews/FastQC) | 0.12.1 | None |
+| [fastp](https://github.com/OpenGene/fastp>) | 0.23.4 |  [Chen et al. 2018](https://doi.org/10.1093/bioinformatics/bty560) |
+| [porechop](https://github.com/rrwick/Porechop) | 0.2.4 | None |
+| [bbmap](https://github.com/BioInfoTools/BBMap) | 39.06 | None |
+| [prodigal](https://github.com/hyattpd/Prodigal) | 2.6.3 | [Hyatt et al. 2010](https://doi.org/10.1186/1471-2105-11-119) |
+| [HMMER](https://github.com/EddyRivasLab/hmmer) | 3.4 | [Johnson et al. 2010](https://doi.org/10.1186/1471-2105-11-431) |
 
 - NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
 
@@ -204,10 +206,10 @@ All pre-formatted databases are present at OSF
 | [PGAPfams](https://ftp.ncbi.nlm.nih.gov/hmm/current/) | 2023-12-21 | 14 | [Tatusova et al. 2016]( https://doi.org/10.1093/nar/gkw569) |
 | [AMRFinder-fams](https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/) | 2024-02-05 | 2024-02-05 | [Feldgarden et al. 2021](https://doi.org/10.1038/s41598-021-91456-0) |
 | [NFixDB](https://github.com/raw-lab/NFixDB) | 2024-01-22 | 2 | [Bellanger et al. 2024](https://doi.org/10.1101/2024.03.04.583350) |
-| [Pads Arsenal](https://ngdc.cncb.ac.cn/padsarsenal/download.php) | 2019-09-09 | 1 | |
-| [GVDB](https://faylward.github.io/GVDB/) | 2021 | 1 | |
-| [efam-XC](https://datacommons.cyverse.org/browse/iplant/home/shared/iVirus/Zayed_efam_2020.1) | 2021-05-21 | 1 | |
-| [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | |
+| [Pads Arsenal](https://ngdc.cncb.ac.cn/padsarsenal/download.php) | 2019-09-09 | 1 | [Zhang et al. 2020](https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkz916) |
+| [GVDB](https://faylward.github.io/GVDB/) | 2021 | 1 | [Aylward et al. 2021](https://doi.org/10.1371/journal.pbio.3001430)|
+| [efam-XC](https://datacommons.cyverse.org/browse/iplant/home/shared/iVirus/Zayed_efam_2020.1) | 2021-05-21 | 1 | [Zayed et al. 2021](https://doi.org/10.1093/bioinformatics/btab451) |
+| [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | [Baltoumas et al. 2024](https://doi.org/10.1093/nar/gkad800) |
 
 
 - NOTE: eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
@@ -298,7 +300,7 @@ For example (class.tsv):
 | ------- | -------------|
 | 1A      | rhizobium    |
 | 1B      | non-rhizobium|
-
+| ------- | -------------|
 
 The output is saved under the step_10-visualizeData/combined/pathview folder. Also, at least 4 samples need to be used for this type of analysis.  
   
