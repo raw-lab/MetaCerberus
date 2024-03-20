@@ -373,6 +373,8 @@ Example:
             config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
+    temp_dir = Path(ray.nodes()[0]['ObjectStoreSocketName']).parent.parent
+    print("Ray temporary directory:", temp_dir)
 
 
     startTime = time.time()
@@ -510,12 +512,16 @@ Example:
             fastqPaired.update( {k:v for k,v in fastq.items() if "R1"+ext in v and v.replace("R1"+ext, "R2"+ext) in fastq.values() } )
         for key,value in fastqPaired.items():
             reverse = fastq.pop(key.replace("R1", "R2"))
-            fastq.pop(key)
+            forward = fastq.pop(key)
             key = key.removesuffix("R1").rstrip('-_')
-            fastq[key] = metacerberus_merge.mergePairedEnd([value,reverse], config, f"{STEP[3]}/{key}/merged")
+            #TODO: quick fix, improve for Ray
+            r1,r2 = metacerberus_trim.trimPairedRead([key, [value,reverse]], config, Path(STEP[3], key))
+            value = metacerberus_merge.mergePairedEnd([r1,r2], config, f"{STEP[3]}/{key}/merged")
+            pipeline += [ray.put([key, value, 'trimSingleRead'])]
         del fastqPaired # memory cleanup
         # Trim
         for key,value in fastq.items():
+            print("TRIM:", key, value)
             pipeline.append(rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)]))
 
     # Step 5 Contig Entry Point
