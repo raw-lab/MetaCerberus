@@ -214,11 +214,10 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 | [Porechop](https://github.com/rrwick/Porechop) | 0.2.4 | None |
 | [bbmap](https://github.com/BioInfoTools/BBMap) | 39.06 | None |
 | [Prodigal](https://github.com/hyattpd/Prodigal) | 2.6.3 | [Hyatt et al. 2010](https://doi.org/10.1186/1471-2105-11-119) |
-| [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/) | v1.1.0 | | 
-| [Prodigal-gv](https://github.com/apcamargo/prodigal-gv) | 2.2.1 | | 
+| [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/) | v1.1.0 | [Van der Jeugt et al. 2022](https://doi.org/10.1186/s12859-022-04736-5) | 
+| [Prodigal-gv](https://github.com/apcamargo/prodigal-gv) | 2.2.1 | [Camargo et al. 2023](https://www.nature.com/articles/s41587-023-01953-y) | 
+| [Phanotate](https://github.com/deprekate/PHANOTATE) | 1.5.0 | [McNair et al. 2019](https://doi.org/10.1093/bioinformatics/btz265) | 
 | [HMMER](https://github.com/EddyRivasLab/hmmer) | 3.4 | [Johnson et al. 2010](https://doi.org/10.1186/1471-2105-11-431) |
-
-- NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
 
 ## MetaCerberus databases
 
@@ -247,7 +246,7 @@ All pre-formatted databases are present at OSF
 | [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | [Baltoumas et al. 2024](https://doi.org/10.1093/nar/gkad800) |
 
 
-- NOTE: eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
+- NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes. eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
 
 ## MetaCerberus Options
 
