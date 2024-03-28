@@ -44,6 +44,8 @@ from meta_cerberus import (
 
 ##### Global Variables #####
 
+DEBUG = True
+
 # known file extensions
 FILES_FASTQ = ['.fastq', '.fq']#, '.fastq.gz', '.fq.gz']
 FILES_FASTA = [".fasta", ".fa", ".fna", ".ffn"]
@@ -233,7 +235,8 @@ Example:
         return 0
 
     # HMM Databases
-    DB_HMM = dict(ALL=list())
+    DB_HMM = dict()
+    all = list()
     if Path(PATHDB, "databases.tsv").exists():
         with Path(PATHDB, "databases.tsv").open() as reader:
             header = reader.readline().split()
@@ -242,16 +245,18 @@ Example:
                 if ".hmm" in Path(filename).suffixes:
                     if name == "KOFam":
                         name = Path(filename).with_suffix('').stem
-                        if name == "KOFam_all":
-                            DB_HMM['ALL'] += [Path(args.db_path, filename)]
-                    else:
-                        DB_HMM['ALL'] += [Path(args.db_path, filename)]
+                    #    if name == "KOFam_all":
+                    #        all += [name]
+                    #else:
+                    #    all += [name]
                     DB_HMM[name] = Path(args.db_path, filename)
+                    if "ALL" in args.hmm:
+                        args.hmm += [name]
 
     dbHMM = dict()
-    if "ALL" in args.hmm:
-        args.hmm = DB_HMM['ALL']
-    for hmm in [x.strip(',') for x in args.hmm]:
+    #if "ALL" in args.hmm:
+    #    args.hmm += all
+    for hmm in [x.strip(',') for x in set(args.hmm)]:
         if hmm in DB_HMM:
             if DB_HMM[hmm].exists():
                 if Path(DB_HMM[hmm]).name.startswith("KOFam"):
@@ -356,19 +361,19 @@ Example:
     # Get CPU Count
     if 'CPUS' not in config:
         config['CPUS'] = psutil.cpu_count()
-    
+
     if args.slurm_single:
         # Force single node
-        ray.init(num_cpus=config['CPUS'], log_to_driver=False)
+        ray.init(num_cpus=config['CPUS'], log_to_driver=DEBUG)
         print("Started RAY single node")
         config['CLUSTER'] = False
     else:
         try:
-            ray.init(address='auto', log_to_driver=False)
+            ray.init(address='auto', log_to_driver=DEBUG)
             print("Started RAY on cluster")
             config['CLUSTER'] = True
         except:
-            ray.init(num_cpus=config['CPUS'], log_to_driver=False)
+            ray.init(num_cpus=config['CPUS'], log_to_driver=DEBUG)
             print("Started RAY single node")
             config['CLUSTER'] = False
     print(f"Running RAY on {len(ray.nodes())} node(s)")
@@ -538,7 +543,8 @@ Example:
         set_add(step_curr, 8, "STEP 8: HMMER Search")
         for key,value in amino.items():
             pipeline += [ray.put([key, value, 'findORF_'])]
-            jobsORF += 1
+            for hmm in dbHMM:
+                jobsORF += 1
 
     # Step 9 Rollup Entry Point
     hmm_tsv = dict()
@@ -562,6 +568,7 @@ Example:
     countFiltered = dict()
     hmmRollup = {}
     hmmCounts = {}
+    config['CLUSTER'] = True
     while pipeline:
         ready,pipeline = ray.wait(pipeline, timeout=1)
         if not ready:
@@ -694,19 +701,21 @@ Example:
                                                                 [amino_queue, config, Path(STEP[8]), hmm]))
                         amino_queue = dict()
                 else:
-                    jobsORF -= 1
                     for hmm in dbHMM.items():
-                        #hmm_key = f"{hmm[0]}-{key}"
-                        amino_queue[key] = value
+                        jobsORF -= 1
+                        hmm_key = f"{hmm[0]}/{key}"
+                        amino_queue[hmm_key] = value
+                        print("TESTING", hmm_key, len(amino_queue), jobsORF)
                         if len(amino_queue) >= jobs_per_node:
+                            print("RUNNING:", len(amino_queue), jobsORF)
                             amino_names = list()
                             for k,v in amino_queue.items():
-                                amino_names += [f"{hmm[0]}-{key}"]
-                            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, amino_names, config['DIR_OUT'],
+                                amino_names += [f"{hmm[0]}/{key}"]
+                            pipeline.append(rayWorkerThread.options(num_cpus=0.5).remote(metacerberus_hmm.searchHMM, amino_names, config['DIR_OUT'],
                                                                     [amino_queue, config, Path(STEP[8]), hmm]))
                             amino_queue = dict()
                 # submit remaining searchHMM jobs
-                if len(amino_queue) >= jobs_per_node and jobsORF == 0:
+                if len(amino_queue) >= jobs_per_node or jobsORF <= 0:
                     print("DEBUG: Remaining amino queue", amino_queue)
                     pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
                                                             [amino_queue, config, Path(STEP[8]), hmm]))
@@ -808,15 +817,23 @@ Example:
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
 
-    # Copy report files from QC, Parser
-    for key in hmmRollup.keys():
-        Path(report_path, key).mkdir(0o777, True, True)
-        shutil.copy( os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv"), os.path.join(report_path, key) )
+    ## Copy report files from QC, Parser
+    #for key in hmmRollup.keys():
+    #    Path(report_path, key).mkdir(0o777, True, True)
+    #    src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv")
+    #    dst = os.path.join(report_path, key)
+    #    shutil.copy(src, dst)
 
     # Write Stats
     print("Saving Statistics")
     protStats = {}
     for key in hmm_tsvs.keys():
+        # Copy report files from QC, Parser
+        Path(report_path, key).mkdir(0o777, True, True)
+        src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv")
+        dst = os.path.join(report_path, key)
+        shutil.copy(src, dst)
+        # Protein statistics & annotation summary
         protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, Path(report_path, key, 'annotation_summary.tsv'))
     metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
@@ -864,6 +881,7 @@ Example:
         metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 
     # Run post processing analysis in R
+    print("KOFAMS", [x for x in dfCounts if x.startswith("KOFam")])
     print("KOFAMS", [True for x in dfCounts if x.startswith("KOFam")])
     if not [True for x in dfCounts if x.startswith("KOFam")]:
         print("NOTE: Pathview created only when KOFams are used since it uses KOs for its analysis.\n")
