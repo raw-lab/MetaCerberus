@@ -166,52 +166,53 @@ def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
             ID_counts[ID] += 1
 
     # Write rollup files to disk
-
-    #dbPath = Path(config['PATHDB'])
-    dfRollup = rollup(ID_counts, dbname, dbpath, path)
+    dbRollup = rollup(ID_counts, dbname, dbpath, path)
     rollup_files = dict()
-    #for name,df in dfRollups.items():
-    if len(dfRollup.index) > 1:
-        outfile = Path(path, f"HMMER_BH_{dbname}_rollup.tsv")
-        dfRollup.to_csv(outfile, index=False, header=True, sep='\t')
+    if len(dbRollup) > 1:
+        outfile = Path(path, f"HMMER_BH_{dbname}_rollup2.tsv")
+        with open(outfile, 'w') as writer:
+            for line in dbRollup:
+                print(*line, sep='\t', file=writer)
         rollup_files[dbname] = outfile
 
     #done.touch()
     return rollup_files
 
-######### Roll-Up All #########
+######### Roll-Up #########
 def rollup(COUNTS:dict, dbname:str, dbpath:Path, outpath:str):
     while(dbpath.suffixes):
         dbpath = Path(dbpath.with_suffix(''))
-    dbLookup = dbpath.with_suffix('.tsv')
+    dbpath = dbpath.with_suffix('.tsv')
     if dbname.startswith("KOFam"):
-        dbLookup = re.search(r"KOFam_.*_([A-Z]+)", dbname).group(1)
-        dbLookup = dbpath.with_name(f'{dbLookup}.tsv')
+        match = re.search(r"KOFam_.*_([A-Z]+)", dbname).group(1)
+        dbpath = dbpath.with_name(f'{match}.tsv')
 
-    dfLookup = pd.read_csv(dbLookup, sep='\t').fillna('')
-    dfRollup = pd.DataFrame()
+    dbLookup = dict()
+    with open(dbpath) as reader:
+        cols = reader.readline().rstrip('\n').split('\t')
+        for line in reader:
+            line = line.rstrip('\n').split('\t')
+            ID = line[cols.index('ID')]    
+            if line[cols.index('Function')]:
+                if ID not in dbLookup:
+                    dbLookup[ID] = list()
+                dbLookup[ID] += [line]
+
+    dbRollup = [cols+['Count']]
     count_file = Path(outpath, f'counts_{dbname}.tsv')
-    errfile = Path(outpath, 'lookup.err')
-
-    with count_file.open('w') as count_writer, errfile.open('w') as errlog:
+    with count_file.open('w') as count_writer, Path(outpath, 'lookup.err').open('w') as errlog:
         print('ID', 'count', sep='\t', file=count_writer)
         for ID,count in sorted(COUNTS.items()):
-            found = False
-            rows = pd.DataFrame(dfLookup[dfLookup.ID==ID])
-            if not rows.empty:
-                found = True
-                rows.drop(rows[rows['Function']==''].index, inplace=True)
-                if rows.empty:
-                    print("WARNING:'", ID, "'Does not have a 'Function' in the Lookup File:", dbname, file=errlog)
-                    continue
+            if ID in dbLookup:
+                rows:list = dbLookup[ID]
                 print(ID, count, sep='\t', file=count_writer)
-                rows['Count'] = count
-                dfRollup = pd.concat([dfRollup,rows])
-            if not found:
-                print("WARNING:'", ID, "'not found in any Lookup File", file=errlog)
+                for row in rows:
+                    dbRollup += [row+[count]]
+            else:
+                print("WARNING:'", ID, "'not found in any Lookup File, or does not have a 'Function'", file=errlog)
                 continue
     
-    return dfRollup
+    return dbRollup
 
 
 ########## Counts Table #########

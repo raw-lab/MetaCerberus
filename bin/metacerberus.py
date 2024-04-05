@@ -245,17 +245,13 @@ Example:
                 if ".hmm" in Path(filename).suffixes:
                     if name == "KOFam":
                         name = Path(filename).with_suffix('').stem
-                    #    if name == "KOFam_all":
-                    #        all += [name]
-                    #else:
-                    #    all += [name]
-                    DB_HMM[name] = Path(args.db_path, filename)
-                    if "ALL" in args.hmm:
+                        if name == "KOFam_all" and "ALL" in args.hmm:
+                            args.hmm += [name]
+                    elif "ALL" in args.hmm:
                         args.hmm += [name]
+                    DB_HMM[name] = Path(args.db_path, filename)
 
     dbHMM = dict()
-    #if "ALL" in args.hmm:
-    #    args.hmm += all
     for hmm in [x.strip(',') for x in set(args.hmm)]:
         if hmm in DB_HMM:
             if DB_HMM[hmm].exists():
@@ -490,6 +486,7 @@ Example:
     print(f"Processing {len(rollup)} rollup files")
 
     if len(fastq) > 0:
+        config['META'] = True
         if not any([args.illumina, args.nanopore, args.pacbio]):
             parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
         else:
@@ -560,15 +557,18 @@ Example:
     NStats = dict()
     readStats = dict()
     report_path = os.path.join(config['DIR_OUT'], STEP[10])
+    final_path = Path(config['DIR_OUT'], "final")
 
     groupIndex = dict()
     amino_queue = dict()
-    jobs_per_node = int(-(config["CPUS"] // -4))
     dictChunks = dict()
     countFiltered = dict()
     hmmRollup = {}
     hmmCounts = {}
-    config['CLUSTER'] = True
+    if config['CLUSTER']:
+        jobs_per_node = 4/config['CPUS']
+    else:
+        jobs_per_node = 4
     while pipeline:
         ready,pipeline = ray.wait(pipeline, timeout=1)
         if not ready:
@@ -657,69 +657,28 @@ Example:
             set_add(step_curr, 8, "STEP 8: HMMER Search")
             if value: # TODO: Put this check at top of "findORF_" block
                 amino[key] = value
-                if not config['CLUSTER']:
-                    if config['CHUNKER'] > 0:
-                        chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
-                        for hmm in dbHMM.items():
-                            chunkCount = 1
-                            for chunk in chunks.files:
-                                key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
-                                key_name = f'chunk-{chunkCount}-{len(chunks.files)}_{key}'
-                                chunkCount += 1
-                                pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
-                                                                                        [{key_name:chunk}, config, Path(STEP[8], key), hmm, 4]))
-                    else:
-                        outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
-                        if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
-                            for hmm in dbHMM.items():
-                                hmm_key = f"{hmm[0]}/{key}"
-                                pipeline.append(rayWorkerThread.options(num_cpus=4).remote(metacerberus_hmm.searchHMM, [hmm_key], config['DIR_OUT'],
-                                                                        [{key:value}, config, Path(STEP[8]), hmm, 4]))
-                        else:
-                            #TODO: distinguish filtered tsv per hmm
-                            tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                            set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                            pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
-
-                    continue
                 if config['CHUNKER'] > 0:
                     chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
-                    jobsORF -= 1
                     for hmm in dbHMM.items():
                         chunkCount = 1
                         for chunk in chunks.files:
-                            amino_queue[f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'] = chunk
+                            key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
+                            key_name = f'chunk-{chunkCount}-{len(chunks.files)}_{key}'
                             chunkCount += 1
-                            # submit searchHMM jobs
-                            if len(amino_queue) >= jobs_per_node:
-                                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
-                                                                    [amino_queue, config, Path(STEP[8]), hmm]))
-                                amino_queue = dict()
-                    if len(amino_queue) > 0:
-                        # Leftover chunks in queue not submited yet
-                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
-                                                                [amino_queue, config, Path(STEP[8]), hmm]))
-                        amino_queue = dict()
+                            pipeline.append(rayWorkerThread.options(num_cpus=jobs_per_node).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
+                                                                                    [{key_name:chunk}, config, Path(STEP[8], key), hmm, 4]))
                 else:
-                    for hmm in dbHMM.items():
-                        jobsORF -= 1
-                        hmm_key = f"{hmm[0]}/{key}"
-                        amino_queue[hmm_key] = value
-                        print("TESTING", hmm_key, len(amino_queue), jobsORF)
-                        if len(amino_queue) >= jobs_per_node:
-                            print("RUNNING:", len(amino_queue), jobsORF)
-                            amino_names = list()
-                            for k,v in amino_queue.items():
-                                amino_names += [f"{hmm[0]}/{key}"]
-                            pipeline.append(rayWorkerThread.options(num_cpus=0.5).remote(metacerberus_hmm.searchHMM, amino_names, config['DIR_OUT'],
-                                                                    [amino_queue, config, Path(STEP[8]), hmm]))
-                            amino_queue = dict()
-                # submit remaining searchHMM jobs
-                if len(amino_queue) >= jobs_per_node or jobsORF <= 0:
-                    print("DEBUG: Remaining amino queue", amino_queue)
-                    pipeline.append(rayWorkerThread.remote(metacerberus_hmm.searchHMM, list(amino_queue.keys()), config['DIR_OUT'],
-                                                            [amino_queue, config, Path(STEP[8]), hmm]))
-                    amino_queue = dict()
+                    outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
+                    if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
+                        for hmm in dbHMM.items():
+                            hmm_key = f"{hmm[0]}/{key}"
+                            pipeline.append(rayWorkerThread.options(num_cpus=jobs_per_node).remote(metacerberus_hmm.searchHMM, [hmm_key], config['DIR_OUT'],
+                                                                    [{key:value}, config, Path(STEP[8]), hmm, 4]))
+                    else:
+                        #TODO: distinguish filtered tsv per hmm
+                        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+                        set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
+                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
         if func.startswith('searchHMM'):
             keys = key
             for key,tsv_file in zip(keys,value):
@@ -803,7 +762,9 @@ Example:
                 pipeline.append(rayWorkerThread.remote(metacerberus_parser.top5s, key, config['DIR_OUT'],
                                                        [hmm_tsvs[key], outfile]))
         if func.startswith('parseHmmer'):
-            hmmRollup[key] = value
+            if key not in hmmRollup:
+                hmmRollup[key] = dict()
+            hmmRollup[key].update(value)
             pipeline.append(rayWorkerThread.remote(metacerberus_parser.createCountTables, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}"]))
         if func.startswith('createCountTables'):
             hmmCounts[key] = value
@@ -825,16 +786,18 @@ Example:
     #    shutil.copy(src, dst)
 
     # Write Stats
+    Path(final_path, "fasta").mkdir(0o777, True, True)
     print("Saving Statistics")
     protStats = {}
     for key in hmm_tsvs.keys():
         # Copy report files from QC, Parser
         Path(report_path, key).mkdir(0o777, True, True)
+        Path(final_path, key).mkdir(0o777, True, True)
         src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv")
-        dst = os.path.join(report_path, key)
+        dst = Path(final_path, key)
         shutil.copy(src, dst)
         # Protein statistics & annotation summary
-        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, Path(report_path, key, 'annotation_summary.tsv'))
+        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, Path(final_path, key, 'final_annotation_summary.tsv'), Path(final_path, "fasta", f"{key}.faa"))
     metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
 
@@ -847,7 +810,7 @@ Example:
     for sample,tables in hmmRollup.items():
         os.makedirs(f"{report_path}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            shutil.copy(table, Path(report_path, sample, f'{name}_rollup.tsv'))
+            shutil.copy(table, Path(final_path, sample, f'rollup_{name}.tsv'))
 
     # Counts Tables
     print("Mergeing Count Tables")
@@ -881,8 +844,6 @@ Example:
         metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 
     # Run post processing analysis in R
-    print("KOFAMS", [x for x in dfCounts if x.startswith("KOFam")])
-    print("KOFAMS", [True for x in dfCounts if x.startswith("KOFam")])
     if not [True for x in dfCounts if x.startswith("KOFam")]:
         print("NOTE: Pathview created only when KOFams are used since it uses KOs for its analysis.\n")
     elif len(hmm_tsv) < 4 or not config['CLASS']:
