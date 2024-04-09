@@ -767,7 +767,9 @@ Example:
             hmmRollup[key].update(value)
             pipeline.append(rayWorkerThread.remote(metacerberus_parser.createCountTables, key, config['DIR_OUT'], [value, config, f"{STEP[9]}/{key}"]))
         if func.startswith('createCountTables'):
-            hmmCounts[key] = value
+            if key not in hmmCounts:
+                hmmCounts[key] = dict()
+            hmmCounts[key].update(value)
 
     # End main pipeline
 
@@ -787,7 +789,7 @@ Example:
 
     # Write Stats
     Path(final_path, "fasta").mkdir(0o777, True, True)
-    print("Saving Statistics")
+    print("Creating final reports and statistics")
     protStats = {}
     for key in hmm_tsvs.keys():
         # Copy report files from QC, Parser
@@ -797,7 +799,48 @@ Example:
         dst = Path(final_path, key)
         shutil.copy(src, dst)
         # Protein statistics & annotation summary
-        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, Path(final_path, key, 'final_annotation_summary.tsv'), Path(final_path, "fasta", f"{key}.faa"))
+        summary = Path(final_path, key, 'final_annotation_summary.tsv')
+        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary, Path(final_path, "fasta", f"{key}.faa"))
+        # Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
+        gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
+        Path(final_path, "gff").mkdir(511, True, True)
+        if len(gff) == 1:
+            gff = gff[0]
+            print("GFF:", gff)
+            out_gff = Path(final_path, "gff", f"{key}.gff")
+            with out_gff.open('w') as writer:
+                with open(gff) as read_gff, summary.open() as read_summary:
+                    read_summary.readline()
+                    for line in read_gff:
+                        if line.startswith('#'):
+                            writer.write(line)
+                        else:
+                            data = line.split('\t')[0:8]
+                            summ = read_summary.readline().split('\t')
+                            attributes = ';'.join([f"ID={summ[0]}", f"Name={summ[1]}", f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}", f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"])
+                            print(*data, attributes, sep='\t', file=writer)
+                print("##FASTA", file=writer)
+                with open(fasta[key]) as read_fasta:
+                    for line in read_fasta:
+                        writer.write(line)
+        else:
+            print("GFF", "NONE")
+            out_gff = Path(final_path, "gff", f"{key}.gff")
+            with out_gff.open('w') as writer:
+                with summary.open() as read_summary:
+                    read_summary.readline()
+                    print("##gff-version  3", file=writer)
+                    for summ in read_summary:
+                        summ = summ.split('\t')
+                        data = [summ[0].split('_')[0], ".", ".", ".", ".", ".", ".", ".", ]
+                        attributes = ';'.join([f"ID={summ[0]}", f"Name={summ[1]}", f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}", f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"])
+                        print(*data, attributes, sep='\t', file=writer)
+                try:
+                    with open(fasta[key]) as read_fasta:
+                        print("##FASTA", file=writer)
+                        for line in read_fasta:
+                            writer.write(line)
+                except: pass
     metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
 
@@ -889,7 +932,7 @@ Example:
     figSunburst = {}
     for key,value in hmmCounts.items():
         figSunburst[key] = metacerberus_visual.graphSunburst(value)
-    
+
     #@ray.remote
     #def graphCharts(key, rollup, counts):
     #    return key, metacerberus_visual.graphBarcharts(rollup, counts)
