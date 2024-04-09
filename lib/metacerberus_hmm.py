@@ -117,8 +117,6 @@ def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
                             elif e_value == match[1]:
                                 if score > match[2]:
                                     BH_target[target][c] = item
-                        if not overlap:
-                            print("NO OVERLAP:", overlap_len, file=logger)
                 if add or not overlap:
                     # Equal score OR Dual domain
                     BH_target[target] += [item]
