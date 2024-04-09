@@ -137,16 +137,19 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                     else:
                         print("WARNING, query not in lookup:", target, dbname, query)
                     #TODO: Debug this section for sanity...
-                    if dbname in annotations and annotations[dbname][1] != query:
-                        print("NOTE, multi-domain:", target,dbname,query,eval,score,'|',annotations[dbname][1],annotations[dbname][2],annotations[dbname][3])
-                        annotations[dbname][0] += f" | {name}"
-                        annotations[dbname][1] += f" | {query}"
-                    else:
+                    annotation = [name, query, eval, score, EC, gene, start, end, end-start, length]
+                    print(target, *annotation, sep='\t', file=hmmFiles[dbname])
+                    if dbname not in annotations:
                         annotations[dbname] = [name, query, eval, score, EC, gene, start, end, end-start, length]
+                    elif annotations[dbname][1] != query:
+                        print("NOTE, multi-domain:", target,dbname,query,eval,score,'|',annotations[dbname][1],annotations[dbname][2],annotations[dbname][3])
+
+                    #if dbname in annotations and annotations[dbname][1] != query:
+                    #    print("NOTE, multi-domain:", target,dbname,query,eval,score,'|',annotations[dbname][1],annotations[dbname][2],annotations[dbname][3])
+                    #else:
+                    #    annotations[dbname] = [name, query, eval, score, EC, gene, start, end, end-start, length]
                 for dbname in dbhmms.keys():
-                    if dbname in annotations:
-                        print(target, *annotations[dbname], sep='\t', file=hmmFiles[dbname])
-                    else:
+                    if dbname not in annotations:
                         print(target, "Hypothetical", *empty[1:], sep='\t', file=hmmFiles[dbname])
             else:
                 print(target, "Hypothetical", *empty, sep='\t', file=writer)
