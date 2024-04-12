@@ -225,24 +225,26 @@ All pre-formatted databases are present at OSF
 
 ### Database sources
 
-| Database | Last Update | Version |  Publication |
-| ---- | --- | --------| -----|
-| [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) | 2024-01-01 | Jan24 | [Aramaki et al. 2020](https://doi.org/10.1093/bioinformatics/btz859) |
-| [FOAM/KOfams](https://osf.io/3uz2j/) | 2017 | 1 | [Prestat et al. 2014](https://doi.org/10.1093/nar/gku702) |
-| [COG](https://ftp.ncbi.nlm.nih.gov/pub/COG/COG2020/data/) | 2020 | 2020 | [Galperin et al. 2020](https://doi.org/10.1093/nar/gkaa1018) |
-| [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)| 2023-08-02 | 12 | [Yin et al., 2012](https://doi.org/10.1093/nar/gks479) |
-| [VOG](https://vogdb.org/download)| 2017-03-03 | 80 | [Website](https://vogdb.org/) |
-| [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)| 2016 | 2016 | [Grazziotin et al. 2017](https://doi.org/10.1093/nar/gkw975) |
-| [PHROG](https://phrogs.lmge.uca.fr/)| 2022-06-15 | 4 | [Terizan et al., 2021](https://doi.org/10.1093/nargab/lqab067) |
-| [PFAM](http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release)| 2023-09-12 | 36 | [Mistry et al. 2020](https://doi.org/10.1093/nar/gkaa913) |
-| [TIGRfams](https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/) | 2018-06-19 | 15 | [Haft et al. 2003](https://doi.org/10.1093/nar/gkg128) |
-| [PGAPfams](https://ftp.ncbi.nlm.nih.gov/hmm/current/) | 2023-12-21 | 14 | [Tatusova et al. 2016]( https://doi.org/10.1093/nar/gkw569) |
-| [AMRFinder-fams](https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/) | 2024-02-05 | 2024-02-05 | [Feldgarden et al. 2021](https://doi.org/10.1038/s41598-021-91456-0) |
-| [NFixDB](https://github.com/raw-lab/NFixDB) | 2024-01-22 | 2 | [Bellanger et al. 2024](https://doi.org/10.1101/2024.03.04.583350) |
-| [Pads Arsenal](https://ngdc.cncb.ac.cn/padsarsenal/download.php) | 2019-09-09 | 1 | [Zhang et al. 2020](https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkz916) |
-| [GVDB](https://faylward.github.io/GVDB/) | 2021 | 1 | [Aylward et al. 2021](https://doi.org/10.1371/journal.pbio.3001430)|
-| [efam-XC](https://datacommons.cyverse.org/browse/iplant/home/shared/iVirus/Zayed_efam_2020.1) | 2021-05-21 | 1 | [Zayed et al. 2021](https://doi.org/10.1093/bioinformatics/btab451) |
-| [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | [Baltoumas et al. 2024](https://doi.org/10.1093/nar/gkad800) |
+| Database | Last Update | Version |  Publication | Added Version of MetaCerberus |
+| ---- | --- | --------| -----| ---|
+| [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) | 2024-01-01 | Jan24 | [Aramaki et al. 2020](https://doi.org/10.1093/bioinformatics/btz859) | beta |
+| [FOAM/KOfams](https://osf.io/3uz2j/) | 2017 | 1 | [Prestat et al. 2014](https://doi.org/10.1093/nar/gku702) | beta |
+| [COG](https://ftp.ncbi.nlm.nih.gov/pub/COG/COG2020/data/) | 2020 | 2020 | [Galperin et al. 2020](https://doi.org/10.1093/nar/gkaa1018) | beta |
+| [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)| 2023-08-02 | 12 | [Yin et al., 2012](https://doi.org/10.1093/nar/gks479) | beta |
+| [VOG](https://vogdb.org/download)| 2017-03-03 | 80 | [Website](https://vogdb.org/) | beta |
+| [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)| 2016 | 2016 | [Grazziotin et al. 2017](https://doi.org/10.1093/nar/gkw975) | 1.2 |
+| [PHROG](https://phrogs.lmge.uca.fr/)| 2022-06-15 | 4 | [Terizan et al., 2021](https://doi.org/10.1093/nargab/lqab067) | 1.2 |
+| [PFAM](http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release)| 2023-09-12 | 36 | [Mistry et al. 2020](https://doi.org/10.1093/nar/gkaa913) | 1.3 |
+| [TIGRfams](https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/) | 2018-06-19 | 15 | [Haft et al. 2003](https://doi.org/10.1093/nar/gkg128) | 1.3 |
+| [PGAPfams](https://ftp.ncbi.nlm.nih.gov/hmm/current/) | 2023-12-21 | 14 | [Tatusova et al. 2016]( https://doi.org/10.1093/nar/gkw569) | 1.3 |
+| [AMRFinder-fams](https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/) | 2024-02-05 | 2024-02-05 | [Feldgarden et al. 2021](https://doi.org/10.1038/s41598-021-91456-0) | 1.3 |
+| [NFixDB](https://github.com/raw-lab/NFixDB) | 2024-01-22 | 2 | [Bellanger et al. 2024](https://doi.org/10.1101/2024.03.04.583350) | 1.3 |
+| [GVDB](https://faylward.github.io/GVDB/) | 2021 | 1 | [Aylward et al. 2021](https://doi.org/10.1371/journal.pbio.3001430)| 1.3 |
+| [Pads Arsenal](https://ngdc.cncb.ac.cn/padsarsenal/download.php) | 2019-09-09 | 1 | [Zhang et al. 2020](https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkz916) | Coming soon |
+| [efam-XC](https://datacommons.cyverse.org/browse/iplant/home/shared/iVirus/Zayed_efam_2020.1) | 2021-05-21 | 1 | [Zayed et al. 2021](https://doi.org/10.1093/bioinformatics/btab451) | Coming soon |
+| [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | [Baltoumas et al. 2024](https://doi.org/10.1093/nar/gkad800) | Coming soon |
+| [MEROPS](https://www.ebi.ac.uk/merops/download_list.shtml) | 2017 | 1 | [Rawlings et al. 2018](https://academic.oup.com/nar/article/46/D1/D624/4626772) | Coming soon |
+
 
 
 - NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes. eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
