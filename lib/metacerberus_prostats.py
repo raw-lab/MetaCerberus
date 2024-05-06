@@ -136,22 +136,18 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                         except: pass
                     else:
                         print("WARNING, query not in lookup:", target, dbname, query)
-                    #TODO: Debug this section for sanity...
+                    # add match to corresponding file
                     annotation = [name, query, eval, score, EC, gene, start, end, end-start, length]
                     print(target, *annotation, sep='\t', file=hmmFiles[dbname])
+                    # keep track of db names with matches
                     if dbname not in annotations:
                         annotations[dbname] = [name, query, eval, score, EC, gene, start, end, end-start, length]
-                    elif annotations[dbname][1] != query:
-                        print("NOTE, multi-domain:", target,dbname,query,eval,score,'|',annotations[dbname][1],annotations[dbname][2],annotations[dbname][3])
-
-                    #if dbname in annotations and annotations[dbname][1] != query:
-                    #    print("NOTE, multi-domain:", target,dbname,query,eval,score,'|',annotations[dbname][1],annotations[dbname][2],annotations[dbname][3])
-                    #else:
-                    #    annotations[dbname] = [name, query, eval, score, EC, gene, start, end, end-start, length]
+                # if db name wasn't in a match, mark target as hypothetical for that db
                 for dbname in dbhmms.keys():
                     if dbname not in annotations:
                         print(target, "Hypothetical", *empty[1:], sep='\t', file=hmmFiles[dbname])
             else:
+                # no match found for target, mark in all files as hypothetical
                 print(target, "Hypothetical", *empty, sep='\t', file=writer)
                 for dbname in dbhmms.keys():
                     print(target, "Hypothetical", *empty[1:], sep='\t', file=hmmFiles[dbname])
