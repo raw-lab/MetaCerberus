@@ -805,24 +805,9 @@ Example:
         gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
         Path(final_path, "gff").mkdir(511, True, True)
         if len(gff) == 1:
-            gff = gff[0]
-            print("GFF:", gff)
             out_gff = Path(final_path, "gff", f"{key}.gff")
-            with out_gff.open('w') as writer:
-                with open(gff) as read_gff, summary.open() as read_summary:
-                    read_summary.readline()
-                    for line in read_gff:
-                        if line.startswith('#'):
-                            writer.write(line)
-                        else:
-                            data = line.split('\t')[0:8]
-                            summ = read_summary.readline().split('\t')
-                            attributes = ';'.join([f"ID={summ[0]}", f"Name={summ[1]}", f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}", f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"])
-                            print(*data, attributes, sep='\t', file=writer)
-                print("##FASTA", file=writer)
-                with open(fasta[key]) as read_fasta:
-                    for line in read_fasta:
-                        writer.write(line)
+            out_genbank = Path(final_path, f"{key}_template.gbk")
+            metacerberus_report.write_datafiles(gff[0], fasta[key], amino[key], summary, out_gff, out_genbank)
         else:
             print("GFF", "NONE")
             out_gff = Path(final_path, "gff", f"{key}.gff")

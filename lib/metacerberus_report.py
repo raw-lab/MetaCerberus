@@ -362,3 +362,107 @@ def write_HTML_files(outfile, figure, sample, name):
     with open(outfile, 'w') as writer:
         writer.write(doc.render())
     return
+
+
+# Save Annotated GFF and GenBank files
+#TODO: Add embl, gtf(simplified gff??)
+def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path, out_genbank:Path):
+    gff_data = dict()
+    with out_gff.open('w') as writer_gff:
+        with open(gff) as read_gff, summary.open() as read_summary:
+            read_summary.readline()
+            for line in read_gff:
+                if line.startswith('#'):
+                    writer_gff.write(line)
+                else:
+                    data = line.split('\t')[0:8]
+                    summ = read_summary.readline().split('\t')
+                    attributes = [f"ID={summ[0]}", f"Name={summ[1]}",
+                                        f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}",
+                                        f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"]
+                    print(*data, ';'.join(attributes), sep='\t', file=writer_gff)
+                    if data[0] not in gff_data:
+                        gff_data[data[0]] = list()
+                    att = dict()
+                    for a in attributes:
+                        a = a.split('=')
+                        att[a[0]] = a[1]
+                    gff_data[data[0]] += [data + [att]]
+        # Write contigs to end of GFF (ROARY compatible)
+        # Create GENBANK template
+        print("##FASTA", file=writer_gff)
+        with open(fasta) as read_fasta, out_genbank.open('w') as writer_gbk:
+            locus = False
+            line = read_fasta.readline()
+            while line:
+                if line.startswith(">"):
+                    writer_gff.write(line)
+                    locus = line.strip()[1:]
+                    print(f"{'LOCUS':<12}{locus}", file=writer_gbk)
+                    print(f"{'DEFINITION':<12}", file=writer_gbk)
+                    print(f"{'ACCESSION':<12}", file=writer_gbk)
+                    print(f"{'VERSION':<12}", file=writer_gbk)
+                    print(f"{'KEYWORDS':<12}", file=writer_gbk)
+                    print(f"{'SOURCE':<12}", file=writer_gbk)
+                    print(f"{'  ORGANISM':<12}", file=writer_gbk)
+                    print(f"{'REFERENCE':<12}1", file=writer_gbk)
+                    print(f"{'  AUTHORS':<12}", file=writer_gbk)
+                    print(f"{'  TITLE':<12}", file=writer_gbk)
+                    print(f"{'  JOURNAL':<12}", file=writer_gbk)
+                    print(f"{'  PUBMED':<12}", file=writer_gbk)
+                    print(f"{'COMMENT':<12}", file=writer_gbk)
+                    print(f"{'FEATURES':<21}Location/Qualifiers", file=writer_gbk)
+                    seq = list()
+                    line = read_fasta.readline()
+                    while line:
+                        if line.startswith(">"):
+                            break
+                        writer_gff.write(line)
+                        seq += [line.strip()]
+                        line = read_fasta.readline()
+                    seq = "".join(seq)
+                    locus = locus.split()[0]
+                    print(f'{"     source":<21}{f"1..{len(seq)}"}', file=writer_gbk)
+                    print(f'{"":<21}/organism=""', file=writer_gbk)
+                    if locus in gff_data:
+                        for data in gff_data[locus]:
+                            attributes = data[-1]
+                            start = data[3]
+                            end = data[4]
+                            print(f'{"     CDS":<21}{f"{start}..{end}"}', file=writer_gbk)
+                            print(f'{"":<21}/product="{attributes["Name"]}"', file=writer_gbk)
+                            print(f'{"":<21}/db_xref="{attributes["Dbxref"]}"', file=writer_gbk)
+                            translation = f'/translation="'
+                            seq_faa = []
+                            with open(amino) as read_faa:
+                                line_faa = read_faa.readline()
+                                while line_faa:
+                                    if line_faa.startswith(">"):
+                                        if attributes["ID"]  == line_faa.strip().split()[0][1:]:
+                                            line_faa = read_faa.readline()
+                                            while line_faa:
+                                                if line_faa.startswith(">"):
+                                                    break
+                                                seq_faa += [line_faa.strip()]
+                                                line_faa = read_faa.readline()
+                                    if len(seq_faa) > 0:
+                                        break
+                                    line_faa = read_faa.readline()
+                            translation += ''.join(seq_faa + ['"'])
+                            for i in range(0, len(translation), 48):
+                                print(f'{"":<21}{translation[i:i+48]}', file=writer_gbk)
+                    print(f'{"ORIGIN":<12}', file=writer_gbk)
+                    row = list()
+                    start = 1
+                    for s in range(0, len(seq), 10):
+                        row += [seq[s:s+10]]
+                        if len(row) == 6:
+                            print(f'{start:>9} {" ".join(row)}', file=writer_gbk)
+                            row = list()
+                            start += 60
+                    print(f'{start:>9} {" ".join(row)}', file=writer_gbk)
+                    print("//", file=writer_gbk)
+                    continue
+                line = read_fasta.readline()
+
+    return
