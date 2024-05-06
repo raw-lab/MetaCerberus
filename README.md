@@ -1,10 +1,10 @@
 # Welcome to MetaCerberus
-
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/metacerberus/README.html)
+[![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1093/bioinformatics/btae119)
+[![BioConda Install](https://anaconda.org/bioconda/metacerberus/badges/downloads.svg)](https://anaconda.org/bioconda/metacerberus)
 
 ## About
 
-MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy, VOG/pVOG, PHROG, and COG databases via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis. MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
+MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy/dbCAN, VOG, pVOG, PHROG, and COG databases via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis. MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
 
 ![GitHub Logo](https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/metacerberus_logo.jpg)
 
@@ -56,6 +56,24 @@ conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
 metacerberus.py --setup
 ```
+## Brief Overview
+
+<p align="center">
+  <img src="img/Fig1.jpg" alt="MetaCerberus Workflow" height=600>
+</p>
+
+### MetaCerberus has three basic modes: quality control (QC) for raw reads, formatting/gene prediction, and annotation. 
+- MetaCerberus can use three different input files: 1) raw read data from any sequencing platform (Illumina, PacBio, or Oxford Nanopore), 2) assembled contigs, as MAGs, vMAGs, isolate genomes, or a collection of contigs, 3) amino acid fasta (.faa), previously called pORFs.
+- We offer customization, including running all databases together, individually or specifying select databases. For example, if a user wants to run prokaryotic or eukaryotic-specific KOfams, or an individual database alone such as dbCAN, both are easily customized within MetaCerberus.
+- In QC mode, raw reads are quality controlled via FastQC prior and post trim [FastQC](https://github.com/s-andrews/FastQC). Raw reads are then trimmed via data type; if the data is Illumina or PacBio, [fastp](https://doi.org/10.1093/bioinformatics/bty560)  is called, otherwise it assumes the data is Oxford Nanopore then Porechop is utilized [PoreChop](https://github.com/rrwick/Porechop).
+- If Illumina reads are utilized, an optional bbmap step to remove the phiX174 genome is available or user provided contaminate genome. Phage phiX174 is a common contaminant within the Illumina platform as their library spike-in control. We highly recommend this removal if viral analysis is conducted, as it would provide false positives to ssDNA microviruses within a sample.
+- We include a --skip_decon option to skip the filtration of phiX174, which may remove common k-mers that are shared in ssDNA phages.
+- In the formatting and gene prediction stage, contigs and genomes are checked for N repeats. These N repeats are removed by default.
+- We impute contig/genome statistics (e.g., N50, N90, max contig) via our custom module [Metaome Stats](https://github.com/raw-lab/metaome_stats).
+- Contigs can be converted to pORFs using [Prodigal](https://anaconda.org/bioconda/prodigal), [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/), and [Prodigal-gv](https://github.com/apcamargo/prodigal-gv)) as specified by user preference.
+- Scaffold annotation is not recommended due to N's providing ambiguous annotation.
+- Both Prodigal and FragGeneScanRs can be used via our --super option, and we recommend using FragGeneScanRs for samples rich in eukaryotes.
+- FragGeneScanRs found more ORFs and KOs than Prodigal for a stimulated eukaryote rich metagenome. HMMER searches against the above databases via user specified bitscore and e-values or our minimum defaults (i.e., bitscore = 25, e-value = 1 x 10<sup>-9</sup> ).
 
 ## Input formats
 
@@ -75,6 +93,20 @@ metacerberus.py --setup
 - We use Plotly to visualize the data
 - Once the program is executed the html reports with the visuals will be saved to the last step of the pipeline.
 - The HTML files require plotly.js to be present. One has been provided in the package and is saved to the report folder.
+
+## Annotation Rules
+
+<p align="center">
+  <img src="img/Rules.jpg" alt="MetaCerberus Rules" height=600>
+</p>
+
+- ***Rule 1*** is for finding high quality matches across databases. It is a score pre-filtering module for pORFs thresholds: which states that each pORF match to an HMM is recorded by default or a user-selected cut-off (i.e.,  e-value/bit scores) per database independently, or across all default databases (e.g, finding best hit), or per user specification of the selected database.
+- ***Rule 2*** is to avoid missing genes encoding proteins with dual domains that are not overlapping. It is imputed for non-overlapping dual domain module pORF threshold: if two HMM hits are non-overlapping from the same database, both are counted as long as they are within the default or user selected score (i.e., e-value/bit scores).
+- ***Rule 3*** is to ensure overlapping dual domains are not missed. This is the dual independent overlapping domain module for convergent binary domain pORFs. If two domains within a pORF are overlapping <10 amino acids (e.g, COG1 and COG4) then both domains are counted and reported due to the dual domain issue within a single pORF. If a function hits multiple pathways within an accession, both are counted, in pathway roll-up, as many proteins function in multiple pathways.
+- ***Rule 4*** is the equal match counter to avoid missing high quality matches within the same protein. This is an independent accession module for a single pORF: if both hits within the same database have equal values for both e-value and bit score but are different accessions from the same database (e.g., KO1 and KO3) then both are reported.
+- ***Rule 5*** is the ‘winner take all’ match rule for providing the best match. It is computed as the winner takes all module for overlapping pORFs: if two HMM hits are overlapping (>10 amino acids) from the same database the lowest resulting e-value and highest bit score wins.
+- ***Rule 6*** is to avoid partial or fractional hits being counted. This ensures that only whole discrete integer counting (e.g., 0, 1, 2 to n) are computed and that partial or fractional counting is excluded. 
+
 
 ## Quick start examples
 
@@ -172,31 +204,50 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 
 - python >= 3.8
 
-### Available from Bioconda
+### Available from Bioconda - external tool list
 
-- [fastqc](https://github.com/s-andrews/FastQC) 
-- [fastp](https://github.com/OpenGene/fastp>)
-- [porechop](https://github.com/rrwick/Porechop)
-- [bbmap](https://github.com/BioInfoTools/BBMap)
-- [prodigal](https://github.com/hyattpd/Prodigal)
-- [HMMER](https://github.com/EddyRivasLab/hmmer)
-
-- NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes.
+| Tool | Version |  Publication |
+| ---- | -----| ---------|
+| [Fastqc](https://github.com/s-andrews/FastQC) | 0.12.1 | None |
+| [Fastp](https://github.com/OpenGene/fastp>) | 0.23.4 |  [Chen et al. 2018](https://doi.org/10.1093/bioinformatics/bty560) |
+| [Porechop](https://github.com/rrwick/Porechop) | 0.2.4 | None |
+| [bbmap](https://github.com/BioInfoTools/BBMap) | 39.06 | None |
+| [Prodigal](https://github.com/hyattpd/Prodigal) | 2.6.3 | [Hyatt et al. 2010](https://doi.org/10.1186/1471-2105-11-119) |
+| [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/) | v1.1.0 | [Van der Jeugt et al. 2022](https://doi.org/10.1186/s12859-022-04736-5) | 
+| [Prodigal-gv](https://github.com/apcamargo/prodigal-gv) | 2.2.1 | [Camargo et al. 2023](https://www.nature.com/articles/s41587-023-01953-y) | 
+| [Phanotate](https://github.com/deprekate/PHANOTATE) | 1.5.0 | [McNair et al. 2019](https://doi.org/10.1093/bioinformatics/btz265) | 
+| [HMMER](https://github.com/EddyRivasLab/hmmer) | 3.4 | [Johnson et al. 2010](https://doi.org/10.1186/1471-2105-11-431) |
 
 ## MetaCerberus databases
 
 All pre-formatted databases are present at OSF 
 - [OSF](https://osf.io/3uz2j)
 
-### Sources for databases for MetaCerberus
-- [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/)
-- [COG](https://ftp.ncbi.nih.gov/pub/COG/COG2020/data/)
-- [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)
-- [VOG](https://vogdb.org/download)
-- [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)
-- [PHROG](https://phrogs.lmge.uca.fr/)
+### Database sources
 
-- NOTE: pfam, eggNOG, MEROPS, GVDB, and FunGene databases are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
+| Database | Last Update | Version |  Publication | Added Version of MetaCerberus |
+| ---- | --- | --------| -----| ---|
+| [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) | 2024-01-01 | Jan24 | [Aramaki et al. 2020](https://doi.org/10.1093/bioinformatics/btz859) | beta |
+| [FOAM/KOfams](https://osf.io/3uz2j/) | 2017 | 1 | [Prestat et al. 2014](https://doi.org/10.1093/nar/gku702) | beta |
+| [COG](https://ftp.ncbi.nlm.nih.gov/pub/COG/COG2020/data/) | 2020 | 2020 | [Galperin et al. 2020](https://doi.org/10.1093/nar/gkaa1018) | beta |
+| [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)| 2023-08-02 | 12 | [Yin et al., 2012](https://doi.org/10.1093/nar/gks479) | beta |
+| [VOG](https://vogdb.org/download)| 2017-03-03 | 80 | [Website](https://vogdb.org/) | beta |
+| [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)| 2016 | 2016 | [Grazziotin et al. 2017](https://doi.org/10.1093/nar/gkw975) | 1.2 |
+| [PHROG](https://phrogs.lmge.uca.fr/)| 2022-06-15 | 4 | [Terizan et al., 2021](https://doi.org/10.1093/nargab/lqab067) | 1.2 |
+| [PFAM](http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release)| 2023-09-12 | 36 | [Mistry et al. 2020](https://doi.org/10.1093/nar/gkaa913) | 1.3 |
+| [TIGRfams](https://ftp.ncbi.nlm.nih.gov/hmm/TIGRFAMs/release_15.0/) | 2018-06-19 | 15 | [Haft et al. 2003](https://doi.org/10.1093/nar/gkg128) | 1.3 |
+| [PGAPfams](https://ftp.ncbi.nlm.nih.gov/hmm/current/) | 2023-12-21 | 14 | [Tatusova et al. 2016]( https://doi.org/10.1093/nar/gkw569) | 1.3 |
+| [AMRFinder-fams](https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/) | 2024-02-05 | 2024-02-05 | [Feldgarden et al. 2021](https://doi.org/10.1038/s41598-021-91456-0) | 1.3 |
+| [NFixDB](https://github.com/raw-lab/NFixDB) | 2024-01-22 | 2 | [Bellanger et al. 2024](https://doi.org/10.1101/2024.03.04.583350) | 1.3 |
+| [GVDB](https://faylward.github.io/GVDB/) | 2021 | 1 | [Aylward et al. 2021](https://doi.org/10.1371/journal.pbio.3001430)| 1.3 |
+| [Pads Arsenal](https://ngdc.cncb.ac.cn/padsarsenal/download.php) | 2019-09-09 | 1 | [Zhang et al. 2020](https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkz916) | Coming soon |
+| [efam-XC](https://datacommons.cyverse.org/browse/iplant/home/shared/iVirus/Zayed_efam_2020.1) | 2021-05-21 | 1 | [Zayed et al. 2021](https://doi.org/10.1093/bioinformatics/btab451) | Coming soon |
+| [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | [Baltoumas et al. 2024](https://doi.org/10.1093/nar/gkad800) | Coming soon |
+| [MEROPS](https://www.ebi.ac.uk/merops/download_list.shtml) | 2017 | 1 | [Rawlings et al. 2018](https://academic.oup.com/nar/article/46/D1/D624/4626772) | Coming soon |
+
+
+
+- NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes. eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
 
 ## MetaCerberus Options
 
@@ -253,11 +304,39 @@ optional arguments:
 Args that start with '--' (eg. --prodigal) can also be set in a config file (specified via -c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for
 details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override config file values which override defaults.
 ```
+### OUTPUTS (/final folder in 1.3 update)
+
+| File Extension | Description Summary |
+| --------- | ----------- |
+| .gff | coming soon |
+| .gbk | coming soon |
+| .fna | Nucleotide FASTA file of the input contig sequences. |
+| .faa | Protein FASTA file of the translated CDS sequences. |
+| .ffn | coming soon |
+| .sqn | coming soon |
+| .fsa | coming soon |
+| .tbl | coming soon |
+| .err | coming soon |
+| .log | coming soon |
+| .html | Summary statistics and/or visualizations, in step 10 folder|
+| .txt | Statistics relating to the annotated features found. |
+| level.tsv | Various levels of hierachical steps that is tab-separated file from various databases|
+| rollup.tsv | All levels of hierachical steps that is tab-separated file from various databases|
+| .tsv | Final Annotation summary, Tab-separated file of all features from various databases|
 
 ### GAGE / PathView
 
 After processing the HMM files MetaCerberus calculates a KO (KEGG Orthology) counts table from KEGG/FOAM for processing through GAGE and PathView.
-GAGE is recommended for pathway enrichment followed by PathView for visualize the metabolic pathways. A "class" file is required through the --class option to run this analysis. The output is saved under the step_10-visualizeData/combined/pathview folder. Also, at least 4 samples need to be used for this type of analysis.  
+GAGE is recommended for pathway enrichment followed by PathView for visualize the metabolic pathways. A "class" file is required through the --class option to run this analysis. 
+As we are unsure which comparisons you want to make thus you have to make a class.tsv so the code will know the comparisons you want to make. 
+
+For example (class.tsv):
+| Sample  |   Class      |
+| ------- | -------------|
+| 1A      | rhizobium    |
+| 1B      | non-rhizobium|
+
+The output is saved under the step_10-visualizeData/combined/pathview folder. Also, at least 4 samples need to be used for this type of analysis.  
   
 GAGE and PathView also require internet access to be able to download information from a database. MetaCerberus will save a bash script 'run_pathview.sh' in the step_10-visualizeData/combined/pathview directory along with the KO Counts tsv files and the class file for running manualy in case MetaCerberus was run on a cluster without access to the internet.
 
@@ -315,9 +394,17 @@ Both edgeR and DeSeq2 R have the highest sensitivity when compared to other algo
 
 MetaCerberus as a community resource as recently acquired [FunGene](http://fungene.cme.msu.edu/), we welcome contributions of other experts expanding annotation of all domains of life (viruses, bacteria, archaea, eukaryotes).  Please send us an issue on our MetaCerberus GitHub [open an issue](https://github.com/raw-lab/metacerberus/issues); or email us we will fully annotate your genome, add suggested pathways/metabolisms of interest, make custom HMMs to be added to MetaCerberus and FunGene. 
 
+## Copyright  
+This is copyrighted by University of North Carolina at Charlotte, Jose L Figueroa III, Eliza Dhungal, Madeline Bellanger, Cory R Brouwer and Richard Allen White III.  All rights reserved.  MetaCerberus is a bioinformatic tool that can be distributed freely for academic use only. Please contact us for commerical use. The software is provided “as is” and the copyright owners or contributors are not liable for any direct, indirect, incidental, special, or consequential damages including but not limited to, procurement of goods or services, loss of use, data or profits arising in any way out of the use of this software.<br />
+
 ## Citing MetaCerberus
 
 If you are publishing results obtained using MetaCerberus, please cite: <br />
+### Publication
+Figueroa JL, Dhungel E, Bellanger M, Brouwer CR, White III RA. 2024.
+MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. [Bioinformatics](https://doi.org/10.1093/bioinformatics/btae119)  <br />
+
+### Pre-print
 Figueroa JL, Dhungel E, Brouwer CR, White III RA. 2023.  <br />
 MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.08.10.552700v1)   <br />
 
@@ -326,7 +413,7 @@ MetaCerberus: distributed highly parallelized HMM-based processing for robust fu
 The informatics point-of-contact for this project is [Dr. Richard Allen White III](https://github.com/raw-lab).  
 If you have any questions or feedback, please feel free to get in touch by email.  
 [Dr. Richard Allen White III](mailto:rwhit101@uncc.edu)<br /> 
-[Jose Luis Figueroa](mailto:jlfiguer@uncc.edu) <br />
+[Jose Luis Figueroa III](mailto:jlfiguer@uncc.edu) <br />
 Or [open an issue](https://github.com/raw-lab/metacerberus/issues).  
 
 
