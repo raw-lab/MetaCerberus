@@ -9,8 +9,8 @@
 -Update downloaded databases (currently re-downloads the database)
 -List available databases
 -Custom database support
-  -Must supply HMM file with .hmm extension (supports .hmm.gz)
-  -Must also supply a TSV file with minimum columns: ID, Function
+  -HMM file with .hmm extension (also supports .hmm.gz)
+  -A TSV file is also required with minimum columns: ID, Function
   -The ID field must match the NAME field of the HMM file, one row per HMM entry
 -Output files
   -reworked output directories to separate graphs/stats from annotation files
