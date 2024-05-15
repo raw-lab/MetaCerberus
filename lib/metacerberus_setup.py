@@ -16,7 +16,14 @@ def list_db(pathDB):
     pathDB = Path(pathDB).absolute()
     pathDB.mkdir(exist_ok=True, parents=True)
     db_tsv = Path(pathDB, "databases.tsv")
-    url.urlretrieve("https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/lib/DB/databases.tsv", db_tsv)
+    try:
+        url.urlretrieve("https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/lib/DB/databases.tsv", db_tsv)
+    except:
+        print("WARNING: Failed to download database list")
+        if db_tsv.exists():
+            print("Using previously downloaded list")
+        else:
+            return dict(), dict(), dict(), dict()
     databases = dict()
     url_paths = dict()
     hmm_version = dict()
@@ -74,14 +81,18 @@ def download(pathDB, hmms):
         if to_download:
             print("This may take a few minutes...")
         else:
-            print("All know databases already downloaded")
+            print("\nAll know databases already downloaded")
         for name,filelist in to_download.items():
             for filename,urlpath in urls[name].items():
                 filepath = Path(pathDB, filename)
                 start = time.time()
                 print("Downloading:", filename)
-                url.urlretrieve(urlpath, filepath, reporthook=progress)
-                print(f"Progress: 100%")
+                try:
+                    url.urlretrieve(urlpath, filepath, reporthook=progress)
+                except:
+                    print("Failed to download:", name)
+                else:
+                    print(f"Progress: 100%")
     else:
         print("This may take a few minutes...")
         for hmm in hmms:
@@ -92,8 +103,12 @@ def download(pathDB, hmms):
                     filepath = Path(pathDB, filename)
                     start = time.time()
                     print("Downloading:", filename)
-                    url.urlretrieve(urlpath, filepath, reporthook=progress)
-                    print(f"Progress: 100%")
+                    try:
+                        url.urlretrieve(urlpath, filepath, reporthook=progress)
+                    except:
+                        print("Failed to download:", hmm)
+                    else:
+                        print(f"Progress: 100%")
             else:
                 print("Warning: '",hmm, "' not found in HMMs to download.")
     return
