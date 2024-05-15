@@ -805,6 +805,11 @@ Example:
             dst = Path(final_path, "fasta", f"{key}.ffn")
             shutil.copy(src, dst)
         except: pass
+        try:
+            src = Path(fasta[key])
+            dst = Path(final_path, "fasta", f"{key}.fna")
+            shutil.copy(src, dst)
+        except: pass
         # Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
         gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
         Path(final_path, "gff").mkdir(511, True, True)
