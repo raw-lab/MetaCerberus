@@ -165,7 +165,7 @@ Example:
 
     # Output options
     output = parser.add_argument_group(f'''Output options''')
-    output.add_argument('--dir-out', type=str, default='./results-metacerberus', help='path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]')
+    output.add_argument('--dir-out', "--dir_out", type=str, default='./results-metacerberus', help='path to output directory, defaults to "results-metacerberus" in current directory. [./results-metacerberus]')
     output.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     output.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
     output.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY (experimental) [system tmp dir]')

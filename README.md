@@ -306,7 +306,7 @@ Example:
   --pacbio              Specifies that the given FASTQ files are from PacBio
 
 Output options:
-  --dir-out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]
+  --dir-out DIR_OUT     path to output directory, defaults to "results-metacerberus" in current directory. [./results-metacerberus]
   --replace             Flag to replace existing files. [False]
   --keep                Flag to keep temporary files. [False]
   --tmpdir TMPDIR       temp directory for RAY (experimental) [system tmp dir]
