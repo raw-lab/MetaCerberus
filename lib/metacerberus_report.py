@@ -365,10 +365,11 @@ def write_HTML_files(outfile, figure, sample, name):
 
 
 # Save Annotated GFF and GenBank files
-#TODO: Add embl, gtf(simplified gff??)
+#TODO: Add embl
 def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path, out_genbank:Path):
     gff_data = dict()
-    with out_gff.open('w') as writer_gff:
+    with out_gff.open('w') as writer_gff, out_gff.with_suffix(".gtf").open('w') as writer_gtf:
+        print("##gff-version 2", file=writer_gtf)
         with open(gff) as read_gff, summary.open() as read_summary:
             read_summary.readline()
             for line in read_gff:
@@ -381,6 +382,7 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                                         f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}",
                                         f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"]
                     print(*data, ';'.join(attributes), sep='\t', file=writer_gff)
+                    print(*data, ';'.join(attributes), sep='\t', file=writer_gtf)
                     if data[0] not in gff_data:
                         gff_data[data[0]] = list()
                     att = dict()
