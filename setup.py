@@ -50,7 +50,6 @@ setuptools.setup(
             'configargparse',
             'kaleido',
             'scikit-learn',
-            'pandas',
             'plotly',
             'psutil',
             'dominate',
