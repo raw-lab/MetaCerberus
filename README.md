@@ -122,7 +122,7 @@ metacerberus.py --setup
 #### All databases
 ```bash
 conda activate metacerberus
-metacerberus.py --prodigal lambda.fna --hmm KOFam_all, COG, VOG, PHROG, CAZy --dir_out lambda_dir
+metacerberus.py --prodigal lambda.fna --hmm ALL --dir_out lambda_dir
 ```
 
 #### Only KEGG/FOAM all
@@ -149,6 +149,12 @@ conda activate metacerberus
 metacerberus.py --prodigal lambda.fna --hmm VOG, PHROG --dir_out lambda_vir-only_dir
 ```
 - NOTE: You can pick any single database you want for your analysis including KOFam_all, COG, VOG, PHROG, CAZy or specific KO databases for eukaryotes and prokaryotes (KOFam_eukaryote or KOFam_prokaryote).
+
+#### Custom HMM
+```bash
+conda activate metacerberus
+metacerberus.py --prodigal lambda.fna --hmm Custom.hmm --dir_out lambda_vir-only_dir
+```
   
 ### Illumina data
 
@@ -232,7 +238,7 @@ All pre-formatted databases are present at OSF
 
 ### Database sources
 
-| Database | Last Update | Version |  Publication | Added Version of MetaCerberus |
+| Database | Last Update | Version |  Publication | MetaCerberus Update Version |
 | ---- | --- | --------| -----| ---|
 | [KEGG/KOfams](https://www.genome.jp/ftp/db/kofam/) | 2024-01-01 | Jan24 | [Aramaki et al. 2020](https://doi.org/10.1093/bioinformatics/btz859) | beta |
 | [FOAM/KOfams](https://osf.io/3uz2j/) | 2017 | 1 | [Prestat et al. 2014](https://doi.org/10.1093/nar/gku702) | beta |
@@ -253,8 +259,18 @@ All pre-formatted databases are present at OSF
 | [MEROPS](https://www.ebi.ac.uk/merops/download_list.shtml) | 2017 | 1 | [Rawlings et al. 2018](https://academic.oup.com/nar/article/46/D1/D624/4626772) | Coming soon |
 
 
+- NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes. eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue.
 
-- NOTE: The KEGG database contains KOs related to Human disease. It is possible that these will show up in the results, even when analyzing microbes. eggNOG and FunGene database are coming soon. If you want a custom HMM build please let us know by email or leaving an issue. 
+### Custom Database
+
+To run a custom database, you need a HMM containing the protein family of interest and a metadata sheet describing the HMM required for look-up tables and downstream analysis. For the metadata information you need an ID that matches the HMM and a function or hierarchy. See example below. 
+
+#### Example Metadata sheet
+| ID | Function |
+| ---- | --- |
+| HMM1 | Sugarase | 
+| HMM2 | Coffease | 
+
 
 ## MetaCerberus Options
 
@@ -335,25 +351,20 @@ Args that start with '--' can also be set in a config file (specified via -c). C
 https://goo.gl/R74nmi). In general, command-line values override config file values which override defaults.
 ```
 
-### OUTPUTS (/final folder in 1.3 update)
+### OUTPUTS (/final folder)
 
-| File Extension | Description Summary |
-| --------- | ----------- |
-| .gff | coming soon |
-| .gbk | coming soon |
-| .fna | Nucleotide FASTA file of the input contig sequences. |
-| .faa | Protein FASTA file of the translated CDS sequences. |
-| .ffn | coming soon |
-| .sqn | coming soon |
-| .fsa | coming soon |
-| .tbl | coming soon |
-| .err | coming soon |
-| .log | coming soon |
-| .html | Summary statistics and/or visualizations, in step 10 folder|
-| .txt | Statistics relating to the annotated features found. |
-| level.tsv | Various levels of hierachical steps that is tab-separated file from various databases|
-| rollup.tsv | All levels of hierachical steps that is tab-separated file from various databases|
-| .tsv | Final Annotation summary, Tab-separated file of all features from various databases|
+| File Extension | Description Summary |  MetaCerberus Update Version |
+| --------- | ----------- | -------- |
+| .gff | General Feature Format | 1.3 |
+| .gbk | GenBank Format | 1.3 |
+| .fna | Nucleotide FASTA file of the input contig sequences. | 1.3 |
+| .faa | Protein FASTA file of the translated CDS/ORFs sequences. | 1.3 |
+| .ffn | FASTA Feature Nucleotide file, the Nucleotide sequence of translated CDS/ORFs.| 1.3 |
+| .html | Summary statistics and/or visualizations, in step 10 folder | 1.3 |
+| .txt | Statistics relating to the annotated features found. | 1.3 |
+| level.tsv | Various levels of hierachical steps that is tab-separated file from various databases| 1.3 |
+| rollup.tsv | All levels of hierachical steps that is tab-separated file from various databases| 1.3 |
+| .tsv | Final Annotation summary, Tab-separated file of all features from various databases| 1.3 |
 
 ### GAGE / PathView
 
@@ -361,7 +372,7 @@ After processing the HMM files MetaCerberus calculates a KO (KEGG Orthology) cou
 GAGE is recommended for pathway enrichment followed by PathView for visualize the metabolic pathways. A "class" file is required through the --class option to run this analysis. 
 As we are unsure which comparisons you want to make thus you have to make a class.tsv so the code will know the comparisons you want to make. 
 
-For example (class.tsv):
+#### For example (class.tsv):
 | Sample  |   Class      |
 | ------- | -------------|
 | 1A      | rhizobium    |
