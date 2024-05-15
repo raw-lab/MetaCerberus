@@ -236,7 +236,6 @@ Example:
 
     # HMM Databases
     DB_HMM = dict()
-    all = list()
     if Path(PATHDB, "databases.tsv").exists():
         with Path(PATHDB, "databases.tsv").open() as reader:
             header = reader.readline().split()
@@ -801,6 +800,11 @@ Example:
         # Protein statistics & annotation summary
         summary = Path(final_path, key, 'final_annotation_summary.tsv')
         protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary, Path(final_path, "fasta", f"{key}.faa"))
+        try:
+            src = Path(amino[key]).with_suffix(".ffn")
+            dst = Path(final_path, "fasta", f"{key}.ffn")
+            shutil.copy(src, dst)
+        except: pass
         # Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
         gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
         Path(final_path, "gff").mkdir(511, True, True)

@@ -45,13 +45,14 @@ def findORF_prod(contig, config, subdir):
     done = path / "complete"
 
     faaOut = path / "proteins.faa"
+    fnaOut = faaOut.with_suffix(".ffn")
 
     if not config['REPLACE'] and done.exists() and faaOut.exists():
         return faaOut
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff"
+    command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -d {fnaOut} -f gff"
     try:
         with Path(path, 'stdout.txt').open('w') as fout, Path(path, 'stderr.txt').open('w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
@@ -68,13 +69,14 @@ def findORF_meta(contig, config, subdir):
     done = path / "complete"
 
     faaOut = path / "proteins.faa"
+    fnaOut = faaOut.with_suffix(".ffn")
 
     if not config['REPLACE'] and done.exists() and faaOut.exists():
         return faaOut
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -f gff -p meta"
+    command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -d {fnaOut} -f gff -p meta"
     try:
         with Path(path, "stdout.txt").open('w') as fout, Path(path, "stderr.txt").open('w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
@@ -90,13 +92,14 @@ def findORF_prodgv(contig, config, subdir, meta=False):
     done = path / "complete"
 
     faaOut  = path / "proteins.faa"
+    fnaOut = faaOut.with_suffix(".ffn")
 
     if not config['REPLACE'] and done.exists() and faaOut.exists():
             return faaOut
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    command = f"{config['EXE_PRODIGAL-GV']} -i {contig} -a {faaOut} -o {path / 'proteins.gbk'} {'-p meta' if meta else ''}"
+    command = f"{config['EXE_PRODIGAL-GV']} -i {contig} -a {faaOut} -d {fnaOut} -o {path / 'proteins.gbk'} {'-p meta' if meta else ''}"
     print(command)
     try:
         with Path(path,"stdout.txt").open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
