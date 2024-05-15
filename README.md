@@ -1,4 +1,5 @@
 # Welcome to MetaCerberus
+
 [![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1093/bioinformatics/btae119)
 [![BioConda Install](https://anaconda.org/bioconda/metacerberus/badges/downloads.svg)](https://anaconda.org/bioconda/metacerberus)
 
@@ -15,13 +16,17 @@ MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/meta
 - Mamba install from bioconda with all dependencies:
 
 #### Linux/OSX-64
+
 1. Install mamba using conda
+
 ```bash
 conda install mamba
 ```
+
 - NOTE: Make sure you install mamba in your base conda environment unless you have OSX with ARM architecture (M1/M2 Macs). Follow the OSX-ARM instructions below if you have a Mac with ARM architecture.
 
 2. Install MetaCerberus with mamba
+
 ```bash
 mamba create -n metacerberus -c bioconda -c conda-forge metacerberus
 conda activate metacerberus
@@ -29,6 +34,7 @@ metacerberus.py --setup
 ```
 
 #### OSX-ARM (M1/M2)
+
 1. Set up conda environment
 ```bash
 conda create -y -n metacerberus
@@ -56,10 +62,11 @@ conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
 metacerberus.py --setup
 ```
+
 ## Brief Overview
 
 <p align="center">
-  <img src="img/Fig1.jpg" alt="MetaCerberus Workflow" height=600>
+  <img src="https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/img/workflow.jpg" alt="MetaCerberus Workflow" height=600>
 </p>
 
 ### MetaCerberus has three basic modes: quality control (QC) for raw reads, formatting/gene prediction, and annotation. 
@@ -85,8 +92,8 @@ metacerberus.py --setup
 ## Output Files
 
 - If an output directory is given, that folder will be created where all files are stored.
-- If no output directory is specified, the 'pipeline' subfolder will be created in the current directory.
-- Gage/Pathview R analysis provided as separate scripts within R. 
+- If no output directory is specified, the 'results_metacerberus' subfolder will be created in the current directory.
+- Gage/Pathview R analysis provided as separate scripts within R.  
 
 ## Visualization of Outputs
 
@@ -97,7 +104,7 @@ metacerberus.py --setup
 ## Annotation Rules
 
 <p align="center">
-  <img src="img/Rules.jpg" alt="MetaCerberus Rules" height=600>
+  <img src="https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/img/Rules.jpg" alt="MetaCerberus Rules" height=600>
 </p>
 
 - ***Rule 1*** is for finding high quality matches across databases. It is a score pre-filtering module for pORFs thresholds: which states that each pORF match to an HMM is recorded by default or a user-selected cut-off (i.e.,  e-value/bit scores) per database independently, or across all default databases (e.g, finding best hit), or per user specification of the selected database.
@@ -115,31 +122,31 @@ metacerberus.py --setup
 #### All databases
 ```bash
 conda activate metacerberus
-metacerberus.py --prodigal lambda.fna --hmm "KOFam_all, COG, VOG, PHROG, CAZy" --dir_out lambda_dir
+metacerberus.py --prodigal lambda.fna --hmm KOFam_all, COG, VOG, PHROG, CAZy --dir_out lambda_dir
 ```
 
 #### Only KEGG/FOAM all
 ```bash
 conda activate metacerberus
-metacerberus.py --prodigal lambda.fna --hmm "KOFam_all" --dir_out lambda_ko-only_dir
+metacerberus.py --prodigal lambda.fna --hmm KOFam_all --dir_out lambda_ko-only_dir
 ```
 
 #### Only KEGG/FOAM prokaryotic centric
 ```bash
 conda activate metacerberus
-metacerberus.py --prodigal ecoli.fna --hmm "KOFam_prokaryote" --dir_out ecoli_ko-only_dir
+metacerberus.py --prodigal ecoli.fna --hmm KOFam_prokaryote --dir_out ecoli_ko-only_dir
 ```
 
 #### Only KEGG/FOAM eukaryotic centric
 ```bash
 conda activate metacerberus
-metacerberus.py --fraggenescan human.fna --hmm "KOFam_eukaryote" --dir_out human_ko-only_dir
+metacerberus.py --fraggenescan human.fna --hmm KOFam_eukaryote --dir_out human_ko-only_dir
 ```
 
 #### Only Viral/Phage databases
 ```bash
 conda activate metacerberus
-metacerberus.py --prodigal lambda.fna --hmm "VOG, PHROG" --dir_out lambda_vir-only_dir
+metacerberus.py --prodigal lambda.fna --hmm VOG, PHROG --dir_out lambda_vir-only_dir
 ```
 - NOTE: You can pick any single database you want for your analysis including KOFam_all, COG, VOG, PHROG, CAZy or specific KO databases for eukaryotes and prokaryotes (KOFam_eukaryote or KOFam_prokaryote).
   
@@ -254,56 +261,80 @@ All pre-formatted databases are present at OSF
 - If the metacerberus environment is not used, make sure the dependencies are in PATH or specified in the config file.
 - Run metacerberus.py with the options required for your project.
 
-```
-usage: metacerberus.py [-c CONFIG] [--prodigal PRODIGAL] [--fraggenescan FRAGGENESCAN] [--super SUPER] [--protein PROTEIN] [--illumina | --nanopore | --pacbio] [--setup]
-                       [--uninstall] [--dir_out DIR_OUT] [--meta] [--scaffolds] [--minscore MINSCORE] [--evalue EVALUE] [--cpus CPUS] [--chunker CHUNKER] [--replace]
-                       [--keep] [--hmm HMM] [--class CLASS] [--tmpdir TMPDIR] [--version] [-h] [--adapters ADAPTERS] [--qc_seq QC_SEQ]
+```bash
+usage: metacerberus.py [--setup] [--update] [--list-db] [--download [DOWNLOAD ...]] [--uninstall] [-c CONFIG] [--prodigal PRODIGAL [PRODIGAL ...]]
+                       [--fraggenescan FRAGGENESCAN [FRAGGENESCAN ...]] [--super SUPER [SUPER ...]] [--prodigalgv PRODIGALGV [PRODIGALGV ...]]
+                       [--phanotate PHANOTATE [PHANOTATE ...]] [--protein PROTEIN [PROTEIN ...]] [--hmmer-tsv HMMER_TSV [HMMER_TSV ...]] [--class CLASS]
+                       [--illumina | --nanopore | --pacbio] [--dir-out DIR_OUT] [--replace] [--keep] [--tmpdir TMPDIR] [--hmm HMM [HMM ...]] [--db-path DB_PATH] [--meta]
+                       [--scaffolds] [--minscore MINSCORE] [--evalue EVALUE] [--skip-decon] [--skip-pca] [--cpus CPUS] [--chunker CHUNKER] [--grouped] [--version] [-h]
+                       [--adapters ADAPTERS] [--qc_seq QC_SEQ]
 
-options:
+Setup arguments:
+  --setup               Setup additional dependencies [False]
+  --update              Update downloaded databases [False]
+  --list-db             List available and downloaded databases [False]
+  --download [DOWNLOAD ...]
+                        Downloads selected HMMs. Use the option --list-db for a list of available databases, default is to download all available databases
+  --uninstall           Remove downloaded databases and FragGeneScan+ [False]
+
+Input files
+At least one sequence is required.
+    accepted formats: [.fastq, .fq, .fasta, .fa, .fna, .ffn, .faa]
+Example:
+> metacerberus.py --prodigal file1.fasta
+> metacerberus.py --config file.config
+*Note: If a sequence is given in [.fastq, .fq] format, one of --nanopore, --illumina, or --pacbio is required.:
+  -c CONFIG, --config CONFIG
+                        Path to config file, command line takes priority
+  --prodigal PRODIGAL [PRODIGAL ...]
+                        Prokaryote nucleotide sequence (includes microbes, bacteriophage)
+  --fraggenescan FRAGGENESCAN [FRAGGENESCAN ...]
+                        Eukaryote nucleotide sequence (includes other viruses, works all around for everything)
+  --super SUPER [SUPER ...]
+                        Run sequence in both --prodigal and --fraggenescan modes
+  --prodigalgv PRODIGALGV [PRODIGALGV ...]
+                        Giant virus nucleotide sequence
+  --phanotate PHANOTATE [PHANOTATE ...]
+                        Phage sequence
+  --protein PROTEIN [PROTEIN ...], --amino PROTEIN [PROTEIN ...]
+                        Protein Amino Acid sequence
+  --hmmer-tsv HMMER_TSV [HMMER_TSV ...]
+                        Annotations tsv file from HMMER (experimental)
+  --class CLASS         path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R
   --illumina            Specifies that the given FASTQ files are from Illumina
   --nanopore            Specifies that the given FASTQ files are from Nanopore
   --pacbio              Specifies that the given FASTQ files are from PacBio
 
-Required arguments
-At least one sequence is required.
-<accepted formats {.fastq .fasta .faa .fna .ffn .rollup}>
-Example:
-> metaerberus.py --prodigal file1.fasta
-> metacerberus.py --config file.config
-*Note: If a sequence is given in .fastq format, one of --nanopore, --illumina, or --pacbio is required.:
-  -c CONFIG, --config CONFIG
-                        Path to config file, command line takes priority
-  --prodigal PRODIGAL   Prokaryote nucleotide sequence (includes microbes, bacteriophage)
-  --fraggenescan FRAGGENESCAN
-                        Eukaryote nucleotide sequence (includes other viruses, works all around for everything)
-  --super SUPER         Run sequence in both --prodigal and --fraggenescan modes
-  --protein PROTEIN, --amino PROTEIN
-                        Protein Amino Acid sequence
-
-optional arguments:
-  --setup               Set this flag to ensure dependencies are setup [False]
-  --uninstall           Set this flag to remove downloaded databases and FragGeneScan+ [False]
-  --dir_out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]
-  --meta                Metagenomic nucleotide sequences (for prodigal) [False]
-  --scaffolds           Sequences are treated as scaffolds [False]
-  --minscore MINSCORE   Score cutoff for parsing HMMER results [25]
-  --evalue EVALUE       E-value cutoff for parsing HMMER results [1e-09]
-  --cpus CPUS           Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]
-  --chunker CHUNKER     Split files into smaller chunks, in Megabytes [Disabled by default]
+Output options:
+  --dir-out DIR_OUT     path to output directory, creates "pipeline" folder. Defaults to current directory. [./results-metacerberus]
   --replace             Flag to replace existing files. [False]
   --keep                Flag to keep temporary files. [False]
-  --hmm HMM             Specify the database for HMMER. (KOFam_all, KOFam_eukaryote, KOFam_prokaryote, COG, CAZy, PHROG, COG) [KOFam_all]
-  --class CLASS         path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R
-  --tmpdir TMPDIR       temp directory for RAY [system tmp dir]
+  --tmpdir TMPDIR       temp directory for RAY (experimental) [system tmp dir]
+
+Database options:
+  --hmm HMM [HMM ...]   A list of databases for HMMER. Use the option --list-db for a list of available databases [KOFam_all]
+  --db-path DB_PATH     Path to folder of databases [Default: under the library path of MetaCerberus]
+
+optional arguments:
+  --meta                Metagenomic nucleotide sequences (for prodigal) [False]
+  --scaffolds           Sequences are treated as scaffolds [False]
+  --minscore MINSCORE   Score cutoff for parsing HMMER results [60]
+  --evalue EVALUE       E-value cutoff for parsing HMMER results [1e-09]
+  --skip-decon          Skip decontamination step. [False]
+  --skip-pca            Skip PCA. [False]
+  --cpus CPUS           Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]
+  --chunker CHUNKER     Split files into smaller chunks, in Megabytes [Disabled by default]
+  --grouped             Group multiple fasta files into a single file before processing. When used with chunker can improve speed
   --version, -v         show the version number and exit
   -h, --help            show this help message and exit
 
   --adapters ADAPTERS   FASTA File containing adapter sequences for trimming
   --qc_seq QC_SEQ       FASTA File containing control sequences for decontamination
 
-Args that start with '--' (eg. --prodigal) can also be set in a config file (specified via -c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for
-details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override config file values which override defaults.
+Args that start with '--' can also be set in a config file (specified via -c). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for details, see syntax at
+https://goo.gl/R74nmi). In general, command-line values override config file values which override defaults.
 ```
+
 ### OUTPUTS (/final folder in 1.3 update)
 
 | File Extension | Description Summary |
@@ -387,7 +418,9 @@ echo "End Time   : $(date)"
 echo "======================================================"
 echo ""
 ```
+
 ## DESeq2 and Edge2 Type I errors
+
 Both edgeR and DeSeq2 R have the highest sensitivity when compared to other algorithms that control type-I error when the FDR was at or below 0.1. EdgeR and DESeq2 all perform fairly well in simulation and via data splitting (so no parametric assumptions). Typical benchmarks will show limma having stronger FDR control across all types of datasets (it’s hard to beat the moderated t-test), and edgeR and DESeq2 having higher sensitivity for low counts (makes sense as limma has to filter these out / down-weight them to use the normal model on log counts). Further information about type I errors are present from Mike Love's vignette here [vignette](https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#multi-factor-designs)
 
 ## Contributing to MetaCerberus and Fungene
@@ -395,17 +428,18 @@ Both edgeR and DeSeq2 R have the highest sensitivity when compared to other algo
 MetaCerberus as a community resource as recently acquired [FunGene](http://fungene.cme.msu.edu/), we welcome contributions of other experts expanding annotation of all domains of life (viruses, bacteria, archaea, eukaryotes).  Please send us an issue on our MetaCerberus GitHub [open an issue](https://github.com/raw-lab/metacerberus/issues); or email us we will fully annotate your genome, add suggested pathways/metabolisms of interest, make custom HMMs to be added to MetaCerberus and FunGene. 
 
 ## Copyright  
+
 This is copyrighted by University of North Carolina at Charlotte, Jose L Figueroa III, Eliza Dhungal, Madeline Bellanger, Cory R Brouwer and Richard Allen White III.  All rights reserved.  MetaCerberus is a bioinformatic tool that can be distributed freely for academic use only. Please contact us for commerical use. The software is provided “as is” and the copyright owners or contributors are not liable for any direct, indirect, incidental, special, or consequential damages including but not limited to, procurement of goods or services, loss of use, data or profits arising in any way out of the use of this software.<br />
 
 ## Citing MetaCerberus
 
 If you are publishing results obtained using MetaCerberus, please cite: <br />
 ### Publication
-Figueroa JL, Dhungel E, Bellanger M, Brouwer CR, White III RA. 2024.
+Figueroa III JL, Dhungel E, Bellanger M, Brouwer CR, White III RA. 2024.
 MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. [Bioinformatics](https://doi.org/10.1093/bioinformatics/btae119)  <br />
 
 ### Pre-print
-Figueroa JL, Dhungel E, Brouwer CR, White III RA. 2023.  <br />
+Figueroa III JL, Dhungel E, Brouwer CR, White III RA. 2023.  <br />
 MetaCerberus: distributed highly parallelized HMM-based processing for robust functional annotation across the tree of life. [bioRxiv](https://www.biorxiv.org/content/10.1101/2023.08.10.552700v1)   <br />
 
 ## CONTACT
@@ -415,7 +449,3 @@ If you have any questions or feedback, please feel free to get in touch by email
 [Dr. Richard Allen White III](mailto:rwhit101@uncc.edu)<br /> 
 [Jose Luis Figueroa III](mailto:jlfiguer@uncc.edu) <br />
 Or [open an issue](https://github.com/raw-lab/metacerberus/issues).  
-
-
-
-

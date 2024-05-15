@@ -134,11 +134,11 @@ def main():
     # Setup options
     setup = parser.add_argument_group('''Setup arguments''')
     setup_grp = setup.add_mutually_exclusive_group(required=False)
-    setup_grp.add_argument('--setup', action="store_true", help="Set this flag to ensure dependencies are setup [False]")
-    setup_grp.add_argument('--update', action="store_true", help="Set this flag to update downloaded databases [False]")
-    setup_grp.add_argument('--list-db', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
+    setup_grp.add_argument('--setup', action="store_true", help="Setup additional dependencies [False]")
+    setup_grp.add_argument('--update', action="store_true", help="Update downloaded databases [False]")
+    setup_grp.add_argument('--list-db', action="store_true", help="List available and downloaded databases [False]")
     setup.add_argument('--download', nargs='*', default=None, help="Downloads selected HMMs. Use the option --list-db for a list of available databases, default is to download all available databases")
-    setup_grp.add_argument('--uninstall', action="store_true", help="Set this flag to remove downloaded databases and FragGeneScan+ [False]")
+    setup_grp.add_argument('--uninstall', action="store_true", help="Remove downloaded databases and FragGeneScan+ [False]")
 
     # At least one of these options are required
     input = parser.add_argument_group(f'''Input files
