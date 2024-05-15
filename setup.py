@@ -32,8 +32,8 @@ setuptools.setup(
     package_data=dict(meta_cerberus=package_files('lib/')),             # add non-python data to package, relative paths
     license="BSD License",  # metadata
     platforms=['Unix'],     # metadata
-    classifiers=[           # This is the new updated way for metadata, but old way seems to still be used in some of the output
-        "Development Status :: 4 - Beta",
+    classifiers=[           # This is the new updated way for metadata (PyPi??), but old way seems to still be used in some of the output
+        "Development Status :: 5 - Production/Stable",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
