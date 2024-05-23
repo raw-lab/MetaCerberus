@@ -2,6 +2,9 @@
 
 [![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1093/bioinformatics/btae119)
 [![Pre-print](https://img.shields.io/badge/preprint-BioRxiv-red.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1101/2023.08.10.552700)
+[![Downloads PePY overall](https://static.pepy.tech/badge/MetaCerberus)](https://pepy.tech/project/MetaCerberus)
+[![Downloads PePy monthly](https://static.pepy.tech/badge/MetaCerberus/month)](https://pepy.tech/project/MetaCerberus)
+[![Downloads PePy weekly](https://static.pepy.tech/badge/MetaCerberus/week)](https://pepy.tech/project/MetaCerberus)
 [![BioConda Install Downloads](https://anaconda.org/bioconda/metacerberus/badges/downloads.svg)](https://anaconda.org/bioconda/metacerberus)
 [![Version](https://anaconda.org/bioconda/metacerberus/badges/version.svg)](https://anaconda.org/bioconda/metacerberus)
 [![Anaconda-Server Latest Release date](https://anaconda.org/bioconda/metacerberus/badges/latest_release_date.svg)](https://anaconda.org/bioconda/metacerberus)
