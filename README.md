@@ -9,7 +9,7 @@
 [![Anaconda-Server Platforms](https://anaconda.org/bioconda/metacerberus/badges/platforms.svg)](https://anaconda.org/bioconda/metacerberus)
 [![Anaconda-Server License](https://anaconda.org/bioconda/metacerberus/badges/license.svg)](https://anaconda.org/bioconda/metacerberus)
 
-## Note MetaCerberus version 1.3 is the newest version via manual install due to current conda/mamba issue. 
+## Note - MetaCerberus version 1.3 is the newest version via manual install due to current conda/mamba issue. 
 
 
 ## About
