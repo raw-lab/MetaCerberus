@@ -1,14 +1,17 @@
 # Welcome to MetaCerberus
 
 [![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1093/bioinformatics/btae119)
-[![BioConda Install](https://anaconda.org/bioconda/metacerberus/badges/downloads.svg)](https://anaconda.org/bioconda/metacerberus)
+[![BioConda Install Downloads](https://anaconda.org/bioconda/metacerberus/badges/downloads.svg)](https://anaconda.org/bioconda/metacerberus)
 [![Version](https://anaconda.org/bioconda/metacerberus/badges/version.svg)](https://anaconda.org/bioconda/metacerberus)
-[![Anaconda-Server Badge](https://anaconda.org/bioconda/metacerberus/badges/platforms.svg)](https://anaconda.org/bioconda/metacerberus)
-[![Anaconda-Server Badge](https://anaconda.org/bioconda/metacerberus/badges/latest_release_date.svg)](https://anaconda.org/bioconda/metacerberus)
+[![Anaconda-Server Latest Release date](https://anaconda.org/bioconda/metacerberus/badges/latest_release_date.svg)](https://anaconda.org/bioconda/metacerberus)
+[![Anaconda-Server Relative Release date](https://anaconda.org/bioconda/metacerberus/badges/latest_release_relative_date.svg)](https://anaconda.org/bioconda/metacerberus)
+[![Anaconda-Server Platforms](https://anaconda.org/bioconda/metacerberus/badges/platforms.svg)](https://anaconda.org/bioconda/metacerberus)
+[![Anaconda-Server License](https://anaconda.org/bioconda/metacerberus/badges/license.svg)](https://anaconda.org/bioconda/metacerberus)
+
 
 ## About
 
-MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy/dbCAN, VOG, pVOG, PHROG, and COG databases via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis. MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
+MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy/dbCAN, VOG, pVOG, PHROG, COG, and a variety of other databases including user customized databases via Hidden Markov Models (HMM) for whole ecosystem metabolomic analysis. MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
 
 ![GitHub Logo](https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/metacerberus_logo.jpg)
 
