@@ -3,6 +3,8 @@
 [![Paper](https://img.shields.io/badge/paper-Bioinformatics-teal.svg?style=flat-square&maxAge=3600)](https://doi.org/10.1093/bioinformatics/btae119)
 [![BioConda Install](https://anaconda.org/bioconda/metacerberus/badges/downloads.svg)](https://anaconda.org/bioconda/metacerberus)
 [![Version](https://anaconda.org/bioconda/metacerberus/badges/version.svg)](https://anaconda.org/bioconda/metacerberus)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/metacerberus/badges/platforms.svg)](https://anaconda.org/bioconda/metacerberus)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/metacerberus/badges/latest_release_date.svg)](https://anaconda.org/bioconda/metacerberus)
 
 ## About
 
