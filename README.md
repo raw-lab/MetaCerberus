@@ -11,6 +11,20 @@ MetaCerberus transforms raw shotgun metaomics sequencing (i.e. metagenomics/meta
 
 ## Installing MetaCerberus
 
+## Installing MetaCerberus 1.3 manually due to Mamba/Conda issue (Newest Version)
+You still need to have mamba and conda installed. Just can't use mamba/conda directly currently for the new verison. 
+
+```bash
+git clone https://github.com/raw-lab/MetaCerberus.git 
+cd MetaCerberus
+bash install_metacerberus.sh
+conda activate MetaCerberus-1.3.0
+metacerberus.py --download 
+```
+
+## Current Mamba and Conda are experiencing an error these options only work for MetaCerberus 1.2.1 and below. 
+We will update this as soon as Mamba/Conda fixes this error. 
+
 ### Option 1) Mamba
 
 - Mamba install from bioconda with all dependencies:
