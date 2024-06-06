@@ -46,53 +46,8 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
                         print(h.name.decode(), hit.query_name.decode(), f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,
                             align.target_from, align.target_to,
                             sep='\t', file=hmm_writer)
+        outlist += [outfile]
         errfile.close
-
-    return outlist
-def searchHMM_old(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4):
-    minscore = config['MINSCORE']
-    evalue = config['EVALUE']
-
-    hmmKey,hmmDB = hmmDB
-
-    hmmOut = dict()
-    for key,amino in aminoAcids.items():
-        path = Path(config['DIR_OUT'], subdir, key)
-        os.makedirs(path, exist_ok=True)
-
-        name_dom = f"{key}_tmp.hmm"
-        hmmOut[os.path.join(path, name_dom)] = amino
-
-    jobs = dict()
-    outlist = list()
-    for domtbl_out,amino in hmmOut.items():
-        pathname = os.path.dirname(domtbl_out)
-        basename = os.path.basename(domtbl_out)
-        outname = os.path.splitext(basename)[0] + ".tsv"
-        outfile = os.path.join(pathname, f"{hmmKey}-{outname}")
-
-        # HMMER
-        errfile=Path(outfile).with_suffix('.err').open('w')
-        try:
-            reduce_awk = f"""grep -Ev '^#' | awk '$7 < {evalue} && $14 > {minscore} {{ print $1 "\t" $4 "\t" $7 "\t" $14 "\t" $3 "\t" $18 "\t" $19 }}' >> {outfile}"""
-            command = f"{config['EXE_HMMSEARCH']} -o /dev/null --cpu {CPUs} --domtblout /dev/stdout {hmmDB} {amino} | {reduce_awk}"
-            if not Path(outfile).exists():
-                jobs[domtbl_out] = subprocess.Popen(command, shell=True, stderr=errfile)
-            outlist.append(outfile)
-        except Exception as e:
-            print(e, file=errfile)
-            print("Error: failed to run: " + command, file=errfile)
-        errfile.close
-    
-    # Wait for jobs
-    done = False
-    while not done:
-        done = True
-        keys = list(jobs.keys())
-        for domtbl_out in keys:
-            if jobs[domtbl_out].poll() is None: # no return code yet, still running
-                done = False # At least one job still running
-        time.sleep(1)
 
     return outlist
 
