@@ -12,9 +12,6 @@
 [![Anaconda-Server Platforms](https://anaconda.org/bioconda/metacerberus/badges/platforms.svg)](https://anaconda.org/bioconda/metacerberus)
 [![Anaconda-Server License](https://anaconda.org/bioconda/metacerberus/badges/license.svg)](https://anaconda.org/bioconda/metacerberus)
 
-## Note - MetaCerberus version 1.3 is the newest version via manual install due to current conda/mamba issue. 
-
-
 ## About
 
 MetaCerberus transforms raw sequencing (i.e. genomic, transcriptomics, metagenomics, metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy/dbCAN, VOG, pVOG, PHROG, COG, and a variety of other databases including user customized databases via Hidden Markov Models (HMM) for functional annotation for complete metabolic analysis across the tree of life (i.e., bacteria, archaea, phage, viruses, eukaryotes, and whole ecosystems). MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
@@ -22,20 +19,6 @@ MetaCerberus transforms raw sequencing (i.e. genomic, transcriptomics, metagenom
 ![GitHub Logo](https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/metacerberus_logo.jpg)
 
 ## Installing MetaCerberus
-
-## Installing MetaCerberus 1.3 manually due to Mamba/Conda issue (Newest Version)
-You still need to have mamba and conda installed. Just can't use mamba/conda directly currently for the new verison. 
-
-```bash
-git clone https://github.com/raw-lab/MetaCerberus.git 
-cd MetaCerberus
-bash install_metacerberus.sh
-conda activate MetaCerberus-1.3.0
-metacerberus.py --download 
-```
-
-## Current Mamba and Conda are experiencing an error these options only work for MetaCerberus 1.2.1 and below. 
-We will update this as soon as Mamba/Conda fixes this error. 
 
 ### Option 1) Mamba
 
@@ -87,6 +70,16 @@ metacerberus.py --setup
 conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
 metacerberus.py --setup
+```
+
+### Option 3) Manual with conda/mamba from Github
+
+```bash
+git clone https://github.com/raw-lab/MetaCerberus.git 
+cd MetaCerberus
+bash install_metacerberus.sh
+conda activate MetaCerberus-1.3.0
+metacerberus.py --download
 ```
 
 ## Brief Overview
