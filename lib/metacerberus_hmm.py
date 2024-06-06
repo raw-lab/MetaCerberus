@@ -9,10 +9,47 @@ import re
 from pathlib import Path
 import subprocess
 import time
+import pyhmmer
 
 
 ## HMMER Search
-def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4):
+def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
+    minscore = config['MINSCORE']
+    evalue = config['EVALUE']
+
+    hmmKey,hmm = hmm
+
+    hmmOut = dict()
+    for key,amino in aminoAcids.items():
+        path = Path(config['DIR_OUT'], subdir, key)
+        os.makedirs(path, exist_ok=True)
+
+        name_dom = f"{key}_tmp.hmm"
+        hmmOut[os.path.join(path, name_dom)] = amino
+
+    outlist = list()
+    for domtbl_out,amino in hmmOut.items():
+        pathname = os.path.dirname(domtbl_out)
+        basename = os.path.basename(domtbl_out)
+        outname = os.path.splitext(basename)[0] + ".tsv"
+        outfile = os.path.join(pathname, f"{hmmKey}-{outname}")
+
+        # HMMER
+        errfile=Path(outfile).with_suffix('.err').open('w')
+        with open(outfile, 'wt') as hmm_writer, pyhmmer.plan7.HMMFile(hmm) as hmm_reader, pyhmmer.easel.SequenceFile(amino, digital=True) as seq_reader:
+            for hit in pyhmmer.hmmer.hmmsearch(hmm_reader, seq_reader, E=evalue, cpus=CPUs):
+                for h in hit:
+                    for domain in h.domains.included:
+                        if domain.score < minscore:
+                            continue
+                        align = domain.alignment
+                        print(h.name.decode(), hit.query_name.decode(), f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,
+                            align.target_from, align.target_to,
+                            sep='\t', file=hmm_writer)
+        errfile.close
+
+    return outlist
+def searchHMM_old(aminoAcids:dict, config:dict, subdir:str, hmmDB:tuple, CPUs:int=4):
     minscore = config['MINSCORE']
     evalue = config['EVALUE']
 
