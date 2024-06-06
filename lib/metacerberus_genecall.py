@@ -6,6 +6,7 @@ Uses FGS+
 
 from pathlib import Path
 import subprocess
+import pyrodigal
 
 
 # Eukaryotic option
@@ -40,51 +41,48 @@ def findORF_fgs(contig, config, subdir):
 
 
 # Microbial option
-def findORF_prod(contig, config, subdir):
+def findORF_prod(contig, config, subdir, meta=False):
     path = Path(config['DIR_OUT'], subdir)
+    path.mkdir(exist_ok=True, parents=True)
     done = path / "complete"
 
-    faaOut = path / "proteins.faa"
-    fnaOut = faaOut.with_suffix(".ffn")
+    faa = path / "proteins.faa"
+    fna = faa.with_suffix(".fna")
+    gff = faa.with_suffix(".gff")
+    gbk = faa.with_suffix(".gbk")
 
-    if not config['REPLACE'] and done.exists() and faaOut.exists():
-        return faaOut
+    if not config['REPLACE'] and done.exists() and faa.exists():
+        return faa
     done.unlink(missing_ok=True)
-    path.mkdir(exist_ok=True, parents=True)
 
-    command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -d {fnaOut} -f gff"
-    try:
-        with Path(path, 'stdout.txt').open('w') as fout, Path(path, 'stderr.txt').open('w') as ferr:
-            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    except Exception as e:
-        print(e)
-
-    done.touch()    
-    return faaOut
-
-
-# Metagenome option
-def findORF_meta(contig, config, subdir):
-    path = Path(config['DIR_OUT'], subdir)
-    done = path / "complete"
-
-    faaOut = path / "proteins.faa"
-    fnaOut = faaOut.with_suffix(".ffn")
-
-    if not config['REPLACE'] and done.exists() and faaOut.exists():
-        return faaOut
-    done.unlink(missing_ok=True)
-    path.mkdir(exist_ok=True, parents=True)
-
-    command = f"{config['EXE_PRODIGAL']} -i {contig} -o {path}/genes.gff -a {faaOut} -d {fnaOut} -f gff -p meta"
-    try:
-        with Path(path, "stdout.txt").open('w') as fout, Path(path, "stderr.txt").open('w') as ferr:
-            subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
-    except Exception as e:
-        print(e)
+    if not meta:
+        train = pyrodigal.GeneFinder(meta=False).train(open(contig).read())
+        orf_finder = pyrodigal.GeneFinder(training_info=train, meta=meta)
+    else:
+       orf_finder = pyrodigal.GeneFinder(meta=meta)
+    with open(contig, 'rt') as reader, open(faa, 'wt') as w_faa, open(fna, 'wt') as w_fna, open(gff, 'wt') as w_gff, open(gbk, 'wt') as w_gbk:
+        line = reader.readline()
+        while line:
+            if line.startswith(">"):
+                seq_id = line[1:].split()[0]
+                seq = list()
+                line = reader.readline()
+                while line:
+                    if line.startswith(">"):
+                        break
+                    seq += [line.strip()]
+                    line = reader.readline()
+                genes = orf_finder.find_genes("".join(seq))
+                genes.write_translations(w_faa, seq_id)
+                genes.write_genes(w_fna, seq_id)
+                genes.write_gff(w_gff, seq_id)
+                genes.write_genbank(w_gbk, seq_id)
+                continue
+            line = reader.readline()
 
     done.touch()
-    return faaOut
+    return faa
+
 
 # Giant Virus
 def findORF_prodgv(contig, config, subdir, meta=False):
@@ -124,24 +122,11 @@ def findORF_phanotate(contig, config, subdir, meta=False):
     path.mkdir(exist_ok=True, parents=True)
 
     command = [config['EXE_PHANOTATE'], '-f', 'faa', contig] #, '-o', faaOut, contig]
-        #awk '{ if (substr($1,1,1) != ">") gsub(/#|\+|\*/, ""); print $1 }'
     try:
-        with faaOut.open('r') as fout, Path(path,"stderr.txt").open('w') as ferr:
-            pout = subprocess.run(command, stdout=faaOut, stderr=ferr)
+        with faaOut.open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
+            subprocess.run(command, stdout=fout, stderr=ferr)
     except Exception as e:
          print(e)
-    #    for line in pout:
-    #        line=line.strip()
-    #        if line.startswith('>'):
-    #            print(line, file=fout)
-    #        else:
-    #            re.sub(r'[^A-Za-z]', '', line, file=fout)
-
-    #try:
-    #    subprocess.run(['sed', '-i', 's/#//g', faaOut])
-    #except Exception as e:
-    #    with Path(path,"stderr.txt").open('a') as ferr:
-    #        print(e, file=ferr)
 
     done.touch()
     return faaOut
