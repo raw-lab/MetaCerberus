@@ -172,7 +172,7 @@ Example:
 
     # Database options
     database = parser.add_argument_group(f'''Database options''')
-    database.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. Use the option --list-db for a list of available databases [KOFam_all]")
+    database.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. 'ALL' uses all downloaded databases. Use the option --list-db for a list of available databases [KOFam_all]")
     database.add_argument("--db-path", type=str, default=PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
 
     # optional flags
@@ -181,8 +181,8 @@ Example:
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
     optional.add_argument('--minscore', type=float, default=60, help="Score cutoff for parsing HMMER results [60]")
     optional.add_argument('--evalue', type=float, default=1e-09, help="E-value cutoff for parsing HMMER results [1e-09]")
-    optional.add_argument('--skip-decon', action="store_true", help="Skip decontamination step. [False]")
-    optional.add_argument('--skip-pca', action="store_true", help="Skip PCA. [False]")
+    optional.add_argument('--skip-decon', action="store_true", help="Skip decontamination step [False]")
+    optional.add_argument('--skip-pca', action="store_true", help="Skip PCA [False]")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
     optional.add_argument('--grouped', action="store_true", help="Group multiple fasta files into a single file before processing. When used with chunker can improve speed")
@@ -247,6 +247,10 @@ Example:
                         if name == "KOFam_all" and "ALL" in args.hmm:
                             args.hmm += [name]
                     elif "ALL" in args.hmm:
+                        args.hmm += [name]
+                    elif "all" in args.hmm:
+                        args.hmm += [name]
+                    elif "All" in args.hmm:
                         args.hmm += [name]
                     DB_HMM[name] = Path(args.db_path, filename)
 
@@ -340,9 +344,10 @@ Example:
             print(f"ERROR executing 'which {value}'")
 
     # Check for dependencies
-    for key,value in config.items():
-        if key.startswith("EXE_") and not os.path.isfile(value):
-            parser.error(f"Unable to find file: {value}")
+    #TODO: don't quit on all dependencies, not all paths required
+    #for key,value in config.items():
+    #    if key.startswith("EXE_") and not os.path.isfile(value):
+    #        parser.error(f"Unable to find file: {value}")
 
 
     # Initialize RAY for Multithreading
@@ -539,8 +544,7 @@ Example:
         set_add(step_curr, 8, "STEP 8: HMMER Search")
         for key,value in amino.items():
             pipeline += [ray.put([key, value, 'findORF_'])]
-            for hmm in dbHMM:
-                jobsORF += 1
+            jobsORF += 1
 
     # Step 9 Rollup Entry Point
     hmm_tsv = dict()
@@ -611,10 +615,7 @@ Example:
             elif key.startswith("prodigalgv_"):
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prodgv, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             elif key.startswith("prodigal_"):
-                if config['META']:
-                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_meta, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
-                else:
-                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             elif key.startswith("phanotate_"):
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             jobsORF += 1
@@ -626,10 +627,7 @@ Example:
             elif key.startswith("prodigalgv_"):
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prodgv, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             elif key.startswith("prodigal_"):
-                if config['META']:
-                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_meta, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
-                else:
-                    pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             elif key.startswith("phanotate_"):
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
             jobsORF += 1
