@@ -39,7 +39,7 @@ conda install mamba
 ```bash
 mamba create -n metacerberus -c bioconda -c conda-forge metacerberus
 conda activate metacerberus
-metacerberus.py --setup
+metacerberus.py --download
 ```
 
 #### OSX-ARM (M1/M2)
@@ -57,7 +57,7 @@ conda install -y -c conda-forge mamba python=3.10 "pydantic<2"
 3. Install MetaCerberus with mamba
 ```bash
 mamba install -y -c bioconda -c conda-forge metacerberus
-metacerberus.py --setup
+metacerberus.py --download
 ```
 
 - NOTE: Mamba is the fastest installer. Anaconda or miniconda can be slow. Also, install mamba from conda not from pip. The pip mamba doesn't work for install. 
@@ -69,7 +69,8 @@ metacerberus.py --setup
 ```bash
 conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
-metacerberus.py --setup
+metacerberus.py --download
+
 ```
 
 ### Option 3) Manual with conda/mamba from Github
