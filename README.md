@@ -39,6 +39,7 @@ conda install mamba
 ```bash
 mamba create -n metacerberus -c bioconda -c conda-forge metacerberus
 conda activate metacerberus
+metacerberus.py --setup
 metacerberus.py --download
 ```
 
@@ -57,6 +58,7 @@ conda install -y -c conda-forge mamba python=3.10 "pydantic<2"
 3. Install MetaCerberus with mamba
 ```bash
 mamba install -y -c bioconda -c conda-forge metacerberus
+metacerberus.py --setup
 metacerberus.py --download
 ```
 
@@ -69,6 +71,7 @@ metacerberus.py --download
 ```bash
 conda create -n metacerberus -c conda-forge -c bioconda metacerberus -y
 conda activate metacerberus
+metacerberus.py --setup
 metacerberus.py --download
 
 ```
