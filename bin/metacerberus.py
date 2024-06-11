@@ -365,7 +365,6 @@ Example:
         try:
             ray.init(address="local", num_cpus=config['CPUS'], log_to_driver=DEBUG)
             print("Started RAY single node")
-            config['CLUSTER'] = False
         except:
             print("Failed to initizlize Ray with --slurm_single")
             return 0
@@ -373,11 +372,13 @@ Example:
         try:
             ray.init(address='auto', log_to_driver=DEBUG)
             print("Started RAY on cluster")
-            config['CLUSTER'] = True
         except:
             ray.init(num_cpus=config['CPUS'], log_to_driver=DEBUG)
             print("Started RAY single node")
-            config['CLUSTER'] = False
+
+    config['CLUSTER'] = False
+    if len(ray.nodes()) > 1:
+        config['CLUSTER'] = True
     print(f"Running RAY on {len(ray.nodes())} node(s)")
     print(f"Using {config['CPUS']} CPUs per node")
     temp_dir = Path(ray.nodes()[0]['ObjectStoreSocketName']).parent.parent
