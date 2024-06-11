@@ -46,7 +46,7 @@ setuptools.setup(
     install_requires=[
             'setuptools',
             'ray',
-            'grpcio =1.43'
+            'grpcio==1.43',
             'metaomestats',
             'configargparse',
             'kaleido',
