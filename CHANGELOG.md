@@ -1,5 +1,17 @@
 # Change log
 
+## Version 1.3.1
+
+### New Features
+
+-Implemented PyHMMER
+-Implemented Pyrodigal
+-Added ORF start and end to output summary files
+
+### Bug Fixes
+
+-Fixed prodigal-gv GFF
+
 ## Version 1.3.0
 
 ### New Features
