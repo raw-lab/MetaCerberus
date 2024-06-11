@@ -7,8 +7,8 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.3.0"
-__date__        = "March 2024"
+__version__     = "1.3.1"
+__date__        = "June 2024"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022-2024"
 
@@ -44,7 +44,7 @@ from meta_cerberus import (
 
 ##### Global Variables #####
 
-DEBUG = True
+DEBUG = False
 
 # known file extensions
 FILES_FASTQ = ['.fastq', '.fq']#, '.fastq.gz', '.fq.gz']
@@ -71,10 +71,8 @@ DEPENDENCIES = {
     'EXE_PORECHOP': 'porechop',
     'EXE_BBDUK': 'bbduk.sh',
     'EXE_FGS': 'FragGeneScanRs',
-    'EXE_PRODIGAL': 'prodigal',
     'EXE_PRODIGAL-GV': 'prodigal-gv',
     'EXE_PHANOTATE' : 'phanotate.py',
-    'EXE_HMMSEARCH' : 'hmmsearch',
     'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
     }
 
@@ -264,7 +262,7 @@ Example:
                 else:
                     dbHMM[hmm] = DB_HMM[hmm]
             else:
-                print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --setup")
+                print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --download")
         else:
             dbpath = Path(hmm)
             while Path(hmm).suffixes:
@@ -364,9 +362,13 @@ Example:
 
     if args.slurm_single:
         # Force single node
-        ray.init(num_cpus=config['CPUS'], log_to_driver=DEBUG)
-        print("Started RAY single node")
-        config['CLUSTER'] = False
+        try:
+            ray.init(address="local", num_cpus=config['CPUS'], log_to_driver=DEBUG)
+            print("Started RAY single node")
+            config['CLUSTER'] = False
+        except:
+            print("Failed to initizlize Ray with --slurm_single")
+            return 0
     else:
         try:
             ray.init(address='auto', log_to_driver=DEBUG)
@@ -796,8 +798,8 @@ Example:
         dst = Path(final_path, key)
         shutil.copy(src, dst)
         # Protein statistics & annotation summary
-        summary = Path(final_path, key, 'final_annotation_summary.tsv')
-        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary, Path(final_path, "fasta", f"{key}.faa"))
+        summary_tsv = Path(final_path, key, 'final_annotation_summary.tsv')
+        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary_tsv, Path(final_path, "fasta", f"{key}.faa"))
         try:
             src = Path(amino[key]).with_suffix(".ffn")
             dst = Path(final_path, "fasta", f"{key}.ffn")
@@ -814,12 +816,12 @@ Example:
         if len(gff) == 1:
             out_gff = Path(final_path, "gff", f"{key}.gff")
             out_genbank = Path(final_path, f"{key}_template.gbk")
-            metacerberus_report.write_datafiles(gff[0], fasta[key], amino[key], summary, out_gff, out_genbank)
+            metacerberus_report.write_datafiles(gff[0], fasta[key], amino[key], summary_tsv, out_gff, out_genbank)
         else:
             print("GFF", "NONE")
             out_gff = Path(final_path, "gff", f"{key}.gff")
             with out_gff.open('w') as writer:
-                with summary.open() as read_summary:
+                with summary_tsv.open() as read_summary:
                     read_summary.readline()
                     print("##gff-version  3", file=writer)
                     for summ in read_summary:

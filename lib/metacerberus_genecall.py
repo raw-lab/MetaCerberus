@@ -89,16 +89,17 @@ def findORF_prodgv(contig, config, subdir, meta=False):
     path = Path(config['DIR_OUT'], subdir)
     done = path / "complete"
 
-    faaOut  = path / "proteins.faa"
-    fnaOut = faaOut.with_suffix(".ffn")
+    faa = path / "proteins.faa"
+    fna = faa.with_suffix(".fna")
+    gff = faa.with_suffix(".gff")
+    gbk = faa.with_suffix(".gbk")
 
-    if not config['REPLACE'] and done.exists() and faaOut.exists():
-            return faaOut
+    if not config['REPLACE'] and done.exists() and faa.exists():
+            return faa
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    command = f"{config['EXE_PRODIGAL-GV']} -i {contig} -a {faaOut} -d {fnaOut} -o {path / 'proteins.gbk'} {'-p meta' if meta else ''}"
-    print(command)
+    command = f"{config['EXE_PRODIGAL-GV']} -i {contig} -a {faa} -d {fna} -f gff -o {gff} {'-p meta' if meta else ''}"
     try:
         with Path(path,"stdout.txt").open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
             subprocess.run(command, shell=True, check=True, stdout=fout, stderr=ferr)
@@ -107,7 +108,7 @@ def findORF_prodgv(contig, config, subdir, meta=False):
         return None
 
     done.touch()
-    return faaOut
+    return faa
 
 # Phage
 def findORF_phanotate(contig, config, subdir, meta=False):
@@ -126,7 +127,13 @@ def findORF_phanotate(contig, config, subdir, meta=False):
         with faaOut.open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
             subprocess.run(command, stdout=fout, stderr=ferr)
     except Exception as e:
-         print(e)
+        print(e)
+        return None
+
+    #command = [config['EXE_PHANOTATE'], '-f', 'genbank', contig] #, '-o', faaOut, contig]
+    #genbank.py outfile.gbk -f gff -o outfile.gff
+    #genbank.py outfile.gbk -f fna -o outfile.fna
+    #genbank.py outfile.gbk -f faa -o outfile.faa
 
     done.touch()
     return faaOut

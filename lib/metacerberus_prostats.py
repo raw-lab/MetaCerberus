@@ -78,7 +78,7 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
     # Annotate proteins
     #TODO: use evalue as well as score for best comparison
     # Load Lookup Tables, create header
-    header = ["target", "product", "best_hit", "HMM", "evalue", "score", "EC", "gene", "product_start", "product_end", "product_length", "ORF_length"]
+    header = ["target", "product", "best_hit", "HMM", "evalue", "score", "EC", "gene", "ORF_start", "ORF_end", "product_start", "product_end", "product_length", "ORF_length-aa"]
     empty = ["" for x in header][2:]
     dfLookup = dict()
     hmmFiles = dict()
@@ -93,15 +93,24 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
         dfLookup[dbname] = pd.read_csv(dbLookup, sep='\t').fillna('')
         # open outfile for hmm matches
         hmmFiles[dbname] = open(summary_out.with_stem(f"annotation_summary_{dbname}"), 'w')
-        print("target", "product", "best_hit", "evalue", "score", "EC", "gene", "product_start", "product_end", "product_length", "ORF_length", sep='\t', file=hmmFiles[dbname])
+        print("target", "product", "best_hit", "evalue", "score", "EC", "gene", "ORF_start", "ORF_end", "product_start", "product_end", "product_length", "ORF_length-aa", sep='\t', file=hmmFiles[dbname])
+    gff = Path(faa).with_suffix(".gff")
+    if gff.exists():
+        gff = [x.split() for x in open(gff).readlines() if not x.startswith("#")]
     with open(summary_out, 'w') as writer, fasta_prefix.open('w') as faa_writer, open(faa) as faa_reader:
         print(*header, sep='\t', file=writer)
-        for target in proteins.keys():
+        for i,target in enumerate(proteins.keys()):
+            if gff:
+                orf_start, orf_end = gff[i][3:5]
+            else:
+                orf_start,orf_end = ["N/A", "N/A"]
+            empty[6] = orf_start
+            empty[7] = orf_end
             if target in hmmHits:
                 # sort by score
                 hmmHits[target].sort(key = lambda x: x[1], reverse=False)
                 # Best Match
-                query,eval,score,length,start,end,dbname = hmmHits[target][0]
+                query,eval,score,length_orf,start,end,dbname = hmmHits[target][0]
                 name,EC,gene = ["", "", ""]
                 rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].ID==query])
                 if not rows.empty:
@@ -110,7 +119,7 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                     except: pass
                     try: gene = rows.iloc[0].Gene
                     except: pass
-                annotate = [name, query, dbname, eval, score, EC, gene, start, end, end-start, length]
+                annotate = [name, query, dbname, eval, score, EC, gene, orf_start, orf_end, start, end, end-start, length]
                 print(target, *annotate, sep='\t', file=writer)
 
                 # Write to FAA file
@@ -123,9 +132,9 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                 annotate = list()
 
                 # Individual matches
-                annotations = dict()
+                annotations = dict() # TODO: this can probably be a set instead of dict
                 for match in hmmHits[target]:
-                    query,eval,score,length,start,end,dbname = match
+                    query,eval,score,length_orf,start,end,dbname = match
                     rows = pd.DataFrame(dfLookup[dbname][dfLookup[dbname].ID==query])
                     name,EC, gene = ["", "", ""]
                     if not rows.empty:
@@ -137,11 +146,11 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
                     else:
                         print("WARNING, query not in lookup:", target, dbname, query)
                     # add match to corresponding file
-                    annotation = [name, query, eval, score, EC, gene, start, end, end-start, length]
+                    annotation = [name, query, eval, score, EC, gene, orf_start, orf_end, start, end, end-start, length_orf]
                     print(target, *annotation, sep='\t', file=hmmFiles[dbname])
                     # keep track of db names with matches
                     if dbname not in annotations:
-                        annotations[dbname] = [name, query, eval, score, EC, gene, start, end, end-start, length]
+                        annotations[dbname] = [name, query, eval, score, EC, gene, orf_start, orf_end, start, end, end-start, length_orf]
                 # if db name wasn't in a match, mark target as hypothetical for that db
                 for dbname in dbhmms.keys():
                     if dbname not in annotations:

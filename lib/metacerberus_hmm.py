@@ -7,8 +7,6 @@ Uses HMMER hmmsearch
 import os
 import re
 from pathlib import Path
-import subprocess
-import time
 import pyhmmer
 
 

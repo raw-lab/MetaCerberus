@@ -2,7 +2,7 @@
 
 set -e
 
-ENV_NAME=MetaCerberus-1.3.0
+ENV_NAME=MetaCerberus-1.3.1
 echo "Creating conda environment: "$ENV_NAME
 
 # initialize conda environment in bash script
