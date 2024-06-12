@@ -371,11 +371,12 @@ Example:
     else:
         try:
             ray.init(address='auto', log_to_driver=DEBUG)
-            print("Started RAY on cluster")
         except:
-            ray.init(num_cpus=config['CPUS'], log_to_driver=DEBUG)
-            print("Started RAY single node")
-
+            try:
+                ray.init(num_cpus=config['CPUS'], log_to_driver=DEBUG)
+            except:
+                print("Failed to initialize ray")
+                return 0
     config['CLUSTER'] = False
     if len(ray.nodes()) > 1:
         config['CLUSTER'] = True
