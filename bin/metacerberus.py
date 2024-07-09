@@ -71,7 +71,6 @@ DEPENDENCIES = {
     'EXE_PORECHOP': 'porechop',
     'EXE_BBDUK': 'bbduk.sh',
     'EXE_FGS': 'FragGeneScanRs',
-    'EXE_PRODIGAL-GV': 'prodigal-gv',
     'EXE_PHANOTATE' : 'phanotate.py',
     'EXE_COUNT_ASSEMBLY': 'countAssembly.py'
     }
@@ -607,33 +606,24 @@ Example:
             set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
             pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_decon', config['DIR_OUT'], [value, config, f"{STEP[4]}/{key}/quality"]))
             pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
-        if func == "removeN":
-            fasta[key] = value[0]
-            if value[1]:
-                NStats[key] = value[1]
-            set_add(step_curr, 6, "STEP 6: Metaome Stats")
-            readStats[key] = metacerberus_metastats.getReadStats(value[0], config, os.path.join(STEP[6], key))
+        if func == "removeN" or func == "reformat":
+            if func == "removeN":
+                fasta[key] = value[0]
+                if value[1]:
+                    NStats[key] = value[1]
+                set_add(step_curr, 6, "STEP 6: Metaome Stats")
+                readStats[key] = metacerberus_metastats.getReadStats(value[0], config, os.path.join(STEP[6], key))
+            elif func == "reformat":
+                fasta[key] = value
             set_add(step_curr, 7, "STEP 7: ORF Finder")
             if key.startswith("FragGeneScan_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}"]))
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}"]))
             elif key.startswith("prodigalgv_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prodgv, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}", config['META'], True]))
             elif key.startswith("prodigal_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}", config['META']]))
             elif key.startswith("phanotate_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
-            jobsORF += 1
-        if func == "reformat":
-            fasta[key] = value
-            set_add(step_curr, 7, "STEP 7: ORF Finder")
-            if key.startswith("FragGeneScan_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [value, config, f"{STEP[7]}/{key}"]))
-            elif key.startswith("prodigalgv_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prodgv, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
-            elif key.startswith("prodigal_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
-            elif key.startswith("phanotate_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [value[0], config, f"{STEP[7]}/{key}", config['META']]))
+                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}", config['META']]))
             jobsORF += 1
         if func.startswith("findORF_"):
             if config['GROUPED']:
