@@ -178,6 +178,7 @@ Example:
     optional.add_argument('--scaffolds', action="store_true", help="Sequences are treated as scaffolds [False]")
     optional.add_argument('--minscore', type=float, default=60, help="Score cutoff for parsing HMMER results [60]")
     optional.add_argument('--evalue', type=float, default=1e-09, help="E-value cutoff for parsing HMMER results [1e-09]")
+    optional.add_argument('--remove-n-repeats', action="store_true", help="Remove N repeats, splitting contigs [False]")
     optional.add_argument('--skip-decon', action="store_true", help="Skip decontamination step [False]")
     optional.add_argument('--skip-pca', action="store_true", help="Skip PCA [False]")
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
@@ -536,9 +537,13 @@ Example:
     # Step 5 Contig Entry Point
     # Only do this if a fasta file was given, not if fastq
     if fasta:# and "scaffold" in config:
-        print("\nSTEP 5a: Removing N's from contig files")
-        for key,value in fasta.items():
-            pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.removeN, key, config['DIR_OUT'], [value, config, Path(STEP[5], key)]))
+        if config['REMOVE_N_REPEATS']:
+            print("\nSTEP 5a: Removing N's from contig files")
+            for key,value in fasta.items():
+                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.removeN, key, config['DIR_OUT'], [value, config, Path(STEP[5], key)]))
+        else:
+            for key,value in fasta.items():
+                pipeline += [ray.put([key, value, "reformat"])]
 
 
     # Step 8 Protein Entry Point
