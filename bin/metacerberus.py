@@ -815,7 +815,6 @@ Example:
             out_genbank = Path(final_path, f"{key}_template.gbk")
             metacerberus_report.write_datafiles(gff[0], fasta[key], amino[key], summary_tsv, out_gff, out_genbank)
         else:
-            print("GFF", "NONE")
             out_gff = Path(final_path, "gff", f"{key}.gff")
             with out_gff.open('w') as writer:
                 with summary_tsv.open() as read_summary:

@@ -97,6 +97,8 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
     gff = Path(faa).with_suffix(".gff")
     if gff.exists():
         gff = [x.split() for x in open(gff).readlines() if not x.startswith("#")]
+    else:
+        gff = None
     with open(summary_out, 'w') as writer, fasta_prefix.open('w') as faa_writer, open(faa) as faa_reader:
         print(*header, sep='\t', file=writer)
         for i,target in enumerate(proteins.keys()):
