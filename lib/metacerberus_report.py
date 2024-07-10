@@ -380,7 +380,7 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                     summ = read_summary.readline().split('\t')
                     attributes = [f"ID={summ[0]}", f"Name={summ[1]}",
                                         f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}",
-                                        f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"]
+                                        f"product_start={summ[10]}", f"product_end={summ[11]}", f"product_length={summ[12]}"]
                     print(*data, ';'.join(attributes), sep='\t', file=writer_gff)
                     print(*data, ';'.join(attributes), sep='\t', file=writer_gtf)
                     if data[0] not in gff_data:
@@ -400,7 +400,17 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                 if line.startswith(">"):
                     writer_gff.write(line)
                     locus = line.strip()[1:]
-                    print(f"{'LOCUS':<12}{locus}", file=writer_gbk)
+                    # read in sequence in fasta file
+                    seq = list()
+                    line = read_fasta.readline()
+                    while line:
+                        if line.startswith(">"):
+                            break
+                        writer_gff.write(line)
+                        seq += [line.strip()]
+                        line = read_fasta.readline()
+                    seq = "".join(seq)
+                    print(f"{'LOCUS':<12}{locus:<12} {len(seq)} bp", file=writer_gbk)
                     print(f"{'DEFINITION':<12}", file=writer_gbk)
                     print(f"{'ACCESSION':<12}", file=writer_gbk)
                     print(f"{'VERSION':<12}", file=writer_gbk)
@@ -414,28 +424,25 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                     print(f"{'  PUBMED':<12}", file=writer_gbk)
                     print(f"{'COMMENT':<12}", file=writer_gbk)
                     print(f"{'FEATURES':<21}Location/Qualifiers", file=writer_gbk)
-                    seq = list()
-                    line = read_fasta.readline()
-                    while line:
-                        if line.startswith(">"):
-                            break
-                        writer_gff.write(line)
-                        seq += [line.strip()]
-                        line = read_fasta.readline()
-                    seq = "".join(seq)
-                    locus = locus.split()[0]
                     print(f'{"     source":<21}{f"1..{len(seq)}"}', file=writer_gbk)
                     print(f'{"":<21}/organism=""', file=writer_gbk)
+                    # get gff data
+                    locus = locus.split()[0]
                     if locus in gff_data:
                         for data in gff_data[locus]:
                             attributes = data[-1]
                             start = data[3]
                             end = data[4]
-                            print(f'{"     CDS":<21}{f"{start}..{end}"}', file=writer_gbk)
+                            if data[6] == '+':
+                                print(f'{"     CDS":<21}{f"{start}..{end}"}', file=writer_gbk)
+                            else:
+                                print(f'{"     CDS":<21}{f"complement ({start}..{end})"}', file=writer_gbk)
+                            print(f'{"":<21}/codon_start={int(data[7])+1}', file=writer_gbk)
                             print(f'{"":<21}/product="{attributes["Name"]}"', file=writer_gbk)
                             print(f'{"":<21}/db_xref="{attributes["Dbxref"]}"', file=writer_gbk)
                             translation = f'/translation="'
                             seq_faa = []
+                            #TODO: This is super slow, get index of headers before any loops
                             with open(amino) as read_faa:
                                 line_faa = read_faa.readline()
                                 while line_faa:
@@ -450,7 +457,7 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                                     if len(seq_faa) > 0:
                                         break
                                     line_faa = read_faa.readline()
-                            translation += ''.join(seq_faa + ['"'])
+                            translation += re.sub(r'\*', "", ''.join(seq_faa)) + '"'
                             for i in range(0, len(translation), 48):
                                 print(f'{"":<21}{translation[i:i+48]}', file=writer_gbk)
                     print(f'{"ORIGIN":<12}', file=writer_gbk)
