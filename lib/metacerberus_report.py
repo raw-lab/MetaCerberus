@@ -367,6 +367,17 @@ def write_HTML_files(outfile, figure, sample, name):
 # Save Annotated GFF and GenBank files
 #TODO: Add embl
 def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path, out_genbank:Path):
+    # Create amino acid index
+    faa_idx = dict()
+    with open(amino) as read_faa:
+        line_faa = read_faa.readline()
+        while line_faa:
+            if line_faa.startswith(">"):
+                line = line_faa.strip().split()[0][1:]
+                faa_idx[line] = read_faa.tell()
+            line_faa = read_faa.readline()
+
+    # Read in GFF data
     gff_data = dict()
     with out_gff.open('w') as writer_gff, out_gff.with_suffix(".gtf").open('w') as writer_gtf:
         print("##gff-version 2", file=writer_gtf)
@@ -390,6 +401,7 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                         a = a.split('=')
                         att[a[0]] = a[1]
                     gff_data[data[0]] += [data + [att]]
+
         # Write contigs to end of GFF (ROARY compatible)
         # Create GENBANK template
         print("##FASTA", file=writer_gff)
@@ -401,16 +413,16 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                     writer_gff.write(line)
                     locus = line.strip()[1:]
                     # read in sequence in fasta file
-                    seq = list()
+                    seq_fna = list()
                     line = read_fasta.readline()
                     while line:
                         if line.startswith(">"):
                             break
                         writer_gff.write(line)
-                        seq += [line.strip()]
+                        seq_fna += [line.strip()]
                         line = read_fasta.readline()
-                    seq = "".join(seq)
-                    print(f"{'LOCUS':<12}{locus:<12} {len(seq)} bp", file=writer_gbk)
+                    seq_fna = "".join(seq_fna)
+                    print(f"{'LOCUS':<12}{locus:<12} {len(seq_fna)} bp", file=writer_gbk)
                     print(f"{'DEFINITION':<12}", file=writer_gbk)
                     print(f"{'ACCESSION':<12}", file=writer_gbk)
                     print(f"{'VERSION':<12}", file=writer_gbk)
@@ -424,7 +436,7 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                     print(f"{'  PUBMED':<12}", file=writer_gbk)
                     print(f"{'COMMENT':<12}", file=writer_gbk)
                     print(f"{'FEATURES':<21}Location/Qualifiers", file=writer_gbk)
-                    print(f'{"     source":<21}{f"1..{len(seq)}"}', file=writer_gbk)
+                    print(f'{"     source":<21}{f"1..{len(seq_fna)}"}', file=writer_gbk)
                     print(f'{"":<21}/organism=""', file=writer_gbk)
                     # get gff data
                     locus = locus.split()[0]
@@ -440,31 +452,24 @@ def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path
                             print(f'{"":<21}/codon_start={int(data[7])+1}', file=writer_gbk)
                             print(f'{"":<21}/product="{attributes["Name"]}"', file=writer_gbk)
                             print(f'{"":<21}/db_xref="{attributes["Dbxref"]}"', file=writer_gbk)
+                            # load translation from amino acid sequence file, using previously created index
                             translation = f'/translation="'
                             seq_faa = []
-                            #TODO: This is super slow, get index of headers before any loops
-                            with open(amino) as read_faa:
-                                line_faa = read_faa.readline()
-                                while line_faa:
-                                    if line_faa.startswith(">"):
-                                        if attributes["ID"]  == line_faa.strip().split()[0][1:]:
-                                            line_faa = read_faa.readline()
-                                            while line_faa:
-                                                if line_faa.startswith(">"):
-                                                    break
-                                                seq_faa += [line_faa.strip()]
-                                                line_faa = read_faa.readline()
-                                    if len(seq_faa) > 0:
-                                        break
-                                    line_faa = read_faa.readline()
-                            translation += re.sub(r'\*', "", ''.join(seq_faa)) + '"'
+                            if attributes["ID"] in faa_idx:
+                                with open(amino) as read_faa:
+                                    read_faa.seek(faa_idx[attributes["ID"]])
+                                    for line_faa in read_faa:
+                                        if line_faa.startswith(">"):
+                                            break
+                                        seq_faa += [line_faa.strip()]
+                                translation += re.sub(r'\*', "", ''.join(seq_faa)) + '"'
                             for i in range(0, len(translation), 48):
                                 print(f'{"":<21}{translation[i:i+48]}', file=writer_gbk)
                     print(f'{"ORIGIN":<12}', file=writer_gbk)
                     row = list()
                     start = 1
-                    for s in range(0, len(seq), 10):
-                        row += [seq[s:s+10]]
+                    for s in range(0, len(seq_fna), 10):
+                        row += [seq_fna[s:s+10]]
                         if len(row) == 6:
                             print(f'{start:>9} {" ".join(row)}', file=writer_gbk)
                             row = list()
