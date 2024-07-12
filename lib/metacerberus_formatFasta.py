@@ -13,6 +13,7 @@ import textwrap
 # Remove quality from fastq
 def reformat(fastq:Path, config:dict, subdir:Path):
     path = Path(config['DIR_OUT'], subdir)
+    fastq = Path(fastq)
 
     fasta = Path(path, fastq.name).with_suffix(".fna")
 
@@ -22,11 +23,20 @@ def reformat(fastq:Path, config:dict, subdir:Path):
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    if not config['REPLACE'] and os.path.exists(fasta):
-        return fasta
+    command = ["sed", "-n", '1~4s/^@/>/p;2~4p', fastq.as_posix()]
+    p = subprocess.Popen(command, stdout=subprocess.PIPE, text=True)
 
-    command = "sed -n '1~4s/^@/>/p;2~4p' " +fastq.as_posix()+ " > " +fasta.as_posix()
-    subprocess.call(command, shell=True)
+    with fasta.open('w') as writer:
+        headers = set()
+        for line in p.stdout:
+            if line.startswith(">"):
+                line = line.split(maxsplit=1)
+                if line[0] in headers:
+                    line[0] += ":2"
+                headers.add(line[0])
+                writer.write(f"{line[0]} {line[1]}")
+            else:
+                writer.write(line)
 
     done.touch()
     return fasta
