@@ -54,6 +54,7 @@ setuptools.setup(
             'psutil',
             'dominate',
             'pyrodigal',
+            'pyrodigal-gv',
             'pyhmmer'
             ],
 )
