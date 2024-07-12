@@ -336,8 +336,12 @@ Example:
             if proc.returncode == 0:
                 print(f"{value:20} {path}")
                 config[key] = path
+                if not os.path.isfile(path):
+                    print(f"{value:20} WARNING: '{value}' not found")
+                    config[key] = None
             else:
                 print(f"{value:20} NOT FOUND, must be defined in config file as {key}:<path>")
+                config[key] = None
         except:
             print(f"ERROR executing 'which {value}'")
 
@@ -496,7 +500,7 @@ Example:
     if len(fastq) > 0:
         config['META'] = True
         if not any([args.illumina, args.nanopore, args.pacbio]):
-            parser.error('A .fastq file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
+            parser.error('A FASTQ file was given, but no flag specified as to the type.\nPlease use one of --illumina, --nanopore, or --pacbio')
         else:
             if args.illumina:
                 config['QC_SEQ'] = QC_SEQ["illumina"]
@@ -520,19 +524,34 @@ Example:
         fastqPaired = dict()
         for ext in FILES_FASTQ:
             fastqPaired.update( {k:v for k,v in fastq.items() if "R1"+ext in v and v.replace("R1"+ext, "R2"+ext) in fastq.values() } )
+        if len(fastqPaired) > 0 and not config['EXE_FLASH']:
+            parser.error('ERROR: FLASH is required for merging paired end FASTQ files.\nPlease install FLASH and edit the PATH variable or set the path in a config file')
         for key,value in fastqPaired.items():
             reverse = fastq.pop(key.replace("R1", "R2"))
             forward = fastq.pop(key)
             key = key.removesuffix("R1").rstrip('-_')
-            #TODO: quick fix, improve for Ray
-            r1,r2 = metacerberus_trim.trimPairedRead([key, [value,reverse]], config, Path(STEP[3], key))
+            #TODO: quick fix, make parallel
+            if not config['EXE_FASTP']:
+                print("WARNING: Skipping paired end trimming, FASTP not found")
+                r1 = value
+                r2 = reverse
+            else:
+                r1,r2 = metacerberus_trim.trimPairedRead([key, [value,reverse]], config, Path(STEP[3], key))
             value = metacerberus_merge.mergePairedEnd([r1,r2], config, f"{STEP[3]}/{key}/merged")
             pipeline += [ray.put([key, value, 'trimSingleRead'])]
         del fastqPaired # memory cleanup
         # Trim
-        for key,value in fastq.items():
-            print("TRIM:", key, value)
-            pipeline.append(rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)]))
+        if config['NANOPORE'] and not config['EXE_PORECHOP']:
+            print("WARNING: Skipping Nanopore trimming, PORECHOP not found")
+            for key,value in fastq.items():
+                pipeline += [ray.put([key, value, "trimSingleRead"])]
+        elif not config['EXE_FASTP']:
+            print("WARNING: Skipping single-end trimming, FASTP not found")
+            for key,value in fastq.items():
+                pipeline += [ray.put([key, value, "trimSingleRead"])]
+        else:
+            for key,value in fastq.items():
+                pipeline += [rayWorkerThread.remote(metacerberus_trim.trimSingleRead, key, config['DIR_OUT'], [[key, value], config, Path(STEP[3], key)])]
 
     # Step 5 Contig Entry Point
     # Only do this if a fasta file was given, not if fastq
@@ -597,7 +616,9 @@ Example:
             fastq[key] = value
             pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_trim', config['DIR_OUT'], [value, config, f"{STEP[3]}/{key}/quality"]))
             if fastq and config['ILLUMINA']:
-                if config['SKIP_DECON']:
+                if config['SKIP_DECON'] or not config['EXE_BBDUK']:
+                    if not config['EXE_BBDUK']:
+                        set_add(step_curr, "decon", "WARNING: Skipping decontamination, BBDUK not found")
                     set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
                     pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
                 else:
@@ -631,6 +652,12 @@ Example:
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}", config['META']]))
             jobsORF += 1
         if func.startswith("findORF_"):
+            if Path(value).stat().st_size == 0:
+                # fail if amino file is empty
+                print("WARNING: no ORFs found in:", key, value)
+                continue
+            #TODO: Check for duplicate headers in amino acids
+            # This causes an issue with the GFF and summary files
             if config['GROUPED']:
                 amino[key] = value
                 jobsORF -= 1
