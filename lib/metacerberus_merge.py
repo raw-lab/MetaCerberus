@@ -42,7 +42,7 @@ def mergePairedEnd(pairedFastq, config, subdir):
     var = sum([((x - mu)**2) for x in lengths]) / len(lengths)
     std = var**0.5
     _99th = round(mu + (3*std))
-    print(R1, mu, var, std, _99th, max(lengths), file=sys.stderr)
+    #print(R1, mu, var, std, _99th, max(lengths), file=sys.stderr)
 
     command = f"{config['EXE_FLASH']} {R1} {R2} -d {outpath} -o {prefix} -M {_99th} --interleaved-output"
     with open(f"{outpath}/stdout.txt", 'w') as fout, open(f"{outpath}/stderr.txt", 'w') as ferr:
