@@ -652,6 +652,8 @@ Example:
                 pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}", config['META']]))
             jobsORF += 1
         if func.startswith("findORF_"):
+            if not value:
+                continue
             if Path(value).stat().st_size == 0:
                 # fail if amino file is empty
                 print("WARNING: no ORFs found in:", key, value)
@@ -678,30 +680,29 @@ Example:
                 value = outfile
                 key = "grouped"
             set_add(step_curr, 8, "STEP 8: HMMER Search")
-            if value: # TODO: Put this check at top of "findORF_" block
-                amino[key] = value
-                if config['CHUNKER'] > 0:
-                    chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+            amino[key] = value
+            if config['CHUNKER'] > 0:
+                chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+                for hmm in dbHMM.items():
+                    chunkCount = 1
+                    for chunk in chunks.files:
+                        key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
+                        key_name = f'chunk-{chunkCount}-{len(chunks.files)}_{key}'
+                        chunkCount += 1
+                        pipeline.append(rayWorkerThread.options(num_cpus=jobs_per_node).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
+                                                                                [{key_name:chunk}, config, Path(STEP[8], key), hmm, 4]))
+            else:
+                outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
+                if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
                     for hmm in dbHMM.items():
-                        chunkCount = 1
-                        for chunk in chunks.files:
-                            key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
-                            key_name = f'chunk-{chunkCount}-{len(chunks.files)}_{key}'
-                            chunkCount += 1
-                            pipeline.append(rayWorkerThread.options(num_cpus=jobs_per_node).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
-                                                                                    [{key_name:chunk}, config, Path(STEP[8], key), hmm, 4]))
+                        hmm_key = f"{hmm[0]}/{key}"
+                        pipeline.append(rayWorkerThread.options(num_cpus=jobs_per_node).remote(metacerberus_hmm.searchHMM, [hmm_key], config['DIR_OUT'],
+                                                                [{key:value}, config, Path(STEP[8]), hmm, 4]))
                 else:
-                    outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
-                    if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
-                        for hmm in dbHMM.items():
-                            hmm_key = f"{hmm[0]}/{key}"
-                            pipeline.append(rayWorkerThread.options(num_cpus=jobs_per_node).remote(metacerberus_hmm.searchHMM, [hmm_key], config['DIR_OUT'],
-                                                                    [{key:value}, config, Path(STEP[8]), hmm, 4]))
-                    else:
-                        #TODO: distinguish filtered tsv per hmm
-                        tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                        set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
+                    #TODO: distinguish filtered tsv per hmm
+                    tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+                    set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
+                    pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
         if func.startswith('searchHMM'):
             keys = key
             for key,tsv_file in zip(keys,value):
