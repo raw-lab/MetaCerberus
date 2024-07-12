@@ -393,6 +393,10 @@ Example:
     startTime = time.time()
     # Step 1 - Load Input Files
     print("\nSTEP 1: Loading sequence files:")
+    # Check installed libraries for pyrodigal, pyrodigal-gv
+    #required = {'mutagen', 'gTTS'}
+    #installed = {pkg.key for pkg in pkg_resources.working_set}
+    #missing = required - installed
     fastq = {}
     fasta = {}
     amino = {}
@@ -429,6 +433,7 @@ Example:
                     args.prodigalgv.append(os.path.join(item, file))
         else:
             print(f'{item} is not a valid sequence')
+    # Load Prodigal input
     for item in args.prodigal:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -447,6 +452,10 @@ Example:
         else:
             print(f'{item} is not a valid sequence')
     # Load FGS+ input
+    if not config['EXE_FGS'] and args.fgs:
+        #TODO: setup FGS automatically instead
+        print("WARNING: FragGeneScanRS is not installed, skipping files set to use FGS")
+        args.fraggenescan = list()
     for item in args.fraggenescan:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
@@ -465,6 +474,9 @@ Example:
         else:
             print(f'{item} is not a valid sequence')
     # Load Phanotate input
+    if not config['EXE_PHANOTATE'] and args.phanotate:
+        print("WARNING: Phanotate is not installed, skipping files set to use Phanotate")
+        args.phanotate = list()
     for item in args.phanotate:
         item = os.path.abspath(os.path.expanduser(item))
         if os.path.isfile(item):
