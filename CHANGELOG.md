@@ -6,11 +6,19 @@
 
 -Implemented PyHMMER
 -Implemented Pyrodigal
+-Implemented Pyrodigal-gv
 -Added ORF start and end to output summary files
+-Improved speed in creating final GFF files
+-Fixed dependency checking for lite version
+-Made N removal optional
 
 ### Bug Fixes
 
 -Fixed prodigal-gv GFF
+-Fixed some Phanotate bugs
+-Fixed bug with --protein option
+-Fixed crash when GFF is not present
+-Other minor bug fixes
 
 ## Version 1.3.0
 
