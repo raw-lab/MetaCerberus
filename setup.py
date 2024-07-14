@@ -45,6 +45,7 @@ setuptools.setup(
     python_requires='>=3.8',
     install_requires=[
             'setuptools',
+            'pandas',
             'ray',
             'metaomestats',
             'configargparse',
