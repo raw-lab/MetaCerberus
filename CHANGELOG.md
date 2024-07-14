@@ -11,6 +11,7 @@
 -Improved speed in creating final GFF files
 -Fixed dependency checking for lite version
 -Made N removal optional
+-Improved Genbank output
 
 ### Bug Fixes
 

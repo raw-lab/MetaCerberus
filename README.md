@@ -360,6 +360,7 @@ optional arguments:
   --scaffolds           Sequences are treated as scaffolds [False]
   --minscore MINSCORE   Score cutoff for parsing HMMER results [60]
   --evalue EVALUE       E-value cutoff for parsing HMMER results [1e-09]
+  --remove-n-repeats    Remove N repeats, splitting contigs [False]
   --skip-decon          Skip decontamination step. [False]
   --skip-pca            Skip PCA. [False]
   --cpus CPUS           Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]
