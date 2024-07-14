@@ -2,7 +2,7 @@
 
 set -e
 
-ENV_NAME=MetaCerberus
+ENV_NAME=MetaCerberus-lite
 echo "Creating conda environment: "$ENV_NAME
 
 # initialize conda environment in bash script
@@ -24,7 +24,3 @@ metacerberus.py --setup
 echo "Created conda environment: "$ENV_NAME
 echo "To activate run 'conda activate $ENV_NAME'"
 echo "Run metacerberus.py --download to download databases"
-
-#267
-#193
-#194 with flash2
