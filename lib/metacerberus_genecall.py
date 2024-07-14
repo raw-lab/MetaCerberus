@@ -6,6 +6,7 @@ Uses FGS+
 Uses Phanotate
 """
 
+import re
 from pathlib import Path
 import subprocess
 import pyrodigal
@@ -94,25 +95,60 @@ def findORF_phanotate(contig, config, subdir, meta=False):
     path = Path(config['DIR_OUT'], subdir)
     done = path / "complete"
 
-    faaOut  = path / "proteins.faa"
+    faa = path / "proteins.faa"
+    fna = faa.with_suffix(".fna")
+    gff = faa.with_suffix(".gff")
+    gbk = faa.with_suffix(".gbk")
 
-    if not config['REPLACE'] and done.exists() and faaOut.exists():
-            return faaOut
+    if not config['REPLACE'] and done.exists() and faa.exists():
+            return faa
     done.unlink(missing_ok=True)
     path.mkdir(exist_ok=True, parents=True)
 
-    command = [config['EXE_PHANOTATE'], '-f', 'faa', contig] #, '-o', faaOut, contig]
+    ferr = Path(path, "stderr.txt").open('w')
+
+    # Phanotate > genbank file
+    command = [config['EXE_PHANOTATE'], '-f', 'genbank', contig]
     try:
-        with faaOut.open('w') as fout, Path(path,"stderr.txt").open('w') as ferr:
+        with gbk.open('w') as fout:
             subprocess.run(command, stdout=fout, stderr=ferr)
     except Exception as e:
-        print(e)
+        print(e, file=ferr)
         return None
 
-    #command = [config['EXE_PHANOTATE'], '-f', 'genbank', contig] #, '-o', faaOut, contig]
-    #genbank.py outfile.gbk -f gff -o outfile.gff
-    #genbank.py outfile.gbk -f fna -o outfile.fna
-    #genbank.py outfile.gbk -f faa -o outfile.faa
+    re_fix = re.compile(r'\[(\d+)\.\.(\d+)\] \[(.+)\]')
+    re_clean = re.compile(r'[+*#]')
+    # Genbank > faa
+    fout = Path(path, "stdout.txt").open('w')
+    try:
+        command = ["genbank.py", "-f", "faa", gbk]
+        p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=ferr, text=True)
+        with faa.open('w') as faa_writer:
+            for line in p.stdout:
+                if line.startswith(">"):
+                    faa_writer.write(re_fix.sub(r'\1_\2 \3', line))
+                else:
+                    faa_writer.write(re_clean.sub('', line))
+    except Exception as e:
+        print(e, file=ferr)
+        return None
+    # Genbank > GFF, FNA
+    try:
+        command = ["genbank.py", "-f", "gff", "-o", gff, gbk]
+        p = subprocess.run(command, stdout=subprocess.PIPE, stderr=ferr, text=True)
+        #TODO: Filtering out tRNA from GFF until figuring out how to put them in the FAA file. Causes report to fail if they don't match.
+        with gff.open('w') as gff_writer:
+            for line in p.stdout:
+                if line.split('\t')[2] != "tRNA":
+                    gff_writer.write(line)
+
+        command = ["genbank.py", "-f", "fna", "-o", fna, gbk]
+        subprocess.run(command, stdout=fout, stderr=ferr)
+    except Exception as e:
+        print(e, file=ferr)
+
+    ferr.close()
+    fout.close()
 
     done.touch()
-    return faaOut
+    return faa

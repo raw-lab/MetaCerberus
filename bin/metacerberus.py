@@ -150,7 +150,7 @@ Example:
     input.add_argument('--fraggenescan', nargs='+', default=[], help='Eukaryote nucleotide sequence (includes other viruses, works all around for everything)')
     input.add_argument('--super', nargs='+', default=[], help='Run sequence in both --prodigal and --fraggenescan modes')
     input.add_argument('--prodigalgv', nargs='+', default=[], help='Giant virus nucleotide sequence')
-    input.add_argument('--phanotate', nargs='+', default=[], help='Phage sequence')
+    input.add_argument('--phanotate', nargs='+', default=[], help='Phage sequence (EXPERIMENTAL)')
     input.add_argument('--protein', '--amino', nargs='+', default=[], help='Protein Amino Acid sequence')
     input.add_argument('--hmmer-tsv', nargs='+', default=[], help='Annotations tsv file from HMMER (experimental)')
     input.add_argument('--class', type=str, default='', help='path to a tsv file which has class information for the samples. If this file is included scripts will be included to run Pathview in R')
