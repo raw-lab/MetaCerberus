@@ -70,6 +70,7 @@ MetaCerberus transforms raw sequencing (i.e. genomic, transcriptomics, metagenom
    page13
    page14
    page15
+   tutorial1
 
 Indices and tables
 ==================
