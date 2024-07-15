@@ -1,4 +1,4 @@
-Using MetaCerberus - A Tutorial
+MetaCerberus Tutorial - Installation
 ===================================
 
 STEP 0: Installation
