@@ -18,20 +18,20 @@ These are the commands you will use to install MetaCerberus:
   metacerberus.py --download
 
 After the ``git clone http://github.com/raw-lab/MetaCerberus.git`` command, you will see:
-.. img:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/Gitclone_result_install.png
-    width: 600px
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/image/MetaCerberus_tutorial_images/Gitclone_result_install.png
+    :width: 600
 
 Then proceed to next part of command:
-.. img:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/cd-MC-bash%20install_metacerberus.png
-    width: 600px
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/image/MetaCerberus_tutorial_images/cd-MC-bash%20install_metacerberus.png
+    :width: 600
 This command will result in installation of MetaCerberus, which looks like this once completed:
-.. img::https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/install_MC%20results.png
-    width: 600px
+.. image::https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/image/MetaCerberus_tutorial_images/install_MC%20results.png
+    :width: 600
 
 Then we'll activate MetaCerberus, followed by downloaded the appropriate databases, like so:
-.. img:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/metacerberus.py%20--download.png
-    width: 600px
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/image/MetaCerberus_tutorial_images/metacerberus.py%20--download.png
+    :width: 600
 Which will look like: 
-.. img:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/metacerberus.py%20--download%20RESULT.png
-
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/image/MetaCerberus_tutorial_images/metacerberus.py%20--download%20RESULT.png
+    :width: 600
 Now you're ready to run MetaCerberus!
