@@ -21,9 +21,12 @@ The file `read-stats.txt` contains statistics for your input file, like so:
 .. image:: https://github.com/raw-lab/MetaCerberus/blob/5d2b110d0c50ef45920a85fdf60fc12389eccf31/img/MetaCerberus_tutorial_imgs/step6-read-stats-txt.png
 
 .. note:: The file ``stderr.out`` is a log file where any errors will be stored.
-    
+
 Step 7 - Gene Call
 -------------------
+Contents of the `step_07-geneCall` directory are:
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/31546be7ec23f8c86b6e431ad0d7e13ae00f3207/img/MetaCerberus_tutorial_imgs/Step7_contents.png
+    :width: 600
 
 
 Step 8 - HMMER

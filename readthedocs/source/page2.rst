@@ -2,7 +2,7 @@ Overview
 =============
 
 .. image:: https://raw.githubusercontent.com/raw-lab/metacerberus/main/img/workflow.jpg
-   :width: 600px
+   :width: 600
 
 General Info
 ---------------
