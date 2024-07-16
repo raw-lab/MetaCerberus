@@ -16,7 +16,7 @@ Here's the command I'm using to run the Lambda phage genome:
 - I'm using ``--super /path/to/input/file`` so that MetaCerberus will run both FragGeneScan and Prodigal on this file. 
 - ``--dir-out`` is used to tell MetaCerberus where to output the results. 
 
-A detailed list of options for MetaCerberus can be found `here_`_.
+A detailed list of options for MetaCerberus can be found `here_`.
 
 .. _here: https://metacerberus.readthedocs.io/en/latest/page7.html#
 

@@ -21,7 +21,6 @@ After the ``git clone http://github.com/raw-lab/MetaCerberus.git`` command, you 
 
 .. image:: ../img/Gitclone_result_install.jpg
     :width: 600
-    :loading: embed
 
 Then proceed to next part of command:
 
@@ -31,22 +30,21 @@ Then proceed to next part of command:
    :height: 600
 This command will result in installation of MetaCerberus, which looks like this once completed:
 
-.. figure:: ../img/install_MC_results.jpg
+.. image:: ../img/install_MC_results.jpg
     :width: 600
-
 
 .. image:: ../img/install_MC_results.jpg
 
 Then we'll activate MetaCerberus, followed by downloaded the appropriate databases, like so:
 
 
-.. image:: ../img/metacerberus.py%20--download.jpg
+.. image:: ../img/metacerberus.py_--download.jpg
     :width: 600
 
 Which will look like: 
 
 
-.. image:: ../img/metacerberus.py%20--download%20RESULT.jpg
+.. image:: ../img/metacerberus.py_--download_RESULT.jpg
     :width: 600
 
 
