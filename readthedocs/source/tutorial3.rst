@@ -8,7 +8,7 @@ Now that we've run the MetaCerberus pipeline, let's take a look at the results f
     :height: 350
 Now a closer look at each subdirectory of our results:
 
-Step 5 - Format:
+Step_5-format:
 -------------------
 
 .. image:: ../img/step_5_outputs.jpg
@@ -16,7 +16,7 @@ Step 5 - Format:
 
 Step 5 contents only consist of a ``complete`` file, which merely indicates Step 5 ran to completion.
 
-Step 6 - MetaomeQC
+Step_6-metaomeQC
 -------------------
 Here are the contents of ``step_06-metaomeQC``:
 
@@ -31,7 +31,7 @@ The file ``read-stats.txt`` contains statistics for your input file, like so:
 
 .. note:: The file ``stderr.out`` is a log file where any error messages will be stored.
 
-Step 7 - Gene Call
+Step_7-geneCall
 -------------------
 Contents of the ``step_07-geneCall`` directory are:
 
@@ -40,7 +40,7 @@ Contents of the ``step_07-geneCall`` directory are:
 
 These are protein files in different formats. 
 
-Step 8 - HMMER
+Step_8-hmmer
 ------------------
 Contents of the ``step_08-hmmer`` directory are:
 
@@ -82,7 +82,7 @@ In this example run, we have several file outputs for FragGeneScan. This is what
 
 .. image:: ../img/S8-filtered_tsv.jpg
 
-Step 9 - Parse
+Step_9-parse
 ------------------
 The contents of ``step_09-parse`` are:
 
@@ -153,7 +153,7 @@ Looking a little closer:
 .. image:: ../img/S9-top5_FGS_tsv.jpg
 
 
-Step 10 - Visualize data
+Step_10-visualizeData
 --------------------------
 
 The contents of ``step_10-visualizeData`` are:
