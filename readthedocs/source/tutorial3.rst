@@ -4,8 +4,8 @@ A Look at the Results folder - Tutorial
 Now that we've run the MetaCerberus pipeline, let's take a look at the results folder. Having ran the ``--super`` option on my data, the results folder looks like so:
 
 .. image:: ../img/results_folder.jpg
-    :width: 500
-    :height: 200
+    :width: 400
+    :height: 100
 Now a closer look at each subdirectory of our results:
 
 Step_5-format:
@@ -27,7 +27,7 @@ The file ``read-stats.txt`` contains statistics for your input file, like so:
 
 
 .. image:: ../img/step6-read-stats-txt.jpg
-    :scale: 115%
+    :width: 500
 
 .. note:: The file ``stderr.out`` is a log file where any error messages will be stored.
 
@@ -46,7 +46,7 @@ Contents of the ``step_08-hmmer`` directory are:
 
 
 .. image:: ../img/Step8_contents.jpg
-    :scale: 130%
+    :scale: 115%
 
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
 In this example run, we have several file outputs for FragGeneScan. This is what they look like:
@@ -88,7 +88,7 @@ The contents of ``step_09-parse`` are:
 
 
 .. image::  ../img/S9_contents.jpg
-    :scale: 130%
+    :scale: 115%
 
 Looking a little closer: 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,12 +109,12 @@ Looking a little closer:
 
 
 .. image:: ../img/S9-HMMR_BH_KOFam_FOAM_rollup2_tsv.jpg
-    :scale: 130%
+    :scale: 110%
 
 ``HMMER_BH_KOFam_all_KEGG_rollup2.tsv``
 
 .. image:: ../img/S9-HMMR_BH_KOFam_all_KEGG_rollup2_tsv.jpg
-    :scale: 125%
+    :scale: 115%
 
 ``HMMER_top_5.tsv``
 
@@ -159,14 +159,14 @@ The contents of ``step_10-visualizeData`` are:
 
 
 .. image:: ../img/S10-contents.jpg
-    :scale: 155%
+    :scale: 160%
 
 What's in the FragGeneScan and Prodigal subdirectories?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/S10-FGS-Prod-contents.jpg
-    :width: 600
-    :height: 250
+    :width: 550
+    :height: 150
 
 Files under FragGeneScan or Prodigal:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -229,19 +229,19 @@ Files under FragGeneScan or Prodigal:
 
 
 .. image:: ../img/S10_fasta_stats_txt.jpg
-    :scale: 115%
+    :scale: 110%
 
 ``sunburst_KOFam_all_FOAM.html`` --- open in web browser
 
 
 .. image:: ../img/S10_Sunburst_KOFam_all_FOAM_html.jpg
-    :scale: 130%
+    :scale: 115%
 
 ``sunburst_KOFam_all_KEGG.html`` --- open in web browser
 
 
 .. image:: ../img/S10_Sunburst_KOFam_all_KEGG_html.jpg
-    :scale: 130%
+    :scale: 115%
 
 Contents under ``combined``:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -257,29 +257,29 @@ At a glance:
 .. image:: ../img/step10-combined-countsKOFamFOAM.jpg
 
 
-**``counts_KOFam_all_KEGG.tsv``**
+``counts_KOFam_all_KEGG.tsv``
 
 
 .. image:: ../img/S10_combined_counts_KOFam_all_KEGG_tsv.jpg
 
 
-**``stats.html``** --- open in web browser
+``stats.html`` --- open in web browser
 
 
 .. image:: ../img/S10_combined_stats_html.jpg
-    :scale: 125%
+    :scale: 110%
 
-**``stats.tsv``**
+*``stats.tsv``*
 
 
 .. image:: ../img/S10_Stats_tsv.jpg
 
 
-**``img``** --- contains the individual .png image files which are collectively located in ``stats.html``
+*``img``* --- contains the individual .png image files which are collectively located in ``stats.html``
 
 
 .. image:: ../img/S10_combined_img_contents.jpg
-    :scale: 140%
+    :width: 500
 
 Final
 -------------------
@@ -287,7 +287,7 @@ The contents of ``final`` are:
 
 
 .. image:: ../img/Final_contents.jpg
-    :scale: 140%
+    :width: 600
 
 
 
