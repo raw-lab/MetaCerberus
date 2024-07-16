@@ -3,14 +3,14 @@ A Look at the Results folder - Tutorial
 
 Now that we've run the MetaCerberus pipeline, let's take a look at the results folder. Having ran the ``--super`` option on my data, the results folder looks like so:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/img/MetaCerberus_tutorial_imgs/results_folder.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/results_folder.jpg
     :width: 600
 Now a closer look at each subdirectory of our results:
 
 Step 5 - Format:
 -------------------
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/e05bd6a59da4daed62ae39b4638471312db87d6e/img/MetaCerberus_tutorial_imgs/step_5_outputs.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/step_5_outputs.jpg
     :width: 600
 Step 5 contents only consist of a ``complete`` file, which merely indicates Step 5 ran to completion.
 
@@ -18,11 +18,11 @@ Step 6 - MetaomeQC
 -------------------
 Here are the contents of ``step_06-metaomeQC``:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/5d2b110d0c50ef45920a85fdf60fc12389eccf31/img/MetaCerberus_tutorial_imgs/S6_contents.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/S6_contents.jpg
     :width: 600
 The file ``read-stats.txt`` contains statistics for your input file, like so:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/5d2b110d0c50ef45920a85fdf60fc12389eccf31/img/MetaCerberus_tutorial_imgs/step6-read-stats-txt.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/step6-read-stats-txt.jpg
 
 .. note:: The file ``stderr.out`` is a log file where any error messages will be stored.
 
@@ -30,7 +30,7 @@ Step 7 - Gene Call
 -------------------
 Contents of the ``step_07-geneCall`` directory are:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/31546be7ec23f8c86b6e431ad0d7e13ae00f3207/img/MetaCerberus_tutorial_imgs/Step7_contents.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/Step7_contents.jpg
     :width: 600
 These are protein files in different formats. 
 
@@ -38,7 +38,7 @@ Step 8 - HMMER
 ------------------
 Contents of the ``step_08-hmmer`` directory are:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/a9bf37c3c7b779f947ced69688edca7f6c7349ee/img/MetaCerberus_tutorial_imgs/Step8_contents.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/Step8_contents.jpg
     :width: 600
 
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
@@ -48,7 +48,7 @@ In this example run, we have several file outputs for FragGeneScan. This is what
 
 ``KOFam_all_FOAM-FragGeneScan_Lambda_phage_sequences.tsv``:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/a9bf37c3c7b779f947ced69688edca7f6c7349ee/img/MetaCerberus_tutorial_imgs/S8-KOFam_FOAM_FGS_tsv.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/S8-KOFam_FOAM_FGS_tsv.jpg
 
 ``KOFam_all_KEGG-FragGeneScan_Lambda_phage_sequences.tsv``
 

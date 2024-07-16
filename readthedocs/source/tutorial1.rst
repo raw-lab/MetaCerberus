@@ -1,5 +1,5 @@
 MetaCerberus Tutorial - Installation
-===================================
+=======================================
 
 STEP 0: Installation
 --------------------------
@@ -28,16 +28,19 @@ Then proceed to next part of command:
 
 This command will result in installation of MetaCerberus, which looks like this once completed:
 
-.. figure:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/install_MC%20results.png
+.. figure:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/install_MC_results.jpg
     :width: 600
+
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/1ce9498f026ccd44a68cd645103901f5a7542b48/readthedocs/img/install_MC_results.jpg
+**Test image above**
 
 Then we'll activate MetaCerberus, followed by downloaded the appropriate databases, like so:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/metacerberus.py%20--download.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/metacerberus.py%20--download.jpg
     :width: 600
 
 Which will look like: 
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/metacerberus.py%20--download%20RESULT.png
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/metacerberus.py%20--download%20RESULT.jpg
     :width: 600
 Now you're ready to run MetaCerberus!
