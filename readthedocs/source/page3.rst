@@ -2,7 +2,7 @@ Annotation
 ===========
 
 .. image:: https://raw.githubusercontent.com/raw-lab/metacerberus/main/img/Rules.jpg
-   :width: 600px 
+   :width: 600 
 
 - **Rule 1** is for finding high quality matches across databases. It is a score pre-filtering module for pORFs thresholds: which states that each pORF match to an HMM is recorded by default or a user-selected cut-off (i.e.,  e-value/bit scores) per database independently, or across all default databases (e.g, finding best hit), or per user specification of the selected database.
 - **Rule 2** is to avoid missing genes encoding proteins with dual domains that are not overlapping. It is imputed for non-overlapping dual domain module pORF threshold: if two HMM hits are non-overlapping from the same database, both are counted as long as they are within the default or user selected score (i.e., e-value/bit scores).

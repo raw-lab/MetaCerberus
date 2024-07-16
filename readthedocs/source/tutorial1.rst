@@ -28,7 +28,7 @@ Then proceed to next part of command:
     :width: 600
 This command will result in installation of MetaCerberus, which looks like this once completed:
 
-.. image::https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/install_MC%20results.png
+.. figure:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/install_MC%20results.png
     :width: 600
 
 Then we'll activate MetaCerberus, followed by downloaded the appropriate databases, like so:
