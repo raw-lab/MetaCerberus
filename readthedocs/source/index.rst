@@ -53,8 +53,9 @@ MetaCerberus transforms raw sequencing (i.e. genomic, transcriptomics, metagenom
 
 
 .. toctree::
-   :hidden:
    :maxdepth: 3
+   :hidden:
+
    page1
    page2
    page3
