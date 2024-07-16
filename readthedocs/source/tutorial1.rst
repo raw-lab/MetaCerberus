@@ -19,13 +19,13 @@ These are the commands you will use to install MetaCerberus:
 
 After the ``git clone http://github.com/raw-lab/MetaCerberus.git`` command, you will see:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/img/MetaCerberus_tutorial_imgs/Gitclone_result_install.jpg
+.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/Gitclone_result_install.jpg
     :width: 600
 
 Then proceed to next part of command:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/img/MetaCerberus_tutorial_imgs/cd-MC-bash%20install_metacerberus.png
-    :width: 600
+.. image::https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/cd-MC-bash_install_metacerberus.jpg
+
 This command will result in installation of MetaCerberus, which looks like this once completed:
 
 .. figure:: https://github.com/raw-lab/MetaCerberus/blob/b9e782247b187a6bf0436a7776e32ce07193b322/img/MetaCerberus_tutorial_imgs/install_MC%20results.png
