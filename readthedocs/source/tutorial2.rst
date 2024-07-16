@@ -10,7 +10,7 @@ Step 1: Initializing the Pipeline
 
 Here's the command I'm using to run the Lambda phage genome:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/run_command_super_lambda.jpg
+.. image:: ../img/run_command_super_lambda.jpg
     :width: 600
 
 - I'm using ``--super /path/to/input/file`` so that MetaCerberus will run both FragGeneScan and Prodigal on this file. 
@@ -22,11 +22,11 @@ A detailed list of options for MetaCerberus can be found `here_`_.
 
 Once you have your command prepared, let's run MetaCerberus. After you enter your command, the pipeline output looks like so:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/pipeline_look.jpg
+.. image:: ../img/pipeline_look.jpg
     :width: 600
 
 Once finished, the bottom of your prompt screen will show:
 
-.. image:: https://github.com/raw-lab/MetaCerberus/blob/main/readthedocs/img/Finished_pipeline.jpg
+.. image:: ../img/Finished_pipeline.jpg
     :width: 600
 
