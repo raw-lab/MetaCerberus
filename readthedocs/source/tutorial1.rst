@@ -48,4 +48,4 @@ Which, once started will look like:
     :width: 650
 
 
-Now you're ready to run MetaCerberus!
+**Now you're ready to run MetaCerberus!**

@@ -251,31 +251,31 @@ At a glance:
 .. image:: ../img/S10_combined_contents.jpg
     :scale: 150%
 
-``counts_KOFam_all_FOAM.tsv``    
+**``counts_KOFam_all_FOAM.tsv``**    
 
 
 .. image:: ../img/step10-combined-countsKOFamFOAM.jpg
 
 
-``counts_KOFam_all_KEGG.tsv``
+**``counts_KOFam_all_KEGG.tsv``**
 
 
 .. image:: ../img/S10_combined_counts_KOFam_all_KEGG_tsv.jpg
 
 
-``stats.html`` --- open in web browser
+**``stats.html``** --- open in web browser
 
 
 .. image:: ../img/S10_combined_stats_html.jpg
     :scale: 125%
 
-``stats.tsv``
+**``stats.tsv``**
 
 
 .. image:: ../img/S10_Stats_tsv.jpg
 
 
-``img`` --- contains the individual .png image files which are collectively located in ``stats.html``
+**``img``** --- contains the individual .png image files which are collectively located in ``stats.html``
 
 
 .. image:: ../img/S10_combined_img_contents.jpg
