@@ -5,7 +5,7 @@ Now that we've run the MetaCerberus pipeline, let's take a look at the results f
 
 .. image:: ../img/results_folder.jpg
     :width: 400
-    :height: 100
+
 Now a closer look at each subdirectory of our results:
 
 Step_5-format:
