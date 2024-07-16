@@ -1,7 +1,7 @@
 Running MetaCerberus - Tutorial
 ==================================
 
-Once you have installation complete, databases are downloaded, and you've already ``conda activate MetaCerberus-1.3.1``, it's time to run MetaCerberus. This tutorial will show an example run through using a fasta file of the complete Lambda phage genome. 
+Once you have installation complete, databases are downloaded, and you've already ran ``conda activate MetaCerberus-1.3.1``, it's time to run MetaCerberus. This tutorial gives an example run through using a fasta file of the complete Lambda phage genome. 
 
 Step 1: Initializing the Pipeline
 ---------------------------------------
