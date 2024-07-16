@@ -5,7 +5,7 @@ Now that we've run the MetaCerberus pipeline, let's take a look at the results f
 
 .. image:: ../img/results_folder.jpg
     :width: 600
-
+    :height: 350
 Now a closer look at each subdirectory of our results:
 
 Step 5 - Format:
@@ -46,7 +46,7 @@ Contents of the ``step_08-hmmer`` directory are:
 
 
 .. image:: ../img/Step8_contents.jpg
-    :width: 600
+    :scale: 150%
 
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
 In this example run, we have several file outputs for FragGeneScan. This is what they look like:
@@ -88,9 +88,10 @@ The contents of ``step_09-parse`` are:
 
 
 .. image::  ../img/S9_contents.jpg
-
+    :scale: 150%
 
 Looking a little closer: 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``HMMER-KOFam_all_FOAM_top_5.tsv``
 
@@ -108,7 +109,7 @@ Looking a little closer:
 
 
 .. image:: ../img/S9-HMMR_BH_KOFam_FOAM_rollup2_tsv.jpg
-
+    :scale: 150%
 
 ``HMMER_BH_KOFam_all_KEGG_rollup2.tsv``
 
@@ -159,13 +160,14 @@ The contents of ``step_10-visualizeData`` are:
 
 
 .. image:: ../img/S10-contents.jpg
-
+    :scale: 150%
 
 What's in the FragGeneScan and Prodigal subdirectories?
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/S10-FGS-Prod-contents.jpg
-
+    :width: 550
+    :height: 450
 
 Files under FragGeneScan or Prodigal:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -234,13 +236,13 @@ Files under FragGeneScan or Prodigal:
 
 
 .. image:: ../img/S10_Sunburst_KOFam_all_FOAM_html.jpg
-
+    :scale: 150%
 
 ``sunburst_KOFam_all_KEGG.html`` --- open in web browser
 
 
 .. image:: ../img/S10_Sunburst_KOFam_all_KEGG_html.jpg
-
+    :scale: 150%
 
 Contents under ``combined``:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -248,7 +250,7 @@ At a glance:
 
 
 .. image:: ../img/S10_combined_contents.jpg
-
+    :scale: 150%
 
 ``counts_KOFam_all_FOAM.tsv``    
 
@@ -266,7 +268,7 @@ At a glance:
 
 
 .. image:: ../img/S10_combined_stats_html.jpg
-
+    :scale: 150%
 
 ``stats.tsv``
 
@@ -278,7 +280,7 @@ At a glance:
 
 
 .. image:: ../img/S10_combined_img_contents.jpg
-
+    :scale: 150%
 
 Final
 -------------------
@@ -286,7 +288,7 @@ The contents of ``final`` are:
 
 
 .. image:: ../img/Final_contents.jpg
-
+    :scale: 150%
 
 
 
