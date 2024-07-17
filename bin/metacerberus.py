@@ -30,8 +30,10 @@ import time
 import datetime
 from urllib import request
 import socket
-import ray #parallel-processing
-
+try:
+    import ray #parallel-processing
+except:
+    from meta_cerberus import metacerberus_mpp as ray
 
 # our package import
 from meta_cerberus import (
@@ -990,7 +992,8 @@ Example:
     temp_dir = Path(ray.nodes()[0]['ObjectStoreSocketName']).parent.parent
     print("Cleaning up Ray temporary directory", temp_dir)
     ray.shutdown()
-    shutil.rmtree(temp_dir)
+    if temp_dir.exists():
+        shutil.rmtree(temp_dir)
 
     return 0
 
