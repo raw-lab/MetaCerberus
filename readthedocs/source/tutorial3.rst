@@ -4,7 +4,7 @@ A Look at the Results folder - Tutorial
 Now that we've run the MetaCerberus pipeline, let's take a look at the results folder. Having ran the ``--super`` option on my data, the results folder looks like so:
 
 .. image:: ../img/results_folder.jpg
-    :width: 800
+    :width: 950
 
 Now a closer look at each subdirectory of our results:
 
@@ -27,7 +27,7 @@ The file ``read-stats.txt`` contains statistics for your input file, like so:
 
 
 .. image:: ../img/step6-read-stats-txt.jpg
-    :scale: 108%
+    :scale: 109%
 
 .. note:: The file ``stderr.out`` is a log file where any error messages will be stored.
 
@@ -46,7 +46,7 @@ Contents of the ``step_08-hmmer`` directory are:
 
 
 .. image:: ../img/Step8_contents.jpg
-    :width: 750
+    :width: 1000
 
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
 In this example run, we have several file outputs for FragGeneScan. This is what they look like:
@@ -88,7 +88,7 @@ The contents of ``step_09-parse`` are:
 
 
 .. image::  ../img/S9_contents.jpg
-    :width: 750
+    :width: 1200
 
 Looking a little closer: 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -109,12 +109,12 @@ Looking a little closer:
 
 
 .. image:: ../img/S9-HMMR_BH_KOFam_FOAM_rollup2_tsv.jpg
-    :width: 650
+    :width: 950
 
 ``HMMER_BH_KOFam_all_KEGG_rollup2.tsv``
 
 .. image:: ../img/S9-HMMR_BH_KOFam_all_KEGG_rollup2_tsv.jpg
-    :width: 700
+    :width: 900
 
 ``HMMER_top_5.tsv``
 
@@ -159,14 +159,14 @@ The contents of ``step_10-visualizeData`` are:
 
 
 .. image:: ../img/S10-contents.jpg
-    :scale: 160%
+    :scale: 165%
 
 What's in the FragGeneScan and Prodigal subdirectories?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/S10-FGS-Prod-contents.jpg
-    :width: 770
-    :height: 135
+    :width: 950
+    :height: 120
 
 Files under FragGeneScan or Prodigal:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -229,19 +229,19 @@ Files under FragGeneScan or Prodigal:
 
 
 .. image:: ../img/S10_fasta_stats_txt.jpg
-    :scale: 108%
+    :scale: 107%
 
 ``sunburst_KOFam_all_FOAM.html`` --- open in web browser
 
 
 .. image:: ../img/S10_Sunburst_KOFam_all_FOAM_html.jpg
-    :scale: 85%
+    :width: 950
 
 ``sunburst_KOFam_all_KEGG.html`` --- open in web browser
 
 
 .. image:: ../img/S10_Sunburst_KOFam_all_KEGG_html.jpg
-    :scale: 90%
+    :scale: 70%
 
 Contents under ``combined``:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -267,7 +267,7 @@ At a glance:
 
 
 .. image:: ../img/S10_combined_stats_html.jpg
-    :scale: 90%
+    :scale: 50%
 
 ``stats.tsv``
 
@@ -279,7 +279,7 @@ At a glance:
 
 
 .. image:: ../img/S10_combined_img_contents.jpg
-    :width: 900
+    :width: 1200
 
 Final
 -------------------
@@ -287,8 +287,8 @@ The contents of ``final`` are:
 
 
 .. image:: ../img/Final_contents.jpg
-    :width: 800
-    :height: 250
+    :width: 1200
+    :height: 200
 
 
 
