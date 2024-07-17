@@ -290,7 +290,47 @@ The contents of ``final`` are:
     :width: 1200
     :height: 200
 
+There's two ``.gbk`` files which are in GenBank Format.
 
+The ``./final/fasta`` subdirectory contains .faa, .ffn, and .fna files of FragGeneScan, Prodigal, etc (depending on commands given):
+    * ``.faa`` - Protein FASTA file of the translated CDS/ORFs sequences
+    * ``.ffn`` - FASTA Feature Nucleotide file, the Nucleotide sequence of translated CDS/ORFs.
+    * ``.fna`` - Nucleotide FASTA file of the input contig sequences.
 
-`` ``
-    .. image::
+.. image:: ../img/Final_fasta_folder.jpg
+
+The ``./final/gff`` contains .gff and .gtf files:
+    * ``.gff`` - General Feature Format
+    * ``.gtf`` - Gene Transfer Format
+
+.. image:: ../img/Final_gff_folder.jpg
+
+What's in the ``./final/FragGeneScan_<file_name>`` and ``./final/prodigal_<file_name>`` subdirectories?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    .. image:: ../img/Final_contents_expanded_FGS_Prod.jpg
+
+A closer look:
+^^^^^^^^^^^^^^^^^^^^^
+``HMMER_top_5.tsv``
+
+.. image:: ../img/Final_HMMR_top5_tsv.jpg
+
+``annotation_summary_KOFam_all_FOAM.tsv``
+
+.. image:: ../img/Final_annotation_summary_KOFam_allFOAM_tsv.jpg
+
+``annotation_summary_KOFam_all_KEGG.tsv``
+
+.. image:: ../img/Final_annotation_summary_KOFam_allKEGG_tsv.jpg
+
+``final_annotation_summary.tsv``
+
+.. image:: ../img/Final_annotation_summary_tsv.jpg
+
+``rollup_KOFam_all_FOAM.tsv``
+
+.. image:: ../img/Final_rollup_KOFam_allFOAM_tsv.jpg
+
+``rollup_KOFam_all_KEGG.tsv``
+
+.. image:: ../img/Final_rollup_KOFam_all_KEGG_tsv.jpg
