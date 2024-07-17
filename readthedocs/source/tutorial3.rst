@@ -4,7 +4,7 @@ A Look at the Results folder - Tutorial
 Now that we've run the MetaCerberus pipeline, let's take a look at the results folder. Having ran the ``--super`` option on my data, the results folder looks like so:
 
 .. image:: ../img/results_folder.jpg
-    :width: 1500
+    :width: 1750
 
 Now a closer look at each subdirectory of our results:
 
@@ -36,7 +36,7 @@ Step_7-geneCall
 Contents of the ``step_07-geneCall`` directory are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. image:: ../img/Step7_contents.jpg
-    :width: 600
+    :width: 700
 
 These are protein files in different formats. 
 
@@ -46,7 +46,7 @@ Contents of the ``step_08-hmmer`` directory are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/Step8_contents.jpg
-    :width: 2000
+    :width: 3000
 
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
 In this example run, we have several file outputs for FragGeneScan. 
@@ -90,7 +90,7 @@ The contents of ``step_09-parse`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image::  ../img/S9_contents.jpg
-    :width: 2200
+    :width: 3200
 
 Looking a little closer: 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -111,13 +111,13 @@ Looking a little closer:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../img/S9-HMMR_BH_KOFam_FOAM_rollup2_tsv.jpg
-    :width: 2000
+    :width: 3000
 
 ``HMMER_BH_KOFam_all_KEGG_rollup2.tsv``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../img/S9-HMMR_BH_KOFam_all_KEGG_rollup2_tsv.jpg
-    :width: 2000
+    :width: 3500
 
 ``HMMER_top_5.tsv``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -168,8 +168,8 @@ What's in the FragGeneScan and Prodigal subdirectories?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/S10-FGS-Prod-contents.jpg
-    :width: 1500
-    :height: 100
+    :width: 2000
+    :height: 120
 
 Files under FragGeneScan or Prodigal:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -244,7 +244,7 @@ Files under FragGeneScan or Prodigal:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../img/S10_Sunburst_KOFam_all_KEGG_html.jpg
-    :width: 1400
+    :width: 1700
 
 Contents under ``combined``:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -270,7 +270,7 @@ At a glance:
 #############################################
 
 .. image:: ../img/S10_combined_stats_html.jpg
-    :scale: 70%
+    :width: 1700
 
 ``stats.tsv``
 #############################################
@@ -281,7 +281,7 @@ At a glance:
 ################################################################################################################
 
 .. image:: ../img/S10_combined_img_contents.jpg
-    :width: 2000
+    :width: 3000
 
 Final
 -------------------
@@ -289,7 +289,7 @@ The contents of ``final`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/Final_contents.jpg
-    :width: 2000
+    :width: 3000
 
 - There's two ``.gbk`` files which are in GenBank Format.
 
@@ -302,7 +302,7 @@ The contents of ``final`` are:
     * ``.fna`` - Nucleotide FASTA file of the input contig sequences.
 
 .. image:: ../img/Final_fasta_folder.jpg
-    :width: 2500
+    :width: 3500
 
 
 - The ``./final/gff`` contains .gff and .gtf files:
@@ -312,12 +312,12 @@ The contents of ``final`` are:
     * ``.gtf`` - Gene Transfer Format
 
 .. image:: ../img/Final_gff_folder.jpg
-    :scale: 105%
+    :scale: 103%
 
 What's in the ``./final/FragGeneScan_<file_name>`` and ``./final/prodigal_<file_name>`` subdirectories?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     .. image:: ../img/Final_contents_expanded_FGS_Prod.jpg
-        :scale: 100%
+        :scale: 90%
 
 A closer look:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -330,29 +330,29 @@ A closer look:
 #############################################
 
 .. image:: ../img/Final_annotation_summary_KOFam_allFOAM_tsv.jpg
-    :width: 1500
+    :width: 3500
 
 ``annotation_summary_KOFam_all_KEGG.tsv``
 #############################################
 
 .. image:: ../img/Final_annotation_summary_KOFam_allKEGG_tsv.jpg
-    :width: 2000
+    :width: 4000
 
 ``final_annotation_summary.tsv``
 #############################################
 
 .. image:: ../img/Final_annotation_summary_tsv.jpg
-    :width: 2500
+    :width: 4500
 
 ``rollup_KOFam_all_FOAM.tsv``
 #############################################
 
 .. image:: ../img/Final_rollup_KOFam_allFOAM_tsv.jpg
-    :width: 1700
+    :width: 3700
 
 ``rollup_KOFam_all_KEGG.tsv``
 #############################################
 
 .. image:: ../img/Final_rollup_KOFam_all_KEGG_tsv.jpg
-    :width: 2200
-Everything has crossed over!!
+    :width: 4000
+Everything has crossed over()!
