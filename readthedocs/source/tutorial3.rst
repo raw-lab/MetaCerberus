@@ -46,8 +46,8 @@ Contents of the ``step_08-hmmer`` directory are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/Step8_contents.jpg
-    :width: 5000
-    :height: 150
+    :width: 2000
+    :height: 100
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
 In this example run, we have several file outputs for FragGeneScan. The types of outputs are similar for prodigal.
 * Quick link to examples:
@@ -96,20 +96,20 @@ The contents of ``step_09-parse`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image::  ../img/S9_contents.jpg
-    :width: 7500
-    :height: 150
+    :width: 3500
+    :height: 80
 
 * Quick link to examples:
-    - '``HMMER-KOFam_all_FOAM_top_5.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-foam-top-5-tsv>'_
-    - '``HMMER-KOFam_all_KEGG_top_5.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-kegg-top-5-tsv>'_
-    - '``HMMER_BH_KOFam_all_FOAM_rollup2.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-foam-rollup2-tsv>'_
-    - '``HMMER_BH_KOFam_all_KEGG_rollup2.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-kegg-rollup2-tsv>'_
-    - '``HMMER_top_5.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-top-5-tsv>'_
-    - '``KOFam_all_FOAM-rollup_counts.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-rollup-counts-tsv>'_
-    - '``KOFam_all_KEGG-rollup_counts.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-rollup-counts-tsv>'_
-    - '``counts_KOFam_all_FOAM.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-foam-tsv>'_
-    - '``counts_KOFam_all_KEGG.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-kegg-tsv>'_
-    - '``top_5-FragGeneScan_Lambda_phage_sequences.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#top-5-fraggenescan-lambda-phage-sequences-tsv>'_
+    - 'HMMER-KOFam_all_FOAM_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-foam-top-5-tsv>'_
+    - 'HMMER-KOFam_all_KEGG_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-kegg-top-5-tsv>'_
+    - 'HMMER_BH_KOFam_all_FOAM_rollup2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-foam-rollup2-tsv>'_
+    - 'HMMER_BH_KOFam_all_KEGG_rollup2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-kegg-rollup2-tsv>'_
+    - 'HMMER_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-top-5-tsv>'_
+    - 'KOFam_all_FOAM-rollup_counts.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-rollup-counts-tsv>'_
+    - 'KOFam_all_KEGG-rollup_counts.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-rollup-counts-tsv>'_
+    - 'counts_KOFam_all_FOAM.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-foam-tsv>'_
+    - 'counts_KOFam_all_KEGG.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-kegg-tsv>'_
+    - 'top_5-FragGeneScan_Lambda_phage_sequences.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#top-5-fraggenescan-lambda-phage-sequences-tsv>'_
 
 Looking a little closer: 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -130,15 +130,15 @@ Looking a little closer:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../img/S9-HMMR_BH_KOFam_FOAM_rollup2_tsv.jpg
-    :width: 5500
-    :height: 150
+    :width: 2000
+    :height: 75
 
 ``HMMER_BH_KOFam_all_KEGG_rollup2.tsv``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../img/S9-HMMR_BH_KOFam_all_KEGG_rollup2_tsv.jpg
-    :width: 6500
-    :height: 200
+    :width: 4000
+    :height: 100
 
 ``HMMER_top_5.tsv``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -325,8 +325,8 @@ At a glance:
 ################################################################################################################
 
 .. image:: ../img/S10_combined_img_contents.jpg
-    :width: 6000
-    :height: 225
+    :width: 3000
+    :height: 100
 
 Final
 -------------------
@@ -334,8 +334,8 @@ The contents of ``final`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/Final_contents.jpg
-    :width: 5500
-    :height: 150
+    :width: 1000
+    :height: 35
 
 
 - There's two ``.gbk`` files which are in GenBank Format.
@@ -349,8 +349,8 @@ The contents of ``final`` are:
     * ``.fna`` - Nucleotide FASTA file of the input contig sequences.
 
 .. image:: ../img/Final_fasta_folder.jpg
-    :width: 5500
-    :height: 100
+    :width: 1000
+    :height: 50
 
 
 - The ``./final/gff`` contains .gff and .gtf files:
@@ -360,12 +360,12 @@ The contents of ``final`` are:
     * ``.gtf`` - Gene Transfer Format
 
 .. image:: ../img/Final_gff_folder.jpg
-    :scale: 94%
+    :scale: 96%
 
 What's in the ``./final/FragGeneScan_<file_name>`` and ``./final/prodigal_<file_name>`` subdirectories?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     .. image:: ../img/Final_contents_expanded_FGS_Prod.jpg
-        :scale: 94%
+        :scale: 96%
 
 A closer look:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -387,13 +387,13 @@ A closer look:
 #############################################
 
 .. image:: ../img/Final_annotation_summary_KOFam_allFOAM_tsv.jpg
-    :width: 5500
+
 
 ``annotation_summary_KOFam_all_KEGG.tsv``
 #############################################
 
 .. image:: ../img/Final_annotation_summary_KOFam_allKEGG_tsv.jpg
-    :width: 6000
+
 
 ``final_annotation_summary.tsv``
 #############################################
@@ -406,14 +406,14 @@ A closer look:
 #############################################
 
 .. image:: ../img/Final_rollup_KOFam_allFOAM_tsv.jpg
-    :width: 5700
-    :height: 100
+    :width: 1500
+    :height: 75
 
 ``rollup_KOFam_all_KEGG.tsv``
 #############################################
 
 .. image:: ../img/Final_rollup_KOFam_all_KEGG_tsv.jpg
-    :width: 6000
-    :height: 125
+    :width: 3000
+    :height: 75
 
-Everything has crossed over(^)!
+Everything has crossed over(^^^)!
