@@ -32,10 +32,6 @@ This command will result in installation of MetaCerberus, which looks like this 
 .. image:: ../img/install_MC_results.jpg
    :scale: 91%
 
-.. image:: ../img/install_MC_results.jpg
-   :width: 3500
-   :height: 700
-
 Then we'll activate MetaCerberus, followed by downloading the appropriate databases, like so:
 
 .. image:: ../img/metacerberus.py_--download.jpg
