@@ -14,7 +14,7 @@ mamba create -y -n $ENV_NAME -c conda-forge -c bioconda \
 	fastqc flash2 fastp porechop bbmap trnascan-se phanotate \
 	ray-default"<=2.6.3" ray-core"<=2.6.3" ray-tune"<=2.6.3" ray-dashboard"<=2.6.3" \
 	pyrodigal pyrodigal-gv pyhmmer \
-	metaomestats plotly scikit-learn dominate python-kaleido configargparse psutil
+	metaomestats plotly scikit-learn dominate python-kaleido configargparse psutil pandas
 
 conda activate $ENV_NAME
 
