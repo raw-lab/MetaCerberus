@@ -101,7 +101,7 @@ metacerberus.py --download
 - We include a --skip_decon option to skip the filtration of phiX174, which may remove common k-mers that are shared in ssDNA phages.
 - In the formatting and gene prediction stage, contigs and genomes are checked for N repeats. These N repeats are removed by default.
 - We impute contig/genome statistics (e.g., N50, N90, max contig) via our custom module [Metaome Stats](https://github.com/raw-lab/metaome_stats).
-- Contigs can be converted to pORFs using [Prodigal](https://anaconda.org/bioconda/prodigal), [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/), and [Prodigal-gv](https://github.com/apcamargo/prodigal-gv)) as specified by user preference.
+- Contigs can be converted to pORFs using [Prodigal](https://anaconda.org/bioconda/prodigal), [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/), and [Prodigal-gv](https://github.com/apcamargo/prodigal-gv) as specified by user preference.
 - Scaffold annotation is not recommended due to N's providing ambiguous annotation.
 - Both Prodigal and FragGeneScanRs can be used via our --super option, and we recommend using FragGeneScanRs for samples rich in eukaryotes.
 - FragGeneScanRs found more ORFs and KOs than Prodigal for a stimulated eukaryote rich metagenome. HMMER searches against the above databases via user specified bitscore and e-values or our minimum defaults (i.e., bitscore = 25, e-value = 1 x 10<sup>-9</sup> ).
