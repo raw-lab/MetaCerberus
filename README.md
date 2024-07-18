@@ -17,6 +17,7 @@
 MetaCerberus transforms raw sequencing (i.e. genomic, transcriptomics, metagenomics, metatranscriptomic) data into knowledge. It is a start to finish python code for versatile analysis of the Functional Ontology Assignments for Metagenomes (FOAM), KEGG, CAZy/dbCAN, VOG, pVOG, PHROG, COG, and a variety of other databases including user customized databases via Hidden Markov Models (HMM) for functional annotation for complete metabolic analysis across the tree of life (i.e., bacteria, archaea, phage, viruses, eukaryotes, and whole ecosystems). MetaCerberus also provides automatic differential statistics using DESeq2/EdgeR, pathway enrichments with GAGE, and pathway visualization with Pathview R. 
 
 ![GitHub Logo](https://raw.githubusercontent.com/raw-lab/MetaCerberus/main/img/Screenshot_20240614_205914_Gallery.jpg)
+**Art by Andra Buchan**
 
 ## Installing MetaCerberus
 
@@ -100,7 +101,7 @@ metacerberus.py --download
 - We include a --skip_decon option to skip the filtration of phiX174, which may remove common k-mers that are shared in ssDNA phages.
 - In the formatting and gene prediction stage, contigs and genomes are checked for N repeats. These N repeats are removed by default.
 - We impute contig/genome statistics (e.g., N50, N90, max contig) via our custom module [Metaome Stats](https://github.com/raw-lab/metaome_stats).
-- Contigs can be converted to pORFs using [Prodigal](https://anaconda.org/bioconda/prodigal), [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/), and [Prodigal-gv](https://github.com/apcamargo/prodigal-gv)) as specified by user preference.
+- Contigs can be converted to pORFs using [Prodigal](https://anaconda.org/bioconda/prodigal), [FragGeneScanRs](https://github.com/unipept/FragGeneScanRs/), and [Prodigal-gv](https://github.com/apcamargo/prodigal-gv) as specified by user preference.
 - Scaffold annotation is not recommended due to N's providing ambiguous annotation.
 - Both Prodigal and FragGeneScanRs can be used via our --super option, and we recommend using FragGeneScanRs for samples rich in eukaryotes.
 - FragGeneScanRs found more ORFs and KOs than Prodigal for a stimulated eukaryote rich metagenome. HMMER searches against the above databases via user specified bitscore and e-values or our minimum defaults (i.e., bitscore = 25, e-value = 1 x 10<sup>-9</sup> ).
@@ -457,7 +458,7 @@ echo ""
 
 ## DESeq2 and Edge2 Type I errors
 
-Both edgeR and DeSeq2 R have the highest sensitivity when compared to other algorithms that control type-I error when the FDR was at or below 0.1. EdgeR and DESeq2 all perform fairly well in simulation and via data splitting (so no parametric assumptions). Typical benchmarks will show limma having stronger FDR control across all types of datasets (it’s hard to beat the moderated t-test), and edgeR and DESeq2 having higher sensitivity for low counts (makes sense as limma has to filter these out / down-weight them to use the normal model on log counts). Further information about type I errors are present from Mike Love's vignette here [vignette](https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#multi-factor-designs)
+Both edgeR and DeSeq2 R have the highest sensitivity when compared to other algorithms that control type-I error when the FDR was at or below 0.1. EdgeR and DESeq2 all perform fairly well in simulation and via data splitting (so no parametric assumptions). Typical benchmarks will show limma having stronger FDR control across all types of datasets (it’s hard to beat the moderated t-test), and edgeR and DESeq2 having higher sensitivity for low counts (makes sense as limma has to filter these out / down-weight them to use the normal model on log counts). Further information about type I errors are present from Mike Love's vignette [here](https://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#multi-factor-designs).
 
 ## Contributing to MetaCerberus and Fungene
 
