@@ -16,7 +16,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="MetaCerberus",
+    name="MetaCerberus-lite",
     version="1.3.1",
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
@@ -46,7 +46,6 @@ setuptools.setup(
     install_requires=[
             'setuptools',
             'pandas',
-            'ray',
             'metaomestats',
             'configargparse',
             'kaleido',
