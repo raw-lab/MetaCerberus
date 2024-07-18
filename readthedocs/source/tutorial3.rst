@@ -51,11 +51,11 @@ Contents of the ``step_08-hmmer`` directory are:
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
 In this example run, we have several file outputs for FragGeneScan. The types of outputs are similar for prodigal.
 * Quick link to examples:
-    - '``KOFam_all_FOAM-FragGeneScan_Lambda_phage_sequences.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-fraggenescan-lambda-phage-sequences-tsv>'_
-    - '``KOFam_all_KEGG-FragGeneScan_Lambda_phage_sequences.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-fraggenescan-lambda-phage-sequences-tsv>'_
-    - '``filtered-KOFam_all_FOAM.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#filtered-kofam-all-foam-tsv>'_
-    - '``filtered-KOFam_all_KEGG.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#filtered-kofam-all-kegg-tsv>'_
-    - '``filtered.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#filtered-tsv>'_
+    - ```KOFam_all_FOAM-FragGeneScan_Lambda_phage_sequences.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-fraggenescan-lambda-phage-sequences-tsv>`_
+    - `KOFam_all_KEGG-FragGeneScan_Lambda_phage_sequences.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-fraggenescan-lambda-phage-sequences-tsv>`_
+    - `filtered-KOFam_all_FOAM.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#filtered-kofam-all-foam-tsv>`_
+    - `filtered-KOFam_all_KEGG.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#filtered-kofam-all-kegg-tsv>`_
+    - `filtered.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#filtered-tsv>`_
 
 This is what they look like:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -100,16 +100,16 @@ The contents of ``step_09-parse`` are:
     :height: 80
 
 * Quick link to examples:
-    - 'HMMER-KOFam_all_FOAM_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-foam-top-5-tsv>'_
-    - 'HMMER-KOFam_all_KEGG_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-kegg-top-5-tsv>'_
-    - 'HMMER_BH_KOFam_all_FOAM_rollup2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-foam-rollup2-tsv>'_
-    - 'HMMER_BH_KOFam_all_KEGG_rollup2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-kegg-rollup2-tsv>'_
-    - 'HMMER_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-top-5-tsv>'_
-    - 'KOFam_all_FOAM-rollup_counts.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-rollup-counts-tsv>'_
-    - 'KOFam_all_KEGG-rollup_counts.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-rollup-counts-tsv>'_
-    - 'counts_KOFam_all_FOAM.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-foam-tsv>'_
-    - 'counts_KOFam_all_KEGG.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-kegg-tsv>'_
-    - 'top_5-FragGeneScan_Lambda_phage_sequences.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#top-5-fraggenescan-lambda-phage-sequences-tsv>'_
+    - `HMMER-KOFam_all_FOAM_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-foam-top-5-tsv>`_
+    - `HMMER-KOFam_all_KEGG_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-kegg-top-5-tsv>`_
+    - `HMMER_BH_KOFam_all_FOAM_rollup2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-foam-rollup2-tsv>`_
+    - `HMMER_BH_KOFam_all_KEGG_rollup2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-bh-kofam-all-kegg-rollup2-tsv>`_
+    - `HMMER_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-top-5-tsv>`_
+    - `KOFam_all_FOAM-rollup_counts.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-rollup-counts-tsv>`_
+    - `KOFam_all_KEGG-rollup_counts.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-rollup-counts-tsv>`_
+    - `counts_KOFam_all_FOAM.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-foam-tsv>`_
+    - `counts_KOFam_all_KEGG.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#counts-kofam-all-kegg-tsv>`_
+    - `top_5-FragGeneScan_Lambda_phage_sequences.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#top-5-fraggenescan-lambda-phage-sequences-tsv>`_
 
 Looking a little closer: 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -196,18 +196,18 @@ Files under FragGeneScan or Prodigal:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 * Quick link to examples:
-    - '``KOFam_all_FOAM_level-1.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-1-tsv>'_
-    - '``KOFam_all_FOAM_level-2.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-2-tsv>'_
-    - '``KOFam_all_FOAM_level-3.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-3-tsv>'_
-    - '``KOFam_all_FOAM_level-4.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-4-tsv>'_
-    - '``KOFam_all_FOAM_level-id.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-id-tsv>'_
-    - '``KOFam_all_KEGG_level-1.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-1-tsv>'_
-    - '``KOFam_all_KEGG_level-2.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-2-tsv>'_
-    - '``KOFam_all_KEGG_level-3.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-3-tsv>'_
-    - '``KOFam_all_KEGG_level-id.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-id-tsv>'_
-    - '``fasta_stats.txt``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#fasta-stats-txt>'_
-    - '``sunburst_KOFam_all_FOAM.html``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#sunburst-kofam-all-foam-html-open-in-web-browser>'_
-    - '``sunburst_KOFam_all_KEGG.html``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#sunburst-kofam-all-kegg-html-open-in-web-browser>'_
+    - `KOFam_all_FOAM_level-1.S9-top5_FGS_tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-1-tsv>`_
+    - `KOFam_all_FOAM_level-2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-2-tsv>`_
+    - `KOFam_all_FOAM_level-3.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-3-tsv>`_
+    - `KOFam_all_FOAM_level-4.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-4-tsv>`_
+    - `KOFam_all_FOAM_level-id.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-foam-level-id-tsv>`_
+    - `KOFam_all_KEGG_level-1.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-1-tsv>`_
+    - `KOFam_all_KEGG_level-2.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-2-tsv>`_
+    - `KOFam_all_KEGG_level-3.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-3-tsv>`_
+    - `KOFam_all_KEGG_level-id.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#kofam-all-kegg-level-id-tsv>`_
+    - `fasta_stats.txt<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#fasta-stats-txt>`_
+    - `sunburst_KOFam_all_FOAM.html<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#sunburst-kofam-all-foam-html-open-in-web-browser>`_
+    - `sunburst_KOFam_all_KEGG.html<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#sunburst-kofam-all-kegg-html-open-in-web-browser>`_
 
 
 
@@ -292,11 +292,11 @@ At a glance:
     :scale: 150%
 
 * Quick link to examples:
-    - '``counts_KOFam_all_FOAM.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#id1>'_
-    - '``counts_KOFam_all_KEGG.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#id2>'_
-    - '``stats.html``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#stats-html-open-in-web-browser>'_
-    - '``stats.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#stats-tsv>'_
-    - '``img`` subdirectory<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#img-contains-the-individual-png-image-files-which-are-collectively-located-in-stats-html>'_
+    - `counts_KOFam_all_FOAM.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#id1>`_
+    - `counts_KOFam_all_KEGG.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#id2>`_
+    - `stats.html<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#stats-html-open-in-web-browser>`_
+    - `stats.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#stats-tsv>`_
+    - `img subdirectory<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#img-contains-the-individual-png-image-files-which-are-collectively-located-in-stats-html>`_
 
 ``counts_KOFam_all_FOAM.tsv``    
 #############################################
@@ -371,12 +371,12 @@ A closer look:
 ^^^^^^^^^^^^^^^^^^^^^
 
 * Quick link to examples:
-    - '``HMMER_top_5.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#id3>'_
-    - '``annotation_summary_KOFam_all_FOAM.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#annotation-summary-kofam-all-foam-tsv>'_
-    - '``annotation_summary_KOFam_all_KEGG.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#annotation-summary-kofam-all-kegg-tsv>'_
-    - '``final_annotation_summary.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#final-annotation-summary-tsv>'_
-    - '``rollup_KOFam_all_FOAM.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#rollup-kofam-all-foam-tsv>'_
-    - '``rollup_KOFam_all_KEGG.tsv``<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#rollup-kofam-all-kegg-tsv>'_
+    - `HMMER_top_5.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#id3>`_
+    - `annotation_summary_KOFam_all_FOAM.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#annotation-summary-kofam-all-foam-tsv>`_
+    - `annotation_summary_KOFam_all_KEGG.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#annotation-summary-kofam-all-kegg-tsv>`_
+    - `final_annotation_summary.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#final-annotation-summary-tsv>`_
+    - `rollup_KOFam_all_FOAM.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#rollup-kofam-all-foam-tsv>`_
+    - `rollup_KOFam_all_KEGG.tsv<https://metacerberus.readthedocs.io/en/latest/tutorial3.html#rollup-kofam-all-kegg-tsv>`_
 
 ``HMMER_top_5.tsv``
 #########################
@@ -416,4 +416,4 @@ A closer look:
     :width: 3000
     :height: 75
 
-Everything has crossed over(^^^)!
+Everything has crossed over(^`^`^)!
