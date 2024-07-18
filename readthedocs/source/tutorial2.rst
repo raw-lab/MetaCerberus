@@ -1,7 +1,7 @@
 MetaCerberus Tutorial - Running the Pipeline
 ==============================================
 
-After installation is complete, databases are downloaded, and you've ran ``conda activate MetaCerberus-1.3.1``, it's time to run MetaCerberus. This tutorial gives an example run through using a fasta file of the complete Lambda phage genome. 
+After installation is complete, databases are downloaded, and you've executed ``conda activate MetaCerberus-1.3.1``, it's time to run MetaCerberus. This tutorial gives an example run through using a fasta file of the complete Lambda phage genome. 
 
 Step 1: Initializing the Pipeline
 ---------------------------------------
@@ -11,7 +11,7 @@ Step 1: Initializing the Pipeline
 Here's the command I'm using to run the Lambda phage genome:
 
 .. image:: ../img/run_command_super_lambda.jpg
-    :scale: 93%
+    :scale: 95%
 
 - I'm using ``--super /path/to/input/file`` so that MetaCerberus will run both FragGeneScan and Prodigal on this file. 
 - ``--dir-out`` is used to tell MetaCerberus where to output the results. 
@@ -23,7 +23,7 @@ A detailed list of options for MetaCerberus can be found `here`_.
 Once you have your command prepared, let's run MetaCerberus. After you enter your command, the pipeline output looks like so:
 
 .. image:: ../img/pipeline_look.jpg
-    :width: 1600
+    :width: 2000
     :height: 750
 Once finished, the bottom of your prompt screen will show:
 

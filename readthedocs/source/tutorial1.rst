@@ -30,11 +30,11 @@ Then proceed to next part of command:
 This command will result in installation of MetaCerberus, which looks like this once completed:
 
 .. image:: ../img/install_MC_results.jpg
-   :scale: 90%
+   :scale: 92%
 
 .. image:: ../img/install_MC_results.jpg
-   :width: 2200
-   :height: 650
+   :width: 3200
+   :height: 675
 
 Then we'll activate MetaCerberus, followed by downloading the appropriate databases, like so:
 
