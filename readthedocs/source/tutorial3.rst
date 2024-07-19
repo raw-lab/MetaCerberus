@@ -4,8 +4,8 @@ MetaCerberus Tutorial - What's in the Results folder?
 Now that we've run the MetaCerberus pipeline, let's take a look at the results folder. Having ran the ``--super`` option on my data, the results folder looks like so:
 
 .. image:: ../img/results_folder.jpg
-    :width: 1800
-    :height: 250
+    :width: 800
+    :height: 100
 
 Now a closer look at each subdirectory of our results:
 
@@ -47,7 +47,8 @@ Contents of the ``step_08-hmmer`` directory are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/Step8_contents.jpg
-    :width: 800
+    :width: 1000
+    :height: 180
     
 For your MetaCerberus run, you should get a subdirectory for the mode that MetaCerberus used (FragGeneScan, Prodigal, Prodigalgv, etc).
 In this example run, we have several file outputs for FragGeneScan. The types of outputs are similar for prodigal.
@@ -98,8 +99,8 @@ The contents of ``step_09-parse`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image::  ../img/S9_contents.jpg
-    :width: 3500
-    :height: 200
+    :width: 1000
+    :height: 100
 
 * Quick link to examples:
     - `HMMER-KOFam_all_FOAM_top_5.tsv <https://metacerberus.readthedocs.io/en/latest/tutorial3.html#hmmer-kofam-all-foam-top-5-tsv>`_
@@ -132,15 +133,15 @@ Looking a little closer:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../img/S9-HMMR_BH_KOFam_FOAM_rollup2_tsv.jpg
-    :width: 2000
+    :width: 1000
     :height: 200
 
 ``HMMER_BH_KOFam_all_KEGG_rollup2.tsv``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: ../img/S9-HMMR_BH_KOFam_all_KEGG_rollup2_tsv.jpg
-    :width: 4000
-    :height: 200
+    :width: 2000
+    :height: 350
 
 ``HMMER_top_5.tsv``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -327,8 +328,8 @@ At a glance:
 ################################################################################################################
 
 .. image:: ../img/S10_combined_img_contents.jpg
-    :width: 3000
-    :height: 150
+    :width: 2000
+    :height: 100
 
 Final
 -------------------
@@ -336,8 +337,8 @@ The contents of ``final`` are:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ../img/Final_contents.jpg
-    :width: 1000
-    :height: 150
+    :width: 700
+    :height: 100
 
 
 - There's two ``.gbk`` files which are in GenBank Format.
@@ -351,7 +352,7 @@ The contents of ``final`` are:
     * ``.fna`` - Nucleotide FASTA file of the input contig sequences.
 
 .. image:: ../img/Final_fasta_folder.jpg
-    :width: 1000
+    :width: 750
     :height: 50
 
 
@@ -362,12 +363,12 @@ The contents of ``final`` are:
     * ``.gtf`` - Gene Transfer Format
 
 .. image:: ../img/Final_gff_folder.jpg
-    :scale: 96%
+    :scale: 95%
 
 What's in the ``./final/FragGeneScan_<file_name>`` and ``./final/prodigal_<file_name>`` subdirectories?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     .. image:: ../img/Final_contents_expanded_FGS_Prod.jpg
-        :scale: 96%
+        :scale: 100%
 
 A closer look:
 ^^^^^^^^^^^^^^^^^^^^^
@@ -415,5 +416,5 @@ A closer look:
 #############################################
 
 .. image:: ../img/Final_rollup_KOFam_all_KEGG_tsv.jpg
-    :width: 3000
+    :width: 1500
     :height: 250
