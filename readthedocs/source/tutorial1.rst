@@ -12,7 +12,7 @@ These are the commands you will use to install MetaCerberus:
 ::
 
   git clone https://github.com/raw-lab/MetaCerberus.git 
-  cd metacerberus
+  cd MetaCerberus
   bash install_metacerberus.sh
   conda activate MetaCerberus-1.3.0
   metacerberus.py --download
