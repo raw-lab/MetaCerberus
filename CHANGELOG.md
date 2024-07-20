@@ -1,5 +1,11 @@
 # Change log
 
+## Version 1.3.2
+
+### Bug Fixes
+
+- Fixed Ray dependency issue
+
 ## Version 1.3.1
 
 ### New Features
