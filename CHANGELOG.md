@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
-- Fixed Ray dependency issue
+- Fixed Ray dependency issue for MetaCerberus-lite, or when Ray is not available.
 
 ## Version 1.3.1
 
