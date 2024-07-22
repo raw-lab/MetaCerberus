@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 
-"""metacerberus_mpp.py: Module to replace Ray MPP library
+"""hydraMPP: Module for Distributed Parallel Processing
+
+Hydra MPP is a Python library for Distributed Parallel Processing.
+DPP utilizes multiple nodes/computers to distribute workloads for
+faster processing.
+
+Currently this module is compatible as a basic stand in for Ray.
+Not all features are fully implemented yet.
+
 """
 
 
@@ -10,8 +18,6 @@ import psutil
 import time
 from pathlib import Path
 
-
-# Name: Hydra DMPP
 
 ## GLOBAL VARIABLES ##
 RUNNING = False
@@ -60,24 +66,22 @@ def init(address="local", num_cpus=None, log_to_driver=False):
 	NODES = [dict(
 		address = "local",
 		num_cpus = num_cpus,
-		ObjectStoreSocketName = "tmp/current/objects")]
-	print("Starting Hydra DMPP (Distributed MPP)")
+		temp = Path("tmp-hydra"),
+		ObjectStoreSocketName = Path("tmp-hydra", "current", "objects"))]
+	NODES[0]['temp'].mkdir(parents=True, exist_ok=True)
+	print("Starting Hydra DPP (Distributed Parallel Processing)")
 	print("CPUS:", NODES[0]['num_cpus'])
-	#Path("tmp/current/objects").mkdir(parents=True, exist_ok=True)
 	P = mp.Process(target=main_loop)
 	RUNNING = True
 	P.start()
 	return
 
 def main_loop():
-	def __worker(func, id, args, kwargs):
-		try: QUEUE[id] = [func(*args, **kwargs), True, 0]
-		except: pass
 	start = time.time()
 	while RUNNING:
 		time.sleep(0.001)
 		if time.time() > start+1:
-			with open("queue.log", 'w') as writer:
+			with open(NODES[0]["temp"]/"queue.log", 'w') as writer:
 				print("QUEUE:", NODES[0]['num_cpus'], file=writer)
 				for k,v in QUEUE.items():
 					try:
@@ -89,9 +93,9 @@ def main_loop():
 							print(f"{k}|{v[2]}\t{v[0][0].__name__}", file=writer)
 						print(f"\t{v[0][1]}", file=writer)
 					except Exception as e:
-						pass
 						#print("QUEUE ERROR:", k, v)
 						#print(e)
+						pass
 				start = time.time()
 	return
 
