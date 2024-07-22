@@ -33,7 +33,7 @@ import socket
 try:
     import ray #parallel-processing
 except:
-    from meta_cerberus import metacerberus_mpp as ray
+    from meta_cerberus import hydraMPP as ray
 
 # our package import
 from meta_cerberus import (
@@ -97,9 +97,11 @@ def set_add(to_set:set, item, msg:str):
         print('\n', msg, '\n', sep='')
     return to_set
 
-def logTime(dirout, host, funcName, path, time):
+def logTime(dirout, host, funcName, path, timed):
+    now = time.localtime()
+    now = f"{now[3]}:{now[4]}:{now[5]}"
     with open(f'{dirout}/time.tsv', 'a+') as outTime:
-        print(host, funcName, time, path, file=outTime, sep='\t')
+        print(host, now, timed, funcName, path, file=outTime, sep='\t')
     return
 
 
