@@ -9,7 +9,22 @@ faster processing.
 Currently this module is compatible as a basic stand in for Ray.
 Not all features are fully implemented yet.
 
+Implemented:
+local MPP
+
+Not implemented;
+DPP
+  sockets
+  password
+  error reporting
+  pickle objects
+  compression?
+  encryption
+Error checking
+  if more CPUs are requested than available
 """
+
+__version__ = "0.1.2"
 
 
 import atexit
