@@ -20,6 +20,9 @@ def checkSingleRead(singleRead, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
     
+    if not config['EXE_FASTQC']:
+        return None
+
     command = f"{config['EXE_FASTQC']} -o {path} {singleRead}"
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
@@ -35,7 +38,10 @@ def checkSingleRead(singleRead, config, subdir):
 def checkPairedRead(pairedRead, config, subdir):
     path = f"{config['DIR_OUT']}/{subdir}"
     os.makedirs(path, exist_ok=True)
-    
+
+    if not config['EXE_FASTQC']:
+        return None
+
     command = f"{config['EXE_FASTQC']} -o {path} {pairedRead[0]} {pairedRead[1]}"
     try:
         with open(f"{path}/stdout.txt", 'w') as fout, open(f"{path}/stderr.txt", 'w') as ferr:
