@@ -8,9 +8,11 @@ import os
 import re
 from pathlib import Path
 import pyhmmer
+import meta_cerberus.hydraMPP as mpp
 
 
 ## HMMER Search
+@mpp.remote
 def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
     minscore = config['MINSCORE']
     evalue = config['EVALUE']

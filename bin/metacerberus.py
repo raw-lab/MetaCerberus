@@ -33,7 +33,7 @@ import socket
 try:
     import ray #parallel-processing
 except:
-    from meta_cerberus import hydraMPP as ray
+    import meta_cerberus.hydraMPP as ray
 
 # our package import
 from meta_cerberus import (
@@ -175,6 +175,11 @@ Example:
     database = parser.add_argument_group(f'''Database options''')
     database.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. 'ALL' uses all downloaded databases. Use the option --list-db for a list of available databases [KOFam_all]")
     database.add_argument("--db-path", type=str, default=PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
+
+    # MPP options
+    network = parser.add_argument_group("MPP options")
+    network.add_argument('--address', default='local', help="Address for MPP. local=no networking, host=make this machine a host, ip-address=connect to remote host [local]")
+    network.add_argument('--port', type=int, default=24515, help="The port to listen/connect to [24515]")
 
     # optional flags
     optional = parser.add_argument_group('optional arguments')
@@ -378,6 +383,10 @@ Example:
             return 0
     else:
         try:
+            ray.init(address=args.address, log_to_driver=DEBUG)
+        except:
+            pass
+        try:
             ray.init(address='auto', log_to_driver=DEBUG)
         except:
             try:
@@ -389,10 +398,12 @@ Example:
     if len(ray.nodes()) > 1:
         config['CLUSTER'] = True
     print(f"Running RAY on {len(ray.nodes())} node(s)")
-    print(f"Using {config['CPUS']} CPUs per node")
+    for node in ray.nodes():
+        print(f"Node '{node['address']}' Using {node['num_cpus']} CPUs")
     temp_dir = Path(ray.nodes()[0]['ObjectStoreSocketName']).parent.parent
     print("Ray temporary directory:", temp_dir)
 
+    return 0
 
     startTime = time.time()
     # Step 1 - Load Input Files
