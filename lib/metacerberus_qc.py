@@ -5,9 +5,11 @@ Uses FastQC [https://www.bioinformatics.babraham.ac.uk/projects/fastqc/]
 
 import os
 import subprocess
+import hydraMPP
 
 
 ## Check quality
+@hydraMPP.remote
 def checkQuality(rawRead, config, subdir):
     if type(rawRead) is list or type(rawRead) is tuple:
         return checkPairedRead(rawRead, config, subdir)

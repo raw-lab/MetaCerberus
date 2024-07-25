@@ -13,8 +13,10 @@ warnings.warn = warn
 import re
 from pathlib import Path
 import pandas as pd
+import hydraMPP
 
 
+@hydraMPP.remote
 def top5s(hmm_tsv:dict, outfile:Path):
     outfile.parent.mkdir(0o777, True, True)
 
@@ -52,6 +54,7 @@ def top5s(hmm_tsv:dict, outfile:Path):
     return outfile
 
 
+@hydraMPP.remote
 def top5(hmm_tsv:Path, outfile:Path):
     outfile.parent.mkdir(0o777, True, True)
 
@@ -88,6 +91,7 @@ def top5(hmm_tsv:Path, outfile:Path):
     return outfile
 
 
+@hydraMPP.remote
 def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
     path = Path(config['DIR_OUT'], subdir)
     path.mkdir(exist_ok=True, parents=True)
@@ -216,6 +220,7 @@ def rollup(COUNTS:dict, dbname:str, dbpath:Path, outpath:str):
 
 
 ########## Counts Table #########
+@hydraMPP.remote
 def createCountTables(rollup_files:dict, config:dict, subdir: str):
     done = Path(config['DIR_OUT']) / subdir / "complete"
     dfCounts = dict()
