@@ -378,7 +378,7 @@ Example:
     print(f"\nRunning HydraMPP on {len(hydra.nodes())} node{'s' if len(hydra.nodes())>1 else ''}")
     for node in hydra.nodes():
         print(f"\tNode: '{node['address']}' Using {node['num_cpus']} CPUs")
-    temp_dir = Path(hydra.nodes()[0]['ObjectStoreSocketName']).parent.parent
+    temp_dir = Path(hydra.nodes()[0]['temp'])
     print("Ray temporary directory:", temp_dir)
 
     config['CPUS'] = hydra.nodes()[0]['num_cpus']
@@ -612,7 +612,9 @@ Example:
         if not ready:
             continue
         key = pipeline.pop(ready[0])
-        func,value,delay,hostname = hydra.get(ready[0])
+        s,func,value,_,delay,hostname = hydra.get(ready[0])
+        if not s:
+            print("PIPELINE:", s,func,value,_,delay,hostname)
         logTime(config['DIR_OUT'], hostname, func, key, delay)
 
         #TODO: Debug message
@@ -976,7 +978,7 @@ Example:
         ready,queue = hydra.wait(jobCharts)
         if ready:
             key = jobCharts.pop(ready[0])
-            func,value,delay,hostname = hydra.get(ready[0])
+            s,func,value,cpus,delay,hostname = hydra.get(ready[0])
             figCharts[key] = value
             logTime(config['DIR_OUT'], hostname, func, key, delay)
 
@@ -989,11 +991,12 @@ Example:
     logTime(config["DIR_OUT"], socket.gethostname(), "Total_Time", config["DIR_OUT"], end)
 
     # Cleaning up
-    temp_dir = Path(hydra.nodes()[0]['ObjectStoreSocketName']).parent.parent
+    temp_dir = Path(hydra.nodes()[0]['temp'])
     print("Cleaning up Ray temporary directory", temp_dir)
     hydra.shutdown()
-    if temp_dir.exists():
-        shutil.rmtree(temp_dir)
+    #TODO: Clean temp directory
+    #if temp_dir.exists():
+    #    shutil.rmtree(temp_dir)
 
     return 0
 
