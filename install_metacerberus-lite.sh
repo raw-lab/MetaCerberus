@@ -10,7 +10,7 @@ eval "$(conda shell.bash hook)"
 
 # create the metacerberus environment in conda
 mamba create -y -n $ENV_NAME -c conda-forge -c bioconda \
-	python'>=3.8' setuptools"<70.0.0" grpcio=1.43 pyhmmer flash2 \
+	python'>=3.8' setuptools"<70.0.0" pyhmmer flash2 \
 	pyrodigal pyrodigal-gv \
 	metaomestats plotly scikit-learn dominate python-kaleido configargparse psutil pandas
 
