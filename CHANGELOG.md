@@ -1,5 +1,9 @@
 # Change log
 
+## Version 1.4.0
+
+Replaced Ray with HydraMPP
+
 ## Version 1.3.2
 
 ### Bug Fixes
