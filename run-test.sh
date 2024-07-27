@@ -2,6 +2,8 @@
 
 #eval "$(conda shell.bash hook)"
 #conda activate MetaCerberus
+rm -r build *egg-info*
+pip install ~/raw-lab/HydraMPP >/dev/null
 pip install ~/raw-lab/MetaCerberus >/dev/null
 
 
@@ -33,7 +35,10 @@ DBPATH=~/database/db-metacerberus
 
 rm -r temp-paired
 #--super ~/temp/raw-reads 
-command time metacerberus.py --prodigalgv ~/temp/raw-reads --illumina --hmm COG --dir-out temp-paired --db-path $DBPATH --address "host"
-#sleep 1
-#command time metacerberus.py --address localhost --hmm COG --dir-out temp-paired-client --db-path $DBPATH --prodigal none > client.log
-#wait
+#command time metacerberus.py --prodigalgv ~/temp/raw-reads --illumina --hmm COG --dir-out temp-paired --db-path $DBPATH --cpus 4
+
+args="--prodigalgv ~/temp/raw-reads --illumina --hmm COG --dir-out temp-paired --db-path $DBPATH"
+command time metacerberus.py $args --address "host" --cpus 4 &
+sleep 1
+command time metacerberus.py $args --address localhost --cpus 8 # &> client.log
+wait
