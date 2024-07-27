@@ -8,9 +8,11 @@ from pathlib import Path
 import re
 import subprocess
 import textwrap
+import hydraMPP
 
 
 # Remove quality from fastq
+@hydraMPP.remote
 def reformat(fastq:Path, config:dict, subdir:Path):
     path = Path(config['DIR_OUT'], subdir)
     fastq = Path(fastq)
@@ -62,6 +64,7 @@ def split_sequenceN(name, sequence):
 
 
 # Remove N's
+@hydraMPP.remote
 def removeN(fasta:str, config:dict, subdir:os.PathLike):
     path = Path(config['DIR_OUT'], subdir)
 

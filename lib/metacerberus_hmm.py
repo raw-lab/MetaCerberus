@@ -8,9 +8,13 @@ import os
 import re
 from pathlib import Path
 import pyhmmer
+import hydraMPP
 
+
+print("\nLOADING HYDRA\n")
 
 ## HMMER Search
+@hydraMPP.remote
 def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
     minscore = config['MINSCORE']
     evalue = config['EVALUE']
@@ -51,6 +55,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
 
 
 # Filter HMM results
+@hydraMPP.remote
 def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
     outfile.parent.mkdir(parents=True, exist_ok=True)
 
