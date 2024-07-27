@@ -641,7 +641,7 @@ Example:
                     pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, key, config['DIR_OUT'], [[key, value], config, f"{STEP[4]}/{key}"]))
             else:
                 set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
+                pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
         if func.startswith("decon"):
             fastq[key] = value
             set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
@@ -658,13 +658,13 @@ Example:
                 fasta[key] = value
             set_add(step_curr, 7, "STEP 7: ORF Finder")
             if key.startswith("FragGeneScan_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_fgs, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}"]))
+                pipeline[metacerberus_genecall.findORF_fgs.remote(fasta[key], config, f"{STEP[7]}/{key}")] = key
             elif key.startswith("prodigalgv_"):
                 pipeline[metacerberus_genecall.findORF_prod.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'], True)] = key
             elif key.startswith("prodigal_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_prod, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}", config['META']]))
+                pipeline[metacerberus_genecall.findORF_prod.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'])] = key
             elif key.startswith("phanotate_"):
-                pipeline.append(rayWorkerThread.remote(metacerberus_genecall.findORF_phanotate, key, config['DIR_OUT'], [fasta[key], config, f"{STEP[7]}/{key}", config['META']]))
+                pipeline[metacerberus_genecall.findORF_phanotate.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'])] = key
             jobsORF += 1
         if func.startswith("findORF_"):
             if not value:
@@ -704,8 +704,8 @@ Example:
                         key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
                         key_name = f'chunk-{chunkCount}-{len(chunks.files)}_{key}'
                         chunkCount += 1
-                        pipeline.append(rayWorkerThread.options(num_cpus=jobs_hmmer).remote(metacerberus_hmm.searchHMM, [key_chunk], config['DIR_OUT'],
-                                                                                [{key_name:chunk}, config, Path(STEP[8], key), hmm, 4]))
+                        pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
+                                                {key_name:chunk}, config, Path(STEP[8], key), hmm, 4)] = [key_chunk]
             else:
                 outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
                 if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
@@ -717,7 +717,7 @@ Example:
                     #TODO: distinguish filtered tsv per hmm
                     tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
                     set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                    pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, key, config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
+                    pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = key
         if func.startswith('searchHMM'):
             keys = key
             for key,tsv_file in zip(keys,value):
@@ -748,7 +748,7 @@ Example:
                             for k in key_set:
                                 tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
                                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], k, f"filtered-{hmm}.tsv")
-                                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, f"{hmm}/{k}", config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
+                                pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{k}"
                             # FINISH SPLITTING GROUP
                             continue
                         # Not grouped
@@ -762,7 +762,7 @@ Example:
                                     os.remove(item)
                         tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
                         set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                        pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, f"{hmm}/{key}", config['DIR_OUT'], [tsv_out, tsv_filtered, dbHMM[hmm]]))
+                        pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
                 else:
                 # Not chunked file
                     hmm,key = key.split(sep='/', maxsplit=1)
