@@ -11,8 +11,6 @@ import pyhmmer
 import hydraMPP
 
 
-print("\nLOADING HYDRA\n")
-
 ## HMMER Search
 @hydraMPP.remote
 def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
