@@ -7,8 +7,8 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.3.2"
-__date__        = "July 2024"
+__version__     = "1.4.0"
+__date__        = "August 2024"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022-2024"
 
@@ -21,7 +21,6 @@ import sys
 import os
 import re
 from pathlib import Path
-import psutil
 import shutil
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
@@ -100,27 +99,6 @@ def logTime(dirout, host, funcName, path, timed):
     with open(f'{dirout}/time.tsv', 'a+') as outTime:
         print(host, now, timed, funcName, path, file=outTime, sep='\t')
     return
-
-
-## Ray Worker Threads ##
-#@hydra.remote
-def rayWorkerThread(func, key, dir_log, params:list):
-    '''Worker thread for Ray
-
-    Parameters:
-        func: The name of the function to call
-        key (str): The key name for the value being processed
-        dir_log (str): Path to the folder of the logfile
-        params**: A list of parameters to send to the called function
-
-    Returns:
-        key, ret, function_name
-    '''
-    start = time.time()
-    ret = func(*params)
-    end = str(datetime.timedelta(seconds=time.time()-start))
-    logTime(dir_log, socket.gethostname(), func.__name__, key, end)
-    return key, ret, func.__name__
 
 
 ## MAIN
@@ -337,13 +315,13 @@ Example:
             continue
         # search environment for executable
         try:
-            proc = subprocess.run(["which", value], stdout=subprocess.PIPE, text=True)
+            proc = subprocess.run(["which", value], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True)
             path = proc.stdout.strip()
             if proc.returncode == 0:
                 print(f"{value:20} {path}")
                 config[key] = path
                 if not os.path.isfile(path):
-                    print(f"{value:20} WARNING: '{value}' not found")
+                    print(f"{value:20} WARNING: '{value}' @ '{path} not found")
                     config[key] = None
             else:
                 print(f"{value:20} NOT FOUND, must be defined in config file as {key}:<path>")
@@ -351,11 +329,6 @@ Example:
         except:
             print(f"ERROR executing 'which {value}'")
 
-    # Check for dependencies
-    #TODO: don't quit on all dependencies, not all paths required
-    #for key,value in config.items():
-    #    if key.startswith("EXE_") and not os.path.isfile(value):
-    #        parser.error(f"Unable to find file: {value}")
 
     # Initialize HydraMPP for Distributed MPP
     print("Initializing HydraMPP")
@@ -363,21 +336,17 @@ Example:
         if args.slurm_single:
             # Force single node
                 hydra.init(address="local", num_cpus=args.cpus, log_to_driver=DEBUG)
-                print("Started RAY single node")
+                print("Started in local mode")
         else:
                 hydra.init(address=args.address, port=args.port, num_cpus=args.cpus, log_to_driver=DEBUG)
     except Exception as e:
         print("Failed to initialize HydraMPP")
         print(e)
-        return 0
-    config['CLUSTER'] = False
-    
-    if len(hydra.nodes()) > 1:
-        config['CLUSTER'] = True
+        return 1
     
     print(f"\nRunning HydraMPP on {len(hydra.nodes())} node{'s' if len(hydra.nodes())>1 else ''}")
     for node in hydra.nodes():
-        print(f"\tNode: '{node['address']}' Using {node['num_cpus']} CPUs")
+        print(f"\tNode: '{node['hostname']}':'{node['address']}' Using {node['num_cpus']} CPUs")
     temp_dir = Path(hydra.nodes()[0]['temp'])
     print("Ray temporary directory:", temp_dir)
 
@@ -525,20 +494,20 @@ Example:
     # Entry Point: Fastq
     if fastq:
         # Step 2 (check quality of fastq files)
-        #print("\nSTEP 2: Checking quality of fastq files")
-        #for key,value in fastq.items():
-        #    pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key, config['DIR_OUT'], [value, config, f"{STEP[2]}/{key}"]))
-        print("\nSTEP 3: Trimming fastq files")
+        print("\nSTEP 2: Merging paired-end reads and checking quality of fastq files")
         # Merge Paired End Reads
         fastqPaired = dict()
         for ext in FILES_FASTQ:
             fastqPaired.update( {k:v for k,v in fastq.items() if "R1"+ext in v and v.replace("R1"+ext, "R2"+ext) in fastq.values() } )
         if len(fastqPaired) > 0 and not config['EXE_FLASH']:
             parser.error('ERROR: FLASH is required for merging paired end FASTQ files.\nPlease install FLASH and edit the PATH variable or set the path in a config file')
+        print("\nSTEP 3: Trimming fastq files")
         for key,value in fastqPaired.items():
             reverse = fastq.pop(key.replace("R1", "R2"))
             forward = fastq.pop(key)
             key = key.removesuffix("R1").rstrip('-_')
+            # Check quality - paired end reads
+            pipeline[metacerberus_qc.checkQuality.remote([forward,reverse], config, f"{STEP[2]}/{key}")] = key
             #TODO: quick fix, make parallel
             if not config['EXE_FASTP']:
                 print("WARNING: Skipping paired end trimming, FASTP not found")
@@ -549,6 +518,9 @@ Example:
             value = metacerberus_merge.mergePairedEnd([r1,r2], config, f"{STEP[3]}/{key}/merged")
             pipeline[hydra.put('trimSingleRead', value)] = key
         del fastqPaired # memory cleanup
+        # Check quality - single end reads
+        for key,value in fastq.items():
+            pipeline[metacerberus_qc.checkQuality.remote(value, config, f"{STEP[2]}/{key}")] = key
         # Trim
         if config['NANOPORE'] and not config['EXE_PORECHOP']:
             print("WARNING: Skipping Nanopore trimming, PORECHOP not found")
@@ -568,19 +540,19 @@ Example:
         if config['REMOVE_N_REPEATS']:
             print("\nSTEP 5a: Removing N's from contig files")
             for key,value in fasta.items():
-                pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.removeN, key, config['DIR_OUT'], [value, config, Path(STEP[5], key)]))
+                pipeline[metacerberus_formatFasta.removeN.remote(value, config, Path(STEP[5], key))] = key
         else:
             for key,value in fasta.items():
                 pipeline[hydra.put("reformat", value)] = key
 
 
     # Step 8 Protein Entry Point
-    jobsORF = 0
+    groupORF = 0
     if amino:
         set_add(step_curr, 8, "STEP 8: HMMER Search")
         for key,value in amino.items():
             pipeline[hydra.put('findORF_', value)] = key
-            jobsORF += 1
+            groupORF += 1
 
     # Step 9 Rollup Entry Point
     hmm_tsv = dict()
@@ -591,7 +563,7 @@ Example:
             amino[key] = None
             for hmm in dbHMM:
                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                pipeline.append(rayWorkerThread.remote(metacerberus_hmm.filterHMM, f"{hmm}/{key}", config['DIR_OUT'], [value, tsv_filtered, dbHMM[hmm]]))
+                pipeline[metacerberus_hmm.filterHMM.remote(value, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
 
     NStats = dict()
     readStats = dict()
@@ -638,15 +610,15 @@ Example:
                     pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
                 else:
                     set_add(step_curr, 4, "STEP 4: Decontaminating trimmed files")
-                    pipeline.append(rayWorkerThread.remote(metacerberus_decon.deconSingleReads, key, config['DIR_OUT'], [[key, value], config, f"{STEP[4]}/{key}"]))
+                    pipeline[metacerberus_decon.deconSingleReads.remote([key, value], config, f"{STEP[4]}/{key}")] = key
             else:
                 set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
                 pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
         if func.startswith("decon"):
             fastq[key] = value
             set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-            pipeline.append(rayWorkerThread.remote(metacerberus_qc.checkQuality, key+'_decon', config['DIR_OUT'], [value, config, f"{STEP[4]}/{key}/quality"]))
-            pipeline.append(rayWorkerThread.remote(metacerberus_formatFasta.reformat, key, config['DIR_OUT'], [value, config, f"{STEP[5]}/{key}"]))
+            pipeline[metacerberus_qc.checkQuality.remote(value, config, f"{STEP[4]}/{key}/quality")] = key+'_decon'
+            pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
         if func == "removeN" or func == "reformat":
             if func == "removeN":
                 fasta[key] = value[0]
@@ -665,7 +637,7 @@ Example:
                 pipeline[metacerberus_genecall.findORF_prod.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'])] = key
             elif key.startswith("phanotate_"):
                 pipeline[metacerberus_genecall.findORF_phanotate.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'])] = key
-            jobsORF += 1
+            groupORF += 1
         if func.startswith("findORF_"):
             if not value:
                 continue
@@ -677,7 +649,7 @@ Example:
             # This causes an issue with the GFF and summary files
             if config['GROUPED']:
                 amino[key] = value
-                jobsORF -= 1
+                groupORF -= 1
                 if not Path(config['DIR_OUT'], 'grouped').exists():
                     Path(config['DIR_OUT'], 'grouped').mkdir(parents=True, exist_ok=True)
                 outfile = Path(config['DIR_OUT'], 'grouped', 'grouped.faa')
@@ -690,7 +662,7 @@ Example:
                             if name in groupIndex:
                                 print("WARN: Duplicate header:", name)
                             groupIndex[name] = key
-                if jobsORF > 0:
+                if groupORF > 0:
                     continue #Continue until all ORFs are done
                 value = outfile
                 key = "grouped"
@@ -963,14 +935,9 @@ Example:
     figSunburst = {}
     for key,value in hmmCounts.items():
         figSunburst[key] = metacerberus_visual.graphSunburst(value)
-
-    #@hydra.remote
-    #def graphCharts(key, rollup, counts):
-    #    return key, metacerberus_visual.graphBarcharts(rollup, counts)
     
     jobCharts = dict()
     for key,value in hmmRollup.items():
-        #jobCharts.append( graphCharts.remote(key, value, hmmCounts[key]) )
         jobCharts[metacerberus_visual.graphBarcharts.remote(value, hmmCounts[key])] = key
     
     figCharts = {}
