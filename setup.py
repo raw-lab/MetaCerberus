@@ -48,7 +48,7 @@ setuptools.setup(
             'setuptools',
             'pandas',
             'pyhmmer',
-            'hydrampp'
+            'hydrampp',
             'pyrodigal',
             'pyrodigal-gv',
             'configargparse',
