@@ -144,7 +144,7 @@ Example:
     output.add_argument('--dir-out', "--dir_out", type=str, default='./results-metacerberus', help='path to output directory, defaults to "results-metacerberus" in current directory. [./results-metacerberus]')
     output.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     output.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
-    output.add_argument('--tmpdir', type=str, default="", help='temp directory for RAY (experimental) [system tmp dir]')
+    output.add_argument('--tmpdir', type=str, default="", help='temp directory for HydraMPP (experimental) [system tmp dir]')
 
     # Database options
     database = parser.add_argument_group(f'''Database options''')
@@ -168,8 +168,6 @@ Example:
     optional.add_argument('--cpus', type=int, help="Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]")
     optional.add_argument('--chunker', type=int, default=0, help="Split files into smaller chunks, in Megabytes [Disabled by default]")
     optional.add_argument('--grouped', action="store_true", help="Group multiple fasta files into a single file before processing. When used with chunker can improve speed")
-    optional.add_argument('--slurm-nodes', type=str, default="", help=argparse.SUPPRESS)# help='list of node hostnames from SLURM, i.e. $SLURM_JOB_NODELIST.')
-    optional.add_argument('--slurm-single', action="store_true", help=argparse.SUPPRESS)# help='Force single node use, do not connect to host')
     optional.add_argument('--version', '-v', action='version',
                         version=f'MetaCerberus: \n version: {__version__} {__date__}',
                         help='show the version number and exit')
@@ -333,12 +331,7 @@ Example:
     # Initialize HydraMPP for Distributed MPP
     print("Initializing HydraMPP")
     try:
-        if args.slurm_single:
-            # Force single node
-                hydra.init(address="local", num_cpus=args.cpus, log_to_driver=DEBUG)
-                print("Started in local mode")
-        else:
-                hydra.init(address=args.address, port=args.port, num_cpus=args.cpus, log_to_driver=DEBUG)
+        hydra.init(address=args.address, port=args.port, num_cpus=args.cpus, log_to_driver=DEBUG)
     except Exception as e:
         print("Failed to initialize HydraMPP")
         print(e)
@@ -348,7 +341,7 @@ Example:
     for node in hydra.nodes():
         print(f"\tNode: '{node['hostname']}':'{node['address']}' Using {node['num_cpus']} CPUs")
     temp_dir = Path(hydra.nodes()[0]['temp'])
-    print("Ray temporary directory:", temp_dir)
+    print("HydraMPP temporary directory:", temp_dir)
 
     config['CPUS'] = hydra.nodes()[0]['num_cpus']
 
@@ -507,7 +500,8 @@ Example:
             forward = fastq.pop(key)
             key = key.removesuffix("R1").rstrip('-_')
             # Check quality - paired end reads
-            pipeline[metacerberus_qc.checkQuality.remote([forward,reverse], config, f"{STEP[2]}/{key}")] = key
+            pipeline[metacerberus_qc.checkQuality.remote([forward,reverse], config['EXE_FASTQC'],
+                f"{config['DIR_OUT']}/{STEP[2]}/{key}")] = key
             #TODO: quick fix, make parallel
             if not config['EXE_FASTP']:
                 print("WARNING: Skipping paired end trimming, FASTP not found")
@@ -520,7 +514,7 @@ Example:
         del fastqPaired # memory cleanup
         # Check quality - single end reads
         for key,value in fastq.items():
-            pipeline[metacerberus_qc.checkQuality.remote(value, config, f"{STEP[2]}/{key}")] = key
+            pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['DIR_OUT']}/{STEP[2]}/{key}")] = key
         # Trim
         if config['NANOPORE'] and not config['EXE_PORECHOP']:
             print("WARNING: Skipping Nanopore trimming, PORECHOP not found")
@@ -571,13 +565,11 @@ Example:
     final_path = Path(config['DIR_OUT'], "final")
 
     groupIndex = dict()
-    amino_queue = dict()
     dictChunks = dict()
-    countFiltered = dict()
     hmmRollup = {}
     hmmCounts = {}
 
-    #TODO: Uptimize this for PyHMMER, taking into account available CPUs/requested jobs
+    #TODO: Optimize this for PyHMMER, taking into account available CPUs/requested jobs
     jobs_hmmer = 4
     while pipeline:
         ready,queue = hydra.wait(pipeline, timeout=1)
@@ -601,7 +593,7 @@ Example:
         if func == "trimSingleRead":
             # Wait for Trimmed Reads
             fastq[key] = value
-            pipeline[metacerberus_qc.checkQuality.remote(value, config, f"{STEP[3]}/{key}/quality")] = key+'_trim'
+            pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['DIR_OUT']}/{STEP[3]}/{key}/quality")] = key+'_trim'
             if fastq and config['ILLUMINA']:
                 if config['SKIP_DECON'] or not config['EXE_BBDUK']:
                     if not config['EXE_BBDUK']:
@@ -617,7 +609,7 @@ Example:
         if func.startswith("decon"):
             fastq[key] = value
             set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-            pipeline[metacerberus_qc.checkQuality.remote(value, config, f"{STEP[4]}/{key}/quality")] = key+'_decon'
+            pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['EXE_FASTQC']}/{STEP[4]}/{key}/quality")] = key+'_decon'
             pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
         if func == "removeN" or func == "reformat":
             if func == "removeN":
@@ -671,6 +663,9 @@ Example:
             if config['CHUNKER'] > 0:
                 chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
                 for hmm in dbHMM.items():
+                    if hmm[0].endswith("FOAM"):
+                        print("SKIPPING FOAM", hmm[0])
+                        continue
                     chunkCount = 1
                     for chunk in chunks.files:
                         key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
@@ -679,9 +674,13 @@ Example:
                         pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
                                                 {key_name:chunk}, config, Path(STEP[8], key), hmm, 4)] = [key_chunk]
             else:
+            # Chunker enabled
                 outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
                 if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
                     for hmm in dbHMM.items():
+                        if hmm[0].endswith("FOAM"):
+                            print("SKIPPING FOAM", hmm[0])
+                            continue
                         hmm_key = f"{hmm[0]}/{key}"
                         pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
                                                                 {key:value}, config, Path(STEP[8]), hmm, 4)] = [hmm_key]
@@ -691,6 +690,7 @@ Example:
                     set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                     pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = key
         if func.startswith('searchHMM'):
+            #TODO: This whole section needs reworking to remove redundant code, and fix grouped option
             keys = key
             for key,tsv_file in zip(keys,value):
                 match = re.search(r"^chunk-([A-Za-z_]+)-(\d+)-(\d+)_(.+)", key)
@@ -704,6 +704,7 @@ Example:
                         # All chunks of a file have returned
                         if config['GROUPED']:
                             key_set = set()
+                            # Split the grouped file into their own hmm_tsv files
                             for item in sorted(dictChunks[hmm_key]):
                                 with open(item) as reader:
                                     for line in reader:
@@ -713,10 +714,15 @@ Example:
                                         tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
                                         with tsv_out.open('a') as writer:
                                             writer.write(line)
+                                        if re.search(r'KEGG', tsv_out):
+                                            tsv_out_foam = re.sub(r'KEGG', 'FOAM', tsv_out)
+                                            with tsv_out_foam.open('a') as writer:
+                                                writer.write(line)
                                 dictChunks[hmm_key].remove(item)
                                 if not config['KEEP']:
                                     os.remove(item)
                             set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
+                            #TODO: Still need to add FOAM filtering for grouped option
                             for k in key_set:
                                 tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
                                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], k, f"filtered-{hmm}.tsv")
@@ -724,10 +730,16 @@ Example:
                             # FINISH SPLITTING GROUP
                             continue
                         # Not grouped
+                        print("HMM chunked:", hmm, key)
                         tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
                         tsv_out.parent.mkdir(parents=True, exist_ok=True)
+                        if re.search(r'KEGG', str(tsv_out)):
+                            tsv_out_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_out)))
+                            writer_foam = tsv_out_foam.open('w')
                         with tsv_out.open('w') as writer:
                             for item in sorted(dictChunks[hmm_key]):
+                                if re.search(r'KEGG', str(tsv_out)):
+                                    writer_foam.write(open(item).read())
                                 writer.write(open(item).read())
                                 dictChunks[hmm_key].remove(item)
                                 if not config['KEEP']:
@@ -735,9 +747,16 @@ Example:
                         tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
                         set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                         pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
+                        if re.search(r'KEGG', str(tsv_out)):
+                            writer_foam.close()
+                            hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
+                            tsv_filtered_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_filtered)))
+                            pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam])] = f"{hmm_foam}/{key}"
                 else:
                 # Not chunked file
                     hmm,key = key.split(sep='/', maxsplit=1)
+                    print("HMM:", hmm,key)
+                    #TODO: FOAM FIX HERE:
                     tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
                     with tsv_out.open('w') as writer:
                         writer.write(open(tsv_file).read())
@@ -959,8 +978,8 @@ Example:
 
     # Cleaning up
     temp_dir = Path(hydra.nodes()[0]['temp'])
-    print("Cleaning up Ray temporary directory", temp_dir)
-    hydra.shutdown()
+    #print("Cleaning up Hydra temporary directory", temp_dir)
+    #hydra.shutdown()
     #TODO: Clean temp directory
     #if temp_dir.exists():
     #    shutil.rmtree(temp_dir)
