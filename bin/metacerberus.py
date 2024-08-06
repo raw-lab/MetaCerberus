@@ -664,7 +664,6 @@ Example:
                 chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
                 for hmm in dbHMM.items():
                     if hmm[0].endswith("FOAM"):
-                        print("SKIPPING FOAM", hmm[0])
                         continue
                     chunkCount = 1
                     for chunk in chunks.files:
@@ -679,7 +678,6 @@ Example:
                 if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
                     for hmm in dbHMM.items():
                         if hmm[0].endswith("FOAM"):
-                            print("SKIPPING FOAM", hmm[0])
                             continue
                         hmm_key = f"{hmm[0]}/{key}"
                         pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
@@ -730,7 +728,6 @@ Example:
                             # FINISH SPLITTING GROUP
                             continue
                         # Not grouped
-                        print("HMM chunked:", hmm, key)
                         tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
                         tsv_out.parent.mkdir(parents=True, exist_ok=True)
                         if re.search(r'KEGG', str(tsv_out)):
@@ -755,16 +752,23 @@ Example:
                 else:
                 # Not chunked file
                     hmm,key = key.split(sep='/', maxsplit=1)
-                    print("HMM:", hmm,key)
                     #TODO: FOAM FIX HERE:
                     tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
                     with tsv_out.open('w') as writer:
                         writer.write(open(tsv_file).read())
+                    if re.search(r'KEGG', str(tsv_out)):
+                        tsv_out_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_out)))
+                        with tsv_out_foam.open('w') as writer:
+                            writer.write(open(tsv_file).read())
                     if not config['KEEP']:
                             os.remove(tsv_file)
                     set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                     tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
                     pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
+                    if re.search(r'KEGG', str(tsv_out)):
+                        hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
+                        tsv_filtered_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_filtered)))
+                        pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam])] = f"{hmm_foam}/{key}"
         if func.startswith('filterHMM'):
             hmm,key = key.split('/')
             set_add(step_curr, 9, "STEP 9: Parse HMMER results")
