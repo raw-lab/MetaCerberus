@@ -22,7 +22,7 @@ DBPATH=~/database/db-metacerberus
 #metacerberus.py --download --db-path $DBPATH
 
 rm -r temp-results
-command time metacerberus.py --prodigal data/five_genomes/GIC* --hmm KOFam_prokaryote --keep --dir-out temp-results --db-path $DBPATH --chunker 1 --cpus 10
+command time metacerberus.py --prodigal data/five_genomes/ --hmm KOFam_prokaryote COG --keep --dir-out temp-results --db-path $DBPATH --grouped --cpus 12
 
 #rm -r temp-NfixDB
 #command time metacerberus.py --prodigal data/rhizobium_test/ --hmm temp-db/NFixDB.hmm.gz --dir-out temp-NfixDB --db-path $DBPATH
