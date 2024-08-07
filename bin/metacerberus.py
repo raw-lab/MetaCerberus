@@ -712,8 +712,8 @@ Example:
                                         tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
                                         with tsv_out.open('a') as writer:
                                             writer.write(line)
-                                        if re.search(r'KEGG', tsv_out):
-                                            tsv_out_foam = re.sub(r'KEGG', 'FOAM', tsv_out)
+                                        if re.search(r'KEGG', str(tsv_out)):
+                                            tsv_out_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_out)))
                                             with tsv_out_foam.open('a') as writer:
                                                 writer.write(line)
                                 dictChunks[hmm_key].remove(item)
@@ -725,6 +725,11 @@ Example:
                                 tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
                                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], k, f"filtered-{hmm}.tsv")
                                 pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{k}"
+                                if re.search(r'KEGG', str(tsv_out)):
+                                    hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
+                                    tsv_out_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_out)))
+                                    tsv_filtered_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_filtered)))
+                                    pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam])] = f"{hmm_foam}/{k}"
                             # FINISH SPLITTING GROUP
                             continue
                         # Not grouped
