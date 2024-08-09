@@ -12,7 +12,7 @@
 [![Anaconda-Server Platforms](https://anaconda.org/bioconda/metacerberus/badges/platforms.svg)](https://anaconda.org/bioconda/metacerberus)
 [![Anaconda-Server License](https://anaconda.org/bioconda/metacerberus/badges/license.svg)](https://anaconda.org/bioconda/metacerberus)
 
-Check out our [MetaCerberus ReadTheDocs Documentation](https://metacerberus.readthedocs.io/en/latest/)
+Check out our [MetaCerberus ReadTheDocs Documentation](https://metacerberus.readthedocs.io/en/latest/) and [Tutorial](https://metacerberus.readthedocs.io/en/latest/tutorial1.html)!
 
 ## About
 
