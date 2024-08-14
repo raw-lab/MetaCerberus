@@ -144,7 +144,7 @@ Example:
     output.add_argument('--dir-out', "--dir_out", type=str, default='./results-metacerberus', help='path to output directory, defaults to "results-metacerberus" in current directory. [./results-metacerberus]')
     output.add_argument('--replace', action="store_true", help="Flag to replace existing files. [False]")
     output.add_argument('--keep', action="store_true", help="Flag to keep temporary files. [False]")
-    output.add_argument('--tmpdir', type=str, default="", help='temp directory for HydraMPP (experimental) [system tmp dir]')
+    #output.add_argument('--tmpdir', type=str, default="", help='temp directory for HydraMPP (experimental) [Hydra default]')
 
     # Database options
     database = parser.add_argument_group(f'''Database options''')
@@ -581,9 +581,6 @@ Example:
             print("PIPELINE:", s,func,value,_,delay,hostname)
         logTime(config['DIR_OUT'], hostname, func, key, delay)
 
-        #TODO: Debug message
-        #print("READY:", func, key, value, sep=" | ")
-
         if func == "checkQuality":
             if value:
                 name = key
@@ -632,13 +629,14 @@ Example:
             groupORF += 1
         if func.startswith("findORF_"):
             if not value:
+                print("ERROR: error from ORF caller")
                 continue
+            # fail if amino file is empty
             if Path(value).stat().st_size == 0:
-                # fail if amino file is empty
-                print("WARNING: no ORFs found in:", key, value)
+                print("ERROR: no ORFs found in:", key, value)
                 continue
             #TODO: Check for duplicate headers in amino acids
-            # This causes an issue with the GFF and summary files
+            #      This causes an issue with the GFF and summary files
             if config['GROUPED']:
                 amino[key] = value
                 groupORF -= 1
@@ -665,6 +663,10 @@ Example:
                 for hmm in dbHMM.items():
                     if hmm[0].endswith("FOAM"):
                         continue
+                    outfile = Path(config['DIR_OUT'], STEP[8], key, f'{hmm[0]}-{key}.tsv')
+                    if not config['REPLACE'] and outfile.exists():
+                        pipeline[hydra.put("searchHMM", [str(outfile)])] = [f"{hmm[0]}/{key}"]
+                        continue
                     chunkCount = 1
                     for chunk in chunks.files:
                         key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
@@ -672,23 +674,19 @@ Example:
                         chunkCount += 1
                         pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
                                                 {key_name:chunk}, config, Path(STEP[8], key), hmm, 4)] = [key_chunk]
-            else:
-            # Chunker enabled
-                outfile = Path(config['DIR_OUT'], STEP[8], key, f'{key}.tsv')
-                if config['REPLACE'] or not outfile.exists(): #TODO: Possible bug, will always be true
-                    for hmm in dbHMM.items():
-                        if hmm[0].endswith("FOAM"):
-                            continue
-                        hmm_key = f"{hmm[0]}/{key}"
-                        pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
-                                                                {key:value}, config, Path(STEP[8]), hmm, 4)] = [hmm_key]
-                else:
-                    #TODO: distinguish filtered tsv per hmm
-                    tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                    set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                    pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = key
+            else: # Chunker not enabled
+                for hmm in dbHMM.items():
+                    if hmm[0].endswith("FOAM"):
+                        continue
+                    outfile = Path(config['DIR_OUT'], STEP[8], key, f'{hmm[0]}-{key}.tsv')
+                    if not config['REPLACE'] and outfile.exists():
+                        pipeline[hydra.put("searchHMM", [str(outfile)])] = [f"{hmm[0]}/{key}"]
+                        continue
+                    hmm_key = f"{hmm[0]}/{key}"
+                    pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
+                                                            {key:value}, config, Path(STEP[8]), hmm, 4)] = [hmm_key]
         if func.startswith('searchHMM'):
-            #TODO: This whole section needs reworking to remove redundant code, and fix grouped option
+            #TODO: This whole section needs reworking to remove redundant code, and improve grouped option
             keys = key
             for key,tsv_file in zip(keys,value):
                 match = re.search(r"^chunk-([A-Za-z_]+)-(\d+)-(\d+)_(.+)", key)
@@ -757,16 +755,16 @@ Example:
                 else:
                 # Not chunked file
                     hmm,key = key.split(sep='/', maxsplit=1)
-                    #TODO: FOAM FIX HERE:
                     tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
-                    with tsv_out.open('w') as writer:
-                        writer.write(open(tsv_file).read())
+                    if not tsv_out.exists() or not tsv_out.samefile(Path(tsv_out)):
+                        with tsv_out.open('w') as writer:
+                            writer.write(open(tsv_file).read())
+                        if not config['KEEP']:
+                                os.remove(tsv_file)
                     if re.search(r'KEGG', str(tsv_out)):
                         tsv_out_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_out)))
                         with tsv_out_foam.open('w') as writer:
-                            writer.write(open(tsv_file).read())
-                    if not config['KEEP']:
-                            os.remove(tsv_file)
+                            writer.write(open(tsv_out).read())
                     set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                     tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
                     pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
@@ -778,7 +776,7 @@ Example:
             hmm,key = key.split('/')
             set_add(step_curr, 9, "STEP 9: Parse HMMER results")
             pipeline[metacerberus_parser.parseHmmer.remote(value, config, f"{STEP[9]}/{key}", hmm, dbHMM[hmm])] = key
-            
+
             tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
             if key not in hmm_tsvs:
                 hmm_tsvs[key] = dict()
@@ -791,13 +789,9 @@ Example:
                 for line in reader:
                     print(*line.rstrip('\n').split('\t'), hmm, sep='\t', file=writer)
             if len(hmm_tsvs[key]) == len(dbHMM):
-                # old method
                 hmm_tsv[key] = tsv_filtered
-                outfile = Path(config['DIR_OUT'], STEP[9], key, f"top_5-{key}.tsv")
+                outfile = Path(config['DIR_OUT'], STEP[9], key, f"HMMER_top_5.tsv")
                 pipeline[metacerberus_parser.top5.remote(tsv_filtered, outfile)] = key
-                # new method
-                outfile = Path(config['DIR_OUT'], STEP[9], key, "HMMER_top_5.tsv")
-                pipeline[metacerberus_parser.top5s.remote(hmm_tsvs[key], outfile)] = key
         if func.startswith('parseHmmer'):
             if key not in hmmRollup:
                 hmmRollup[key] = dict()
