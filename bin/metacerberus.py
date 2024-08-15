@@ -557,7 +557,7 @@ Example:
             amino[key] = None
             for hmm in dbHMM:
                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
-                pipeline[metacerberus_hmm.filterHMM.remote(value, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
+                pipeline[metacerberus_hmm.filterHMM.remote(value, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{key}"
 
     NStats = dict()
     readStats = dict()
@@ -722,12 +722,12 @@ Example:
                             for k in key_set:
                                 tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
                                 tsv_filtered = Path(config['DIR_OUT'], STEP[8], k, f"filtered-{hmm}.tsv")
-                                pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{k}"
+                                pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{k}"
                                 if re.search(r'KEGG', str(tsv_out)):
                                     hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
                                     tsv_out_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_out)))
                                     tsv_filtered_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_filtered)))
-                                    pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam])] = f"{hmm_foam}/{k}"
+                                    pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam], config['REPLACE'])] = f"{hmm_foam}/{k}"
                             # FINISH SPLITTING GROUP
                             continue
                         # Not grouped
@@ -746,12 +746,12 @@ Example:
                                     os.remove(item)
                         tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
                         set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-                        pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
+                        pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{key}"
                         if re.search(r'KEGG', str(tsv_out)):
                             writer_foam.close()
                             hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
                             tsv_filtered_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_filtered)))
-                            pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam])] = f"{hmm_foam}/{key}"
+                            pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam], config['REPLACE'])] = f"{hmm_foam}/{key}"
                 else:
                 # Not chunked file
                     hmm,key = key.split(sep='/', maxsplit=1)
@@ -767,11 +767,11 @@ Example:
                             writer.write(open(tsv_out).read())
                     set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
                     tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
-                    pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm])] = f"{hmm}/{key}"
+                    pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{key}"
                     if re.search(r'KEGG', str(tsv_out)):
                         hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
                         tsv_filtered_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_filtered)))
-                        pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam])] = f"{hmm_foam}/{key}"
+                        pipeline[metacerberus_hmm.filterHMM.remote(tsv_out_foam, tsv_filtered_foam, dbHMM[hmm_foam], config['REPLACE'])] = f"{hmm_foam}/{key}"
         if func.startswith('filterHMM'):
             hmm,key = key.split('/')
             set_add(step_curr, 9, "STEP 9: Parse HMMER results")

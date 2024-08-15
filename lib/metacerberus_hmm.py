@@ -54,8 +54,11 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
 
 # Filter HMM results
 @hydraMPP.remote
-def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path):
+def filterHMM(hmm_tsv:Path, outfile:Path, dbpath:Path, replace:bool=True):
     outfile.parent.mkdir(parents=True, exist_ok=True)
+
+    if not replace and outfile.exists():
+        return outfile
 
     for i in range(1, len(dbpath.suffixes)):
         dbpath = Path(dbpath.with_suffix(''))
