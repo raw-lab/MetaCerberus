@@ -95,7 +95,7 @@ def set_add(to_set:set, item, msg:str):
 
 def logTime(dirout, host, funcName, path, timed):
     now = time.localtime()
-    now = f"{now[3]}:{now[4]}:{now[5]}"
+    now = f"{now[3]:2}:{now[4]:2}:{now[5]:2}"
     with open(f'{dirout}/time.tsv', 'a+') as outTime:
         print(host, now, timed, funcName, path, file=outTime, sep='\t')
     return
@@ -577,8 +577,6 @@ Example:
             continue
         key = pipeline.pop(ready[0])
         s,func,value,_,delay,hostname = hydra.get(ready[0])
-        if not s:
-            print("PIPELINE:", s,func,value,_,delay,hostname)
         logTime(config['DIR_OUT'], hostname, func, key, delay)
 
         if func == "checkQuality":
@@ -811,44 +809,52 @@ Example:
     # step 10 (Report)
     print("\nSTEP 10: Creating Reports")
 
-    ## Copy report files from QC, Parser
-    #for key in hmmRollup.keys():
-    #    Path(report_path, key).mkdir(0o777, True, True)
-    #    src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv")
-    #    dst = os.path.join(report_path, key)
-    #    shutil.copy(src, dst)
-
-    # Write Stats
-    Path(final_path, "fasta").mkdir(0o777, True, True)
-    print("Creating final reports and statistics")
-    protStats = {}
+    # Copy report files from QC, Parser
     for key in hmm_tsvs.keys():
-        # Copy report files from QC, Parser
         Path(report_path, key).mkdir(0o777, True, True)
         Path(final_path, key).mkdir(0o777, True, True)
         src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv")
         dst = Path(final_path, key)
         shutil.copy(src, dst)
-        # Protein statistics & annotation summary
-        summary_tsv = Path(final_path, key, 'final_annotation_summary.tsv')
-        protStats[key] = metacerberus_prostats.getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary_tsv, Path(final_path, "fasta", f"{key}.faa"))
-        try:
-            src = Path(amino[key]).with_suffix(".ffn")
-            dst = Path(final_path, "fasta", f"{key}.ffn")
-            shutil.copy(src, dst)
-        except: pass
         try:
             src = Path(fasta[key])
             dst = Path(final_path, "fasta", f"{key}.fna")
             shutil.copy(src, dst)
         except: pass
+        try:
+            src = Path(amino[key]).with_suffix(".ffn")
+            dst = Path(final_path, "fasta", f"{key}.ffn")
+            shutil.copy(src, dst)
+        except: pass
+
+    # Write Stats
+    jobStat = dict()
+    Path(final_path, "fasta").mkdir(0o777, True, True)
+    print("Creating final reports and statistics\n")
+
+    print("Protein stats")
+    protStats = {}
+    for key in hmm_tsvs.keys():
+        # Protein statistics & annotation summary
+        summary_tsv = Path(final_path, key, 'final_annotation_summary.tsv')
+        jobStat[metacerberus_prostats.getStats.remote(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary_tsv, Path(final_path, "fasta", f"{key}.faa"))] = key
+    while jobStat:
+        ready,queue = hydra.wait(jobStat)
+        key = jobStat.pop(ready[0])
+        s,func,value,_,delay,hostname = hydra.get(ready[0])
+        logTime(config['DIR_OUT'], hostname, func, key, delay)
+        protStats[key] = value
+
+    print("Greating GFF and Genbank files")
+    for key in hmm_tsvs.keys():
         # Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
+        summary_tsv = Path(final_path, key, 'final_annotation_summary.tsv')
         gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
         Path(final_path, "gff").mkdir(511, True, True)
         if len(gff) == 1:
             out_gff = Path(final_path, "gff", f"{key}.gff")
             out_genbank = Path(final_path, f"{key}_template.gbk")
-            metacerberus_report.write_datafiles(gff[0], fasta[key], amino[key], summary_tsv, out_gff, out_genbank)
+            jobStat[metacerberus_report.write_datafiles.remote(gff[0], fasta[key], amino[key], summary_tsv, out_gff, out_genbank)] = None
         else:
             out_gff = Path(final_path, "gff", f"{key}.gff")
             with out_gff.open('w') as writer:
@@ -866,6 +872,12 @@ Example:
                         for line in read_fasta:
                             writer.write(line)
                 except: pass
+    while jobStat:
+        ready,queue = hydra.wait(jobStat)
+        jobStat.pop(ready[0])
+        s,func,value,_,delay,hostname = hydra.get(ready[0])
+        logTime(config['DIR_OUT'], hostname, func, key, delay)
+
     metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
     del protStats
 
