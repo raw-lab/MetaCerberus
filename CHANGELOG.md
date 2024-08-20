@@ -13,6 +13,8 @@
 
 ### v1.4.0 Bug Fixes
 
+- Fixed resume feature for hmm step
+- Fixed counting conflict between parser and filter steps
 
 ## Version 1.3.2
 
