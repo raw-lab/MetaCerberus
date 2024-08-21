@@ -97,15 +97,15 @@ def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
                 print("DEBUG: MINSCORE DETECTED")
                 continue
 
-            # store top 5 per target
-            if target not in BH_top5:
-                BH_top5[target] = [line]
-            elif len(BH_top5[target]) < 5:
-                BH_top5[target].append(line)
+            # store top 5 per query
+            if query not in BH_top5:
+                BH_top5[query] = [line]
+            elif len(BH_top5[query]) < 5:
+                BH_top5[query].append(line)
             else:
-                BH_top5[target].sort(key = lambda x: x[3], reverse=False)
-                if score > float(BH_top5[target][0][3]):
-                    BH_top5[target][0] = line
+                BH_top5[query].sort(key = lambda x: x[3], reverse=False)
+                if score > float(BH_top5[query][0][3]):
+                    BH_top5[query][0] = line
 
             # Create dictionary with found IDs and counts
             #IDs = [ID for ID in line[1].split(",")]
