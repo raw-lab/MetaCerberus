@@ -72,7 +72,7 @@ def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
 
     minscore = config["MINSCORE"]
 
-    top5File = Path(path, f"HMMER-{dbname}_top_5.tsv")
+    top5File = Path(path, f"top_5-{dbname}.tsv")
 
 
     # Calculate Best Hit
