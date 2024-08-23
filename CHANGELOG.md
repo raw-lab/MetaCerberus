@@ -10,6 +10,7 @@
 ### v1.4.0 Improvements
 
 - Removed a redundant hmm search when using KOFam
+- Organized output files
 
 ### v1.4.0 Bug Fixes
 
