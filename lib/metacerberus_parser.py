@@ -13,45 +13,10 @@ warnings.warn = warn
 import re
 from pathlib import Path
 import pandas as pd
+import hydraMPP
 
 
-def top5s(hmm_tsv:dict, outfile:Path):
-    outfile.parent.mkdir(0o777, True, True)
-
-    # Calculate Best Hit
-    BH_top5 = {}
-    for hmm,filename in hmm_tsv.items():
-        with open(filename, "r") as reader:
-            reader.readline()
-            for line in reader:
-                line = line.split('\t')
-                target = line[0]
-                query = line[1]
-                e_value = line[2]
-                score = float(line[3])
-                ec = '' #TODO: Match query to EC
-
-                # store top 5 per query
-                match = [target, query, ec, e_value, score, hmm]
-                if target not in BH_top5:
-                    BH_top5[target] = [match]
-                elif len(BH_top5[target]) < 5:
-                    BH_top5[target].append(match)
-                else:
-                    BH_top5[target].sort(key = lambda x: x[3], reverse=False)
-                    if score > float(BH_top5[target][0][3]):
-                        BH_top5[target][0] = match
-
-    # Save Top 5 hits tsv rollup
-    with outfile.open('w') as writer:
-        print("Target Name", "ID", "EC value", "E-Value (sequence)", "Score (domain)", "hmmDB", sep='\t', file=writer)
-        for target in sorted(BH_top5.keys()):
-            BH_top5[target].sort(key = lambda x: x[3], reverse=True)
-            for line in BH_top5[target]:
-                print(*line, sep='\t', file=writer)
-    return outfile
-
-
+@hydraMPP.remote
 def top5(hmm_tsv:Path, outfile:Path):
     outfile.parent.mkdir(0o777, True, True)
 
@@ -60,15 +25,16 @@ def top5(hmm_tsv:Path, outfile:Path):
     with open(hmm_tsv, "r") as reader:
         reader.readline()
         for line in reader:
-            line = line.split('\t')
+            line = line.rstrip('\r\n').split('\t')
             target = line[0]
             query = line[1]
             e_value = line[2]
             score = float(line[3])
+            hmm = line[7]
             ec = '' #TODO: Match query to EC
 
             # store top 5 per query
-            match = [target, query, ec, e_value, score]
+            match = [target, query, ec, e_value, score, hmm]
             if target not in BH_top5:
                 BH_top5[target] = [match]
             elif len(BH_top5[target]) < 5:
@@ -80,7 +46,7 @@ def top5(hmm_tsv:Path, outfile:Path):
 
     # Save Top 5 hits tsv rollup
     with outfile.open('w') as writer:
-        print("Target Name", "ID", "EC value", "E-Value (sequence)", "Score (domain)", sep='\t', file=writer)
+        print("Target Name", "ID", "EC value", "E-Value (sequence)", "Score (domain)", "hmmDB", sep='\t', file=writer)
         for target in sorted(BH_top5.keys()):
             BH_top5[target].sort(key = lambda x: x[3], reverse=True)
             for line in BH_top5[target]:
@@ -88,6 +54,7 @@ def top5(hmm_tsv:Path, outfile:Path):
     return outfile
 
 
+@hydraMPP.remote
 def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
     path = Path(config['DIR_OUT'], subdir)
     path.mkdir(exist_ok=True, parents=True)
@@ -105,12 +72,12 @@ def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
 
     minscore = config["MINSCORE"]
 
-    top5File = Path(path, f"HMMER-{dbname}_top_5.tsv")
+    top5File = Path(path, f"top_5-{dbname}.tsv")
 
 
     # Calculate Best Hit
-    BH_query = {}
     BH_top5 = {}
+    ID_counts = {}
     #"target", "query", "e-value", "score", "length", "start", "end"
     with open(hmm_tsv, "r") as reader:
         for line in reader:
@@ -140,11 +107,13 @@ def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
                 if score > float(BH_top5[query][0][3]):
                     BH_top5[query][0] = line
 
-            # Check for Best Score per query
-            if query not in BH_query:
-                BH_query[query] = line
-            elif score > float(BH_query[query][3]):
-                BH_query[query] = line
+            # Create dictionary with found IDs and counts
+            #IDs = [ID for ID in line[1].split(",")]
+            #for ID in IDs:
+            if query not in ID_counts:
+                ID_counts[query] = 0
+            ID_counts[query] += 1
+
 
     # Save Top 5 hits tsv rollup
     with top5File.open('w') as writer:
@@ -156,20 +125,12 @@ def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
                 ec = []
                 print(line[0], ','.join(id), ','.join(ec), line[2], line[3], file=writer, sep='\t')
 
-    # Create dictionary with found IDs and counts
-    ID_counts = {}
-    for line in BH_query.values():
-        IDs = [ID for ID in line[1].split(",")]
-        for ID in IDs:
-            if ID not in ID_counts:
-                ID_counts[ID] = 0
-            ID_counts[ID] += 1
 
     # Write rollup files to disk
     dbRollup = rollup(ID_counts, dbname, dbpath, path)
     rollup_files = dict()
     if len(dbRollup) > 1:
-        outfile = Path(path, f"HMMER_BH_{dbname}_rollup2.tsv")
+        outfile = Path(path, f"HMMER_BH_{dbname}_rollup.tsv")
         with open(outfile, 'w') as writer:
             for line in dbRollup:
                 print(*line, sep='\t', file=writer)
@@ -216,12 +177,13 @@ def rollup(COUNTS:dict, dbname:str, dbpath:Path, outpath:str):
 
 
 ########## Counts Table #########
+@hydraMPP.remote
 def createCountTables(rollup_files:dict, config:dict, subdir: str):
     done = Path(config['DIR_OUT']) / subdir / "complete"
     dfCounts = dict()
 
     for dbName,filepath in rollup_files.items():
-        outpath = Path(config['DIR_OUT'], subdir, f"{dbName}-rollup_counts.tsv")
+        outpath = Path(config['DIR_OUT'], subdir, f"rollup-counts_{dbName}.tsv")
         if not config['REPLACE'] and done.exists() and outpath.exists():
             dfCounts[dbName] = outpath
             continue

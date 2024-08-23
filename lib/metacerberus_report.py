@@ -20,6 +20,7 @@ import pkg_resources as pkg
 import plotly.express as px
 import dominate
 from dominate.tags import *
+import hydraMPP
 
 
 # standard html header to include plotly script
@@ -366,6 +367,7 @@ def write_HTML_files(outfile, figure, sample, name):
 
 # Save Annotated GFF and GenBank files
 #TODO: Add embl
+@hydraMPP.remote
 def write_datafiles(gff:Path, fasta:Path, amino:Path, summary:Path, out_gff:Path, out_genbank:Path):
     # Create amino acid index
     faa_idx = dict()

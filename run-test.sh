@@ -2,10 +2,12 @@
 
 #eval "$(conda shell.bash hook)"
 #conda activate MetaCerberus
+rm -r build *egg-info*
+#pip install ~/raw-lab/HydraMPP >/dev/null
 pip install ~/raw-lab/MetaCerberus >/dev/null
 
-
 DBPATH=~/database/db-metacerberus
+
 
 #metacerberus.py -h
 
@@ -19,17 +21,23 @@ DBPATH=~/database/db-metacerberus
 #metacerberus.py --download COG CAZy --db-path $DBPATH
 #metacerberus.py --download --db-path $DBPATH
 
-rm -r temp-results
-command time metacerberus.py --phanotate data/five_genomes/RW1.fna --hmm COG --keep --dir-out temp-results --db-path $DBPATH --slurm-single
+#rm -r temp-results
+#command time metacerberus.py --prodigal data/five_genomes/ --hmm KOFam_prokaryote COG --keep --dir-out temp-results --db-path $DBPATH --grouped --cpus 12
 
 #rm -r temp-NfixDB
-#command time metacerberus.py --prodigal data/rhizobium_test/ --hmm temp-db/NFixDB.hmm.gz --dir-out temp-NfixDB --db-path $DBPATH --slurm-single
+#command time metacerberus.py --prodigal data/rhizobium_test/ --hmm temp-db/NFixDB.hmm.gz --dir-out temp-NfixDB --db-path $DBPATH
 
 #rm -r temp-rhizobium
-#command time metacerberus.py --phanotate data/rhizobium_test/ --hmm COG --dir-out temp-rhizobium --slurm-single --class data/rhizobium_test/samples.tsv --db-path $DBPATH --slurm-single
+#command time metacerberus.py --phanotate data/rhizobium_test/ --hmm COG --dir-out temp-rhizobium --class data/rhizobium_test/samples.tsv --db-path $DBPATH
 
 #rm -r temp-GV
-#command time metacerberus.py --pyrodigalgv data/giantvirus.fna --hmm VOG --dir-out temp-GV --chunk 1 --db-path $DBPATH --slurm-single
+#command time metacerberus.py --pyrodigalgv data/giantvirus.fna --hmm VOG --dir-out temp-GV --chunk 1 --db-path $DBPATH
 
-#rm -r temp-paired
-#command time metacerberus.py --fraggenescan ~/temp/raw-reads --illumina --hmm COG --dir-out temp-paired --db-path $DBPATH --slurm-single
+rm -r temp-paired/step_10* temp-paired/final
+command time metacerberus.py --super ~/temp/raw-reads --prodigalgv ~/temp/raw-reads --illumina --hmm COG, CAZy --dir-out temp-paired --db-path $DBPATH
+#
+#args="--prodigalgv ~/temp/raw-reads --illumina --hmm COG --dir-out temp-paired --db-path $DBPATH"
+#command time metacerberus.py $args --address "host" --cpus 2 &
+#sleep 1
+#command time metacerberus.py $args --address localhost --cpus 8 # &> client.log
+#wait

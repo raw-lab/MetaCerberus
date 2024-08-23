@@ -11,9 +11,11 @@ from pathlib import Path
 import subprocess
 import pyrodigal
 import pyrodigal_gv
+import hydraMPP
 
 
 # Eukaryotic option
+@hydraMPP.remote
 def findORF_fgs(contig, config, subdir):
     path = Path(config['DIR_OUT'], subdir)
     done = path / "complete"
@@ -45,6 +47,7 @@ def findORF_fgs(contig, config, subdir):
 
 
 # Microbial option
+@hydraMPP.remote
 def findORF_prod(contig, config, subdir, meta=False, viral=False):
     path = Path(config['DIR_OUT'], subdir)
     path.mkdir(exist_ok=True, parents=True)
@@ -91,6 +94,7 @@ def findORF_prod(contig, config, subdir, meta=False, viral=False):
 
 
 # Phage
+@hydraMPP.remote
 def findORF_phanotate(contig, config, subdir, meta=False):
     path = Path(config['DIR_OUT'], subdir)
     done = path / "complete"

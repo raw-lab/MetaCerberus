@@ -1,14 +1,31 @@
 # Change log
 
+## Version 1.4.0
+
+### v1.4.0 New Features
+
+- Replaced Ray with HydraMPP
+  - Reduced number of dependencies making install easier
+
+### v1.4.0 Improvements
+
+- Removed a redundant hmm search when using KOFam
+- Organized output files
+
+### v1.4.0 Bug Fixes
+
+- Fixed resume feature for hmm step
+- Fixed counting conflict between parser and filter steps
+
 ## Version 1.3.2
 
-### Bug Fixes
+### v1.3.2 Bug Fixes
 
 - Fixed Ray dependency issue for MetaCerberus-lite, or when Ray is not available.
 
 ## Version 1.3.1
 
-### New Features
+### v1.3.1 New Features
 
 - created "lite" version.
   - removed hard dependency requirements, failing more gracefully to make some dependencies optional
@@ -22,7 +39,7 @@
 - Made N removal optional
 - Improved Genbank output
 
-### Bug Fixes
+### v1.3.1 Bug Fixes
 
 - Fixed prodigal-gv GFF
 - Fixed some Phanotate bugs
@@ -32,7 +49,7 @@
 
 ## Version 1.3.0
 
-### New Features
+### v1.3.0 New Features
 
 - Custom download location for databases
 - Ability to download individual databases
@@ -49,7 +66,7 @@
   -Performance improvements
   -Improved some error handling and reporting
 
-### Bug Fixes
+### v1.3.0 Bug Fixes
 
 - Multi-domain in summary files
   -Individual database summary files contain a line per match found

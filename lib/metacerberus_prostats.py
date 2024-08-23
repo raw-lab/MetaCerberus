@@ -8,8 +8,10 @@ import re
 from pathlib import Path
 import pandas as pd
 import statistics as stat
+import hydraMPP
 
 
+@hydraMPP.remote
 def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summary_out:Path, fasta_prefix:Path):
     minscore = config["MINSCORE"]
 
@@ -190,3 +192,35 @@ def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summ
             stats[dbName+' ID Count'] = df[df['Level']=='Function']['Count'].sum()
 
     return stats
+
+
+#def get_summary(key, final_path, amino, hmm_tsv, hmmCount, config, dbHMM):
+#    prostat = None
+#    # Protein statistics & annotation summary
+#    summary_tsv = Path(final_path, key, 'final_annotation_summary.tsv')
+#    protStats[key] = getStats(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary_tsv, Path(final_path, "fasta", f"{key}.faa"))
+#    # Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
+#    gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
+#    Path(final_path, "gff").mkdir(511, True, True)
+#    if len(gff) == 1:
+#        out_gff = Path(final_path, "gff", f"{key}.gff")
+#        out_genbank = Path(final_path, f"{key}_template.gbk")
+#        metacerberus_report.write_datafiles(gff[0], fasta[key], amino[key], summary_tsv, out_gff, out_genbank)
+#    else:
+#        out_gff = Path(final_path, "gff", f"{key}.gff")
+#        with out_gff.open('w') as writer:
+#            with summary_tsv.open() as read_summary:
+#                read_summary.readline()
+#                print("##gff-version  3", file=writer)
+#                for summ in read_summary:
+#                    summ = summ.split('\t')
+#                    data = [summ[0].split('_')[0], ".", ".", ".", ".", ".", ".", ".", ]
+#                    attributes = ';'.join([f"ID={summ[0]}", f"Name={summ[1]}", f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}", f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"])
+#                    print(*data, attributes, sep='\t', file=writer)
+#            try:
+#                with open(fasta[key]) as read_fasta:
+#                    print("##FASTA", file=writer)
+#                    for line in read_fasta:
+#                        writer.write(line)
+#            except: pass
+#

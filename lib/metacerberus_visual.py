@@ -15,6 +15,7 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import plotly.express as px
 import plotly.graph_objects as go
+import hydraMPP
 
 # global vars
 BAR_LIMIT = 10
@@ -152,6 +153,7 @@ def graphPCA(dfTables:dict):
 
 
 ########## Create Barchart Figures ##########
+@hydraMPP.remote
 def graphBarcharts(rollup_files:dict, dfCounts):
     dfCounts = dfCounts.copy()
 

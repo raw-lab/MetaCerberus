@@ -17,7 +17,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="MetaCerberus",
-    version="1.3.2",
+    version="1.4.0",
     author="Jose L. Figueroa III, Richard A. White III",
     author_email="jlfiguer@uncc.edu",
     description="Versatile Functional Ontology Assignments for Metagenomes via Hidden Markov Model (HMM) searching with environmental focus of shotgun meta'omics data",
@@ -39,6 +39,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "License :: OSI Approved :: BSD License",
         "Operating System :: Unix",
     ],
@@ -46,15 +47,16 @@ setuptools.setup(
     install_requires=[
             'setuptools',
             'pandas',
-            'metaomestats',
+            'pyhmmer',
+            'hydrampp',
+            'pyrodigal',
+            'pyrodigal-gv',
             'configargparse',
+            'metaomestats',
             'kaleido',
             'scikit-learn',
             'plotly',
             'psutil',
             'dominate',
-            'pyrodigal',
-            'pyrodigal-gv',
-            'pyhmmer'
             ],
 )
