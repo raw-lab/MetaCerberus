@@ -282,8 +282,11 @@ Example:
     config['STEP'] = STEP
     config['PATHDB'] = PATHDB
 
-    # Get FGS+ Folder from Library Path
+    # Get FGS+ Path from Library Path
     config['EXE_FGS'] = os.path.join(PATHFGS, DEPENDENCIES["EXE_FGS"])
+    if args.fraggenescan and not Path(config['EXE_FGS']).exists():
+        print("Setting up FragGeneScanRS")
+        metacerberus_setup.FGS(PATHFGS)
 
     # load all args into config
     for arg,value in args.__dict__.items():
@@ -788,7 +791,7 @@ Example:
                     print(*line.rstrip('\n').split('\t'), hmm, sep='\t', file=writer)
             if len(hmm_tsvs[key]) == len(dbHMM):
                 hmm_tsv[key] = tsv_filtered
-                outfile = Path(config['DIR_OUT'], STEP[9], key, f"HMMER_top_5.tsv")
+                outfile = Path(config['DIR_OUT'], STEP[9], key, f"top_5.tsv")
                 pipeline[metacerberus_parser.top5.remote(tsv_filtered, outfile)] = key
         if func.startswith('parseHmmer'):
             if key not in hmmRollup:
@@ -810,12 +813,19 @@ Example:
     print("\nSTEP 10: Creating Reports")
 
     # Copy report files from QC, Parser
+    Path(final_path, "top-5").mkdir(parents=True, exist_ok=True)
+    Path(final_path, "rollup").mkdir(parents=True, exist_ok=True)
+    Path(final_path, "counts").mkdir(parents=True, exist_ok=True)
+    Path(final_path, "gff").mkdir(parents=True, exist_ok=True)
+    Path(final_path, "genbank").mkdir(parents=True, exist_ok=True)
     for key in hmm_tsvs.keys():
-        Path(report_path, key).mkdir(0o777, True, True)
-        Path(final_path, key).mkdir(0o777, True, True)
-        src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "HMMER_top_5.tsv")
-        dst = Path(final_path, key)
-        shutil.copy(src, dst)
+        Path(final_path, f"annotations-{key}").mkdir(parents=True, exist_ok=True)
+        Path(report_path, key).mkdir(parents=True, exist_ok=True)
+        top_5s = Path(config['DIR_OUT'], config['STEP'][9], key).glob("top_5*.tsv")
+        for src in top_5s:
+            #src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "top_5.tsv")
+            dst = Path(final_path, "top-5", f"{key}-{src.name}")
+            shutil.copy(src, dst)
         try:
             src = Path(fasta[key])
             dst = Path(final_path, "fasta", f"{key}.fna")
@@ -836,7 +846,7 @@ Example:
     protStats = {}
     for key in hmm_tsvs.keys():
         # Protein statistics & annotation summary
-        summary_tsv = Path(final_path, key, 'final_annotation_summary.tsv')
+        summary_tsv = Path(final_path, f"annotations-{key}", 'final_annotation_summary.tsv')
         jobStat[metacerberus_prostats.getStats.remote(amino[key], hmm_tsvs[key], hmmCounts[key], config, dbHMM, summary_tsv, Path(final_path, "fasta", f"{key}.faa"))] = key
     while jobStat:
         ready,queue = hydra.wait(jobStat)
@@ -848,12 +858,11 @@ Example:
     print("Greating GFF and Genbank files")
     for key in hmm_tsvs.keys():
         # Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
-        summary_tsv = Path(final_path, key, 'final_annotation_summary.tsv')
+        summary_tsv = Path(final_path, f"annotations-{key}", 'final_annotation_summary.tsv')
         gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
-        Path(final_path, "gff").mkdir(511, True, True)
         if len(gff) == 1:
             out_gff = Path(final_path, "gff", f"{key}.gff")
-            out_genbank = Path(final_path, f"{key}_template.gbk")
+            out_genbank = Path(final_path, "genbank", f"{key}_template.gbk")
             jobStat[metacerberus_report.write_datafiles.remote(gff[0], fasta[key], amino[key], summary_tsv, out_gff, out_genbank)] = None
         else:
             out_gff = Path(final_path, "gff", f"{key}.gff")
@@ -890,7 +899,7 @@ Example:
     for sample,tables in hmmRollup.items():
         os.makedirs(f"{report_path}/{sample}", exist_ok=True)
         for name,table in tables.items():
-            shutil.copy(table, Path(final_path, sample, f'rollup_{name}.tsv'))
+            shutil.copy(table, Path(final_path, "rollup", f'rollup_{sample}-{name}.tsv'))
 
     # Counts Tables
     print("Mergeing Count Tables")
@@ -905,7 +914,7 @@ Example:
             if table_path.exists():
                 name = re.sub(rf'^FragGeneScan_|prodigal_|Protein_', '', name)
                 tsv_list[name] = table_path
-        combined_path = Path(config['DIR_OUT'], STEP[10], 'combined', f'counts_{dbname}.tsv')
+        combined_path = Path(final_path, "counts", f'counts_{dbname}.tsv')
         metacerberus_parser.merge_tsv(tsv_list, Path(combined_path))
         if combined_path.exists():
             dfCounts[dbname] = combined_path
