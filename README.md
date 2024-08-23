@@ -65,7 +65,7 @@ metacerberus.py --setup
 metacerberus.py --download
 ```
 
-- NOTE: Mamba is the fastest installer. Anaconda or miniconda can be slow. Also, install mamba from conda not from pip. The pip mamba doesn't work for install. 
+- NOTE: Mamba is the fastest installer. Anaconda or miniconda can be slow. Also, install mamba from conda not from pip. The pip mamba doesn't work for install.
 
 ### Option 2) Anaconda - Linux/OSX-64 Only
 
@@ -85,9 +85,25 @@ metacerberus.py --download
 git clone https://github.com/raw-lab/MetaCerberus.git 
 cd MetaCerberus
 bash install_metacerberus.sh
-conda activate MetaCerberus-1.3.0
+conda activate MetaCerberus
 metacerberus.py --download
 ```
+
+## MetaCerberus Lite
+
+We also have a lite version of MetaCerberus on anaconda that only depends on the very basic dependencies.  
+This can make it a bit faster and easier to install as it is less likely to have conflicts with other dependencies on the system.
+
+To install the "lite" version, use "metacerberus-lite" instead of "metacerberus" from Bioconda, following the details listed above.
+
+```bash
+mamba create -n metacerberus -c conda-forge -c bioconda metacerberus-lite
+conda activate metacerberus
+metacerberus.py --setup
+metacerberus.py --download
+```
+
+Additional dependencies such as fastqc and fastp can be installed in the environment manually if desired for those steps in the pipeline.
 
 ## Brief Overview
 
@@ -256,10 +272,12 @@ metacerberus.py --super [input_folder]  --pacbio/--nanopore/--illumina --meta --
 | [Prodigal-gv](https://github.com/apcamargo/prodigal-gv) | 2.2.1 | [Camargo et al. 2023](https://www.nature.com/articles/s41587-023-01953-y) | 
 | [Phanotate](https://github.com/deprekate/PHANOTATE) | 1.5.0 | [McNair et al. 2019](https://doi.org/10.1093/bioinformatics/btz265) | 
 | [HMMER](https://github.com/EddyRivasLab/hmmer) | 3.4 | [Johnson et al. 2010](https://doi.org/10.1186/1471-2105-11-431) |
+| [HydraMPP](https://github.com/raw-lab/HydraMPP) | 0.0.4 | None |
 
 ## MetaCerberus databases
 
-All pre-formatted databases are present at OSF 
+All pre-formatted databases are present at OSF
+
 - [OSF](https://osf.io/3uz2j)
 
 ### Database sources
@@ -308,9 +326,9 @@ To run a custom database, you need a HMM containing the protein family of intere
 usage: metacerberus.py [--setup] [--update] [--list-db] [--download [DOWNLOAD ...]] [--uninstall] [-c CONFIG] [--prodigal PRODIGAL [PRODIGAL ...]]
                        [--fraggenescan FRAGGENESCAN [FRAGGENESCAN ...]] [--super SUPER [SUPER ...]] [--prodigalgv PRODIGALGV [PRODIGALGV ...]]
                        [--phanotate PHANOTATE [PHANOTATE ...]] [--protein PROTEIN [PROTEIN ...]] [--hmmer-tsv HMMER_TSV [HMMER_TSV ...]] [--class CLASS]
-                       [--illumina | --nanopore | --pacbio] [--dir-out DIR_OUT] [--replace] [--keep] [--tmpdir TMPDIR] [--hmm HMM [HMM ...]] [--db-path DB_PATH] [--meta]
-                       [--scaffolds] [--minscore MINSCORE] [--evalue EVALUE] [--skip-decon] [--skip-pca] [--cpus CPUS] [--chunker CHUNKER] [--grouped] [--version] [-h]
-                       [--adapters ADAPTERS] [--qc_seq QC_SEQ]
+                       [--illumina | --nanopore | --pacbio] [--dir-out DIR_OUT] [--replace] [--keep] [--hmm HMM [HMM ...]] [--db-path DB_PATH] [--address ADDRESS]
+                       [--port PORT] [--meta] [--scaffolds] [--minscore MINSCORE] [--evalue EVALUE] [--remove-n-repeats] [--skip-decon] [--skip-pca] [--cpus CPUS]
+                       [--chunker CHUNKER] [--grouped] [--version] [-h] [--adapters ADAPTERS] [--qc_seq QC_SEQ]
 
 Setup arguments:
   --setup               Setup additional dependencies [False]
@@ -338,7 +356,7 @@ Example:
   --prodigalgv PRODIGALGV [PRODIGALGV ...]
                         Giant virus nucleotide sequence
   --phanotate PHANOTATE [PHANOTATE ...]
-                        Phage sequence
+                        Phage sequence (EXPERIMENTAL)
   --protein PROTEIN [PROTEIN ...], --amino PROTEIN [PROTEIN ...]
                         Protein Amino Acid sequence
   --hmmer-tsv HMMER_TSV [HMMER_TSV ...]
@@ -352,11 +370,14 @@ Output options:
   --dir-out DIR_OUT     path to output directory, defaults to "results-metacerberus" in current directory. [./results-metacerberus]
   --replace             Flag to replace existing files. [False]
   --keep                Flag to keep temporary files. [False]
-  --tmpdir TMPDIR       temp directory for RAY (experimental) [system tmp dir]
 
 Database options:
-  --hmm HMM [HMM ...]   A list of databases for HMMER. Use the option --list-db for a list of available databases [KOFam_all]
+  --hmm HMM [HMM ...]   A list of databases for HMMER. 'ALL' uses all downloaded databases. Use the option --list-db for a list of available databases [KOFam_all]
   --db-path DB_PATH     Path to folder of databases [Default: under the library path of MetaCerberus]
+
+MPP options:
+  --address ADDRESS     Address for distributed MPP. local=no networking, host=make this machine a host, ip-address=connect to remote host [local]
+  --port PORT           The port to listen/connect to [24515]
 
 optional arguments:
   --meta                Metagenomic nucleotide sequences (for prodigal) [False]
@@ -364,8 +385,8 @@ optional arguments:
   --minscore MINSCORE   Score cutoff for parsing HMMER results [60]
   --evalue EVALUE       E-value cutoff for parsing HMMER results [1e-09]
   --remove-n-repeats    Remove N repeats, splitting contigs [False]
-  --skip-decon          Skip decontamination step. [False]
-  --skip-pca            Skip PCA. [False]
+  --skip-decon          Skip decontamination step [False]
+  --skip-pca            Skip PCA [False]
   --cpus CPUS           Number of CPUs to use per task. System will try to detect available CPUs if not specified [Auto Detect]
   --chunker CHUNKER     Split files into smaller chunks, in Megabytes [Disabled by default]
   --grouped             Group multiple fasta files into a single file before processing. When used with chunker can improve speed
@@ -412,10 +433,10 @@ GAGE and PathView also require internet access to be able to download informatio
 
 ### Multiprocessing / Multi-Computing with RAY
 
-MetaCerberus uses Ray for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
+MetaCerberus uses HydraMPP for distributed processing. This is compatible with both multiprocessing on a single node (computer) or multiple nodes in a cluster.  
 MetaCerberus has been tested on a cluster using Slurm <https://github.com/SchedMD/slurm>.  
   
-A script has been included to facilitate running MetaCerberus on Slurm. To use MetaCerberus on a Slurm cluster, setup your slurm script and run it using sbatch.  
+*note the extra flag "--hydraMPP-slurm $SLURM_JOB_NODELIST" when running MetaCerberus. HydraMPP uses this to setup the SLURM jobs.
 
 ```bash
 sbatch example_script.sh
@@ -437,7 +458,6 @@ example script:
 
 echo "====================================================="
 echo "Start Time  : $(date)"
-echo "Submit Dir  : $SLURM_SUBMIT_DIR"
 echo "Job ID/Name : $SLURM_JOBID / $SLURM_JOB_NAME"
 echo "Node List   : $SLURM_JOB_NODELIST"
 echo "Num Tasks   : $SLURM_NTASKS total [$SLURM_NNODES nodes @ $SLURM_CPUS_ON_NODE CPUs/node]"
@@ -445,17 +465,10 @@ echo "======================================================"
 echo ""
 
 # Load any modules or resources here
-conda activate metacerberus
-# source the slurm script to initialize the Ray worker nodes
-source ray-slurm-metacerberus.sh
-# run MetaCerberus
-metacerberus.py --prodigal [input_folder] --illumina --dir_out [out_folder]
+conda activate MetaCerberus
 
-echo ""
-echo "======================================================"
-echo "End Time   : $(date)"
-echo "======================================================"
-echo ""
+# run MetaCerberus
+metacerberus.py --prodigal [input_folder] --illumina --dir_out [out_folder] --hydraMPP-slurm $SLURM_JOB_NODELIST
 ```
 
 ## DESeq2 and Edge2 Type I errors
