@@ -6,9 +6,11 @@ Uses bbduk [https://sourceforge.net/projects/bbmap/]
 import os
 from pathlib import Path
 import subprocess
+import hydraMPP
 
 
 # Decontaminate single end reads
+@hydraMPP.remote
 def deconSingleReads(key_value, config, subdir):
     path = Path(config['DIR_OUT'], subdir)
 

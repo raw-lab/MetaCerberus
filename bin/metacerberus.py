@@ -607,7 +607,7 @@ Example:
         if func.startswith("decon"):
             fastq[key] = value
             set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-            pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['EXE_FASTQC']}/{STEP[4]}/{key}/quality")] = key+'_decon'
+            pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['DIR_OUT']}/{STEP[4]}/{key}/quality")] = key+'_decon'
             pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
         if func == "removeN" or func == "reformat":
             if func == "removeN":
