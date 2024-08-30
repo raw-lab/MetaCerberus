@@ -36,7 +36,8 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
 
         # HMMER
         errfile=Path(outfile).with_suffix('.err').open('w')
-        with open(outfile, 'wt') as hmm_writer, pyhmmer.plan7.HMMFile(hmm) as hmm_reader, pyhmmer.easel.SequenceFile(amino, digital=True) as seq_reader:
+        alphabet = pyhmmer.easel.Alphabet.amino()
+        with open(outfile, 'wt') as hmm_writer, pyhmmer.plan7.HMMFile(hmm) as hmm_reader, pyhmmer.easel.SequenceFile(amino, digital=True, alphabet=alphabet) as seq_reader:
             for hit in pyhmmer.hmmer.hmmsearch(hmm_reader, seq_reader, E=evalue, cpus=CPUs):
                 for h in hit:
                     for domain in h.domains.included:

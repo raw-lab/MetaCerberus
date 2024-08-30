@@ -688,6 +688,9 @@ Example:
                                                             {key:value}, config, Path(STEP[8]), hmm, 4)] = [hmm_key]
         if func.startswith('searchHMM'):
             #TODO: This whole section needs reworking to remove redundant code, and improve grouped option
+            if value is None:
+                print("Error with hmmsearch")
+                continue
             keys = key
             for key,tsv_file in zip(keys,value):
                 match = re.search(r"^chunk-([A-Za-z_]+)-(\d+)-(\d+)_(.+)", key)
