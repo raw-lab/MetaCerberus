@@ -760,6 +760,7 @@ Example:
                 # Not chunked file
                     hmm,key = key.split(sep='/', maxsplit=1)
                     tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
+                    #TODO: This becomes a bottleneck with a large amount of samples. This begins when hmm/filtering ends, and becomes linear. Large memory holding all the jobs in queue
                     if not tsv_out.exists() or not tsv_out.samefile(Path(tsv_out)):
                         with tsv_out.open('w') as writer:
                             writer.write(open(tsv_file).read())
@@ -781,6 +782,7 @@ Example:
             set_add(step_curr, 9, "STEP 9: Parse HMMER results")
             pipeline[metacerberus_parser.parseHmmer.remote(value, config, f"{STEP[9]}/{key}", hmm, dbHMM[hmm])] = key
 
+            #TODO: This becomes a bottleneck with a large amount of samples. This begins when hmm/filtering ends, and becomes linear.. Large memory holding all the jobs in queue
             tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
             if key not in hmm_tsvs:
                 hmm_tsvs[key] = dict()
@@ -931,7 +933,11 @@ Example:
         print("NOTE: PCA Tables created only when there are at least four sequence files.\n")
     else:
         print("PCA Analysis")
-        pcaFigures = metacerberus_visual.graphPCA(dfCounts)
+        pcaFigures = metacerberus_visual.graphPCA.remote(dfCounts)
+        ready,pending = hydra.wait([pcaFigures])
+        s,func,value,_,delay,hostname = hydra.get(ready[0])
+        logTime(config['DIR_OUT'], hostname, func, "PCA", delay)
+        pcaFigures = value
         Path(report_path, 'combined').mkdir(parents=True, exist_ok=True)
         metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
 

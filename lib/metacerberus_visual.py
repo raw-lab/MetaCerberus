@@ -60,6 +60,7 @@ def graphSunburst(tables):
 
 
 ######### Create PCA Graph ##########
+@hydraMPP.remote
 def graphPCA(dfTables:dict):
 
     # Run PCA and add to Plots
