@@ -288,7 +288,7 @@ All pre-formatted databases are present at OSF
 | [FOAM/KOfams](https://osf.io/3uz2j/) | 2017 | 1 | [Prestat et al. 2014](https://doi.org/10.1093/nar/gku702) | beta |
 | [COG](https://ftp.ncbi.nlm.nih.gov/pub/COG/COG2020/data/) | 2020 | 2020 | [Galperin et al. 2020](https://doi.org/10.1093/nar/gkaa1018) | beta |
 | [dbCAN/CAZy](https://bcb.unl.edu/dbCAN2/download/)| 2023-08-02 | 12 | [Yin et al., 2012](https://doi.org/10.1093/nar/gks479) | beta |
-| [VOG](https://vogdb.org/download)| 2017-03-03 | 80 | [Website](https://vogdb.org/) | beta |
+| [VOG](https://vogdb.org/download)| 2024-10-06 | 225| [Website](https://vogdb.org/) | 1.4 |
 | [pVOG](https://ftp.ncbi.nlm.nih.gov/pub/kristensen/pVOGs/downloads.html#)| 2016 | 2016 | [Grazziotin et al. 2017](https://doi.org/10.1093/nar/gkw975) | 1.2 |
 | [PHROG](https://phrogs.lmge.uca.fr/)| 2022-06-15 | 4 | [Terizan et al., 2021](https://doi.org/10.1093/nargab/lqab067) | 1.2 |
 | [PFAM](http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release)| 2023-09-12 | 36 | [Mistry et al. 2020](https://doi.org/10.1093/nar/gkaa913) | 1.3 |
