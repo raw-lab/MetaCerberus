@@ -660,7 +660,7 @@ Example:
             set_add(step_curr, 8, "STEP 8: HMMER Search")
             amino[key] = value
             if config['CHUNKER'] > 0:
-                chunks = Chunker.Chunker(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+                chunks = Chunker.create_chunks(amino[key], os.path.join(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
                 for hmm in dbHMM.items():
                     if hmm[0].endswith("FOAM"):
                         continue
@@ -669,9 +669,9 @@ Example:
                         pipeline[hydra.put("searchHMM", [str(outfile)])] = [f"{hmm[0]}/{key}"]
                         continue
                     chunkCount = 1
-                    for chunk in chunks.files:
-                        key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks.files)}_{key}'
-                        key_name = f'chunk-{chunkCount}-{len(chunks.files)}_{key}'
+                    for chunk in chunks:
+                        key_chunk = f'chunk-{hmm[0]}-{chunkCount}-{len(chunks)}_{key}'
+                        key_name = f'chunk-{chunkCount}-{len(chunks)}_{key}'
                         chunkCount += 1
                         pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
                                                 {key_name:chunk}, config, Path(STEP[8], key), hmm, 4)] = [key_chunk]
