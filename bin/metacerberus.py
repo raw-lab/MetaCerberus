@@ -7,8 +7,8 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.4.0"
-__date__        = "August 2024"
+__version__     = "1.4.1"
+__date__        = "February 2025"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
 __copyright__   = "Copyright 2022-2024"
 
@@ -149,7 +149,7 @@ Example:
     # Database options
     database = parser.add_argument_group(f'''Database options''')
     database.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. 'ALL' uses all downloaded databases. Use the option --list-db for a list of available databases [KOFam_all]")
-    database.add_argument("--db-path", type=str, default=PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
+    database.add_argument("--db-path", type=str, default=metacerberus_hmm.PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
 
     # MPP options
     network = parser.add_argument_group("MPP options")
@@ -214,47 +214,7 @@ Example:
         metacerberus_setup.update(args.db_path)
         return 0
 
-    # HMM Databases
-    DB_HMM = dict()
-    if Path(PATHDB, "databases.tsv").exists():
-        with Path(PATHDB, "databases.tsv").open() as reader:
-            header = reader.readline().split()
-            for line in reader:
-                name,filename,urlpath,date = line.split()
-                if ".hmm" in Path(filename).suffixes:
-                    if name == "KOFam":
-                        name = Path(filename).with_suffix('').stem
-                        if name == "KOFam_all" and "ALL" in args.hmm:
-                            args.hmm += [name]
-                    elif "ALL" in args.hmm:
-                        args.hmm += [name]
-                    elif "all" in args.hmm:
-                        args.hmm += [name]
-                    elif "All" in args.hmm:
-                        args.hmm += [name]
-                    DB_HMM[name] = Path(args.db_path, filename)
-
-    dbHMM = dict()
-    for hmm in [x.strip(',') for x in set(args.hmm)]:
-        if hmm in DB_HMM:
-            if DB_HMM[hmm].exists():
-                if Path(DB_HMM[hmm]).name.startswith("KOFam"):
-                    dbHMM[f"{hmm}_KEGG"] = DB_HMM[hmm]
-                    dbHMM[f"{hmm}_FOAM"] = DB_HMM[hmm]
-                else:
-                    dbHMM[hmm] = DB_HMM[hmm]
-            else:
-                print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --download")
-        else:
-            dbpath = Path(hmm)
-            while Path(hmm).suffixes:
-                hmm = Path(hmm).with_suffix('')
-            if dbpath.exists() and hmm.with_suffix('.tsv').exists():
-                dbname = Path(dbpath).with_suffix('').stem
-                dbHMM[dbname] = dbpath
-                print("Loading custom HMM:", dbname, dbpath)
-            else:
-                print("Unable to load custom database")
+    dbHMM = metacerberus_hmm.loadHMMs(args.db_path, args.hmm)
     if not len(dbHMM):
         print("ERROR: No HMM DB Loaded")
         return 1
@@ -263,7 +223,7 @@ Example:
     print("Using HMMs:")
     for k,v in dbHMM.items():
         print(k,v)
-
+    exit(0)
     # Merge related arguments
     if args.super:
         args.prodigal += args.super

@@ -7,8 +7,58 @@ Uses HMMER hmmsearch
 import os
 import re
 from pathlib import Path
+import pkg_resources as pkg
 import pyhmmer
 import hydraMPP
+
+
+PATHDB = pkg.resource_filename("meta_cerberus", "DB")
+
+
+def loadHMMs(db_path, hmm_list):
+    print("ARGS.HMM", hmm_list)
+    # HMM Databases
+    DB_HMM = dict()
+    if Path(PATHDB, "databases.tsv").exists():
+        with Path(PATHDB, "databases.tsv").open() as reader:
+            header = reader.readline().split()
+            for line in reader:
+                name,filename,urlpath,date = line.split()
+                if ".hmm" in Path(filename).suffixes:
+                    if name == "KOFam":
+                        name = Path(filename).with_suffix('').stem
+                        if name == "KOFam_all" and "ALL" in hmm_list:
+                            hmm_list += [name]
+                    elif "ALL" in hmm_list:
+                        hmm_list += [name]
+                    elif "all" in hmm_list:
+                        hmm_list += [name]
+                    elif "All" in hmm_list:
+                        hmm_list += [name]
+                    DB_HMM[name] = Path(db_path, filename)
+
+    print("ARGS.HMM", hmm_list)
+    dbHMM = dict()
+    for hmm in [x.strip(',') for x in set(hmm_list)]:
+        if hmm in DB_HMM:
+            if DB_HMM[hmm].exists():
+                if Path(DB_HMM[hmm]).name.startswith("KOFam"):
+                    dbHMM[f"{hmm}_KEGG"] = DB_HMM[hmm]
+                    dbHMM[f"{hmm}_FOAM"] = DB_HMM[hmm]
+                else:
+                    dbHMM[hmm] = DB_HMM[hmm]
+            else:
+                print(f"ERROR: Cannot use '{hmm}', please download it using 'metacerberus.py --download {hmm}'")
+        else:
+            dbpath = Path(hmm)
+            while Path(hmm).suffixes:
+                hmm = Path(hmm).with_suffix('')
+            if dbpath.exists() and hmm.with_suffix('.tsv').exists():
+                dbname = Path(dbpath).with_suffix('').stem
+                dbHMM[dbname] = dbpath
+                print("Loading custom HMM:", dbname, dbpath)
+            else:
+                print("Unable to load custom database:", hmm)
 
 
 ## HMMER Search
