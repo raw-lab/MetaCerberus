@@ -185,11 +185,18 @@ conda activate metacerberus
 metacerberus.py --fraggenescan human.fna --hmm KOFam_eukaryote --dir_out human_ko-only_dir
 ```
 
-#### Only Viral/Phage databases
+#### Only Virus annotation 
 ```bash
 conda activate metacerberus
-metacerberus.py --prodigal lambda.fna --hmm VOG, PHROG --dir_out lambda_vir-only_dir
+metacerberus.py --prodigalgv sarscov2.fna --hmm ALL --dir_out sarscov2_vir-only_dir
 ```
+
+#### Only Phage annotation 
+```bash
+conda activate metacerberus
+metacerberus.py --prodigalgv lambda.fna --hmm ALL --dir_out lambda_vir-only_dir
+```
+
 - NOTE: You can pick any single database you want for your analysis including KOFam_all, COG, VOG, PHROG, CAZy or specific KO databases for eukaryotes and prokaryotes (KOFam_eukaryote or KOFam_prokaryote).
 
 #### Custom HMM
