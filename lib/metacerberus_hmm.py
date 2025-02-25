@@ -15,10 +15,19 @@ import hydraMPP
 PATHDB = pkg.resource_filename("meta_cerberus", "DB")
 
 
-def loadHMMs(db_path, hmm_list):
-    print("ARGS.HMM", hmm_list)
+def loadHMMs(db_path, hmm_list:list):
+    print("HMM_LIST:", hmm_list)
+    db_path = Path(db_path)
     # HMM Databases
     DB_HMM = dict()
+
+    # Clean hmm_list
+    b_all = False
+    hmm_list = [item.strip(',') for item in hmm_list]
+    if any( item in hmm_list for item in ["ALL", "All", "all"] ):
+        b_all = True
+        hmm_list = [item for item in hmm_list if item not in ["ALL", "All", "all"]]
+
     if Path(PATHDB, "databases.tsv").exists():
         with Path(PATHDB, "databases.tsv").open() as reader:
             header = reader.readline().split()
@@ -29,17 +38,14 @@ def loadHMMs(db_path, hmm_list):
                         name = Path(filename).with_suffix('').stem
                         if name == "KOFam_all" and "ALL" in hmm_list:
                             hmm_list += [name]
-                    elif "ALL" in hmm_list:
-                        hmm_list += [name]
-                    elif "all" in hmm_list:
-                        hmm_list += [name]
-                    elif "All" in hmm_list:
+                    elif b_all:
                         hmm_list += [name]
                     DB_HMM[name] = Path(db_path, filename)
 
-    print("ARGS.HMM", hmm_list)
+    hmm_list = set(hmm_list)
+    print("HMM_LIST", hmm_list)
     dbHMM = dict()
-    for hmm in [x.strip(',') for x in set(hmm_list)]:
+    for hmm in hmm_list:
         if hmm in DB_HMM:
             if DB_HMM[hmm].exists():
                 if Path(DB_HMM[hmm]).name.startswith("KOFam"):
@@ -53,17 +59,26 @@ def loadHMMs(db_path, hmm_list):
             dbpath = Path(hmm)
             while Path(hmm).suffixes:
                 hmm = Path(hmm).with_suffix('')
-            if dbpath.exists() and hmm.with_suffix('.tsv').exists():
+            if dbpath.exists() and Path(hmm).with_suffix('.tsv').exists():
                 dbname = Path(dbpath).with_suffix('').stem
                 dbHMM[dbname] = dbpath
                 print("Loading custom HMM:", dbname, dbpath)
             else:
                 print("Unable to load custom database:", hmm)
+    return dbHMM
 
 
 ## HMMER Search
 @hydraMPP.remote
 def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
+    '''
+    aminoAcids (dict): 
+    config (dict): MINSCORE:int, EVALUE:float
+    subdir (str):
+    hmm (tuple): (name, path)
+    CPUS (int)=4: optional number of CPUs
+    '''
+
     minscore = config['MINSCORE']
     evalue = config['EVALUE']
 
@@ -94,7 +109,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
                         if domain.score < minscore:
                             continue
                         align = domain.alignment
-                        print(h.name.decode(), hit.query_name.decode(), f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,
+                        print(h.name.decode(), hit.query.name.decode(), f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,
                             align.target_from, align.target_to,
                             sep='\t', file=hmm_writer)
         outlist += [outfile]
