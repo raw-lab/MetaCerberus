@@ -56,7 +56,7 @@ def top5(hmm_tsv:Path, outfile:Path):
 
 @hydraMPP.remote
 def parseHmmer(hmm_tsv, config, subdir, dbname, dbpath):
-    path = Path(config['DIR_OUT'], subdir)
+    path = Path(subdir)
     path.mkdir(exist_ok=True, parents=True)
 
     #done = path / "complete"
