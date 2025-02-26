@@ -6,14 +6,17 @@
 
 import os
 import re
+import shutil
+import subprocess
+import urllib.request as request
 from pathlib import Path
 import time
 import hydraMPP as hydra
 
 from meta_cerberus import (
-    metacerberus_qc, metacerberus_merge, metacerberus_trim, metacerberus_decon, metacerberus_formatFasta, metacerberus_metastats,
-    metacerberus_genecall, metacerberus_hmm, metacerberus_parser,
-    Chunker
+	metacerberus_qc, metacerberus_merge, metacerberus_trim, metacerberus_decon, metacerberus_formatFasta, metacerberus_metastats,
+	metacerberus_genecall, metacerberus_hmm, metacerberus_parser,
+	metacerberus_prostats, metacerberus_visual, metacerberus_report, Chunker
 )
 
 
@@ -57,7 +60,10 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 	step_curr = set()
 
 	dbHMM = config['HMM']
+	print("dbHMMs:", dbHMM)
 
+	outpath = Path(outpath)
+	outpath.mkdir(parents=True, exist_ok=True)
 
 	# Entry Point: Fastq
 	if fastq:
@@ -77,20 +83,20 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 			key = key.removesuffix("R1").rstrip('-_')
 			# Check quality - paired end reads
 			pipeline[metacerberus_qc.checkQuality.remote([forward,reverse], config['EXE_FASTQC'],
-				f"{config['DIR_OUT']}/{STEP[2]}/{key}")] = key
+				Path(outpath, STEP[2], key))] = key
 			#TODO: quick fix, make parallel
 			if not config['EXE_FASTP']:
 				print("WARNING: Skipping paired end trimming, FASTP not found")
 				r1 = value
 				r2 = reverse
 			else:
-				r1,r2 = metacerberus_trim.trimPairedRead([key, [value,reverse]], config, Path(STEP[3], key))
-			value = metacerberus_merge.mergePairedEnd([r1,r2], config, f"{STEP[3]}/{key}/merged")
+				r1,r2 = metacerberus_trim.trimPairedRead([key, [value,reverse]], config, Path(outpath, STEP[3], key))
+			value = metacerberus_merge.mergePairedEnd([r1,r2], config, Path(outpath, STEP[3], key, "merged"))
 			pipeline[hydra.put('trimSingleRead', value)] = key
 		del fastqPaired # memory cleanup
 		# Check quality - single end reads
 		for key,value in fastq.items():
-			pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['DIR_OUT']}/{STEP[2]}/{key}")] = key
+			pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], Path(outpath, STEP[2], key))] = key
 		# Trim
 		if config['NANOPORE'] and not config['EXE_PORECHOP']:
 			print("WARNING: Skipping Nanopore trimming, PORECHOP not found")
@@ -102,7 +108,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 				pipeline[hydra.put("trimSingleRead", value)] = key
 		else:
 			for key,value in fastq.items():
-				pipeline[metacerberus_trim.trimSingleRead.remote([key, value], config, Path(STEP[3], key))] = key
+				pipeline[metacerberus_trim.trimSingleRead.remote([key, value], config, Path(outpath, STEP[3], key))] = key
 
 	# Step 5 Contig Entry Point
 	# Only do this if a fasta file was given, not if fastq
@@ -110,7 +116,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 		if config['REMOVE_N_REPEATS']:
 			print("\nSTEP 5a: Removing N's from contig files")
 			for key,value in fasta.items():
-				pipeline[metacerberus_formatFasta.removeN.remote(value, config, Path(STEP[5], key))] = key
+				pipeline[metacerberus_formatFasta.removeN.remote(value, Path(outpath, STEP[5], key), config['REPLACE'])] = key
 		else:
 			for key,value in fasta.items():
 				pipeline[hydra.put("reformat", value)] = key
@@ -132,7 +138,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 		for key,value in rollup.items():
 			amino[key] = None
 			for hmm in dbHMM:
-				tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+				tsv_filtered = Path(outpath, STEP[8], key, "filtered.tsv")
 				pipeline[metacerberus_hmm.filterHMM.remote(value, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{key}"
 
 	NStats = dict()
@@ -151,7 +157,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 			continue
 		key = pipeline.pop(ready[0])
 		s,func,value,_,delay,hostname = hydra.get(ready[0])
-		logTime(config['DIR_OUT'], hostname, func, key, delay)
+		logTime(outpath, hostname, func, key, delay)
 
 		if func == "checkQuality":
 			if value:
@@ -162,42 +168,42 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 		if func == "trimSingleRead":
 			# Wait for Trimmed Reads
 			fastq[key] = value
-			pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['DIR_OUT']}/{STEP[3]}/{key}/quality")] = key+'_trim'
+			pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], Path(outpath, STEP[3], key, "quality"))] = key+'_trim'
 			if fastq and config['ILLUMINA']:
 				if config['SKIP_DECON'] or not config['EXE_BBDUK']:
 					if not config['EXE_BBDUK']:
 						set_add(step_curr, "decon", "WARNING: Skipping decontamination, BBDUK not found")
 					set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-					pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
+					pipeline[metacerberus_formatFasta.reformat.remote(value, Path(outpath, STEP[5], key), config['REPLACE'])] = key
 				else:
 					set_add(step_curr, 4, "STEP 4: Decontaminating trimmed files")
-					pipeline[metacerberus_decon.deconSingleReads.remote([key, value], config, f"{STEP[4]}/{key}")] = key
+					pipeline[metacerberus_decon.deconSingleReads.remote([key, value], config, Path(outpath, STEP[4], key))] = key
 			else:
 				set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-				pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
+				pipeline[metacerberus_formatFasta.reformat.remote(value, Path(outpath, STEP[5], key), config['REPLACE'])] = key
 		if func.startswith("decon"):
 			fastq[key] = value
 			set_add(step_curr, 5.2, "STEP 5b: Reformating FASTQ files to FASTA format")
-			pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], f"{config['DIR_OUT']}/{STEP[4]}/{key}/quality")] = key+'_decon'
-			pipeline[metacerberus_formatFasta.reformat.remote(value, config, f"{STEP[5]}/{key}")] = key
+			pipeline[metacerberus_qc.checkQuality.remote(value, config['EXE_FASTQC'], Path(outpath, STEP[4], key, "quality"))] = key+'_decon'
+			pipeline[metacerberus_formatFasta.reformat.remote(value, Path(outpath, STEP[5], key))] = key
 		if func == "removeN" or func == "reformat":
 			if func == "removeN":
 				fasta[key] = value[0]
 				if value[1]:
 					NStats[key] = value[1]
 				set_add(step_curr, 6, "STEP 6: Metaome Stats")
-				readStats[key] = metacerberus_metastats.getReadStats(value[0], config, Path(STEP[6], key))
+				readStats[key] = metacerberus_metastats.getReadStats(value[0], config, Path(outpath, STEP[6], key))
 			elif func == "reformat":
 				fasta[key] = value
 			set_add(step_curr, 7, "STEP 7: ORF Finder")
 			if key.startswith("FragGeneScan_"):
-				pipeline[metacerberus_genecall.findORF_fgs.remote(fasta[key], config, f"{STEP[7]}/{key}")] = key
+				pipeline[metacerberus_genecall.findORF_fgs.remote(fasta[key], config, Path(outpath, STEP[7], key))] = key
 			elif key.startswith("prodigalgv_"):
-				pipeline[metacerberus_genecall.findORF_prod.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'], True)] = key
+				pipeline[metacerberus_genecall.findORF_prod.remote(fasta[key], config, Path(outpath, STEP[7], key), config['META'], True)] = key
 			elif key.startswith("prodigal_"):
-				pipeline[metacerberus_genecall.findORF_prod.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'])] = key
+				pipeline[metacerberus_genecall.findORF_prod.remote(fasta[key], config, Path(outpath, STEP[7], key), config['META'])] = key
 			elif key.startswith("phanotate_"):
-				pipeline[metacerberus_genecall.findORF_phanotate.remote(fasta[key], config, f"{STEP[7]}/{key}", config['META'])] = key
+				pipeline[metacerberus_genecall.findORF_phanotate.remote(fasta[key], config, Path(outpath, STEP[7], key), config['META'])] = key
 			groupORF += 1
 		if func.startswith("findORF_"):
 			if not value:
@@ -205,24 +211,25 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 				continue
 			# fail if amino file is empty
 			if Path(value).stat().st_size == 0:
-				print("ERROR: no ORFs found in:", key, value)
+				print("WARNING: no ORFs found in:", key, value)
 				continue
 			#TODO: Check for duplicate headers in amino acids
 			#      This causes an issue with the GFF and summary files
 			if config['GROUPED']:
+				#TODO: Remove GROUPED option?
 				amino[key] = value
 				groupORF -= 1
-				if not Path(config['DIR_OUT'], 'grouped').exists():
-					Path(config['DIR_OUT'], 'grouped').mkdir(parents=True, exist_ok=True)
-				outfile = Path(config['DIR_OUT'], 'grouped', 'grouped.faa')
-				Path(config['DIR_OUT'], STEP[8], key).mkdir(parents=True, exist_ok=True)
+				if not Path(outpath, 'grouped').exists():
+					Path(outpath, 'grouped').mkdir(parents=True, exist_ok=True)
+				outfile = Path(outpath, 'grouped', 'grouped.faa')
+				Path(outpath, STEP[8], key).mkdir(parents=True, exist_ok=True)
 				with outfile.open('a') as writer, Path(value).open() as reader:
 					for line in reader:
 						writer.write(line)
 						if line.startswith('>'):
 							name = line[1:].rstrip().split()[0]
 							if name in groupIndex:
-								print("WARN: Duplicate header:", name)
+								print("WARNING: Duplicate header:", name)
 							groupIndex[name] = key
 				if groupORF > 0:
 					continue #Continue until all ORFs are done
@@ -231,11 +238,11 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 			set_add(step_curr, 8, "STEP 8: HMMER Search")
 			amino[key] = value
 			if config['CHUNKER'] > 0:
-				chunks = Chunker.create_chunks(amino[key], Path(config['DIR_OUT'], 'chunks', key), f"{config['CHUNKER']}M", '>')
+				chunks = Chunker.create_chunks(amino[key], Path(outpath, 'chunks', key), f"{config['CHUNKER']}M", '>')
 				for hmm in dbHMM.items():
 					if hmm[0].endswith("FOAM"):
 						continue
-					outfile = Path(config['DIR_OUT'], STEP[8], key, f'{hmm[0]}-{key}.tsv')
+					outfile = Path(outpath, STEP[8], key, f'{hmm[0]}-{key}.tsv')
 					if not config['REPLACE'] and outfile.exists():
 						pipeline[hydra.put("searchHMM", [str(outfile)])] = [f"{hmm[0]}/{key}"]
 						continue
@@ -245,18 +252,18 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 						key_name = f'chunk-{chunkCount}-{len(chunks)}_{key}'
 						chunkCount += 1
 						pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
-												{key_name:chunk}, config, Path(STEP[8], key), hmm, 4)] = [key_chunk]
+												{key_name:chunk}, config, Path(outpath, STEP[8], key), hmm, 4)] = [key_chunk]
 			else: # Chunker not enabled
 				for hmm in dbHMM.items():
 					if hmm[0].endswith("FOAM"):
 						continue
-					outfile = Path(config['DIR_OUT'], STEP[8], key, f'{hmm[0]}-{key}.tsv')
+					outfile = Path(outpath, STEP[8], key, f'{hmm[0]}-{key}.tsv')
 					if not config['REPLACE'] and outfile.exists():
 						pipeline[hydra.put("searchHMM", [str(outfile)])] = [f"{hmm[0]}/{key}"]
 						continue
 					hmm_key = f"{hmm[0]}/{key}"
 					pipeline[metacerberus_hmm.searchHMM.options(num_cpus=jobs_hmmer).remote(
-															{key:value}, config, Path(STEP[8]), hmm, 4)] = [hmm_key]
+															{key:value}, config, Path(outpath, STEP[8]), hmm, 4)] = [hmm_key]
 		if func.startswith('searchHMM'):
 			#TODO: This whole section needs reworking to remove redundant code, and improve grouped option
 			if value is None:
@@ -282,7 +289,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 										name = line.split()[0]
 										k = groupIndex[name]
 										key_set.add(k)
-										tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
+										tsv_out = Path(outpath, STEP[8], k, f"{hmm}-{k}.tsv")
 										with tsv_out.open('a') as writer:
 											writer.write(line)
 										if re.search(r'KEGG', str(tsv_out)):
@@ -295,8 +302,8 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 							set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
 							#TODO: Still need to add FOAM filtering for grouped option
 							for k in key_set:
-								tsv_out = Path(config['DIR_OUT'], STEP[8], k, f"{hmm}-{k}.tsv")
-								tsv_filtered = Path(config['DIR_OUT'], STEP[8], k, f"filtered-{hmm}.tsv")
+								tsv_out = Path(outpath, STEP[8], k, f"{hmm}-{k}.tsv")
+								tsv_filtered = Path(outpath, STEP[8], k, f"filtered-{hmm}.tsv")
 								pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{k}"
 								if re.search(r'KEGG', str(tsv_out)):
 									hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
@@ -306,7 +313,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 							# FINISH SPLITTING GROUP
 							continue
 						# Not grouped
-						tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
+						tsv_out = Path(outpath, STEP[8], key, f"{hmm}-{key}.tsv")
 						tsv_out.parent.mkdir(parents=True, exist_ok=True)
 						if re.search(r'KEGG', str(tsv_out)):
 							tsv_out_foam = Path(re.sub(r'KEGG', 'FOAM', str(tsv_out)))
@@ -319,7 +326,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 								dictChunks[hmm_key].remove(item)
 								if not config['KEEP']:
 									os.remove(item)
-						tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
+						tsv_filtered = Path(outpath, STEP[8], key, f"filtered-{hmm}.tsv")
 						set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
 						pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{key}"
 						if re.search(r'KEGG', str(tsv_out)):
@@ -330,7 +337,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 				else:
 				# Not chunked file
 					hmm,key = key.split(sep='/', maxsplit=1)
-					tsv_out = Path(config['DIR_OUT'], STEP[8], key, f"{hmm}-{key}.tsv")
+					tsv_out = Path(outpath, STEP[8], key, f"{hmm}-{key}.tsv")
 					#TODO: This becomes a bottleneck with a large amount of samples. This begins when hmm/filtering ends, and becomes linear. Large memory holding all the jobs in queue
 					if not tsv_out.exists() or not tsv_out.samefile(Path(tsv_out)):
 						with tsv_out.open('w') as writer:
@@ -342,7 +349,7 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 						with tsv_out_foam.open('w') as writer:
 							writer.write(open(tsv_out).read())
 					set_add(step_curr, 8.1, "STEP 8: Filtering HMMER results")
-					tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, f"filtered-{hmm}.tsv")
+					tsv_filtered = Path(outpath, STEP[8], key, f"filtered-{hmm}.tsv")
 					pipeline[metacerberus_hmm.filterHMM.remote(tsv_out, tsv_filtered, dbHMM[hmm], config['REPLACE'])] = f"{hmm}/{key}"
 					if re.search(r'KEGG', str(tsv_out)):
 						hmm_foam = re.sub(r'KEGG', 'FOAM', hmm)
@@ -351,10 +358,10 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 		if func.startswith('filterHMM'):
 			hmm,key = key.split('/')
 			set_add(step_curr, 9, "STEP 9: Parse HMMER results")
-			pipeline[metacerberus_parser.parseHmmer.remote(value, config, Path(config['DIR_OUT'], STEP[9], key), hmm, dbHMM[hmm])] = key
+			pipeline[metacerberus_parser.parseHmmer.remote(value, config, Path(outpath, STEP[9], key), hmm, dbHMM[hmm])] = key
 
 			#TODO: This becomes a bottleneck with a large amount of samples. This begins when hmm/filtering ends, and becomes linear.. Large memory holding all the jobs in queue
-			tsv_filtered = Path(config['DIR_OUT'], STEP[8], key, "filtered.tsv")
+			tsv_filtered = Path(outpath, STEP[8], key, "filtered.tsv")
 			if key not in hmm_tsvs:
 				hmm_tsvs[key] = dict()
 				with tsv_filtered.open('w') as writer:
@@ -367,15 +374,15 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 					print(*line.rstrip('\n').split('\t'), hmm, sep='\t', file=writer)
 			if len(hmm_tsvs[key]) == len(dbHMM):
 				hmm_tsv[key] = tsv_filtered
-				outfile = Path(config['DIR_OUT'], STEP[9], key, f"top_5.tsv")
+				outfile = Path(outpath, STEP[9], key, f"top_5.tsv")
 				pipeline[metacerberus_parser.top5.remote(tsv_filtered, outfile)] = key
 		if func.startswith('parseHmmer'):
 			if not value:
-				print("Warning: no hmm results from:", key)
+				print("WARNING: no hmm results from:", key)
 			if key not in hmmRollup:
 				hmmRollup[key] = dict()
 			hmmRollup[key].update(value)
-			pipeline[metacerberus_parser.createCountTables.remote(value, config, f"{STEP[9]}/{key}")] = key
+			pipeline[metacerberus_parser.createCountTables.remote(value, Path(outpath, STEP[9], key), config['REPLACE'])] = key
 		if func.startswith('createCountTables'):
 			if key not in hmmCounts:
 				hmmCounts[key] = dict()
@@ -383,3 +390,198 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 
 	# End main pipeline
 	return fastq, fasta, amino, rollup, hmm_tsv, hmm_tsvs, hmmRollup, hmmCounts, readStats, NStats
+
+def report(outpath, config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, hmmCounts, readStats, NStats):
+
+	report_path = Path(outpath, STEP[10])
+	final_path = Path(outpath, "final")
+
+	# Copy report files from QC, Parser
+	Path(final_path, "top-5").mkdir(parents=True, exist_ok=True)
+	Path(final_path, "rollup").mkdir(parents=True, exist_ok=True)
+	Path(final_path, "counts").mkdir(parents=True, exist_ok=True)
+	Path(final_path, "gff").mkdir(parents=True, exist_ok=True)
+	Path(final_path, "genbank").mkdir(parents=True, exist_ok=True)
+	for key in hmm_tsvs.keys():
+		Path(final_path, f"annotations-{key}").mkdir(parents=True, exist_ok=True)
+		Path(report_path, key).mkdir(parents=True, exist_ok=True)
+		top_5s = Path(config['DIR_OUT'], config['STEP'][9], key).glob("top_5*.tsv")
+		for src in top_5s:
+			#src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "top_5.tsv")
+			dst = Path(final_path, "top-5", f"{key}-{src.name}")
+			shutil.copy(src, dst)
+		try:
+			src = Path(fasta[key])
+			dst = Path(final_path, "fasta", f"{key}.fna")
+			shutil.copy(src, dst)
+		except: pass
+		try:
+			src = Path(amino[key]).with_suffix(".ffn")
+			dst = Path(final_path, "fasta", f"{key}.ffn")
+			shutil.copy(src, dst)
+		except: pass
+
+	# Write Stats
+	jobStat = dict()
+	Path(final_path, "fasta").mkdir(0o777, True, True)
+	print("Creating final reports and statistics\n")
+
+
+	print("Protein stats")
+	protStats = {}
+	for key in hmm_tsvs.keys():
+		# Protein statistics & annotation summary
+		summary_tsv = Path(final_path, f"annotations-{key}", 'final_annotation_summary.tsv')
+		jobStat[metacerberus_prostats.getStats.remote(amino[key], hmm_tsvs[key], hmmCounts[key], config['MINSCORE'], dbHMM, summary_tsv, Path(final_path, "fasta", f"{key}.faa"))] = key
+	while jobStat:
+		ready,queue = hydra.wait(jobStat)
+		key = jobStat.pop(ready[0])
+		s,func,value,_,delay,hostname = hydra.get(ready[0])
+		logTime(config['DIR_OUT'], hostname, func, key, delay)
+		protStats[key] = value
+
+	print("Creating GFF and Genbank files")
+	for key in hmm_tsvs.keys():
+		# Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
+		summary_tsv = Path(final_path, f"annotations-{key}", 'final_annotation_summary.tsv')
+		gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
+		if len(gff) == 1:
+			out_gff = Path(final_path, "gff", f"{key}.gff")
+			out_genbank = Path(final_path, "genbank", f"{key}_template.gbk")
+			jobStat[metacerberus_report.write_datafiles.remote(gff[0], fasta[key], amino[key], summary_tsv, out_gff, out_genbank)] = None
+		else:
+			out_gff = Path(final_path, "gff", f"{key}.gff")
+			with out_gff.open('w') as writer:
+				with summary_tsv.open() as read_summary:
+					read_summary.readline()
+					print("##gff-version  3", file=writer)
+					for summ in read_summary:
+						summ = summ.split('\t')
+						data = [summ[0].split('_')[0], ".", ".", ".", ".", ".", ".", ".", ]
+						attributes = ';'.join([f"ID={summ[0]}", f"Name={summ[1]}", f"Alias={summ[2]}", f"Dbxref={summ[3]}", f"evalue={summ[4]}", f"product_start={summ[8]}", f"product_end={summ[9]}", f"product_length={summ[10]}"])
+						print(*data, attributes, sep='\t', file=writer)
+				try:
+					with open(fasta[key]) as read_fasta:
+						print("##FASTA", file=writer)
+						for line in read_fasta:
+							writer.write(line)
+				except: pass
+	while jobStat:
+		ready,queue = hydra.wait(jobStat)
+		jobStat.pop(ready[0])
+		s,func,value,_,delay,hostname = hydra.get(ready[0])
+		logTime(config['DIR_OUT'], hostname, func, key, delay)
+
+	metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
+	del protStats
+
+	# Write Roll-up Tables
+	print("Creating Rollup Tables")
+	for sample,tables in hmmCounts.items():
+		os.makedirs(f"{report_path}/{sample}", exist_ok=True)
+		for name,table in tables.items():
+			metacerberus_report.writeTables(table, f"{report_path}/{sample}/{name}")
+	for sample,tables in hmmRollup.items():
+		os.makedirs(f"{report_path}/{sample}", exist_ok=True)
+		for name,table in tables.items():
+			shutil.copy(table, Path(final_path, "rollup", f'rollup_{sample}-{name}.tsv'))
+
+	# Counts Tables
+	print("Mergeing Count Tables")
+	dfCounts = dict()
+	for dbname,dbpath in dbHMM.items():
+		tsv_list = dict()
+		for name in hmm_tsv.keys():
+			if dbname.startswith("KOFam"):
+				dbLookup = re.search(r"KOFam_.*_([A-Z]+)", dbname).group(1)
+				dbLookup = dbpath.with_name(f'{dbLookup}.tsv')
+			table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{dbname}.tsv')
+			if table_path.exists():
+				name = re.sub(rf'^FragGeneScan_|prodigal_|Protein_', '', name)
+				tsv_list[name] = table_path
+		combined_path = Path(final_path, "counts", f'counts_{dbname}.tsv')
+		metacerberus_parser.merge_tsv(tsv_list, Path(combined_path))
+		if combined_path.exists():
+			dfCounts[dbname] = combined_path
+		del(combined_path)
+
+	# PCA output (HTML)
+	pcaFigures = None
+	if config['SKIP_PCA']:
+		pass
+	elif len(hmm_tsv) < 4:
+		print("NOTE: PCA Tables created only when there are at least four sequence files.\n")
+	else:
+		print("PCA Analysis")
+		pcaFigures = metacerberus_visual.graphPCA.remote(dfCounts)
+		ready,pending = hydra.wait([pcaFigures])
+		s,func,value,_,delay,hostname = hydra.get(ready[0])
+		logTime(config['DIR_OUT'], hostname, func, "PCA", delay)
+		pcaFigures = value
+		Path(report_path, 'combined').mkdir(parents=True, exist_ok=True)
+		metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
+
+	# Run post processing analysis in R
+	if not [True for x in dfCounts if x.startswith("KOFam")]:
+		print("NOTE: Pathview created only when KOFams are used since it uses KOs for its analysis.\n")
+	elif len(hmm_tsv) < 4 or not config['CLASS']:
+		print("NOTE: Pathview created only when there are at least four sequence files, and a class tsv file is specified with --class specifying the class for each input file.\n")
+	else:
+		print("\nSTEP 11: Post Analysis with GAGE and Pathview")
+		outpathview = Path(report_path, 'pathview')
+		outpathview.mkdir(exist_ok=True, parents=True)
+		rscript = Path(outpathview, 'run_pathview.sh')
+
+		# Check for internet
+		try:
+			#attempt to connect to Google
+			request.urlopen('http://216.58.195.142', timeout=1)
+			is_internet = True
+		except:
+			is_internet = False
+		
+		with rscript.open('w') as writer:
+			writer.write(f"#!/bin/bash\n\n")
+			for name,countpath in dfCounts.items():
+				if not name.startswith("KOFam"):
+					continue
+				shutil.copy(countpath, Path(outpathview, f"{name}_counts.tsv"))
+				shutil.copy(config['CLASS'], Path(outpathview, f"{name}_class.tsv"))
+				writer.write(f"mkdir -p {name}\n")
+				writer.write(f"cd {name}\n")
+				writer.write(f"pathview-metacerberus.R ../{name}_counts.tsv ../{name}_class.tsv\n")
+				writer.write(f"cd ..\n")
+				outcmd = Path(outpathview, name)
+				outcmd.mkdir(parents=True, exist_ok=True)
+				if is_internet:
+					subprocess.run(['pathview-metacerberus.R', countpath, config['CLASS']],
+									cwd=outcmd,
+									stdout=Path(outcmd, 'stdout.txt').open('w'),
+									stderr=Path(outcmd, 'stderr.txt').open('w')
+								)
+		if not is_internet:
+			print(f"GAGE and Pathview require internet access to run. Run the script '{rscript}'")
+
+	# Figure outputs (HTML)
+	print("Creating combined sunburst and bargraphs")
+	figSunburst = {}
+	for key,value in hmmCounts.items():
+		figSunburst[key] = metacerberus_visual.graphSunburst(value)
+
+	jobCharts = dict()
+	for key,value in hmmRollup.items():
+		jobCharts[metacerberus_visual.graphBarcharts.remote(value, hmmCounts[key])] = key
+
+	figCharts = {}
+	while(jobCharts):
+		ready,queue = hydra.wait(jobCharts)
+		if ready:
+			key = jobCharts.pop(ready[0])
+			s,func,value,cpus,delay,hostname = hydra.get(ready[0])
+			figCharts[key] = value
+			logTime(config['DIR_OUT'], hostname, func, key, delay)
+
+
+	metacerberus_report.createReport(figSunburst, figCharts, Path(config['DIR_OUT'], STEP[10]))
+
+	return
