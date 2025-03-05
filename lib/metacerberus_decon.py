@@ -12,7 +12,7 @@ import hydraMPP
 # Decontaminate single end reads
 @hydraMPP.remote
 def deconSingleReads(key_value, config, subdir):
-    path = Path(config['DIR_OUT'], subdir)
+    path = Path(subdir)
 
     key = key_value[0]
     value = key_value[1]

@@ -17,7 +17,7 @@ import hydraMPP
 # Eukaryotic option
 @hydraMPP.remote
 def findORF_fgs(contig, config, subdir):
-    path = Path(config['DIR_OUT'], subdir)
+    path = Path(subdir)
     done = path / "complete"
 
     baseOut = path / "proteins"
@@ -49,7 +49,7 @@ def findORF_fgs(contig, config, subdir):
 # Microbial option
 @hydraMPP.remote
 def findORF_prod(contig, config, subdir, meta=False, viral=False):
-    path = Path(config['DIR_OUT'], subdir)
+    path = Path(subdir)
     path.mkdir(exist_ok=True, parents=True)
     done = path / "complete"
 
@@ -96,7 +96,7 @@ def findORF_prod(contig, config, subdir, meta=False, viral=False):
 # Phage
 @hydraMPP.remote
 def findORF_phanotate(contig, config, subdir, meta=False):
-    path = Path(config['DIR_OUT'], subdir)
+    path = Path(subdir)
     done = path / "complete"
 
     faa = path / "proteins.faa"

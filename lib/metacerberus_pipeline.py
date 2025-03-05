@@ -60,7 +60,6 @@ def run_jobs(fastq, fasta, amino, rollup, config, outpath):
 	step_curr = set()
 
 	dbHMM = config['HMM']
-	print("dbHMMs:", dbHMM)
 
 	outpath = Path(outpath)
 	outpath.mkdir(parents=True, exist_ok=True)
@@ -405,7 +404,10 @@ def report(outpath, config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, h
 	for key in hmm_tsvs.keys():
 		Path(final_path, f"annotations-{key}").mkdir(parents=True, exist_ok=True)
 		Path(report_path, key).mkdir(parents=True, exist_ok=True)
-		top_5s = Path(config['DIR_OUT'], config['STEP'][9], key).glob("top_5*.tsv")
+		for value in hmmRollup[key].values():
+			parse_path = Path(value).parent
+			break
+		top_5s = parse_path.glob("top_5*.tsv")
 		for src in top_5s:
 			#src = os.path.join(config['DIR_OUT'], config['STEP'][9], key, "top_5.tsv")
 			dst = Path(final_path, "top-5", f"{key}-{src.name}")
@@ -437,14 +439,15 @@ def report(outpath, config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, h
 		ready,queue = hydra.wait(jobStat)
 		key = jobStat.pop(ready[0])
 		s,func,value,_,delay,hostname = hydra.get(ready[0])
-		logTime(config['DIR_OUT'], hostname, func, key, delay)
+		logTime(outpath, hostname, func, key, delay)
 		protStats[key] = value
 
 	print("Creating GFF and Genbank files")
 	for key in hmm_tsvs.keys():
 		# Create GFFs #TODO: Incorporate this into getStats (or separate all summary into new module)
 		summary_tsv = Path(final_path, f"annotations-{key}", 'final_annotation_summary.tsv')
-		gff = [x for x in Path(config['DIR_OUT'], STEP[7], key).glob("*.gff")]
+		amino_path = Path(amino[key]).parent
+		gff = [x for x in amino_path.glob("*.gff")]
 		if len(gff) == 1:
 			out_gff = Path(final_path, "gff", f"{key}.gff")
 			out_genbank = Path(final_path, "genbank", f"{key}_template.gbk")
@@ -470,7 +473,7 @@ def report(outpath, config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, h
 		ready,queue = hydra.wait(jobStat)
 		jobStat.pop(ready[0])
 		s,func,value,_,delay,hostname = hydra.get(ready[0])
-		logTime(config['DIR_OUT'], hostname, func, key, delay)
+		logTime(outpath, hostname, func, key, delay)
 
 	metacerberus_report.write_Stats(report_path, readStats, protStats, NStats, config)
 	del protStats
@@ -495,7 +498,10 @@ def report(outpath, config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, h
 			if dbname.startswith("KOFam"):
 				dbLookup = re.search(r"KOFam_.*_([A-Z]+)", dbname).group(1)
 				dbLookup = dbpath.with_name(f'{dbLookup}.tsv')
-			table_path = Path(config['DIR_OUT'], STEP[9], name, f'counts_{dbname}.tsv')
+			for value in hmmCounts[name].values():
+				parse_path = Path(value).parent
+				break
+			table_path = Path(parse_path, f'counts_{dbname}.tsv')
 			if table_path.exists():
 				name = re.sub(rf'^FragGeneScan_|prodigal_|Protein_', '', name)
 				tsv_list[name] = table_path
@@ -516,7 +522,7 @@ def report(outpath, config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, h
 		pcaFigures = metacerberus_visual.graphPCA.remote(dfCounts)
 		ready,pending = hydra.wait([pcaFigures])
 		s,func,value,_,delay,hostname = hydra.get(ready[0])
-		logTime(config['DIR_OUT'], hostname, func, "PCA", delay)
+		logTime(outpath, hostname, func, "PCA", delay)
 		pcaFigures = value
 		Path(report_path, 'combined').mkdir(parents=True, exist_ok=True)
 		metacerberus_report.write_PCA(os.path.join(report_path, "combined"), pcaFigures)
@@ -579,9 +585,9 @@ def report(outpath, config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, h
 			key = jobCharts.pop(ready[0])
 			s,func,value,cpus,delay,hostname = hydra.get(ready[0])
 			figCharts[key] = value
-			logTime(config['DIR_OUT'], hostname, func, key, delay)
+			logTime(outpath, hostname, func, key, delay)
 
 
-	metacerberus_report.createReport(figSunburst, figCharts, Path(config['DIR_OUT'], STEP[10]))
+	metacerberus_report.createReport(figSunburst, figCharts, Path(outpath, STEP[10]))
 
 	return

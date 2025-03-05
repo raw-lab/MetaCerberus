@@ -12,8 +12,7 @@ import hydraMPP
 
 
 @hydraMPP.remote
-def getStats(faa:str, hmm_tsv:dict, dfCount:dict, config:dict, dbhmms:dict, summary_out:Path, fasta_prefix:Path):
-    minscore = config["MINSCORE"]
+def getStats(faa:str, hmm_tsv:dict, dfCount:dict, minscore:int, dbhmms:dict, summary_out:Path, fasta_prefix:Path):
 
     # sum up proteins in FASTA file
     protein_index = dict()

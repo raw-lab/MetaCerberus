@@ -12,7 +12,7 @@ import subprocess
 
 # Merge paired end reads
 def mergePairedEnd(pairedFastq, config, subdir):
-    outpath = Path(config['DIR_OUT'], subdir)
+    outpath = Path(subdir)
 
     R1 = pairedFastq[0]
     R2 = pairedFastq[1]

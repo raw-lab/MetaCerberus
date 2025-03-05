@@ -13,7 +13,7 @@ import hydraMPP
 # Trim single end reads
 @hydraMPP.remote
 def trimSingleRead(key_value, config, subdir):
-    path = Path(config['DIR_OUT'], subdir)
+    path = Path(subdir)
 
     key = key_value[0]
     value = key_value[1]
@@ -45,7 +45,7 @@ def trimSingleRead(key_value, config, subdir):
 
 # Trim paired end reads
 def trimPairedRead(key_value, config, subdir):
-    path = Path(config['DIR_OUT'], subdir)
+    path = Path(subdir)
 
     key = key_value[0]
     value = key_value[1]

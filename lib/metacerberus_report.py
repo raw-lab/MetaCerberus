@@ -43,8 +43,8 @@ PLOTLY = pkg.resource_filename('meta_cerberus', 'plotly-2.0.0.min.js')
 
 
 ######### Create Report ##########
-def createReport(figSunburst, figCharts, config, subdir):
-    path = f"{config['DIR_OUT']}/{subdir}"
+def createReport(figSunburst, figCharts, subdir):
+    path = Path(subdir)
     os.makedirs(path, exist_ok=True)
 
     shutil.copy(PLOTLY, path)

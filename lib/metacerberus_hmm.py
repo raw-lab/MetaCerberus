@@ -16,7 +16,6 @@ PATHDB = pkg.resource_filename("meta_cerberus", "DB")
 
 
 def loadHMMs(db_path, hmm_list:list):
-    print("HMM_LIST:", hmm_list)
     db_path = Path(db_path)
     # HMM Databases
     DB_HMM = dict()
@@ -43,7 +42,6 @@ def loadHMMs(db_path, hmm_list:list):
                     DB_HMM[name] = Path(db_path, filename)
 
     hmm_list = set(hmm_list)
-    print("HMM_LIST", hmm_list)
     dbHMM = dict()
     for hmm in hmm_list:
         if hmm in DB_HMM:
@@ -78,6 +76,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
     hmm (tuple): (name, path)
     CPUS (int)=4: optional number of CPUs
     '''
+    #TODO: Remove multiple file input support, no longer needed, makes code complex
 
     minscore = config['MINSCORE']
     evalue = config['EVALUE']
@@ -86,7 +85,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
 
     hmmOut = dict()
     for key,amino in aminoAcids.items():
-        path = Path(config['DIR_OUT'], subdir, key)
+        path = Path(subdir, key)
         os.makedirs(path, exist_ok=True)
 
         name_dom = f"{key}_tmp.hmm"
@@ -109,7 +108,11 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
                         if domain.score < minscore:
                             continue
                         align = domain.alignment
-                        print(h.name.decode(), hit.query.name.decode(), f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,
+                        try: #TODO: This block is temporarily here during a transition of pyhmmer update, where query_name is replaced with query.name
+                            query_name = hit.query_name.decode()
+                        except:
+                            query_name = hit.query.name.decode()
+                        print(h.name.decode(), query_name, f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,
                             align.target_from, align.target_to,
                             sep='\t', file=hmm_writer)
         outlist += [outfile]

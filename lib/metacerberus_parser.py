@@ -178,14 +178,16 @@ def rollup(COUNTS:dict, dbname:str, dbpath:Path, outpath:str):
 
 ########## Counts Table #########
 @hydraMPP.remote
-def createCountTables(rollup_files:dict, config:dict, subdir: str):
-    done = Path(config['DIR_OUT']) / subdir / "complete"
+def createCountTables(rollup_files:dict, subdir:Path, replace=False):
+    subdir = Path(subdir)
+    subdir.mkdir(parents=True, exist_ok=True)
+    done = Path(subdir, "complete")
     dfCounts = dict()
 
     for dbName,filepath in rollup_files.items():
-        outpath = Path(config['DIR_OUT'], subdir, f"rollup-counts_{dbName}.tsv")
-        if not config['REPLACE'] and done.exists() and outpath.exists():
-            dfCounts[dbName] = outpath
+        outfile = Path(subdir, f"rollup-counts_{dbName}.tsv")
+        if not replace and done.exists() and outfile.exists():
+            dfCounts[dbName] = outfile
             continue
         done.unlink(missing_ok=True)
 
@@ -220,8 +222,8 @@ def createCountTables(rollup_files:dict, config:dict, subdir: str):
 
         df = pd.DataFrame(data=data)
         df.fillna(0, inplace=True)
-        df.to_csv(outpath, index=False, header=True, sep='\t')
-        dfCounts[dbName] = outpath
+        df.to_csv(outfile, index=False, header=True, sep='\t')
+        dfCounts[dbName] = outfile
 
     done.touch()
     return dfCounts
