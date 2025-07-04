@@ -44,7 +44,7 @@ def searchHMM(aminoAcids:dict, config:dict, subdir:str, hmm:tuple, CPUs:int=4):
                         if domain.score < minscore:
                             continue
                         align = domain.alignment
-                        print(h.name.decode(), hit.query_name.decode(), f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,
+                        print(h.name.decode(), hit.query.name.decode(), f'{h.evalue:.1E}', f"{domain.score:.1f}", h.length,  # since pyhmmer v0.11.0, "query_name" has been removed. Use "hit.query.name" instead.
                             align.target_from, align.target_to,
                             sep='\t', file=hmm_writer)
         outlist += [outfile]

@@ -47,7 +47,7 @@ setuptools.setup(
     install_requires=[
             'setuptools',
             'pandas',
-            'pyhmmer',
+            'pyhmmer>=0.11.0',
             'hydrampp',
             'pyrodigal',
             'pyrodigal-gv',
