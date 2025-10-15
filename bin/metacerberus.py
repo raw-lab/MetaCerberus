@@ -7,10 +7,10 @@ Uses Hidden Markov Model (HMM) searching with environmental focus of shotgun met
 """
 
 
-__version__     = "1.4.1"
-__date__        = "February 2025"
+__version__     = "1.5.0"
+__date__        = "October 2025"
 __author__      = "Jose L. Figueroa III, Richard A. White III"
-__copyright__   = "Copyright 2022-2024"
+__copyright__   = "Copyright 2022-2025"
 
 def warn(*args, **kwargs):
     pass
@@ -19,9 +19,7 @@ warnings.warn = warn
 
 import sys
 import os
-import re
 from pathlib import Path
-import shutil
 import subprocess
 import configargparse as argparse #replace argparse with: https://pypi.org/project/ConfigArgParse/
 import pkg_resources as pkg #to import package data files
@@ -32,12 +30,8 @@ import socket
 import hydraMPP as hydra
 
 # our package import
-from meta_cerberus import (
-    metacerberus_setup,
-    metacerberus_qc, metacerberus_merge, metacerberus_trim, metacerberus_decon, metacerberus_formatFasta, metacerberus_metastats,
-    metacerberus_genecall, metacerberus_hmm, metacerberus_parser,
-    metacerberus_prostats, metacerberus_visual, metacerberus_report, Chunker,
-    metacerberus_pipeline
+from cerberus_x import (
+    cerberus_setup, cerberus_hmm, cerberus_pipeline
 )
 
 
@@ -150,7 +144,7 @@ Example:
     # Database options
     database = parser.add_argument_group(f'''Database options''')
     database.add_argument('--hmm', nargs='+', default=['KOFam_all'], help="A list of databases for HMMER. 'ALL' uses all downloaded databases. Use the option --list-db for a list of available databases [KOFam_all]")
-    database.add_argument("--db-path", type=str, default=metacerberus_hmm.PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
+    database.add_argument("--db-path", type=str, default=cerberus_hmm.PATHDB, help="Path to folder of databases [Default: under the library path of MetaCerberus]")
 
     # MPP options
     network = parser.add_argument_group("MPP options")
@@ -183,10 +177,10 @@ Example:
     args = parser.parse_args()
 
     if args.uninstall:
-        metacerberus_setup.remove(args.db_path, PATHFGS)
+        cerberus_setup.remove(args.db_path, PATHFGS)
         return 0
     if args.list_db:
-        downloaded,to_download,urls,hmm_version = metacerberus_setup.list_db(args.db_path)
+        downloaded,to_download,urls,hmm_version = cerberus_setup.list_db(args.db_path)
         if downloaded:
             print("HMM Databases already downloaded:")
             for name,filelist in downloaded.items():
@@ -206,16 +200,16 @@ Example:
         return 0
     if args.setup:
         print("Setting up FragGeneScanRS")
-        metacerberus_setup.FGS(PATHFGS)
+        cerberus_setup.FGS(PATHFGS)
         return 0
     if args.download is not None:
-        metacerberus_setup.download(args.db_path, args.download)
+        cerberus_setup.download(args.db_path, args.download)
         return 0
     if args.update:
-        metacerberus_setup.update(args.db_path)
+        cerberus_setup.update(args.db_path)
         return 0
 
-    dbHMM = metacerberus_hmm.loadHMMs(args.db_path, args.hmm)
+    dbHMM = cerberus_hmm.loadHMMs(args.db_path, args.hmm)
     if not len(dbHMM):
         print("ERROR: No HMM DB Loaded")
         return 1
@@ -247,7 +241,7 @@ Example:
     config['EXE_FGS'] = os.path.join(PATHFGS, DEPENDENCIES["EXE_FGS"])
     if args.fraggenescan and not Path(config['EXE_FGS']).exists():
         print("Setting up FragGeneScanRS")
-        metacerberus_setup.FGS(PATHFGS)
+        cerberus_setup.FGS(PATHFGS)
 
     # load all args into config
     for arg,value in args.__dict__.items():
@@ -446,7 +440,7 @@ Example:
 
 
     print("Running main pipeline")
-    results = metacerberus_pipeline.run_jobs(fastq, fasta, amino, rollup, config, config['DIR_OUT'])
+    results = cerberus_pipeline.run_jobs(fastq, fasta, amino, rollup, config, config['DIR_OUT'])
     if results:
         fastq, fasta, amino, rollup, hmm_tsv, hmm_tsvs, hmmRollup, hmmCounts, readStats, NStats = results
     else:
@@ -461,7 +455,7 @@ Example:
     print("\nSTEP 10: Creating Reports")
 
 
-    metacerberus_pipeline.report(config['DIR_OUT'], config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, hmmCounts, readStats, NStats)
+    cerberus_pipeline.report(config['DIR_OUT'], config, dbHMM, fasta, amino, hmm_tsv, hmm_tsvs, hmmRollup, hmmCounts, readStats, NStats)
 
     # Finished!
     print("\nFinished Pipeline")
