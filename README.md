@@ -304,6 +304,7 @@ All pre-formatted databases are present at OSF
 | [AMRFinder-fams](https://ftp.ncbi.nlm.nih.gov/hmm/NCBIfam-AMRFinder/latest/) | 2024-02-05 | 2024-02-05 | [Feldgarden et al. 2021](https://doi.org/10.1038/s41598-021-91456-0) | 1.3 |
 | [NFixDB](https://github.com/raw-lab/NFixDB) | 2024-01-22 | 2 | [Bellanger et al. 2024](https://doi.org/10.1101/2024.03.04.583350) | 1.3 |
 | [GVDB](https://faylward.github.io/GVDB/) | 2021 | 1 | [Aylward et al. 2021](https://doi.org/10.1371/journal.pbio.3001430)| 1.3 |
+| [MetHMMDB](https://github.com/kciuchcinski/MetHMMDB) | 2025 | 1 | [Ciuchcinski & Dziurzynski, 2024](https://www.biorxiv.org/content/10.1101/2024.12.26.629440v2)| 1.4 |
 | [Pads Arsenal](https://ngdc.cncb.ac.cn/padsarsenal/download.php) | 2019-09-09 | 1 | [Zhang et al. 2020](https://academic.oup.com/nar/article-lookup/doi/10.1093/nar/gkz916) | Coming soon |
 | [efam-XC](https://datacommons.cyverse.org/browse/iplant/home/shared/iVirus/Zayed_efam_2020.1) | 2021-05-21 | 1 | [Zayed et al. 2021](https://doi.org/10.1093/bioinformatics/btab451) | Coming soon |
 | [NMPFams](https://bib.fleming.gr/NMPFamsDB/downloads) | 2021 | 1 | [Baltoumas et al. 2024](https://doi.org/10.1093/nar/gkad800) | Coming soon |
