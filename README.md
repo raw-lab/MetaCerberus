@@ -32,7 +32,7 @@ MetaCerberus transforms raw sequencing (i.e. genomic, transcriptomics, metagenom
 1. Install mamba using conda
 
 ```bash
-conda install mamba
+conda install conda-forge::mamba
 ```
 
 - NOTE: Make sure you install mamba in your base conda environment unless you have OSX with ARM architecture (M1/M2 Macs). Follow the OSX-ARM instructions below if you have a Mac with ARM architecture.
